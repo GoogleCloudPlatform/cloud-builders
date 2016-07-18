@@ -38,3 +38,9 @@ If you use the `install` subcommand, the binaries will end up in `$GOPATH/bin`.
   define its workspace.
 - [Whole workspace](examples/whole_workspace) is the same as the "Hello, World!"
   example, except that it uses the `./src` method to define its workspace.
+
+## Building this builder
+
+To build this builder, run the following command in this directory.
+
+    $ gcloud alpha container builds create --config=cloudbuild.yaml
