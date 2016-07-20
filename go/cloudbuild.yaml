@@ -3,26 +3,34 @@
 
 steps:
 - name: gcr.io/cloud-builders/docker
-  args: ["build", "--tag=gcr.io/$PROJECT_ID/go", "."]
+  args: [build, --tag=gcr.io/$PROJECT_ID/go, .]
 
 # Test the examples.
 
 # examples/hello_world
 - name: gcr.io/$PROJECT_ID/go
-  args: ["install", "hello"]
-  env: PROJECT_ROOT=hello
+  args: [test, hello]
+  env: [PROJECT_ROOT=hello]
+  dir: examples/hello_world
+- name: gcr.io/$PROJECT_ID/go
+  args: [install, hello]
+  env: [PROJECT_ROOT=hello]
   dir: examples/hello_world
 - name: gcr.io/cloud-builders/docker
-  args: ["build", "."]
+  args: [build, .]
   dir: examples/hello_world
 
 # examples/whole_workspace
 - name: gcr.io/$PROJECT_ID/go
-  args: ["install", "hello"]
-  env: GOPATH=.
+  args: [test, hello]
+  env: [GOPATH=.]
+  dir: examples/whole_workspace
+- name: gcr.io/$PROJECT_ID/go
+  args: [install, hello]
+  env: [GOPATH=.]
   dir: examples/whole_workspace
 - name: gcr.io/cloud-builders/docker
-  args: ["build", "."]
+  args: [build, .]
   dir: examples/whole_workspace
 
-images: gcr.io/$PROJECT_ID/go
+images: [gcr.io/$PROJECT_ID/go]

@@ -63,7 +63,7 @@ You are seeing this message because none of the checks succeeded.
 		[[ "$f" == gopath ]] && continue
 		# Don't say anything if the link already was correct; there may have
 		# been a previous build step that already set up the workspace.
-		[[ $(readlink -f "$PWD/gopath/src/$PROJECT_ROOT/$f") == "$PWD/$f" ]] && continue
+		[[ "$(readlink -f "$PWD/gopath/src/$PROJECT_ROOT/$f")" == "$PWD/$f" ]] && continue
 		ln -s "$PWD/$f" "$PWD/gopath/src/$PROJECT_ROOT/$f" || return
 	done
 	export GOPATH=$PWD/gopath
