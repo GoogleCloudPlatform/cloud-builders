@@ -38,8 +38,8 @@ prepare_workspace() {
 	if [[ -z "$PROJECT_ROOT" ]]; then
 		# Nothing in the environment or directory structure gives a strong enough clue, let's inspect source.
 		PROJECT_ROOT="$(/builder/go_workspace)"
-		if [[ $? == 0 ]]; then
-			echo '\
+		if [[ $? != 0 ]]; then
+			echo '
 Unable to determine the Go workspace structure.
 
 To determine the workspace structure, this tool checks the following, in order:

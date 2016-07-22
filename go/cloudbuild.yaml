@@ -33,4 +33,15 @@ steps:
   args: ['build', '.']
   dir: 'examples/whole_workspace'
 
+# examples/import_workspace
+- name: 'gcr.io/$PROJECT_ID/go'
+  args: ['test', 'hello']
+  dir: 'examples/import_workspace'
+- name: 'gcr.io/$PROJECT_ID/go'
+  args: ['install', 'hello']
+  dir: 'examples/import_workspace'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '.']
+  dir: 'examples/import_workspace'
+
 images: ['gcr.io/$PROJECT_ID/go']
