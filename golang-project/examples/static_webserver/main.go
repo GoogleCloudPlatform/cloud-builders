@@ -23,7 +23,7 @@ var staticRoot = flag.String("content", ".", "static content root")
 
 func main() {
 	flag.Parse()
-	if err := http.ListenAndServe(":8080", http.FileServer(http.Dir(staticRoot))); err != nil {
+	if err := http.ListenAndServe(":8080", http.FileServer(http.Dir(*staticRoot))); err != nil {
 		log.Fatal(err)
 	}
 }

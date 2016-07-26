@@ -25,7 +25,6 @@ import (
 	"path/filepath"
 	"strings"
 	"text/template"
-	"time"
 )
 
 func usage() {
