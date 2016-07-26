@@ -1,0 +1,36 @@
+# In this directory, run the following command to build this builder.
+# $ gcloud alpha container builds create . --config=cloudbuild.yaml
+
+steps:
+- name: 'gcr.io/cloud-builders/go'
+  args: ['install', 'golang_project']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/golang-project', '.']
+
+# Test the examples.
+
+# examples/hello_world
+- name: 'gcr.io/$PROJECT_ID/golang-project'
+  args: ['hello', '--tag=hello_world']
+  dir: 'examples/hello_world'
+
+# examples/multi_bin
+- name: 'gcr.io/$PROJECT_ID/golang-project'
+  args:
+  - 'product/server'
+  - 'product/subtool'
+  - 'product/subtool/subpkg'
+  - '--entrypoint=server'
+  - '--tag=gcr.io/$PROJECT_ID/golang_project_multi_bin'
+  env: ['PROJECT_ROOT=product']
+  dir: 'examples/multi_bin'
+
+# examples/static_webserver
+- name: 'gcr.io/$PROJECT_ID/golang-project'
+  args: ['server', '--tag=server_intermediate']
+  dir: 'examples/static_webserver'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=server', '.']
+  dir: 'examples/static_webserver'
+
+images: ['gcr.io/$PROJECT_ID/golang-project']
