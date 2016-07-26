@@ -43,4 +43,4 @@ If you use the `install` subcommand, the binaries will end up in `$GOPATH/bin`.
 
 To build this builder, run the following command in this directory.
 
-    $ gcloud alpha container builds create --config=cloudbuild.yaml
+    $ gcloud alpha container builds create . --config=cloudbuild.yaml
