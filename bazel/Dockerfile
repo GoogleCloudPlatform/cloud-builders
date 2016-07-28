@@ -1,8 +1,9 @@
-# This ensures that docker is installed.
-FROM gcr.io/cloud-builders/docker
+FROM ubuntu:14.04
 
 RUN apt-get update && \
-    apt-get install -y python && \
+    apt-get install -y python curl && \
+
+    curl https://get.docker.com/builds/Linux/x86_64/docker-1.9.1 > /usr/bin/docker && chmod +x /usr/bin/docker && \
 
     # This makes add-apt-repository available.
     apt-get -y install software-properties-common && \
