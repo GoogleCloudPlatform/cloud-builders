@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/ash
 #
 # Copyright 2016 Google, Inc. All rights reserved.
 #
@@ -13,10 +13,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+tag="$1"
 
-TAG="$1"
-
-if [[ -z "$TAG" ]]; then
+if [[ -z "$tag" ]]; then
   echo "Error: output docker image tag name must be provided as the 1st positional parameter." 1>&2
   exit 1
 fi
@@ -27,4 +26,4 @@ fi
 set -x
 docker version
 cat "$DOCKERFILE"
-docker build --tag "$TAG" -f "$DOCKERFILE" "$PWD"
+docker build --tag "$tag" -f "$DOCKERFILE" "$PWD"
