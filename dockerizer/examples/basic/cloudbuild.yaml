@@ -1,0 +1,5 @@
+steps:
+- name: 'gcr.io/cloud-builders/dockerizer'
+  args: ['gcr.io/$PROJECT_ID/dockerizer_basic']
+
+images: ['gcr.io/$PROJECT_ID/dockerizer_basic']
