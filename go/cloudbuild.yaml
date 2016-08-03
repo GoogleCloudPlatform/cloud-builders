@@ -44,4 +44,17 @@ steps:
   args: ['build', '.']
   dir: 'examples/import_workspace'
 
+# examples/nested_workspace
+- name: 'gcr.io/$PROJECT_ID/go'
+  args: ['test', 'hello']
+  env: ['GOPATH=subproject']
+  dir: 'examples/nested_workspace'
+- name: 'gcr.io/$PROJECT_ID/go'
+  args: ['install', 'hello']
+  env: ['GOPATH=subproject']
+  dir: 'examples/nested_workspace'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '.']
+  dir: 'examples/nested_workspace'
+
 images: ['gcr.io/$PROJECT_ID/go']

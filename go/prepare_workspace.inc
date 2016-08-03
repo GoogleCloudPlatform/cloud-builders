@@ -57,6 +57,7 @@ You are seeing this message because none of the checks succeeded.
 		fi
 	fi
 
+	echo "Creating shadow workspace and symlinking source into \"./gopath/src/$PROJECT_ROOT\"."
 	mkdir -p "gopath/src/$PROJECT_ROOT" || return
 	for f in *; do
 		# Don't link ./gopath back in, it would make our DAG cyclic.
