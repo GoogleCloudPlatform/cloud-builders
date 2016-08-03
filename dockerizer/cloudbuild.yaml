@@ -1,19 +1,19 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/dockerizer', '.']
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/dockerizer:%(build_changelist)s', '.']
 
 # Can this step build itself?
-- name: 'gcr.io/$PROJECT_ID/dockerizer'
+- name: 'gcr.io/$PROJECT_ID/dockerizer:%(build_changelist)s'
   args: ['self-build']
 
 # Test the examples.
-- name: 'gcr.io/$PROJECT_ID/dockerizer'
+- name: 'gcr.io/$PROJECT_ID/dockerizer:%(build_changelist)s'
   args: ['basic']
   dir: 'examples/basic'
 
-- name: 'gcr.io/$PROJECT_ID/dockerizer'
+- name: 'gcr.io/$PROJECT_ID/dockerizer:%(build_changelist)s'
   args: ['alternate']
   env: ['DOCKERFILE=Dockerfile.alt']
   dir: 'examples/alternate'
 
-images: ['gcr.io/$PROJECT_ID/dockerizer']
+images: ['gcr.io/$PROJECT_ID/dockerizer:%(build_changelist)s']

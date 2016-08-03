@@ -3,16 +3,16 @@
 
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/go', '.']
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/go:%(build_changelist)s', '.']
 
 # Test the examples.
 
 # examples/hello_world
-- name: 'gcr.io/$PROJECT_ID/go'
+- name: 'gcr.io/$PROJECT_ID/go:%(build_changelist)s'
   args: ['test', 'hello']
   env: ['PROJECT_ROOT=hello']
   dir: 'examples/hello_world'
-- name: 'gcr.io/$PROJECT_ID/go'
+- name: 'gcr.io/$PROJECT_ID/go:%(build_changelist)s'
   args: ['install', 'hello']
   env: ['PROJECT_ROOT=hello']
   dir: 'examples/hello_world'
@@ -21,11 +21,11 @@ steps:
   dir: 'examples/hello_world'
 
 # examples/whole_workspace
-- name: 'gcr.io/$PROJECT_ID/go'
+- name: 'gcr.io/$PROJECT_ID/go:%(build_changelist)s'
   args: ['test', 'hello']
   env: ['GOPATH=.']
   dir: 'examples/whole_workspace'
-- name: 'gcr.io/$PROJECT_ID/go'
+- name: 'gcr.io/$PROJECT_ID/go:%(build_changelist)s'
   args: ['install', 'hello']
   env: ['GOPATH=.']
   dir: 'examples/whole_workspace'
@@ -34,10 +34,10 @@ steps:
   dir: 'examples/whole_workspace'
 
 # examples/import_workspace
-- name: 'gcr.io/$PROJECT_ID/go'
+- name: 'gcr.io/$PROJECT_ID/go:%(build_changelist)s'
   args: ['test', 'hello']
   dir: 'examples/import_workspace'
-- name: 'gcr.io/$PROJECT_ID/go'
+- name: 'gcr.io/$PROJECT_ID/go:%(build_changelist)s'
   args: ['install', 'hello']
   dir: 'examples/import_workspace'
 - name: 'gcr.io/cloud-builders/docker'
@@ -45,11 +45,11 @@ steps:
   dir: 'examples/import_workspace'
 
 # examples/nested_workspace
-- name: 'gcr.io/$PROJECT_ID/go'
+- name: 'gcr.io/$PROJECT_ID/go:%(build_changelist)s'
   args: ['test', 'hello']
   env: ['GOPATH=subproject']
   dir: 'examples/nested_workspace'
-- name: 'gcr.io/$PROJECT_ID/go'
+- name: 'gcr.io/$PROJECT_ID/go:%(build_changelist)s'
   args: ['install', 'hello']
   env: ['GOPATH=subproject']
   dir: 'examples/nested_workspace'
@@ -57,4 +57,4 @@ steps:
   args: ['build', '.']
   dir: 'examples/nested_workspace'
 
-images: ['gcr.io/$PROJECT_ID/go']
+images: ['gcr.io/$PROJECT_ID/go:%(build_changelist)s']
