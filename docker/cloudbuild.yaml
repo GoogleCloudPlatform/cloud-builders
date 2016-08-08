@@ -3,18 +3,18 @@
 
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/docker:%(build_changelist)s', '.']
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/docker', '.']
 
 # Do some fun things with this builder.
 
 # Like build itself.
-- name: 'gcr.io/$PROJECT_ID/docker:%(build_changelist)s'
+- name: 'gcr.io/$PROJECT_ID/docker'
   args: ['build', '--tag=gcr.io/$PROJECT_ID/docker', '.']
 # Get info about itself.
-- name: 'gcr.io/$PROJECT_ID/docker:%(build_changelist)s'
+- name: 'gcr.io/$PROJECT_ID/docker'
   args: ['inspect', 'gcr.io/$PROJECT_ID/docker']
 # Or run a random container.
-- name: 'gcr.io/$PROJECT_ID/docker:%(build_changelist)s'
+- name: 'gcr.io/$PROJECT_ID/docker'
   args: ['run', 'alpine', 'echo', 'Hello, world!']
 
-images: ['gcr.io/$PROJECT_ID/docker:%(build_changelist)s']
+images: ['gcr.io/$PROJECT_ID/docker']

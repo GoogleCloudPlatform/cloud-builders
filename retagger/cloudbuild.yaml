@@ -1,9 +1,9 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/retagger:%(build_changelist)s', '.']
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/retagger', '.']
 
 # Test the retagger by mirroring in alpine.
-- name: 'gcr.io/$PROJECT_ID/retagger:%(build_changelist)s'
+- name: 'gcr.io/$PROJECT_ID/retagger'
   args: ['alpine', 'gcr.io/$PROJECT_ID/alpine:retagger_example']
 
-images: ['gcr.io/$PROJECT_ID/retagger:%(build_changelist)s']
+images: ['gcr.io/$PROJECT_ID/retagger']
