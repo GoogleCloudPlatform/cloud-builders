@@ -1,6 +1,6 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/dockerizer', '.']
+  args: ['build', '--pull', '--tag=gcr.io/$PROJECT_ID/dockerizer', '.']
 
 # Can this step build itself?
 - name: 'gcr.io/$PROJECT_ID/dockerizer'

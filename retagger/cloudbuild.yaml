@@ -1,6 +1,6 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/retagger', '.']
+  args: ['build', '--pull', '--tag=gcr.io/$PROJECT_ID/retagger', '.']
 
 # Test the retagger by mirroring in alpine.
 - name: 'gcr.io/$PROJECT_ID/retagger'
