@@ -5,7 +5,7 @@ steps:
 - name: 'gcr.io/cloud-builders/go'
   args: ['install', 'golang_project']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/golang-project', '.']
+  args: ['build', '--pull', '--tag=gcr.io/$PROJECT_ID/golang-project', '.']
 
 # Test the examples.
 
