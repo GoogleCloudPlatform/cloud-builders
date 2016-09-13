@@ -33,4 +33,13 @@ steps:
   args: ['build', '--tag=server', '.']
   dir: 'examples/static_webserver'
 
+# examples/custom_base
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=alpine-cacerts', '-f', 'Dockerfile.cacerts', '.']
+  dir: 'examples/custom_base'
+- name: 'gcr.io/$PROJECT_ID/golang-project'
+  args: ['client', '--base-image=alpine-cacerts', '--tag=gcr.io/$PROJECT_ID/golang_project_custom_base']
+  dir: 'examples/custom_base'
+
+
 images: ['gcr.io/$PROJECT_ID/golang-project']

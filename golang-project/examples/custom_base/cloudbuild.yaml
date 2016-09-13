@@ -1,0 +1,8 @@
+steps:
+# First we create a base image with some stuff we need.
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=alpine-cacerts', '-f', 'Dockerfile.cacerts', '.']
+# Then we run the golang-project using the just-built base image.
+- name: 'gcr.io/cloud-builders/golang-project'
+  args: ['client', '--base-image=alpine-cacerts', '--tag=gcr.io/$PROJECT_ID/golang_project_custom_base']
+images: 'gcr.io/$PROJECT_ID/golang_project_custom_base'
