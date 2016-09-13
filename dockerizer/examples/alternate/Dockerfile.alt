@@ -1,5 +1,0 @@
-FROM alpine
-
-RUN echo 'echo "Hello, alternate world!"' > /entry.ash && chmod +x /entry.ash
-
-ENTRYPOINT ["ash", "/entry.ash"]
