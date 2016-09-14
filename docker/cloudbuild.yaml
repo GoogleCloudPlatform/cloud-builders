@@ -9,12 +9,12 @@ steps:
 
 # Like build itself.
 - name: 'gcr.io/$PROJECT_ID/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/docker', '.']
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/docker-again', '.']
 # Get info about itself.
 - name: 'gcr.io/$PROJECT_ID/docker'
   args: ['inspect', 'gcr.io/$PROJECT_ID/docker']
 # Or run a random container.
 - name: 'gcr.io/$PROJECT_ID/docker'
-  args: ['run', 'alpine', 'echo', 'Hello, world!']
+  args: ['run', 'busybox', 'echo', 'Hello, world!']
 
 images: ['gcr.io/$PROJECT_ID/docker']
