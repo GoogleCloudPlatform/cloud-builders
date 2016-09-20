@@ -1,0 +1,10 @@
+# In this directory, run the following command to build this builder.
+# $ gcloud alpha container builds create . --config=cloudbuild.yaml
+
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/gcloud', '.']
+- name: 'gcr.io/$PROJECT_ID/gcloud'
+  args: ['info']
+
+images: ['gcr.io/$PROJECT_ID/gcloud']
