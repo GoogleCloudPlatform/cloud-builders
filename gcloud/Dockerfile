@@ -1,5 +1,7 @@
 FROM python:2.7-alpine
 
+ENV PATH=$PATH:/builder/google-cloud-sdk/bin/
+
 RUN apk update && \
     apk add wget unzip ca-certificates git && \
     # Setup Google Cloud SDK (latest)

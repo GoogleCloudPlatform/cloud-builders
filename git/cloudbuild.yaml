@@ -21,4 +21,8 @@ steps:
   args: ['ash', '-c', 'echo "Version: $(cat VERSION)"']
   dir: 'examples/version-file/cloud-builders'
 
+# Clone a private repo belonging to the project.
+- name: 'gcr.io/$PROJECT_ID/git'
+  args: ['clone', 'https://source.developers.google.com/p/$PROJECT_ID/r/default']
+
 images: ['gcr.io/$PROJECT_ID/git']
