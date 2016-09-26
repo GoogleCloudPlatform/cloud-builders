@@ -7,4 +7,9 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/gsutil'
   args: ['version']
 
+# Invoke a command that requires auth, to check that it gets piped through
+# correctly.
+- name: 'gcr.io/$PROJECT_ID/gsutil'
+  args: ['ls']
+
 images: ['gcr.io/$PROJECT_ID/gsutil']
