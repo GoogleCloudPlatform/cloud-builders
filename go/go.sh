@@ -23,4 +23,4 @@ if [[ "$1" == install ]]; then
   echo "Binaries built using 'go install' will go to \"$binpath\"."
 fi
 echo "Running: go $@"
-go $@
+go "$@"
