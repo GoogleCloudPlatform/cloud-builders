@@ -15,3 +15,4 @@ images as:
     [Go](https://golang.org) projects into container images
 *   `gsutil`: runs the [gsutil](https://cloud.google.com/storage/docs/gsutil)
     tool
+*   `wget`: runs the [wget](https://www.gnu.org/software/wget/) tool
