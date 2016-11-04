@@ -5,6 +5,11 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--tag=gcr.io/$PROJECT_ID/go', '.']
 
+# Ensure that "go get" works
+- name: 'gcr.io/$PROJECT_ID/go'
+  args: ['get', 'golang.org/x/net/context']
+  env: ['GOPATH=/dev/null']
+
 # Test the examples.
 
 # examples/hello_world
