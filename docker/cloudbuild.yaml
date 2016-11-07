@@ -4,17 +4,31 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--tag=gcr.io/$PROJECT_ID/docker', '.']
+  id: 'main'
 
-# Do some fun things with this builder.
+# Here are some things that can be done with this builder.
 
-# Like build itself.
+# Do the same build, but give the image a different name. Note that
+# "docker-again" is absent from the "images" list below, so this image is built
+# but is not pushed to the repository.
+#
+# This build step has no 'waitFor', so it waits for all previous build steps to
+# complete.
 - name: 'gcr.io/$PROJECT_ID/docker'
   args: ['build', '--tag=gcr.io/$PROJECT_ID/docker-again', '.']
-# Get info about itself.
+
+# The following two build steps both 'waitFor' the 'main' build step to complete
+# before running. Once 'main' completes, these will launch concurrently.
+#
+# Get info about an image. This effectively runs the "docker image" command on
+# the image built by the first build step above.
 - name: 'gcr.io/$PROJECT_ID/docker'
   args: ['inspect', 'gcr.io/$PROJECT_ID/docker']
-# Or run a random container.
+  waitFor: 'main'
+# Execute a container. The "busybox" container is executed within the docker
+# build step to echo "Hello, world!"
 - name: 'gcr.io/$PROJECT_ID/docker'
   args: ['run', 'busybox', 'echo', 'Hello, world!']
+  waitFor: 'main'
 
 images: ['gcr.io/$PROJECT_ID/docker']
