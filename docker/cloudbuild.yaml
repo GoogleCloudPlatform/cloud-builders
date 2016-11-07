@@ -24,11 +24,11 @@ steps:
 # the image built by the first build step above.
 - name: 'gcr.io/$PROJECT_ID/docker'
   args: ['inspect', 'gcr.io/$PROJECT_ID/docker']
-  waitFor: 'main'
+  waitFor: ['main']
 # Execute a container. The "busybox" container is executed within the docker
 # build step to echo "Hello, world!"
 - name: 'gcr.io/$PROJECT_ID/docker'
   args: ['run', 'busybox', 'echo', 'Hello, world!']
-  waitFor: 'main'
+  waitFor: ['main']
 
 images: ['gcr.io/$PROJECT_ID/docker']
