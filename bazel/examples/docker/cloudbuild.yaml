@@ -1,0 +1,9 @@
+steps:
+# Run the docker_build rule to produce a container image.
+- name: 'gcr.io/cloud-builders/bazel'
+  args: ['run', '//subdir:target']
+# Re-tag the image to something in your project's gcr.io repository.
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['tag', 'bazel/subdir:target', 'gcr.io/$PROJECT_ID/bazel-example']
+# Push the image.
+images: ['gcr.io/$PROJECT_ID/bazel-example']
