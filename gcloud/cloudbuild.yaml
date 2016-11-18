@@ -7,9 +7,4 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/gcloud'
   args: ['info']
 
-# Invoke a command that requires auth, to check that it gets piped through
-# correctly.
-- name: 'gcr.io/$PROJECT_ID/gcloud'
-  args: ['source', 'repos', 'clone', 'default']
-
 images: ['gcr.io/$PROJECT_ID/gcloud']
