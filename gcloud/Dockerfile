@@ -17,12 +17,13 @@ RUN apk update && \
     /builder/google-cloud-sdk/bin/gcloud -q components update && \
 
     # TODO(jasonhall): These lines pin gcloud to a particular version.
-    # google-cloud-sdk/bin/gcloud components update --version 110.0.0 && \
-    # google-cloud-sdk/bin/gcloud config set component_manager/disable_update_check 1 && \
-    # google-cloud-sdk/bin/gcloud -q components update && \
+    # /builder/google-cloud-sdk/bin/gcloud components update --version 137.0.0 && \
+    # /builder/google-cloud-sdk/bin/gcloud config set component_manager/disable_update_check 1 && \
+    # /builder/google-cloud-sdk/bin/gcloud -q components update && \
 
     # Clean up
     apk del wget unzip && \
-    rm -rf /var/cache/apk/*
+    rm -rf /var/cache/apk/* \
+    rm -rf ~/.config/gcloud
 
 ENTRYPOINT ["/builder/google-cloud-sdk/bin/gcloud"]
