@@ -17,8 +17,8 @@ import (
 	"fmt"
 	"go/build"
 	"io"
+	"io/ioutil"
 	"log"
-	"math/rand"
 	"os"
 	"os/exec"
 	"path"
@@ -161,11 +161,12 @@ func main() {
 		log.Fatal("Could not infer entrypoint; either no targets were specified, or none of them were executable.")
 	}
 
-	fname := fmt.Sprintf("Dockerfile.%0000d", rand.Int63n(1e6))
-	f, err := os.Create(fname)
+	f, err := ioutil.TempFile(".", "Dockerfile.")
 	if err != nil {
-		log.Fatalf("Could not create %q: %v", fname, err)
+		log.Fatalf("Could not create Dockerfile: %v", err)
 	}
+	defer os.Remove(f.Name())
+
 	if err := dockerfileTemplate.Execute(f, struct {
 		BaseImage  string
 		Binaries   []string
@@ -175,23 +176,27 @@ func main() {
 		Binaries:   binPaths,
 		Entrypoint: entryPoint,
 	}); err != nil {
-		log.Fatalf("Could not write %q: %v", fname, err)
+		log.Fatalf("Could not write Dockerfile: %v", err)
 	}
+
+	// Rewind to the beginning of the file
+	if err := f.Sync(); err != nil {
+		log.Fatalf("Failed to write Dockerfile: %v", err)
+	}
+	if _, err := f.Seek(0, 0); err != nil {
+		log.Fatalf("Problem preparing Dockerfile for reading: %v", err)
+	}
+
+	fmt.Println("Dockerfile contents:")
+	io.Copy(os.Stdout, f)
 	if err := f.Close(); err != nil {
-		log.Fatalf("Could not close %q: %v", fname, err)
+		log.Fatalf("Failed to close Dockerfile: %v", err)
 	}
 
-	fin, err := os.Open(fname)
-	if err != nil {
-		log.Fatalf("Problem opening %q: %v\n", fname, err)
-	}
-	fmt.Printf("%q contents:\n", fname)
-	io.Copy(os.Stdout, fin)
-
-	fmt.Printf("Running: docker build --tag %q -f %q .\n", tag, fname)
-	cmd := exec.Command("docker", "build", "--tag", tag, "-f", fname, ".")
+	cmd := exec.Command("docker", "build", "--tag", tag, "-f", f.Name(), ".")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+	fmt.Printf("Running: %s %v\n", cmd.Path, cmd.Args)
 	if err := cmd.Run(); err != nil {
 		log.Fatalf("Problem building image: %v", err)
 	}
