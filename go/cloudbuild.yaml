@@ -62,4 +62,19 @@ steps:
   args: ['build', '.']
   dir: 'examples/nested_workspace'
 
+# examples/https_test
+- name: 'gcr.io/$PROJECT_ID/go'
+  args: ['install', 'https_test']
+  dir: 'examples/https_test'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-f', 'Dockerfile.alpine', '--tag=https_test:alpine', '.']
+  dir: 'examples/https_test'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['run', 'https_test:alpine']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-f', 'Dockerfile.ubuntu', '--tag=https_test:ubuntu', '.']
+  dir: 'examples/https_test'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['run', 'https_test:ubuntu']
+
 images: ['gcr.io/$PROJECT_ID/go']

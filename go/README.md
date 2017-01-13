@@ -20,6 +20,8 @@ To determine the workspace structure, this tool checks the following, in order:
 Once the workspace is set up, the `args` to the build step are passed through to
 the `go` tool.
 
+This tool builder sets `CGO_ENABLED=0`, so that all binaries are linked statically.
+
 ## Output files
 
 The binaries built by a `go install` step will be available to subsequent build

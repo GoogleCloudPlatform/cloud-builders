@@ -7,6 +7,9 @@ RUN apk add --update --no-cache git mercurial subversion
 # if the user of this build step does *not* set it, we want to
 # explore other options for workspace derivation.
 ENV GOPATH=
+# Only allow static linking, so that binaries created using
+# this alpine base can still be run outside alpine environments.
+ENV CGO_ENABLED=0
 
 RUN mkdir /builder
 

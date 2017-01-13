@@ -1,0 +1,15 @@
+steps:
+- name: 'gcr.io/cloud-builders/go'
+  args: ['install', 'https_test']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-f', 'Dockerfile.alpine', '--tag=gcr.io/$PROJECT_ID/https_test:alpine', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['run', 'gcr.io/$PROJECT_ID/https_test:alpine']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-f', 'Dockerfile.ubuntu', '--tag=gcr.io/$PROJECT_ID/https_test:ubuntu', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['run', 'gcr.io/$PROJECT_ID/https_test:ubuntu']
+
+images: ['gcr.io/$PROJECT_ID/https_test:alpine', 'gcr.io/$PROJECT_ID/https_test:ubuntu']
