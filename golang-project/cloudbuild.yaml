@@ -2,6 +2,9 @@
 # $ gcloud container builds submit . --config=cloudbuild.yaml
 
 steps:
+# Pull the latest go image.
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['pull', 'gcr.io/cloud-builders/go']
 - name: 'gcr.io/cloud-builders/go'
   args: ['install', 'golang_project']
 - name: 'gcr.io/cloud-builders/docker'
