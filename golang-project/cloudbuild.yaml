@@ -2,13 +2,25 @@
 # $ gcloud container builds submit . --config=cloudbuild.yaml
 
 steps:
-# Pull the latest go image.
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['pull', 'gcr.io/cloud-builders/go']
-- name: 'gcr.io/cloud-builders/go'
+# build the alpine version
+- name: 'gcr.io/cloud-builders/go:alpine'
   args: ['install', 'golang_project']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--pull', '--tag=gcr.io/$PROJECT_ID/golang-project', '.']
+  args: ['build', '-f', 'Dockerfile.alpine', '--tag=gcr.io/$PROJECT_ID/golang-project:alpine', '.']
+
+# clear out the alpine version of the binary
+- name: 'alpine'
+  args: ['rm', 'gopath/bin/golang_project']
+
+# build the wheezy version
+- name: 'gcr.io/cloud-builders/go:wheezy'
+  args: ['install', 'golang_project']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-f', 'Dockerfile.wheezy', '--tag=gcr.io/$PROJECT_ID/golang-project:wheezy', '.']
+
+# alpine is the default
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['tag', '-f', 'gcr.io/$PROJECT_ID/golang-project:alpine', 'gcr.io/$PROJECT_ID/golang-project']
 
 # Test the examples.
 
@@ -38,11 +50,25 @@ steps:
 
 # examples/custom_base
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=alpine-cacerts', '-f', 'Dockerfile.cacerts', '.']
+  args: ['build', '--tag=alpine-cacerts', '-f', 'Dockerfile.cacerts.alpine', '.']
   dir: 'examples/custom_base'
-- name: 'gcr.io/$PROJECT_ID/golang-project'
-  args: ['client', '--base-image=alpine-cacerts', '--tag=gcr.io/$PROJECT_ID/golang_project_custom_base']
+- name: 'gcr.io/$PROJECT_ID/golang-project:alpine'
+  args: ['client', '--base-image=alpine-cacerts', '--tag=gcr.io/$PROJECT_ID/golang_project_custom_base:alpine']
   dir: 'examples/custom_base'
+- name: 'gcr.io/$PROJECT_ID/golang_project_custom_base:alpine'
+- name: 'alpine'
+  args: ['rm', 'gopath/bin/client']
+  dir: 'examples/custom_base'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=ubuntu-cacerts', '-f', 'Dockerfile.cacerts.ubuntu', '.']
+  dir: 'examples/custom_base'
+- name: 'gcr.io/$PROJECT_ID/golang-project:wheezy'
+  args: ['client', '--base-image=ubuntu-cacerts', '--tag=gcr.io/$PROJECT_ID/golang_project_custom_base:ubuntu']
+  dir: 'examples/custom_base'
+- name: 'gcr.io/$PROJECT_ID/golang_project_custom_base:ubuntu'
 
 
-images: ['gcr.io/$PROJECT_ID/golang-project']
+images:
+  - 'gcr.io/$PROJECT_ID/golang-project'
+  - 'gcr.io/$PROJECT_ID/golang-project:alpine'
+  - 'gcr.io/$PROJECT_ID/golang-project:wheezy'

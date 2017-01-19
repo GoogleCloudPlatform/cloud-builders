@@ -1,8 +1,26 @@
 steps:
-# First we create a base image with some stuff we need.
+# Create an alpine base image with some stuff we need.
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=alpine-cacerts', '-f', 'Dockerfile.cacerts', '.']
+  args: ['build', '--tag=alpine-cacerts', '-f', 'Dockerfile.cacerts.alpine', '.']
 # Then we run the golang-project using the just-built base image.
-- name: 'gcr.io/cloud-builders/golang-project'
-  args: ['client', '--base-image=alpine-cacerts', '--tag=gcr.io/$PROJECT_ID/golang_project_custom_base']
-images: 'gcr.io/$PROJECT_ID/golang_project_custom_base'
+- name: 'gcr.io/cloud-builders/golang-project:alpine'
+  args: ['client', '--base-image=alpine-cacerts', '--tag=gcr.io/$PROJECT_ID/golang_project_custom_base:alpine']
+# See that it runs.
+- name: 'gcr.io/$PROJECT_ID/golang_project_custom_base:alpine'
+
+# Clean up the binary for this testing.
+- name: 'alpine'
+  args: ['rm', 'gopath/bin/client']
+
+# Create an ubuntu base image with some stuff we need.
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=ubuntu-cacerts', '-f', 'Dockerfile.cacerts.ubuntu', '.']
+# Then we run the golang-project using the just-built base image.
+- name: 'gcr.io/cloud-builders/golang-project:wheezy'
+  args: ['client', '--base-image=ubuntu-cacerts', '--tag=gcr.io/$PROJECT_ID/golang_project_custom_base:ubuntu']
+# See that it runs.
+- name: 'gcr.io/$PROJECT_ID/golang_project_custom_base:ubuntu'
+
+images:
+- 'gcr.io/$PROJECT_ID/golang_project_custom_base:alpine'
+- 'gcr.io/$PROJECT_ID/golang_project_custom_base:ubuntu'

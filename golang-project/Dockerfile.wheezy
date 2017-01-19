@@ -1,0 +1,11 @@
+FROM gcr.io/cloud-builders/go:wheezy
+
+# TODO: Upgrade docker in step with that used in the Container Builder service.
+RUN apt-get -qqy update && \
+    apt-get install -qqy curl && \
+    curl https://get.docker.com/builds/Linux/x86_64/docker-1.9.1 > /usr/bin/docker && chmod +x /usr/bin/docker
+
+COPY gopath/bin/golang_project /builder/golang_project
+COPY golang_project.bash /builder/golang_project.bash
+
+ENTRYPOINT ["/builder/golang_project.bash"]

@@ -1,4 +1,4 @@
-FROM gcr.io/cloud-builders/go
+FROM gcr.io/cloud-builders/go:alpine
 
 # TODO: Upgrade docker in step with that used in the Container Builder service.
 RUN apk update && \
@@ -9,6 +9,6 @@ RUN apk update && \
     rm -rf /var/cache/apk/*
 
 COPY gopath/bin/golang_project /builder/golang_project
-COPY golang_project.sh /builder/golang_project.sh
+COPY golang_project.ash /builder/golang_project.ash
 
-ENTRYPOINT ["/builder/golang_project.sh"]
+ENTRYPOINT ["/builder/golang_project.ash"]
