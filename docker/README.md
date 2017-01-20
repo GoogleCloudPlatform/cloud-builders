@@ -6,7 +6,7 @@ Arguments passed to this builder will be passed to `docker` directly, allowing
 callers to run [any Docker
 command](https://docs.docker.com/engine/reference/commandline/).
 
-The version of Docker that is used by this builder is `1.12.6`.
+The version of Docker that is used by this builder is `1.9.1`.
 
 ## Examples
 
