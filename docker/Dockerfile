@@ -1,10 +1,9 @@
 FROM alpine
 
-# TODO: Upgrade docker in step with that used in the Container Builder service.
-RUN apk update && \
-    apk add curl && \
-    curl https://get.docker.com/builds/Linux/x86_64/docker-1.9.1 > /usr/bin/docker && chmod +x /usr/bin/docker && \
-    apk del curl && \
-    rm -rf /var/cache/apk/*
+# Docker installation instructions from:
+# http://wiki.alpinelinux.org/wiki/Docker#Installation
+RUN echo "http://nl.alpinelinux.org/alpine/v3.5/main" >> /etc/apk/repositories && \
+    apk update && \
+    apk add docker=1.12.6-r0
 
 ENTRYPOINT ["/usr/bin/docker"]
