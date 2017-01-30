@@ -12,8 +12,8 @@ RUN apk update && \
     /builder/google-cloud-sdk/install.sh --usage-reporting=false \
         --bash-completion=false \
         --disable-installation-options && \
-    # Install alpha and beta components
-    /builder/google-cloud-sdk/bin/gcloud -q components install alpha beta && \
+    # Install alpha, beta, and kubectl components
+    /builder/google-cloud-sdk/bin/gcloud -q components install alpha beta kubectl && \
     /builder/google-cloud-sdk/bin/gcloud -q components update && \
 
     # TODO(jasonhall): These lines pin gcloud to a particular version.
