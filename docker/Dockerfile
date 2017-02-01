@@ -1,9 +1,19 @@
-FROM alpine
+FROM ubuntu:trusty
 
-# Docker installation instructions from:
-# http://wiki.alpinelinux.org/wiki/Docker#Installation
-RUN echo "http://nl.alpinelinux.org/alpine/v3.5/main" >> /etc/apk/repositories && \
-    apk update && \
-    apk add docker=1.12.6-r0
+# Based on instructions from:
+# https://docs.docker.com/engine/installation/linux/ubuntu/
+RUN \
+   apt-get -y update && \
+   apt-get -y install apt-transport-https ca-certificates curl \
+       # These are necessary for add-apt-respository
+       software-properties-common python-software-properties && \
+   curl -fsSL https://yum.dockerproject.org/gpg | sudo apt-key add - && \
+   apt-key fingerprint 58118E89F3A912897C070ADBF76221572C52609D && \
+   add-apt-repository \
+       "deb https://apt.dockerproject.org/repo/ \
+       ubuntu-$(lsb_release -cs) \
+       main" && \
+   apt-get -y update && \
+   apt-get -y install docker-engine=1.12.6-0~ubuntu-trusty
 
 ENTRYPOINT ["/usr/bin/docker"]
