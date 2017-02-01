@@ -9,4 +9,6 @@ RUN echo "http://nl.alpinelinux.org/alpine/v3.5/community" >> /etc/apk/repositor
 COPY gopath/bin/golang_project /builder/golang_project
 COPY golang_project.ash /builder/golang_project.ash
 
+ENV DEFAULT_BASE_IMAGE=alpine
+
 ENTRYPOINT ["/builder/golang_project.ash"]

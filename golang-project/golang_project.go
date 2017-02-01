@@ -54,7 +54,7 @@ func main() {
 
 	cwd, _ := os.Getwd()
 
-	baseImage := "alpine"
+	baseImage := os.Getenv("DEFAULT_BASE_IMAGE")
 	entryPoint := ""
 	skipTests := false
 	tag := ""
@@ -155,6 +155,10 @@ func main() {
 		if err := cmd.Run(); err != nil {
 			log.Fatal()
 		}
+	}
+
+	if baseImage == "" {
+		log.Fatal("No base image set, either by flag or environment.")
 	}
 
 	if entryPoint == "" {

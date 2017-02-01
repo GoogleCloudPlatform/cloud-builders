@@ -39,4 +39,6 @@ RUN apt-get -qqy update && \
 COPY gopath/bin/golang_project /builder/golang_project
 COPY golang_project.bash /builder/golang_project.bash
 
+ENV DEFAULT_BASE_IMAGE=debian:wheezy
+
 ENTRYPOINT ["/builder/golang_project.bash"]

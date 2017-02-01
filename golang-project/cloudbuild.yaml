@@ -20,7 +20,7 @@ steps:
 
 # alpine is the default
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['tag', '-f', 'gcr.io/$PROJECT_ID/golang-project:alpine', 'gcr.io/$PROJECT_ID/golang-project']
+  args: ['tag', 'gcr.io/$PROJECT_ID/golang-project:alpine', 'gcr.io/$PROJECT_ID/golang-project']
 
 # Test the examples.
 
@@ -37,6 +37,16 @@ steps:
   - 'product/subtool/subpkg'
   - '--entrypoint=server'
   - '--tag=gcr.io/$PROJECT_ID/golang_project_multi_bin'
+  env: ['PROJECT_ROOT=product']
+  dir: 'examples/multi_bin'
+
+- name: 'gcr.io/$PROJECT_ID/golang-project:wheezy'
+  args:
+  - 'product/server'
+  - 'product/subtool'
+  - 'product/subtool/subpkg'
+  - '--entrypoint=server'
+  - '--tag=gcr.io/$PROJECT_ID/golang_project_multi_bin:wheezy'
   env: ['PROJECT_ROOT=product']
   dir: 'examples/multi_bin'
 
