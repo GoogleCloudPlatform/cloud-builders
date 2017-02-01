@@ -6,7 +6,7 @@ Arguments passed to this builder will be passed to `docker` directly, allowing
 callers to run [any Docker
 command](https://docs.docker.com/engine/reference/commandline/).
 
-The version of Docker that is used by this builder is `1.12.6`.
+By default, the version of Docker that is used by this builder is `1.12.6`.
 
 ## Examples
 
@@ -48,3 +48,12 @@ steps:
 - name: gcr.io/cloud-builders/docker
   args: ['run', 'gcr.io/$PROJECT_ID/myimage']
 ```
+
+## Older Versions
+
+Since Docker CLI changes may not be backward-compatible, we provide tagged
+versions of this builder for all previously-supported versions:
+
+* `gcr.io/cloud-builders/docker:1.9.1`
+* `gcr.io/cloud-builders/docker:1.12.6` (`:latest`)
+
