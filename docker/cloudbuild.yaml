@@ -9,11 +9,11 @@ steps:
   args: ['build', '--tag=gcr.io/$PROJECT_ID/docker:1.12.6', '-f=Dockerfile-1.12.6', '.']
 # Future supported versions of docker builder go here.
 
-# Test each version by using it to run "docker build"
+# Test each version by using it to run "docker build" on itself.
 - name: 'gcr.io/$PROJECT_ID/docker:1.9.1'
-  args: ['build', '.']
+  args: ['build', '-f=Dockerfile-1.9.1', '.']
 - name: 'gcr.io/$PROJECT_ID/docker:1.12.6'
-  args: ['build', '.']
+  args: ['build', '-f=Dockerfile-1.12.6', '.']
 # Tests for future supported versions of docker builder go here.
 
 # Tag the latest version as :latest.
@@ -26,7 +26,7 @@ steps:
 # "docker-again" is absent from the "images" list below, so this image is built
 # but is not pushed to the repository.
 - name: 'gcr.io/$PROJECT_ID/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/docker-again', '.']
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/docker-again', '-f=Dockerfile-1.9.1', '.']
 
 # Get info about an image. This effectively runs the "docker inspect" command on
 # the image built above.
