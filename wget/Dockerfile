@@ -1,6 +1,6 @@
-FROM alpine
+FROM ubuntu:trusty
 
-RUN apk update && \
-  apk add wget ca-certificates
+RUN apt-get update && \
+  apt-get -y install wget ca-certificates
 
 ENTRYPOINT ["wget"]

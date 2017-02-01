@@ -1,15 +1,19 @@
-FROM python:2.7-alpine
+FROM ubuntu:trusty
 
-ENV PATH=$PATH:/builder/google-cloud-sdk/bin/
-
-RUN apk update && \
-    apk add wget unzip ca-certificates git && \
+RUN apt-get -y update && \
+    apt-get -y install python2.7 wget unzip ca-certificates \
+       # These are necessary for add-apt-respository
+       software-properties-common python-software-properties && \
+    # Install Git >2.0.1
+    add-apt-repository ppa:git-core/ppa && \
+    apt-get -y update && \
+    apt-get -y install git && \
     # Setup Google Cloud SDK (latest)
     wget -nv https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.zip && \
     mkdir -p /builder && \
     unzip -qq google-cloud-sdk.zip -d /builder && \
     rm google-cloud-sdk.zip && \
-    /builder/google-cloud-sdk/install.sh --usage-reporting=false \
+    CLOUDSDK_PYTHON="python2.7" /builder/google-cloud-sdk/install.sh --usage-reporting=false \
         --bash-completion=false \
         --disable-installation-options && \
     # Install alpha and beta components
@@ -22,8 +26,8 @@ RUN apk update && \
     # /builder/google-cloud-sdk/bin/gcloud -q components update && \
 
     # Clean up
-    apk del wget unzip && \
-    rm -rf /var/cache/apk/* \
     rm -rf ~/.config/gcloud
+
+ENV PATH=$PATH:/builder/google-cloud-sdk/bin/
 
 ENTRYPOINT ["/builder/google-cloud-sdk/bin/gcloud"]
