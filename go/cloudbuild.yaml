@@ -10,7 +10,7 @@ steps:
 
 # The alpine version is our default.
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['tag', '-f', 'gcr.io/$PROJECT_ID/go:alpine', 'gcr.io/$PROJECT_ID/go']
+  args: ['tag', 'gcr.io/$PROJECT_ID/go:alpine', 'gcr.io/$PROJECT_ID/go']
 
 # Ensure that "go get" works
 - name: 'gcr.io/$PROJECT_ID/go'
