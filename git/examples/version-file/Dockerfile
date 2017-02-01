@@ -1,7 +1,7 @@
 FROM gcr.io/cloud-builders/git
 
-ADD write_version.ash /write_version.ash
+ADD write_version.bash /write_version.bash
 
-RUN chmod +x /write_version.ash
+RUN chmod +x /write_version.bash
 
-ENTRYPOINT ["/write_version.ash"]
+ENTRYPOINT ["/write_version.bash"]
