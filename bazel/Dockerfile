@@ -3,7 +3,7 @@ FROM ubuntu:14.04
 RUN \
     # This makes add-apt-repository available.
     apt-get update && \
-    apt-get -y install software-properties-common && \
+    apt-get -y install python software-properties-common && \
 
     # Install Docker 1.12.6 (https://docs.docker.com/engine/installation/linux/ubuntu/)
     apt-get -y install curl \
