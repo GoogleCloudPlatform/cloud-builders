@@ -11,6 +11,6 @@ gcloud container builds submit --tag=gcr.io/my-project/sample-image .
 Once your build is successful, you can run the app like this:
 
 ```
-gcloud docker run -- --rm gcr.io/my-project/sample-image
+gcloud docker -- run --rm gcr.io/my-project/sample-image
 Hello, world! The time is Wed Oct 19 17:02:44 UTC 2016.
 ```
