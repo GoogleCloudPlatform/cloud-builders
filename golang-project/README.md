@@ -2,6 +2,13 @@
 
 This Container Builder build step builds canonical Go projects.
 
+### When to use this builder
+
+The `gcr.io/cloud-builders/golang-project` build step should be used when you
+have a "typical" Go source tree and want a single step to turn it into a
+container image. This step relies on conventions described in the "Workspace
+setup" section and shown in the [examples](examples).
+
 The process is:
 
 1.  Test and build all the targets indicated by the step's `args` using `go
@@ -10,6 +17,20 @@ The process is:
     `--entrypoint` provided.
 1.  Build the container image using the new `Dockerfile` and the `--tag`
     provided.
+
+To customize the image created, either use a `--base-image` with those
+customizations, or use the [`gcr.io/cloud-builders/docker`](../docker/README.md)
+build step with a `Dockerfile` that is built `FROM` the image produced by
+the `gcr.io/cloud-builders/golang-project` build step.
+
+### Related: `gcr.io/cloud-builders/go`
+
+The related build step, [`gcr.io/cloud-builders/go`](../go/README.md), is used
+to run the `go` directly on source. The [`gcr.io/cloud-builders/go`]
+(../go/README.md) build step and this `gcr.io/cloud-builders/golang-project`
+recognize Go workspaces in the same way, described in the
+[`gcr.io/cloud-builders/go`](../go/README.md) build step's [README]
+(../go/README.md)
 
 ## Workspace setup
 

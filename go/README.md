@@ -2,6 +2,18 @@
 
 This Container Builder build step runs the `go` tool.
 
+### When to use this builder
+
+The `gcr.io/cloud-builders/go` build step should be used when you want to run
+the `go` tool directly on your source, similar to how a developer uses the `go`
+tool locally to build (`go build` or `go install`), test (`go test`), or manage
+source (`go get` or `go generate`).
+
+### Related: [`gcr.io/cloud-builders/golang-project`](../golang-project/README.md)
+
+The related build step, `gcr.io/cloud-builders/golang-project`, starts with a
+typical Go source tree and ends with a build container image.
+
 ## Workspace setup
 
 Before the `go` tool is used, the build step first sets up a workspace.
