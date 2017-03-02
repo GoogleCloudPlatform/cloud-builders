@@ -16,4 +16,4 @@
 . /builder/prepare_workspace.inc
 prepare_workspace || exit
 echo "Documentation at https://github.com/GoogleCloudPlatform/cloud-builders/blob/master/golang-project/README.md"
-/builder/golang_project $@
+/builder/golang_project "$@"
