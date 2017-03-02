@@ -25,7 +25,7 @@ steps:
   env: ['PROJECT_ROOT=hello']
   dir: 'examples/hello_world'
 - name: 'gcr.io/$PROJECT_ID/go'
-  args: ['install', 'hello']
+  args: ['install', '.']
   env: ['PROJECT_ROOT=hello']
   dir: 'examples/hello_world'
 - name: 'gcr.io/cloud-builders/docker'

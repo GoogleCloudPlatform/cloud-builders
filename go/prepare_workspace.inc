@@ -13,33 +13,33 @@
 # limitations under the License.
 
 prepare_workspace() {
-	# If $GOPATH is set, do nothing. The user has already set up the workspace.
-	if [[ "$GOPATH" ]]; then
-		# We allow relative paths here, because of how the Container Builder
-		# service works. But, the Go tool does not. To accomodate the Go tool,
-		# we prepend the CWD to $GOPATH if $GOPATH is not absolute.
-		if [[ "$GOPATH" != "/*" ]]; then
-			export GOPATH="$PWD/$GOPATH"
-		fi
-		return 0
-	fi
+    # If $GOPATH is set, do nothing. The user has already set up the workspace.
+    if [[ "$GOPATH" ]]; then
+        # We allow relative paths here, because of how the Container Builder
+        # service works. But, the Go tool does not. To accomodate the Go tool,
+        # we prepend the CWD to $GOPATH if $GOPATH is not absolute.
+        if [[ "$GOPATH" != "/*" ]]; then
+            export GOPATH="$PWD/$GOPATH"
+        fi
+        return 0
+    fi
 
 
-	# If there is a src directory, accept that as a GOPATH indicator.
-	if [[ -d src ]]; then
-		export GOPATH="$PWD"
-		return 0
-	fi
+    # If there is a src directory, accept that as a GOPATH indicator.
+    if [[ -d src ]]; then
+        export GOPATH="$PWD"
+        return 0
+    fi
 
-	# Otherwise, we need to set up $GOPATH and map the source in somehow.
+    # Otherwise, we need to set up $GOPATH and map the source in somehow.
 
 
-	# If $PROJECT_ROOT is set, map the current directory into $GOPATH/src/$PROJECT_ROOT.
-	if [[ -z "$PROJECT_ROOT" ]]; then
-		# Nothing in the environment or directory structure gives a strong enough clue, let's inspect source.
-		PROJECT_ROOT="$(/builder/go_workspace)"
-		if [[ $? != 0 ]]; then
-			echo '
+    # If $PROJECT_ROOT is set, map the current directory into $GOPATH/src/$PROJECT_ROOT.
+    if [[ -z "$PROJECT_ROOT" ]]; then
+        # Nothing in the environment or directory structure gives a strong enough clue, let's inspect source.
+        PROJECT_ROOT="$(/builder/go_workspace)"
+        if [[ $? != 0 ]]; then
+            echo '
 Unable to determine the Go workspace structure.
 
 To determine the workspace structure, this tool checks the following, in order:
@@ -53,19 +53,25 @@ To determine the workspace structure, this tool checks the following, in order:
 
 You are seeing this message because none of the checks succeeded.
 '
-			return 1
-		fi
-	fi
+            return 1
+        fi
+    fi
 
-	echo "Creating shadow workspace and symlinking source into \"./gopath/src/$PROJECT_ROOT\"."
-	mkdir -p "gopath/src/$PROJECT_ROOT" || return
-	for f in *; do
-		# Don't link ./gopath back in, it would make our DAG cyclic.
-		[[ "$f" == gopath ]] && continue
-		# Don't say anything if the link already was correct; there may have
-		# been a previous build step that already set up the workspace.
-		[[ "$(readlink -f "$PWD/gopath/src/$PROJECT_ROOT/$f")" == "$PWD/$f" ]] && continue
-		ln -s "$PWD/$f" "$PWD/gopath/src/$PROJECT_ROOT/$f" || return
-	done
-	export GOPATH=$PWD/gopath
+    shadow_workspace="./gopath/src/$PROJECT_ROOT"
+    link_dir="$(dirname "$shadow_workspace")"
+
+    echo "Creating shadow workspace and symlinking source into \"$shadow_workspace\"."
+
+    mkdir -p "$link_dir" || return
+    ln -s $PWD "$shadow_workspace" || return
+
+    export GOPATH="$PWD/gopath"
+
+    # The tools that use this workspace preparation should be run from inside
+    # the shadow workspace. If they are run from their original locations,
+    # relative targets (eg. ".") will not work properly. Any files read or
+    # written from inside the shadow workspace will have the same affect as if
+    # they were read or written from the original directory, except that the new
+    # working directory will be properly couched in GOPATH.
+    cd "$shadow_workspace"
 }
