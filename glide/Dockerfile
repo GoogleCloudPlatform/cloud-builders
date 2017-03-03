@@ -1,4 +1,4 @@
-FROM gcr.io/test-argo/go:wheezy
+FROM gcr.io/cloud-builders/go:wheezy
 
 RUN GOPATH=/go && curl https://glide.sh/get | sh
 
