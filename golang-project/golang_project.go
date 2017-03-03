@@ -52,7 +52,10 @@ var dockerfileTemplate = template.Must(template.New("dockerfile").Parse(dockerfi
 func main() {
 	log := log.New(os.Stderr, "", 0)
 
-	cwd, _ := os.Getwd()
+	workspaceDir := os.Getenv("WORKSPACE")
+	if workspaceDir == "" {
+		log.Fatal("WORKSPACE must be set")
+	}
 
 	baseImage := os.Getenv("DEFAULT_BASE_IMAGE")
 	entryPoint := ""
@@ -142,7 +145,7 @@ func main() {
 			continue
 		}
 		binPath := filepath.Join(pkg.BinDir, path.Base(pkg.ImportPath))
-		if relBinPath, err := filepath.Rel(cwd, binPath); err == nil && !strings.HasPrefix(relBinPath, "..") {
+		if relBinPath, err := filepath.Rel(workspaceDir, binPath); err == nil && !strings.HasPrefix(relBinPath, "..") {
 			binPaths = append(binPaths, relBinPath)
 		} else {
 			log.Fatalf("For target %q: binary %q is built outside of the current directory.", target, relBinPath)
@@ -165,7 +168,7 @@ func main() {
 		log.Fatal("Could not infer entrypoint; either no targets were specified, or none of them were executable.")
 	}
 
-	f, err := ioutil.TempFile(".", "Dockerfile.")
+	f, err := ioutil.TempFile(workspaceDir, "Dockerfile.")
 	if err != nil {
 		log.Fatalf("Could not create Dockerfile: %v", err)
 	}
@@ -200,6 +203,7 @@ func main() {
 	cmd := exec.Command("docker", "build", "--tag", tag, "-f", f.Name(), ".")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+	cmd.Dir = workspaceDir
 	fmt.Printf("Running: %s %v\n", cmd.Path, cmd.Args)
 	if err := cmd.Run(); err != nil {
 		log.Fatalf("Problem building image: %v", err)

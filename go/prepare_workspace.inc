@@ -67,6 +67,8 @@ You are seeing this message because none of the checks succeeded.
 
     export GOPATH="$PWD/gopath"
 
+    export WORKSPACE="$PWD"
+
     # The tools that use this workspace preparation should be run from inside
     # the shadow workspace. If they are run from their original locations,
     # relative targets (eg. ".") will not work properly. Any files read or
