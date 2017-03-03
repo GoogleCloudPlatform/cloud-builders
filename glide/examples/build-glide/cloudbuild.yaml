@@ -7,7 +7,7 @@ steps:
   env: ['PROJECT_ROOT=github.com/Masterminds/glide']
   args: ['install']
 
-- name: 'gcr.io/cloud-builders/go'
+- name: 'gcr.io/cloud-builders/go:wheezy'
   dir: 'glide'
   env: ['PROJECT_ROOT=github.com/Masterminds/glide']
   args: ['install', '.']
