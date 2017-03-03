@@ -10,6 +10,7 @@ images as:
 *   `docker`: runs the [docker](https://docker.com) tool
 *   `gcloud`: runs the [gcloud](https://cloud.google.com/sdk/gcloud/) tool
 *   `git`: runs the [git](https://git-scm.com/) tool
+*   `glide`: runs the [glide](https://glide.sh/) tool
 *   `go`: runs the [go](https://golang.org/cmd/go) tool
 *   `golang-project`: recognizes and builds conventional
     [Go](https://golang.org) projects into container images

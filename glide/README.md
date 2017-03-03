@@ -1,7 +1,7 @@
 # Tool builder: `gcr.io/cloud-builders/glide`
 
 This Container Builder build step runs the [`glide`](https://glide.sh) tool.
-[`glide`](https://glide.sh) is used to manage source dependencies.
+[`glide`](https://glide.sh) is used to manage Go source dependencies.
 
 ### When to use this builder
 
