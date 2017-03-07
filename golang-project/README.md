@@ -23,6 +23,21 @@ customizations, or use the [`gcr.io/cloud-builders/docker`](../docker/README.md)
 build step with a `Dockerfile` that is built `FROM` the image produced by
 the `gcr.io/cloud-builders/golang-project` build step.
 
+### `alpine` vs `wheezy`
+
+There are two versions of this builder, one for `alpine` and one for `wheezy`.
+The difference is significant since, by default, Go dynamically links libc.
+Binaries built in an `alpine` environment don't always work in a `wheezy`-like
+(including `ubuntu`, etc) environment, or vice versa.
+
+The specific versions are available as
+
+  - gcr.io/cloud-builders/golang-project:alpine
+  - gcr.io/cloud-builders/golang-project:wheezy
+
+And `gcr.io/cloud-builders/golang-project:latest` is an alias for
+`gcr.io/cloud-builders/golang-project:alpine`.
+
 ### Related: `gcr.io/cloud-builders/go`
 
 The related build step, [`gcr.io/cloud-builders/go`](../go/README.md), is used

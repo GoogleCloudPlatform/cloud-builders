@@ -9,6 +9,21 @@ the `go` tool directly on your source, similar to how a developer uses the `go`
 tool locally to build (`go build` or `go install`), test (`go test`), or manage
 source (`go get` or `go generate`).
 
+### `alpine` vs `wheezy`
+
+There are two versions of this builder, one for `alpine` and one for `wheezy`.
+The difference is significant since, by default, Go dynamically links libc.
+Binaries built in an `alpine` environment don't always work in a `wheezy`-like
+(including `ubuntu`, etc) environment, or vice versa.
+
+The specific versions are available as
+
+  - gcr.io/cloud-builders/go:alpine
+  - gcr.io/cloud-builders/go:wheezy
+
+And `gcr.io/cloud-builders/go:latest` is an alias for
+`gcr.io/cloud-builders/go:alpine`.
+
 ### Related: [`gcr.io/cloud-builders/golang-project`](../golang-project/README.md)
 
 The related build step, `gcr.io/cloud-builders/golang-project`, starts with a
