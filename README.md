@@ -18,3 +18,6 @@ images as:
     tool
 *   `npm`: runs the [npm](https://docs.npmjs.com/) tool
 *   `wget`: runs the [wget](https://www.gnu.org/software/wget/) tool
+
+File issues here or e-mail `gcr-contact@google.com` if you have questions about
+the usage of these build steps or the Cloud Container Builder API in general.
