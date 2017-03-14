@@ -15,7 +15,7 @@ steps:
 # Ensure that "go get" works
 - name: 'gcr.io/$PROJECT_ID/go'
   args: ['get', 'golang.org/x/net/context']
-  env: ['GOPATH=/dev/null']
+  env: ['GOPATH=/tmp']
 
 # Test the examples.
 
@@ -40,6 +40,19 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/go'
   args: ['install', 'hello']
   env: ['GOPATH=.']
+  dir: 'examples/whole_workspace'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '.']
+  dir: 'examples/whole_workspace'
+
+# examples/whole_workspace with an absolute path
+- name: 'gcr.io/$PROJECT_ID/go'
+  args: ['test', 'hello']
+  env: ['GOPATH=/workspace/examples/whole_workspace']
+  dir: 'examples/whole_workspace'
+- name: 'gcr.io/$PROJECT_ID/go'
+  args: ['install', 'hello']
+  env: ['GOPATH=/workspace/examples/whole_workspace']
   dir: 'examples/whole_workspace'
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '.']
