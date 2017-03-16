@@ -2,9 +2,17 @@
 # $ gcloud container builds submit . --config=cloudbuild.yaml
 
 steps:
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/bazel', '.']
+        #- name: 'gcr.io/cloud-builders/docker'
+  #  args: ['build', '--tag=gcr.io/$PROJECT_ID/bazel', '.']
+  #- name: 'gcr.io/$PROJECT_ID/bazel'
+  #  args: ['version']
+
+# Build the example.
 - name: 'gcr.io/$PROJECT_ID/bazel'
-  args: ['version']
+  args: ['run', '//subdir:target', '--verbose_failures']
+  dir: 'examples'
+# Example was built as bazel/subdir:target.
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['run', 'bazel/subdir:target']
 
 images: ['gcr.io/$PROJECT_ID/bazel']
