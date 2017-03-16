@@ -8,6 +8,13 @@ command](https://docs.docker.com/engine/reference/commandline/).
 
 By default, the version of Docker that is used by this builder is `1.12.6`.
 
+## GCR Credentials
+
+The Docker build step is automatically set up with credentials for your
+[Container Builder Service
+Account](https://cloud.google.com/container-builder/docs/permissions). These
+permissions are sufficient to interact directly with GCR.
+
 ## Examples
 
 The following examples demonstrate build requests that use this builder:
@@ -54,6 +61,5 @@ steps:
 Since Docker CLI changes may not be backward-compatible, we provide tagged
 versions of this builder for all previously-supported versions:
 
-* `gcr.io/cloud-builders/docker:1.9.1`
-* `gcr.io/cloud-builders/docker:1.12.6` (`:latest`)
-
+*   `gcr.io/cloud-builders/docker:1.9.1`
+*   `gcr.io/cloud-builders/docker:1.12.6` (`:latest`)
