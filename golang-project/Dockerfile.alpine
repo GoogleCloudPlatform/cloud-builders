@@ -6,9 +6,10 @@ RUN echo "http://nl.alpinelinux.org/alpine/v3.5/community" >> /etc/apk/repositor
     apk update && \
     apk add docker=1.12.6-r0
 
-COPY gopath/bin/golang_project /builder/golang_project
-COPY golang_project.ash /builder/golang_project.ash
+COPY gopath/bin/golang_project /builder/
+COPY golang_project.ash /builder/bin/
+ENV PATH=/builder/bin:$PATH
 
 ENV DEFAULT_BASE_IMAGE=alpine
 
-ENTRYPOINT ["/builder/golang_project.ash"]
+ENTRYPOINT ["golang_project.ash"]
