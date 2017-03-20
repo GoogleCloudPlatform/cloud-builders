@@ -1,0 +1,10 @@
+{
+  "name": "Gulpjs build",
+  "version": "1.0.0",
+  "description": "Gulpjs build test",
+  "main": "gulpfile.js",
+  "license": "Apache License 2.0",
+  "dependencies": {
+    "gulp": "^3.9.1"
+  }
+}
