@@ -35,6 +35,6 @@ RUN apt-get -y update && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf ~/.config/gcloud
 
-ENV PATH=$PATH:/builder/google-cloud-sdk/bin/
+ENV PATH=/builder/google-cloud-sdk/bin/:$PATH
 
-ENTRYPOINT ["/builder/google-cloud-sdk/bin/gcloud"]
+ENTRYPOINT ["gcloud"]

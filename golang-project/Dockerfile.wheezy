@@ -37,8 +37,9 @@ RUN apt-get -qqy update && \
 #    docker run hello-world
 
 COPY gopath/bin/golang_project /builder/golang_project
-COPY golang_project.bash /builder/golang_project.bash
+COPY golang_project.bash /builder/bin/
+ENV PATH=/builder/bin:$PATH
 
 ENV DEFAULT_BASE_IMAGE=debian:wheezy
 
-ENTRYPOINT ["/builder/golang_project.bash"]
+ENTRYPOINT ["golang_project.bash"]

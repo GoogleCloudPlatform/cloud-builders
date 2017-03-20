@@ -2,6 +2,7 @@ FROM gcr.io/cloud-builders/go:wheezy
 
 RUN GOPATH=/go && curl https://glide.sh/get | sh
 
-COPY glide.bash /bin/glide.bash
+COPY glide.bash /builder/bin/
+ENV PATH=/builder/bin:$PATH
 
-ENTRYPOINT ["/bin/glide.bash"]
+ENTRYPOINT ["glide.bash"]

@@ -10,8 +10,11 @@ ENV GOPATH=
 
 RUN mkdir /builder
 
-COPY go_workspace.go prepare_workspace.inc go.ash /builder/
+COPY go_workspace.go prepare_workspace.inc /builder/
+
+COPY go.ash /builder/bin/
+ENV PATH=/builder/bin:$PATH
 
 RUN go build -o /builder/go_workspace /builder/go_workspace.go
 
-ENTRYPOINT ["/builder/go.ash"]
+ENTRYPOINT ["go.ash"]
