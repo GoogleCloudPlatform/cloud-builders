@@ -13,6 +13,10 @@
 # limitations under the License.
 
 prepare_workspace() {
+    # We record the original working directory because some tools need to
+    # remember, and sometimes this function changes directory.
+    export WORKSPACE="$PWD"
+
     # If $GOPATH is set, do nothing. The user has already set up the workspace.
     if [[ "$GOPATH" ]]; then
         # We allow relative paths here because of how the Container Builder
@@ -67,8 +71,6 @@ You are seeing this message because none of the checks succeeded.
     ln -s $PWD "$shadow_workspace" || return
 
     export GOPATH="$PWD/gopath"
-
-    export WORKSPACE="$PWD"
 
     # The tools that use this workspace preparation should be run from inside
     # the shadow workspace. If they are run from their original locations,
