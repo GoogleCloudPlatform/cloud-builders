@@ -1,8 +1,11 @@
-load("@bazel_tools//tools/build_defs/docker:docker.bzl", "docker_build")
+load(
+   "@io_bazel_rules_docker//docker:docker.bzl",
+   "docker_build",
+)
 
 docker_build(
     name = "target",
-    base = "@wheezy//:image",
+    base = "@base_image//image:image.tar",
     entrypoint = [
         "echo",
         "foo",

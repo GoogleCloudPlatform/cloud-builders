@@ -1,7 +1,27 @@
-load("@bazel_tools//tools/build_defs/docker:docker.bzl", "docker_pull")
+workspace(name = "bazel_docker")
+
+git_repository(
+    name = "io_bazel_rules_docker",
+    remote = "https://github.com/bazelbuild/rules_docker.git",
+    commit = "c96ef625c645fc26ca4ff03441cc4a352c04ad5d",
+)
+
+load(
+   "@io_bazel_rules_docker//docker:docker.bzl",
+   "docker_pull",
+   "docker_repositories",
+)
+
+# Consumers shouldn't need to do this themselves once WORKSPACE is
+# instantiated recursively.
+docker_repositories()
+
+# TODO: Remove everything above this line and load only docker_pull once
+# docker_pull is available by default
 
 docker_pull(
-    name = "wheezy",
+    name = "base_image",
+    registry = "",
     repository = "debian",
-    digest = "sha256:d3892ebd85bb21b161e9d170beefd6c444d9bd58aba3998e1f67aa842fbedb9d",
+    digest = "sha256:d3892ebd85bb21b161e9d170beefd6c444d9bd58aba3998e1f67aa842fbedb9d", # wheezy
 )
