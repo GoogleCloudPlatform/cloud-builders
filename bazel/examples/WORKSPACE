@@ -3,7 +3,7 @@ workspace(name = "bazel_docker")
 git_repository(
     name = "io_bazel_rules_docker",
     remote = "https://github.com/bazelbuild/rules_docker.git",
-    commit = "c96ef625c645fc26ca4ff03441cc4a352c04ad5d",
+    commit = "06bb5b29088e55a29d09e37e1c88f1cc44aaa806",
 )
 
 load(
@@ -21,7 +21,7 @@ docker_repositories()
 
 docker_pull(
     name = "base_image",
-    registry = "",
-    repository = "debian",
+    registry = "index.docker.io",
+    repository = "library/debian",
     digest = "sha256:d3892ebd85bb21b161e9d170beefd6c444d9bd58aba3998e1f67aa842fbedb9d", # wheezy
 )
