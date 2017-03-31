@@ -16,9 +16,6 @@ load(
 # instantiated recursively.
 docker_repositories()
 
-# TODO: Remove everything above this line and load only docker_pull once
-# docker_pull is available by default
-
 docker_pull(
     name = "base_image",
     registry = "index.docker.io",
