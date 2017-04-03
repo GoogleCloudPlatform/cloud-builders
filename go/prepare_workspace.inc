@@ -68,7 +68,11 @@ You are seeing this message because none of the checks succeeded.
     echo "Creating shadow workspace and symlinking source into \"$shadow_workspace\"."
 
     mkdir -p "$link_dir" || return
-    ln -s $PWD "$shadow_workspace" || return
+
+    # We provide the -T option so that another workspace symlink is not placed inside
+    # our workspace. If it fails, that's ok because it might be because a previous step
+    # already created the symlink.
+    ln  -s $PWD "$shadow_workspace" -T 2> /dev/null || stat "$shadow_workspace" 2> /dev/null || return
 
     export GOPATH="$PWD/gopath"
 
