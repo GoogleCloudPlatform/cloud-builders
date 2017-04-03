@@ -63,6 +63,9 @@ steps:
   args: ['test', 'hello']
   dir: 'examples/import_workspace'
 - name: 'gcr.io/$PROJECT_ID/go'
+  args: ['build', 'hello']
+  dir: 'examples/import_workspace'
+- name: 'gcr.io/$PROJECT_ID/go'
   args: ['install', 'hello']
   dir: 'examples/import_workspace'
 - name: 'gcr.io/cloud-builders/docker'
