@@ -1,6 +1,16 @@
 workspace(name = "bazel_docker")
 
 git_repository(
+    name = "io_bazel_rules_go",
+    remote = "https://github.com/bazelbuild/rules_go.git",
+    tag = "0.4.0",
+)
+
+load("@io_bazel_rules_go//go:def.bzl", "go_repositories")
+
+go_repositories()
+
+git_repository(
     name = "io_bazel_rules_docker",
     remote = "https://github.com/bazelbuild/rules_docker.git",
     commit = "06bb5b29088e55a29d09e37e1c88f1cc44aaa806",

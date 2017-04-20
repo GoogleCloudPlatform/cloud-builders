@@ -35,4 +35,8 @@ RUN \
     # Unpack bazel for future use.
     bazel version
 
+# Store the Bazel outputs under /workspace so that the symlinks under bazel-bin (et al) are accessible
+# to downstream build steps.
+RUN echo 'startup --output_base=/workspace/.bazel' > ~/.bazelrc
+ 
 ENTRYPOINT ["bazel"]
