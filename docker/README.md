@@ -38,7 +38,7 @@ This `cloudbuild.yaml` adds a new tag (`:newtag`) to an existing image
 
 ```
 steps:
-- name: gcr.io.cloud-builders/docker
+- name: gcr.io/cloud-builders/docker
   args: ['tag',
     'gcr.io/$PROJECT_ID/myimage:oldtag',
     'gcr.io/$PROJECT_ID/myimage:newtag']
