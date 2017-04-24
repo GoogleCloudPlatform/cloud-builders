@@ -2,6 +2,7 @@
 # $ gcloud container builds submit . --config=cloudbuild.yaml
 
 steps:
+# Build the Bazel builder and output the version we built with.
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--tag=gcr.io/$PROJECT_ID/bazel', '.']
 - name: 'gcr.io/$PROJECT_ID/bazel'
@@ -11,8 +12,21 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/bazel'
   args: ['run', '//subdir:target', '--verbose_failures']
   dir: 'examples'
+
 # Example was built as bazel/subdir:target.
 - name: 'gcr.io/cloud-builders/docker'
   args: ['run', 'bazel/subdir:target']
 
+# TODO(mattmoor): Test docker_push as well.
+  
+# Build the Go binary
+- name: 'gcr.io/$PROJECT_ID/bazel'
+  args: ['build', '//subdir:hello', '--verbose_failures']
+  dir: 'examples'
+
+# Verify that the Go binary is available post-build
+- name: 'ubuntu'
+  args: ['/workspace/examples/bazel-bin/subdir/hello']
+
+  
 images: ['gcr.io/$PROJECT_ID/bazel']
