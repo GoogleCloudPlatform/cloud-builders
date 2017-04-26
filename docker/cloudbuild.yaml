@@ -7,6 +7,8 @@ steps:
   args: ['build', '--tag=gcr.io/$PROJECT_ID/docker:1.9.1', '-f=Dockerfile-1.9.1', '.']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--tag=gcr.io/$PROJECT_ID/docker:1.12.6', '-f=Dockerfile-1.12.6', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/docker:1.13.1', '-f=Dockerfile-1.13.1', '.']
 # Future supported versions of docker builder go here.
 
 # Test each version by using it to run "docker build" on itself.
@@ -14,11 +16,13 @@ steps:
   args: ['build', '-f=Dockerfile-1.9.1', '.']
 - name: 'gcr.io/$PROJECT_ID/docker:1.12.6'
   args: ['build', '-f=Dockerfile-1.12.6', '.']
+- name: 'gcr.io/$PROJECT_ID/docker:1.13.1'
+  args: ['build', '-f=Dockerfile-1.13.1', '.']
 # Tests for future supported versions of docker builder go here.
 
 # Tag the latest version as :latest.
 - name: 'gcr.io/$PROJECT_ID/docker'
-  args: ['tag', 'gcr.io/$PROJECT_ID/docker:1.12.6', 'gcr.io/$PROJECT_ID/docker']
+  args: ['tag', 'gcr.io/$PROJECT_ID/docker:1.13.1', 'gcr.io/$PROJECT_ID/docker']
 
 # Here are some things that can be done with this builder:
 
@@ -39,4 +43,5 @@ steps:
 
 images: ['gcr.io/$PROJECT_ID/docker', # latest
          'gcr.io/$PROJECT_ID/docker:1.9.1',
-         'gcr.io/$PROJECT_ID/docker:1.12.6']
+         'gcr.io/$PROJECT_ID/docker:1.12.6',
+         'gcr.io/$PROJECT_ID/docker:1.13.1']
