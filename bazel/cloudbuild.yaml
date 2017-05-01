@@ -18,7 +18,7 @@ steps:
   args: ['run', 'bazel/subdir:target']
 
 # TODO(mattmoor): Test docker_push as well.
-  
+
 # Build the Go binary
 - name: 'gcr.io/$PROJECT_ID/bazel'
   args: ['build', '//subdir:hello', '--verbose_failures']
@@ -28,5 +28,5 @@ steps:
 - name: 'ubuntu'
   args: ['/workspace/examples/bazel-bin/subdir/hello']
 
-  
+
 images: ['gcr.io/$PROJECT_ID/bazel']
