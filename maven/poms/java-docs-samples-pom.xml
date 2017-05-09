@@ -1,0 +1,136 @@
+<!--
+ Copyright 2016 Google Inc.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <version>1.0.0</version>
+
+    <groupId>com.google.cloud</groupId>
+    <artifactId>doc-samples</artifactId>
+    <packaging>pom</packaging>
+
+    <!-- Parent POM defines common plugins and properties. -->
+    <parent>
+        <groupId>com.google.cloud.samples</groupId>
+        <artifactId>shared-configuration</artifactId>
+        <version>1.0.2</version>
+<!--
+        <relativePath>../java-repo-tools</relativePath>
+ -->
+
+    </parent>
+
+    <properties>
+        <project.http.version>1.19.0</project.http.version>
+        <project.oauth.version>1.19.0</project.oauth.version>
+
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+
+        <spanner.test.instance>default-instance</spanner.test.instance>
+        <spanner.sample.database>mysample</spanner.sample.database>
+        <spanner.quickstart.database>quickstart-db</spanner.quickstart.database>
+    </properties>
+
+    <modules>
+        <!-- App Engine Standard -->
+        <module>appengine</module>
+
+        <!-- App Engine Flexible -->
+        <module>flexible/analytics</module>
+        <module>flexible/async-rest</module>
+        <module>flexible/cloudsql</module>
+        <module>flexible/cloudstorage</module>
+        <module>flexible/cron</module>
+        <module>flexible/datastore</module>
+        <module>flexible/disk</module>
+        <module>flexible/extending-runtime</module>
+        <module>flexible/helloworld</module>
+        <module>flexible/mailgun</module>
+        <module>flexible/mailjet</module>
+        <module>flexible/memcache</module>
+        <module>flexible/pubsub</module>
+        <module>flexible/sendgrid</module>
+        <module>flexible/sparkjava</module>
+        <module>flexible/static-files</module>
+        <module>flexible/twilio</module>
+
+        <module>bigquery/cloud-client</module>
+        <module>bigquery/rest</module>
+        <module>compute/cmdline</module>
+        <module>compute/error-reporting</module>
+        <module>compute/mailjet</module>
+        <module>compute/sendgrid</module>
+        <module>datastore</module>
+        <module>datastore/cloud-client</module>
+        <module>kms</module>
+        <module>language/analysis</module>
+        <module>language/cloud-client</module>
+        <module>logging</module>
+        <module>logging/cloud-client</module>
+        <module>monitoring/cloud-client</module>
+        <module>monitoring/v2</module>
+        <module>monitoring/v3</module>
+        <module>pubsub/cloud-client</module>
+        <module>spanner/cloud-client</module>
+        <module>speech/cloud-client</module>
+        <module>storage/cloud-client</module>
+        <module>storage/json-api</module>
+        <module>storage/storage-transfer</module>
+        <module>storage/xml-api/cmdline-sample</module>
+        <module>storage/xml-api/serviceaccount-appengine-sample</module>
+        <module>taskqueue/deferred</module>
+        <module>translate</module>
+        <module>translate/cloud-client</module>
+        <module>unittests</module>
+        <module>vision/cloud-client</module>
+        <module>vision/face-detection</module>
+        <module>vision/label</module>
+        <module>vision/landmark-detection</module>
+        <module>vision/text</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+        <!-- Compile/runtime dependencies -->
+
+        <dependency>
+            <groupId>jstl</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+        </dependency>
+
+        <!-- Test Dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.7.22</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.jcabi</groupId>
+            <artifactId>jcabi-matchers</artifactId>
+            <version>1.4</version>
+        </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+</project>
