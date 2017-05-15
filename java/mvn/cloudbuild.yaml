@@ -3,6 +3,6 @@
 
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/java/mvn:3.5.0-jdk-8', '.']
+  args: ['build', '--file=Dockerfile.8-jdk-alpine', '--build-arg=MAVEN_VERSION=3.5.0', '--tag=gcr.io/$PROJECT_ID/java/mvn:3.5.0-jdk-8', '.']
 
 images: ['gcr.io/$PROJECT_ID/java/mvn:3.5.0-jdk-8']
