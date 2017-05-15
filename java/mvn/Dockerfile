@@ -17,11 +17,10 @@ RUN mkdir -p /usr/share/maven /usr/share/maven/ref \
 ENV MAVEN_HOME /usr/share/maven
 ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
 
-# for each included pom file, resolve all of its dependencies
-ADD poms /builder/poms
-RUN for POM in /builder/poms/*.xml; do \
-  mvn --batch-mode -f "$POM" org.apache.maven.plugins:maven-dependency-plugin:3.0.0:go-offline -DincludeParents ; \
-  done; \
-  rm -r /builder/poms
+# transitively resolve all dependencies
+ADD deps.txt /builder/deps.txt
+ADD resolve-deps.sh /builder/resolve-deps.sh
+
+RUN /builder/resolve-deps.sh
 
 ENTRYPOINT ["mvn"]
