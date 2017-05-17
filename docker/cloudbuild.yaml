@@ -22,11 +22,7 @@ steps:
 
 # Tag the latest version as :latest.
 - name: 'gcr.io/$PROJECT_ID/docker'
-  args: ['tag', 'gcr.io/$PROJECT_ID/docker:1.12.6', 'gcr.io/$PROJECT_ID/docker']
-
-# Tag the upcoming version as :next.
-- name: 'gcr.io/$PROJECT_ID/docker'
-  args: ['tag', 'gcr.io/$PROJECT_ID/docker:17.05', 'gcr.io/$PROJECT_ID/docker:next']
+  args: ['tag', 'gcr.io/$PROJECT_ID/docker:17.05', 'gcr.io/$PROJECT_ID/docker']
 
 # Here are some things that can be done with this builder:
 
@@ -46,7 +42,6 @@ steps:
   args: ['run', 'busybox', 'echo', 'Hello, world!']
 
 images: ['gcr.io/$PROJECT_ID/docker', # latest
-         'gcr.io/$PROJECT_ID/docker:next',
          'gcr.io/$PROJECT_ID/docker:1.9.1',
          'gcr.io/$PROJECT_ID/docker:1.12.6',
          'gcr.io/$PROJECT_ID/docker:17.05']
