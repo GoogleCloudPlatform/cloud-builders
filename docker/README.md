@@ -59,7 +59,7 @@ steps:
 ## Older Versions
 
 Since Docker CLI changes may not be backward-compatible, we provide tagged
-versions of this builder for previously-supported versions:
+versions of this builder for all previously-supported versions:
 
 *   `gcr.io/cloud-builders/docker:1.9.1`
 *   `gcr.io/cloud-builders/docker:1.12.6`
