@@ -20,8 +20,9 @@ steps:
   args: ['build', '-f=Dockerfile-17.05', '.']
 # Tests for future supported versions of docker builder go here.
 
-# Tag the latest version as :latest.
-- name: 'gcr.io/$PROJECT_ID/docker'
+# Tag the latest version as :latest. We use gcr.io/cloud-builders/docker here
+# and not gcr.io/$PROJECT_ID/docker because the latter may not yet exist.
+- name: 'gcr.io/cloud-builders/docker'
   args: ['tag', 'gcr.io/$PROJECT_ID/docker:17.05', 'gcr.io/$PROJECT_ID/docker']
 
 # Here are some things that can be done with this builder:
