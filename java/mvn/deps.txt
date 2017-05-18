@@ -1,0 +1,7 @@
+com.google.cloud:google-cloud:0.17.2-alpha
+org.springframework.boot:spring-boot-starter:1.5.3.RELEASE
+org.springframework.boot:spring-boot-starter:1.4.6.RELEASE
+org.springframework.boot:spring-boot-starter-web:1.5.3.RELEASE
+org.springframework.boot:spring-boot-starter-web:1.4.6.RELEASE
+org.springframework.boot:spring-boot-maven-plugin:1.5.3.RELEASE
+org.springframework.boot:spring-boot-maven-plugin:1.4.6.RELEASE
