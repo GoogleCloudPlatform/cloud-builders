@@ -1,6 +1,6 @@
 FROM openjdk:8-jdk-alpine
 
-RUN apk add --no-cache curl tar bash
+RUN apk add --update --no-cache curl tar bash
 
 ARG MAVEN_VERSION=3.5.0
 ARG USER_HOME_DIR="/root"
