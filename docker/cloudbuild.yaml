@@ -22,7 +22,7 @@ steps:
 
 # Tag the latest version as :latest. We use gcr.io/cloud-builders/docker here
 # and not gcr.io/$PROJECT_ID/docker because the latter may not yet exist.
-- name: 'gcr.io/cloud-builders/docker'
+- name: 'gcr.io/$PROJECT_ID/docker:17.05'
   args: ['tag', 'gcr.io/$PROJECT_ID/docker:17.05', 'gcr.io/$PROJECT_ID/docker']
 
 # Here are some things that can be done with this builder:
