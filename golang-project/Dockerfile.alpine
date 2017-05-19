@@ -2,9 +2,9 @@ FROM gcr.io/cloud-builders/go:alpine
 
 # Docker installation instructions from:
 # http://wiki.alpinelinux.org/wiki/Docker#Installation
-RUN echo "http://nl.alpinelinux.org/alpine/v3.5/community" >> /etc/apk/repositories && \
+RUN echo "http://nl.alpinelinux.org/alpine/v3.6/community" >> /etc/apk/repositories && \
     apk update && \
-    apk add docker=1.12.6-r0
+    apk add docker=17.05.0-r0
 
 COPY gopath/bin/golang_project /builder/
 COPY golang_project.ash /builder/bin/
