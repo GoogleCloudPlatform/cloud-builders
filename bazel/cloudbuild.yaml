@@ -8,6 +8,11 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/bazel'
   args: ['version']
 
+# Not clear why we need this; at least some users get permission errors on the
+# next build step unless we do this first.
+- name: 'ubuntu'
+  args: ['chmod', 'a+r', '-R', '.']
+
 # Build the example.
 - name: 'gcr.io/$PROJECT_ID/bazel'
   args: ['run', '//subdir:target', '--verbose_failures']
