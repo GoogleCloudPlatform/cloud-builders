@@ -17,7 +17,6 @@ RUN \
        main" && \
     apt-get update && \
     apt-get -y install docker-engine=17.05.0~ce-0~ubuntu-trusty && \
-
     add-apt-repository ppa:webupd8team/java && \
     apt-get update && \
 
