@@ -5,7 +5,7 @@ RUN \
     apt-get update && \
     apt-get -y install python software-properties-common && \
 
-    # Install Docker 1.12.6 (https://docs.docker.com/engine/installation/linux/ubuntu/)
+    # Install Docker (https://docs.docker.com/engine/installation/linux/ubuntu/)
     apt-get -y install curl \
         apt-transport-https \
         ca-certificates && \
@@ -17,7 +17,6 @@ RUN \
        main" && \
     apt-get update && \
     apt-get -y install docker-engine=1.12.6-0~ubuntu-trusty && \
-
     add-apt-repository ppa:webupd8team/java && \
     apt-get update && \
 
