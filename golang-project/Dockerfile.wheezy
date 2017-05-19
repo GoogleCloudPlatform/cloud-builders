@@ -10,16 +10,14 @@ RUN \
         apt-transport-https \
         ca-certificates \
         python-software-properties && \
-	curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
-	apt-key fingerprint 0EBFCD88 && \
-	# wheezy-backports is required for init-system-helpers which is required by Docker.
-	add-apt-repository "deb http://ftp.de.debian.org/debian wheezy-backports main" && \
+    curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
+    apt-key fingerprint 0EBFCD88 && \
+    # wheezy-backports is required for init-system-helpers which is required by Docker.
+    add-apt-repository "deb http://ftp.de.debian.org/debian wheezy-backports main" && \
     add-apt-repository \
-	    "deb [arch=amd64] https://download.docker.com/linux/debian \
-	    $(lsb_release -cs) \
-	    edge" && \
-	grep -v deb-src /etc/apt/sources.list > /tmp/sources.list && \
-	mv /tmp/sources.list /etc/apt/sources.list && \
+        "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) edge" && \
+    grep -v deb-src /etc/apt/sources.list > /tmp/sources.list && \
+    mv /tmp/sources.list /etc/apt/sources.list && \
     apt-get -qqy update && \
     apt-get -y install docker-ce=17.05.0~ce-0~debian-wheezy
 
