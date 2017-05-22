@@ -9,7 +9,8 @@ steps:
   args: ['version']
 
 # Not clear why we need this; at least some users get permission errors on the
-# next build step unless we do this first.
+# next build step unless we do this first. This is a work-around for issue #53:
+# https://github.com/GoogleCloudPlatform/cloud-builders/issues/53
 - name: 'ubuntu'
   args: ['chmod', 'a+r', '-R', '.']
 
