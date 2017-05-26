@@ -1,4 +1,4 @@
-ARG BASE_IMAGE
+ARG BASE_IMAGE=openjdk:8-jdk-alpine
 FROM ${BASE_IMAGE}
 
 RUN apk add --update --no-cache curl tar bash
