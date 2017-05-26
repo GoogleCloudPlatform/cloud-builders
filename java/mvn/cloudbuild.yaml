@@ -45,7 +45,28 @@ steps:
   args: ['tag', 'gcr.io/$PROJECT_ID/java/mvn:3.5.0-jdk-8', 'gcr.io/$PROJECT_ID/java/mvn']
 
 # run examples
+- name: 'gcr.io/$PROJECT_ID/java/mvn:3.3.9-jdk-8'
+  args: ['install']
+  dir: 'examples/spring_boot'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '.']
+  dir: 'examples/spring_boot'
+
+- name: 'gcr.io/$PROJECT_ID/java/mvn:3.3.9-jdk-7'
+  args: ['install']
+  dir: 'examples/spring_boot'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '.']
+  dir: 'examples/spring_boot'
+
 - name: 'gcr.io/$PROJECT_ID/java/mvn:3.5.0-jdk-8'
+  args: ['install']
+  dir: 'examples/spring_boot'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '.']
+  dir: 'examples/spring_boot'
+
+- name: 'gcr.io/$PROJECT_ID/java/mvn:3.5.0-jdk-7'
   args: ['install']
   dir: 'examples/spring_boot'
 - name: 'gcr.io/cloud-builders/docker'
