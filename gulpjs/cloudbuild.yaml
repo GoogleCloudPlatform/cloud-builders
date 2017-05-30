@@ -1,0 +1,31 @@
+# In this directory, run the following command to build this builder.
+# $ gcloud container builds submit . --config=cloudbuild.yaml
+
+steps:
+# Step 0
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/gulpjs', '.']
+
+# Step 1
+# Print gulp version.
+- name: 'gcr.io/$PROJECT_ID/gulpjs'
+  args: ['--version']
+
+# Step 2
+# Gulp --help
+- name: 'gcr.io/$PROJECT_ID/gulpjs'
+  args: ['--help']
+
+# Step 3
+# Install gulp into the example build project
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['install']
+  dir: 'examples/build'
+
+# Step 4
+# Gulp build
+- name: 'gcr.io/$PROJECT_ID/gulpjs'
+  args: ['build']
+  dir: 'examples/build'
+
+images: ['gcr.io/$PROJECT_ID/gulpjs']
