@@ -78,7 +78,7 @@ steps:
   args: ['run', 'busybox', 'echo', 'Hello, world!']
   wait_for: ['latest']
 
-images: 
+images:
 - 'gcr.io/$PROJECT_ID/docker:latest'
 - 'gcr.io/$PROJECT_ID/docker:1.9.1'
 - 'gcr.io/$PROJECT_ID/docker:1.12.6'
