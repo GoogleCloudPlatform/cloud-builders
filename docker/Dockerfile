@@ -13,7 +13,9 @@ RUN \
        "deb https://apt.dockerproject.org/repo/ \
        ubuntu-$(lsb_release -cs) \
        main" && \
-   apt-get -y update && \
-   apt-get -y install docker-engine=1.12.6-0~ubuntu-trusty
+   apt-get -y update
+
+ARG DOCKER_VERSION=17.05.0~ce-0~ubuntu-trusty
+RUN apt-get -y install docker-engine=${DOCKER_VERSION}
 
 ENTRYPOINT ["/usr/bin/docker"]
