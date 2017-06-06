@@ -16,5 +16,5 @@
     "mocha": "3.1.2",
     "chai": "3.5.0"
   },
-  "license": "BSD-2-Clause"
+  "license": "Apache-2"
 }
