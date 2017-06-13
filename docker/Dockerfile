@@ -1,4 +1,4 @@
-FROM ubuntu:trusty
+FROM gcr.io/cloud-builders/gcloud
 
 # Based on instructions from:
 # https://docs.docker.com/engine/installation/linux/ubuntu/
@@ -17,5 +17,8 @@ RUN \
 
 ARG DOCKER_VERSION=17.05.0~ce-0~ubuntu-trusty
 RUN apt-get -y install docker-engine=${DOCKER_VERSION}
+
+RUN docker-credential-gcr configure-docker --overwrite && \
+    docker-credential-gcr config --token-source=gcloud
 
 ENTRYPOINT ["/usr/bin/docker"]
