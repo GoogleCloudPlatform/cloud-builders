@@ -4,6 +4,8 @@
 if [[ $(kubectl config current-context 2> /dev/null) == "" ]]; then
 	cluster=$(gcloud config get-value container/cluster 2> /dev/null)
 	zone=$(gcloud config get-value compute/zone 2> /dev/null)
+	project=$(gcloud config get-value core/project 2> /dev/null)
+	
 	function var_usage() {
 		cat <<EOF
 No cluster is set. To set the cluster (and the zone where it is found), set the environment variables
@@ -15,12 +17,10 @@ EOF
 
 	[[ -z "$cluster" ]] && var_usage
 	[[ -z "$zone" ]] && var_usage
-	err=$(mktemp)
-	gcloud container clusters get-credentials --zone "$zone" "$cluster" 2> "$err"
-	if [[ "$?" != 0 ]]; then
-		cat "$err"
-		exit 1
-	fi
+
+	echo "Running: gcloud container clusters get-credentials --project=\"$project\" --zone=\"$zone\" \"$cluster\""
+	gcloud container clusters get-credentials --project="$project" --zone="$zone" "$cluster" || exit
 fi
 
+echo "Running: kubectl $@"
 kubectl "$@"
