@@ -11,7 +11,7 @@ will need IAM permissions sufficient for the operations you want to perform. For
 typical read-only usage, the "Container Engine Viewer" role is sufficient. To
 deploy container images on a GKE cluster, the "Container Engine Developer" role
 is sufficient. Check the [GKE IAM page]
-(https://cloud.google.com/container-engine/docs/iam-integration) for details. 
+(https://cloud.google.com/container-engine/docs/iam-integration) for details.
 
 For most use, kubectl will need to be configured to point to a specific GKE
 cluster. You can configure the cluster by setting environment variables.
