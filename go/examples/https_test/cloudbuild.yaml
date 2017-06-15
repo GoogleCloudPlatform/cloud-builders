@@ -1,6 +1,8 @@
 steps:
 - name: 'gcr.io/cloud-builders/go:alpine'
   args: ['install', 'https_test']
+- name: 'gcr.io/cloud-builders/go:alpine'
+  args: ['test', 'https_test']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-f', 'Dockerfile.alpine', '--tag=gcr.io/$PROJECT_ID/https_test:alpine', '.']
 - name: 'gcr.io/cloud-builders/docker'
@@ -12,6 +14,8 @@ steps:
 
 - name: 'gcr.io/cloud-builders/go:wheezy'
   args: ['install', 'https_test']
+- name: 'gcr.io/cloud-builders/go:wheezy'
+  args: ['test', 'https_test']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-f', 'Dockerfile.ubuntu', '--tag=gcr.io/$PROJECT_ID/https_test:ubuntu', '.']
 - name: 'gcr.io/cloud-builders/docker'
