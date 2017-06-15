@@ -2,8 +2,4 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--tag=gcr.io/$PROJECT_ID/kubectl', '.']
 
-# Smoketest kubectl to make sure it gets invoked properly.
-- name: 'gcr.io/$PROJECT_ID/kubectl'
-  args: ['config', 'get-contexts']
-
 images: ['gcr.io/$PROJECT_ID/kubectl']
