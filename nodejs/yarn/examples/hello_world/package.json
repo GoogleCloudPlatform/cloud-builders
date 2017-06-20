@@ -1,0 +1,23 @@
+{
+  "name": "hello_world",
+  "version": "0.0.1",
+  "description": "Expressjs hello world",
+  "main": "index.js",
+  "scripts": {
+    "start": "node .",
+    "test": "NODE_ENV=test mocha test"
+  },
+  "author": "",
+  "dependencies": {
+    "express": "4.14.0"
+  },
+  "devDependencies": {
+    "supertest": "2.0.0",
+    "mocha": "3.1.2",
+    "chai": "3.5.0"
+  },
+  "engines" : {
+    "node" : ">= 6.4.0"
+  },
+  "license": "BSD-2-Clause"
+}
