@@ -1,5 +1,5 @@
 const app = require('./index');
-const expect = require('chai').expect;
+const should = require('chai').should();
 const request = require('supertest');
 
 describe('test.js', () => {
@@ -11,7 +11,7 @@ describe('test.js', () => {
         .get('/')
         .expect(200)
         .end((e, res) => {
-          expect(e).to.not.exist;
+          should.not.exist(e);
           done();
         });
     });
