@@ -16,6 +16,7 @@ images as:
     [Go](https://golang.org) projects into container images
 *   `gsutil`: runs the [gsutil](https://cloud.google.com/storage/docs/gsutil)
     tool
+*   `kubectl`: runs the [kubectl](https://kubernetes.io/docs/user-guide/kubectl-overview/) tool
 *   `npm`: runs the [npm](https://docs.npmjs.com/) tool
 *   `wget`: runs the [wget](https://www.gnu.org/software/wget/) tool
 *   `yarn`: runs the [yarn](https://yarnpkg.com/) tool
