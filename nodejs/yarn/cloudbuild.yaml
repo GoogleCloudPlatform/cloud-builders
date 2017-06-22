@@ -3,24 +3,24 @@
 
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/yarn', '.']
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/nodejs/yarn', '.']
 
 
 # Print yarn version.
-- name: 'gcr.io/$PROJECT_ID/yarn'
+- name: 'gcr.io/$PROJECT_ID/nodejs/yarn'
   args: ['--version']
 
 # Test the examples.
 
 # hello_world
-- name: 'gcr.io/$PROJECT_ID/yarn'
+- name: 'gcr.io/$PROJECT_ID/nodejs/yarn'
   args: ['install']
   dir: 'examples/hello_world'
-- name: 'gcr.io/$PROJECT_ID/yarn'
+- name: 'gcr.io/$PROJECT_ID/nodejs/yarn'
   args: ['test']
   dir: 'examples/hello_world'
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '.']
   dir: 'examples/hello_world'
 
-images: ['gcr.io/$PROJECT_ID/yarn']
+images: ['gcr.io/$PROJECT_ID/nodejs/yarn']
