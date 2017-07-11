@@ -30,7 +30,7 @@ steps:
   args: ['config', '--global', 'test.foo', 'bar']
 - name: 'gcr.io/$PROJECT_ID/git'
   entrypoint: 'bash'
-  args: ['-c', 'git config --test.foo | grep ^bar$']
+  args: ['-c', 'git config --global --get test.foo | grep ^bar$']
 
 # Clone a private repo belonging to the project.
 - name: 'gcr.io/$PROJECT_ID/git'
