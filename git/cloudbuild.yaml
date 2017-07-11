@@ -24,6 +24,14 @@ steps:
   args: ['ash', '-c', 'echo "Version: $(cat VERSION)"']
   dir: 'examples/version-file/cloud-builders'
 
+# Set a global configuration and check that it's persisted.
+# This configuration won't be included in the resulting builder image.
+- name: 'gcr.io/$PROJECT_ID/git'
+  args: ['config', '--global', 'test.foo', 'bar']
+- name: 'gcr.io/$PROJECT_ID/git'
+  entrypoint: 'bash'
+  args: ['-c', 'git config --test.foo | grep ^bar$']
+
 # Clone a private repo belonging to the project.
 - name: 'gcr.io/$PROJECT_ID/git'
   args: ['clone', 'https://source.developers.google.com/p/$PROJECT_ID/r/default']
