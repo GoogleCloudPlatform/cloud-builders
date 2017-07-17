@@ -3,7 +3,7 @@ FROM ${BASE_IMAGE}
 
 ARG GRADLE_VERSION=4.0
 ARG USER_HOME_DIR="/root"
-ARG SHA=56bd2dde29ba2a93903c557da1745cafd72cdd8b6b0b83c05a40ed7896b79dfe 
+ARG SHA=56bd2dde29ba2a93903c557da1745cafd72cdd8b6b0b83c05a40ed7896b79dfe
 ARG BASE_URL=https://services.gradle.org/distributions
 
 ENV GRADLE_HOME "/usr/share/gradle-${GRADLE_VERSION}"
