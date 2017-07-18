@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=openjdk:8-jdk-alpine
+ARG BASE_IMAGE=openjdk:8-jdk
 FROM ${BASE_IMAGE}
 
 ARG GRADLE_VERSION=4.0
@@ -9,7 +9,7 @@ ARG BASE_URL=https://services.gradle.org/distributions
 ENV GRADLE_HOME "/usr/share/gradle-${GRADLE_VERSION}"
 ENV GRADLE_USER_HOME "${USER_HOME_DIR}/.gradle/"
 
-RUN apk add --update --no-cache curl bash \
+RUN apt-get update -qqy && apt-get install -qqy curl \
   && mkdir -p /usr/share "${GRADLE_USER_HOME}" \
   && curl -fsSL -o "gradle-${GRADLE_VERSION}-bin.zip" "${BASE_URL}/gradle-${GRADLE_VERSION}-bin.zip" \
   && echo "${SHA}  gradle-${GRADLE_VERSION}-bin.zip" | sha256sum -c - \
@@ -17,7 +17,8 @@ RUN apk add --update --no-cache curl bash \
   && rm -f "gradle-${GRADLE_VERSION}-bin.zip" \
   && mv "gradle-${GRADLE_VERSION}" /usr/share \
   && ln -s "${GRADLE_HOME}/bin/gradle" /usr/bin/gradle \
-  && apk del curl
+  && apt-get remove -qqy --purge curl \
+  && rm /var/lib/apt/lists/*_*
 
 ADD gradle.properties "${GRADLE_USER_HOME}"
 
