@@ -5,5 +5,5 @@ RUN chmod +x /builder/helm.bash && mkdir -p /builder/helm && apt-get update && a
     && tar zxvf helm.tar.gz --strip-components=1 -C /builder/helm linux-amd64/helm \
     && rm helm.tar.gz \
     && apt-get remove --purge -y curl && apt-get --purge -y autoremove && apt-get clean && rm -rf /var/lib/apt/lists/*
-ENV PATH=/builder/helm:$PATH
+ENV PATH=/builder/helm/:$PATH
 ENTRYPOINT ["/builder/helm.bash"]
