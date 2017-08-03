@@ -6,7 +6,8 @@ RUN apt-get update -y && apt-get install --no-install-recommends -y -q curl pyth
     apt-get clean && rm /var/lib/apt/lists/*_*
 
 # Install the latest LTS release of nodejs
-RUN mkdir /nodejs && curl https://nodejs.org/dist/v6.9.1/node-v6.9.1-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
+ARG NODE_VERSION=v6.9.1
+RUN mkdir /nodejs && curl https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
 ENV PATH $PATH:/nodejs/bin
 
 ENTRYPOINT ["npm"]

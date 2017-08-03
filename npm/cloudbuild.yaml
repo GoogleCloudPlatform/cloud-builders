@@ -2,25 +2,78 @@
 # $ gcloud container builds submit . --config=cloudbuild.yaml
 
 steps:
+# Build all supported versions.
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/npm', '.']
+  args:
+  - 'build'
+  - '--build-arg=NODE_VERSION=v6.9.1'
+  - '--tag=gcr.io/$PROJECT_ID/npm:node-6.9.1'
+  - '.'
+  id: 'node-6.9.1'
+- name: 'gcr.io/cloud-builders/docker'
+  args: 
+  - 'build'
+  - '--build-arg=NODE_VERSION=v8.2.1'
+  - '--tag=gcr.io/$PROJECT_ID/npm:node-8.2.1'
+  - '.'
+  id: 'node-8.2.1'
 
-
-# Print npm version.
-- name: 'gcr.io/$PROJECT_ID/npm'
+# Print for each version
+- name: 'gcr.io/$PROJECT_ID/npm:node-6.9.1'
   args: ['version']
+  wait_for: ['node-6.9.1']
+  id: 'node-6.9.1-version'
+- name: 'gcr.io/$PROJECT_ID/npm:node-8.2.1'
+  args: ['version']
+  wait_for: ['node-8.2.1']
+  id: 'node-8.2.1-version'
+
+# Tag LTS as latest
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['tag', 'gcr.io/$PROJECT_ID/npm:node-6.9.1', 'gcr.io/$PROJECT_ID/npm']
+  wait_for: ['node-6.9.1-version']
+  id: 'latest'
+
+# Tag current as current
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['tag', 'gcr.io/$PROJECT_ID/npm:node-8.2.1', 'gcr.io/$PROJECT_ID/npm:current']
+  wait_for: ['node-8.2.1-version']
+  id: 'current'
 
 # Test the examples.
-
-# hello_world
-- name: 'gcr.io/$PROJECT_ID/npm'
+- name: 'gcr.io/$PROJECT_ID/npm:latest'
   args: ['install']
   dir: 'examples/hello_world'
-- name: 'gcr.io/$PROJECT_ID/npm'
+  wait_for: ['latest']
+  id: 'latest-install'
+- name: 'gcr.io/$PROJECT_ID/npm:latest'
   args: ['test']
   dir: 'examples/hello_world'
+  wait_for: ['latest-install']
+  id: 'latest-test'
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '.']
   dir: 'examples/hello_world'
+  wait_for: ['latest-test']
+  id: 'latest-build'
+- name: 'gcr.io/$PROJECT_ID/npm:current'
+  args: ['install']
+  dir: 'examples/hello_world'
+  wait_for: ['current']
+  id: 'current-install'
+- name: 'gcr.io/$PROJECT_ID/npm:current'
+  args: ['test']
+  dir: 'examples/hello_world'
+  wait_for: ['current-install']
+  id: 'current-test'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '.']
+  dir: 'examples/hello_world'
+  wait_for: ['current-test']
+  id: 'current-build'
 
-images: ['gcr.io/$PROJECT_ID/npm']
+images:
+- 'gcr.io/$PROJECT_ID/npm:latest'
+- 'gcr.io/$PROJECT_ID/npm:current'
+- 'gcr.io/$PROJECT_ID/npm:node-6.9.1'
+- 'gcr.io/$PROJECT_ID/npm:node-8.2.1'
