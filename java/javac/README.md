@@ -1,7 +1,6 @@
-# Tool builder: `gcr.io/cloud-builders/java/openjdk`
+# Tool builder: `gcr.io/cloud-builders/java/javac`
 
-This build step contains openjdk and docker. It is used as a base image for other java tool
-builders.
+This build step runs the javac tool.
 
 ## Building this builder
 
