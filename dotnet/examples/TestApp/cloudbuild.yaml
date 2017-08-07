@@ -4,9 +4,9 @@ steps:
 # Restore and publish the app. The restore must use a local directory
 # inside of the workspace to preserve the packages across invokations
 # of the dotnet tool.
-- name: gcr.io/aspnetcore-staging/dotnet
+- name: gcr.io/cloud-builders/dotnet
   args: [ 'restore', '--packages', './packages' ]
-- name: gcr.io/aspnetcore-staging/dotnet
+- name: gcr.io/cloud-builders/dotnet
   args: [ 'publish', '-c', 'Release' ]
 
 # Build the apps image.
