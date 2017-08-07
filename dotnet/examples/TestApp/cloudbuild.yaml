@@ -1,9 +1,18 @@
 # Example build script to create a Docker image from a .NET Core Web Api.
 steps:
 
-# Restore and publish the app.
+# Restore and publish the app. The restore must use a local directory
+# inside of the workspace to preserve the packages across invokations
+# of the dotnet tool.
 - name: gcr.io/aspnetcore-staging/dotnet
   args: [ 'restore', '--packages', './packages' ]
 - name: gcr.io/aspnetcore-staging/dotnet
   args: [ 'publish', '-c', 'Release' ]
 
+# Build the apps image.
+- name: gcr.io/cloud-builders/docker
+  args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/testapp', '.' ]
+  dir: './bin/Release/netcoreapp1.1/publish'
+
+# Publish the app.
+images: [ 'gcr.io/$PROJECT_ID/testapp' ]
