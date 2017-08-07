@@ -1,0 +1,14 @@
+# Cloud builder for the dotnet builder.
+steps:
+- name: gcr.io/cloud-builders/docker
+  args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/dotnet', '.' ]
+
+# Print versions information
+- name: gcr.io/$PROJECT_ID/dotnet
+  args: [ '--version' ]
+  dir: 'configs/config-1.0.0'
+- name: gcr.io/$PROJECT_ID/dotnet
+  args: [ '--version' ]
+  dir: 'configs/config-1.0.4'
+
+images: [ 'gcr.io/$PROJECT_ID/dotnet' ]
