@@ -18,7 +18,7 @@ RUN \
    apt-get -y install docker-ce=${DOCKER_VERSION} && \
 
    # Clean up build packages
-   apt-get remove -y --purge apt-transport-https curl gnupg2 software-properties-common && \
+   apt-get remove -y --purge curl gnupg2 software-properties-common && \
    apt-get clean
 
 ENTRYPOINT ["javac"]
