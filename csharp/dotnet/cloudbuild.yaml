@@ -1,16 +1,16 @@
 # Cloud builder for the dotnet builder.
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/dotnet', '.' ]
+  args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/csharp/dotnet', '.' ]
 
 # Verify the version output of the supported SDKs.
-- name: 'gcr.io/$PROJECT_ID/dotnet'
+- name: 'gcr.io/$PROJECT_ID/csharp/dotnet'
   entrypoint: 'bash'
   args: [ '-c', '[[ $(dotnet --version) == "1.0.0-preview2-003156" ]]' ]
   dir: 'configs/config-1.0.0'
-- name: 'gcr.io/$PROJECT_ID/dotnet'
+- name: 'gcr.io/$PROJECT_ID/csharp/dotnet'
   entrypoint: 'bash'
   args: [ '-c', '[[ $(dotnet --version) == "1.0.4" ]]' ]
   dir: 'configs/config-1.0.4'
 
-images: [ 'gcr.io/$PROJECT_ID/dotnet' ]
+images: [ 'gcr.io/$PROJECT_ID/csharp/dotnet' ]
