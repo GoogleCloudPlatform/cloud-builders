@@ -12,6 +12,7 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/java/javac'
   - '.'
   waitFor: ['-']
+  id: 'BUILD_JDK_8'
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
@@ -21,20 +22,34 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/java/javac:7'
   - '.'
   waitFor: ['-']
+  id: 'BUILD_JDK_7'
 
-# Test that javac and docker are installed, for all built images
+# Test that javac and docker are installed, for all built images, and that apt-get update will work
+# in child images
 
 - name: 'gcr.io/$PROJECT_ID/java/javac:8'
   args: ['-version']
+  waitFor: ['BUILD_JDK_8']
 - name: 'gcr.io/$PROJECT_ID/java/javac:8'
   entrypoint: 'docker'
   args: ['version']
+  waitFor: ['BUILD_JDK_8']
+- name: 'gcr.io/$PROJECT_ID/java/javac:8'
+  entrypoint: 'apt-get'
+  args: ['update']
+  waitFor: ['BUILD_JDK_8']
 
 - name: 'gcr.io/$PROJECT_ID/java/javac:7'
   args: ['-version']
+  waitFor: ['BUILD_JDK_7']
 - name: 'gcr.io/$PROJECT_ID/java/javac:7'
   entrypoint: 'docker'
   args: ['version']
+  waitFor: ['BUILD_JDK_7']
+- name: 'gcr.io/$PROJECT_ID/java/javac:7'
+  entrypoint: 'apt-get'
+  args: ['update']
+  waitFor: ['BUILD_JDK_7']
 
 images:
 - 'gcr.io/$PROJECT_ID/java/javac:8'
