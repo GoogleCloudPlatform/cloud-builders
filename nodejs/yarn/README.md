@@ -1,4 +1,4 @@
-# Tool builder: `gcr.io/cloud-builders/yarn`
+# Tool builder: `gcr.io/cloud-builders/nodejs/yarn`
 
 This Container Builder build step runs the `yarn` tool.
 
