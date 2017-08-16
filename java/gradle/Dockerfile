@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=openjdk:8-jdk
+ARG BASE_IMAGE=gcr.io/cloud-builders/java/javac:8
 FROM ${BASE_IMAGE}
 
 ARG GRADLE_VERSION=4.0
