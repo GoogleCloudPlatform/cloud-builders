@@ -12,5 +12,9 @@ steps:
   entrypoint: 'bash'
   args: [ '-c', '[[ $(dotnet --version) == "1.0.4" ]]' ]
   dir: 'configs/config-1.0.4'
+- name: 'gcr.io/$PROJECT_ID/csharp/dotnet'
+  entrypoint: 'bash'
+  args: [ '-c', '[[ $(dotnet --version) == "2.0.0" ]]' ]
+  dir: 'configs/config-2.0.0'
 
 images: [ 'gcr.io/$PROJECT_ID/csharp/dotnet' ]

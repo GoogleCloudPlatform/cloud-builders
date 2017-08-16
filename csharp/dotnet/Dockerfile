@@ -24,12 +24,14 @@ RUN apt-get update \
 RUN mkdir -p /usr/share/dotnet && \
     curl -sL https://download.microsoft.com/download/E/7/8/E782433E-7737-4E6C-BFBF-290A0A81C3D7/dotnet-dev-debian-x64.1.0.4.tar.gz | tar -xz -C /usr/share/dotnet/ && \
     curl -sL https://go.microsoft.com/fwlink/?LinkID=836302 | tar -xz -C /usr/share/dotnet && \
+    curl -sL https://download.microsoft.com/download/1/B/4/1B4DE605-8378-47A5-B01B-2C79D6C55519/dotnet-sdk-2.0.0-linux-x64.tar.gz | tar -xz -C /usr/share/dotnet && \
     ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
 
 # Make sure that the caches are expanded.
 ADD ./configs /configs
 RUN cd /configs/config-1.0.0/ && dotnet new && \
     cd /configs/config-1.0.4/ && dotnet new && \
+    cd /configs/config-2.0.0/ && dotnet new && \
     rm -rf /configs
 
 ENTRYPOINT [ "/usr/bin/dotnet" ]
