@@ -1,4 +1,4 @@
-# Example build script to create a Docker image from a .NET Core 1.1 Web Api app.
+# Example build script to create a Docker image from a .NET Core 2.0 Web Api app.
 steps:
 
 # Restore and publish the app. The restore must use a local directory
@@ -11,8 +11,8 @@ steps:
 
 # Build the apps image.
 - name: 'gcr.io/cloud-builders/docker'
-  args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/testapp', '.' ]
-  dir: './bin/Release/netcoreapp1.1/publish'
+  args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/testapp:2.0', '.' ]
+  dir: './bin/Release/netcoreapp2.0/publish'
 
 # Publish the app.
-images: [ 'gcr.io/$PROJECT_ID/testapp' ]
+images: [ 'gcr.io/$PROJECT_ID/testapp:2.0' ]
