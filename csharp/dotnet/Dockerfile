@@ -35,7 +35,7 @@ RUN cd /configs/config-1.0.0/ && dotnet new && \
     cd /configs/config-2.0.0/ && dotnet new && \
     rm -rf /configs
 
-# Ensure that no more cache expansion is performed from now on, see
+# Ensure that no additional cache expansions are performed from now on, see
 # https://github.com/dotnet/cli/issues/6550 and
 # https://github.com/dotnet/cli/pull/6633 for why this is necessary.
 ENV DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
