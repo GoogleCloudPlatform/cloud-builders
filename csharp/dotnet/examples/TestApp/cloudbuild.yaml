@@ -1,13 +1,18 @@
 # Example build script to create a Docker image from a .NET Core 1.1 Web Api app.
 steps:
 
-# Restore and publish the app. The restore must use a local directory
-# inside of the workspace to preserve the packages across invokations
-# of the dotnet tool.
+# Use a persisten volume to store the restored packages for this app. The
+# packages will available in between calls to the 'dotnet' builder 
 - name: 'gcr.io/cloud-builders/csharp/dotnet'
-  args: [ 'restore', '--packages', './packages' ]
+  args: [ 'restore', '--packages', '/packages' ]
+  volumes:
+  - name: 'packages'
+    path: '/packages'
 - name: 'gcr.io/cloud-builders/csharp/dotnet'
   args: [ 'publish', '-c', 'Release' ]
+  volumes:
+  - name: 'packages'
+    path: '/packages'
 
 # Build the apps image.
 - name: 'gcr.io/cloud-builders/docker'
