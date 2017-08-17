@@ -1,7 +1,7 @@
 # Example build script to create a Docker image from a .NET Core 2.0 Web Api app.
 steps:
 
-# Use a persisten volume to store the restored packages for this app. The
+# Use a persistent volume to store the restored packages for this app. The
 # packages will available in between calls to the 'dotnet' builder 
 - name: 'gcr.io/cloud-builders/csharp/dotnet'
   args: [ 'restore', '--packages', '/packages' ]
