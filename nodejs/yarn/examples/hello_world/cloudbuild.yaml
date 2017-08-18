@@ -1,8 +1,9 @@
 steps:
-- name: 'gcr.io/$PROJECT_ID/yarn'
+- name: 'gcr.io/cloud-builders/nodejs/yarn'
   args: ['install']
-- name: 'gcr.io/$PROJECT_ID/yarn'
+- name: 'gcr.io/cloud-builders/nodejs/yarn'
   args: ['test']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--tag=gcr.io/$PROJECT_ID/hello_yarn', '.']
+
 images: ['gcr.io/$PROJECT_ID/hello_yarn']
