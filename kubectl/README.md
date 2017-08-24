@@ -14,6 +14,18 @@ is sufficient. Check the
 [GKE IAM page](https://cloud.google.com/container-engine/docs/iam-integration)
 for details.
 
+Running the following command will give Container Builder Service Account
+`container.developer` role access to your Container Engine clusters:
+
+```sh
+export PROJECT="$(gcloud projects describe \
+    $(gcloud config get-value core/project -q) --format='get(projectNumber)')"
+
+gcloud projects add-iam-policy-binding $PROJECT \
+    --member=serviceAccount:$PROJECT@cloudbuild.gserviceaccount.com \
+    --role=roles/container.developer
+```
+
 For most use, kubectl will need to be configured to point to a specific GKE
 cluster. You can configure the cluster by setting environment variables.
 
