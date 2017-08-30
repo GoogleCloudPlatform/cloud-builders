@@ -3,7 +3,12 @@ FROM ubuntu:14.04
 RUN \
     # This makes add-apt-repository available.
     apt-get update && \
-    apt-get -y install python software-properties-common && \
+    apt-get -y install python software-properties-common unzip && \
+
+    # Install Git >2.0.1
+    add-apt-repository ppa:git-core/ppa && \
+    apt-get -y update && \
+    apt-get -y install git && \
 
     # Install Docker (https://docs.docker.com/engine/installation/linux/ubuntu/)
     apt-get -y install curl \
