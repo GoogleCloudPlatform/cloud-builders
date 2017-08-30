@@ -21,6 +21,7 @@ RUN apt-get update \
 # Install the following SDKs:
 # + 1.0.3 with SDK Preview 2 build 3156, to support .NET Core 1.0.5 with project.json solutions.
 # + 1.0.4, which supporst .csproj projects for .NET Core 1.0.5 and 1.1.2.
+# + 2.0.0, which supports .csproj projects for .NET Core 2.0.0.
 RUN mkdir -p /usr/share/dotnet && \
     curl -sL https://download.microsoft.com/download/E/7/8/E782433E-7737-4E6C-BFBF-290A0A81C3D7/dotnet-dev-debian-x64.1.0.4.tar.gz | tar -xz -C /usr/share/dotnet/ && \
     curl -sL https://go.microsoft.com/fwlink/?LinkID=836302 | tar -xz -C /usr/share/dotnet && \
@@ -33,5 +34,10 @@ RUN cd /configs/config-1.0.0/ && dotnet new && \
     cd /configs/config-1.0.4/ && dotnet new && \
     cd /configs/config-2.0.0/ && dotnet new && \
     rm -rf /configs
+
+# Ensure that no additional cache expansions are performed from now on, see
+# https://github.com/dotnet/cli/issues/6550 and
+# https://github.com/dotnet/cli/pull/6633 for why this is necessary.
+ENV DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 
 ENTRYPOINT [ "/usr/bin/dotnet" ]
