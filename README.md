@@ -7,6 +7,7 @@ These images are available at `gcr.io/cloud-builders/...` and include such
 images as:
 
 *   `bazel`: runs the [bazel](https://bazel.io) tool
+*   `fsharp`: runs the [fsharpc](http://fsharp.org/) tool/compiler
 *   `docker`: runs the [docker](https://docker.com) tool
 *   `gcloud`: runs the [gcloud](https://cloud.google.com/sdk/gcloud/) tool
 *   `git`: runs the [git](https://git-scm.com/) tool
@@ -18,7 +19,8 @@ images as:
     tool
 *   `java/gradle`: runs the [gradle](https://gradle.org/) tool
 *   `java/mvn`: runs the [maven](https://maven.apache.org/) tool
-*   `kubectl`: runs the [kubectl](https://kubernetes.io/docs/user-guide/kubectl-overview/) tool
+*   `kubectl`: runs the
+    [kubectl](https://kubernetes.io/docs/user-guide/kubectl-overview/) tool
 *   `npm`: runs the [npm](https://docs.npmjs.com/) tool
 *   `wget`: runs the [wget](https://www.gnu.org/software/wget/) tool
 *   `yarn`: runs the [yarn](https://yarnpkg.com/) tool
