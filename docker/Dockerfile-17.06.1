@@ -1,11 +1,10 @@
-FROM ubuntu:trusty
+FROM ubuntu:xenial
 
 # Based on instructions from:
 # https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/#uninstall-old-versions
 RUN \
    apt-get -y update && \
    apt-get install -y \
-      linux-image-extra-$(uname -r) \
       linux-image-extra-virtual \
       apt-transport-https \
       ca-certificates \
