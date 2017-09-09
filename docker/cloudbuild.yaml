@@ -17,6 +17,14 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/docker:17.05'
   - '.'
   id: '17.05'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=DOCKER_VERSION=17.06.1~ce-0~ubuntu'
+  - '--tag=gcr.io/$PROJECT_ID/docker:17.06.1'
+  - '--file=Dockerfile-17.06.1'
+  - '.'
+  id: '17.06.1'
 # Future supported versions of docker builder go here.
 
 # Test each version by using it to run "docker build" on itself.
@@ -32,13 +40,20 @@ steps:
   - '--build-arg=DOCKER_VERSION=17.05.0~ce-0~ubuntu-trusty'
   - '.'
   wait_for: ['17.05']
+- name: 'gcr.io/$PROJECT_ID/docker:17.06.1'
+  args:
+  - 'build'
+  - '--build-arg=DOCKER_VERSION=17.06.1~ce-0~ubuntu'
+  - '--file=Dockerfile-17.06.1'
+  - '.'
+  wait_for: ['17.06.1']
 # Tests for future supported versions of docker builder go here.
 
 # Tag the latest version as :latest. We use gcr.io/cloud-builders/docker here
 # and not gcr.io/$PROJECT_ID/docker because the latter may not yet exist.
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['tag', 'gcr.io/$PROJECT_ID/docker:17.05', 'gcr.io/$PROJECT_ID/docker']
-  wait_for: ['17.05']
+  args: ['tag', 'gcr.io/$PROJECT_ID/docker:17.06.1', 'gcr.io/$PROJECT_ID/docker']
+  wait_for: ['17.06.1']
   id: 'latest'
 
 # Here are some things that can be done with this builder:
@@ -69,3 +84,4 @@ images:
 - 'gcr.io/$PROJECT_ID/docker:latest'
 - 'gcr.io/$PROJECT_ID/docker:1.12.6'
 - 'gcr.io/$PROJECT_ID/docker:17.05'
+- 'gcr.io/$PROJECT_ID/docker:17.06.1'
