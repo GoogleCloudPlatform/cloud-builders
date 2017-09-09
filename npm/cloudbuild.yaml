@@ -11,7 +11,7 @@ steps:
   - '.'
   id: 'node-6.11.2'
 - name: 'gcr.io/cloud-builders/docker'
-  args: 
+  args:
   - 'build'
   - '--build-arg=NODE_VERSION=v8.4.0'
   - '--tag=gcr.io/$PROJECT_ID/npm:node-8.4.0'
