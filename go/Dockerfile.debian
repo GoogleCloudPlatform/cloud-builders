@@ -1,4 +1,4 @@
-FROM golang:wheezy
+FROM golang
 
 # Install VCS tools to support "go get" commands.
 RUN apt-get update -qqy && apt-get install -qqy git mercurial subversion
@@ -12,7 +12,7 @@ RUN mkdir /builder
 
 COPY go_workspace.go prepare_workspace.inc /builder/
 
-COPY go.wheezy.bash /builder/bin/go.bash
+COPY go.bash /builder/bin/
 ENV PATH=/builder/bin:$PATH
 
 RUN go build -o /builder/go_workspace /builder/go_workspace.go
