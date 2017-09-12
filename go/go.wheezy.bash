@@ -15,7 +15,7 @@
 # limitations under the License.
 . /builder/prepare_workspace.inc
 prepare_workspace || exit
-echo <<EOF
+cat <<EOF
 **DEPRECATION WARNING**
 The 'gcr.io/cloud-builders/go:wheezy' image is deprecated. Please switch go 'gcr.io/cloud-builders/go:debian'.
 Starting no earlier than 2017-12-12 the 'gcr.io/cloud-builders/go:wheezy' image will be broken and no longer work.
