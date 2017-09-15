@@ -18,7 +18,7 @@ Running the following command will give Container Builder Service Account
 `container.developer` role access to your Container Engine clusters:
 
 ```sh
-export PROJECT="$(gcloud projects describe \
+PROJECT="$(gcloud projects describe \
     $(gcloud config get-value core/project -q) --format='get(projectNumber)')"
 
 gcloud projects add-iam-policy-binding $PROJECT \
