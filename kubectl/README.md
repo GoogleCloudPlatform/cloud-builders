@@ -32,6 +32,13 @@ cluster. You can configure the cluster by setting environment variables.
     CLOUDSDK_COMPUTE_ZONE=<your cluster's zone>
     CLOUDSDK_CONTAINER_CLUSTER=<your cluster's name>
 
+
+If your GKE cluster is in a different project than Container Builder, also set:
+
+```CLOUDSDK_CORE_PROJECT=<the GKE cluster project>```
+
+Make sure you also grant the Container Builder service account permissions in the GKE cluster project.
+
 Setting the environment variables above will cause this step's entrypoint to
 first run a command to fetch cluster credentials as follows.
 
