@@ -31,7 +31,7 @@ RUN mkdir -p /usr/share/dotnet && \
 # Make sure that the caches are expanded.
 ADD ./configs /configs
 RUN cd /configs/config-1.0.0/ && dotnet new && \
-    cd /configs/config-1.0.4/ && dotnet new && \
+    cd /configs/config-1.1.4/ && dotnet new && \
     cd /configs/config-2.0.0/ && dotnet new && \
     rm -rf /configs
 
