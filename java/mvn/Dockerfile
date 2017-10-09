@@ -19,6 +19,9 @@ RUN apt-get update -qqy && apt-get install -qqy curl \
 
 ENV M2_HOME /usr/share/maven
 
+# Point maven central to google internal mirror
+ADD settings.xml $USER_HOME_DIR/.m2/settings.xml
+
 # transitively resolve all dependencies
 ADD deps.txt /builder/deps.txt
 ADD resolve-deps.sh /builder/resolve-deps.sh
