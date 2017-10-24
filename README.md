@@ -1,6 +1,6 @@
 # Google Cloud Container Builder official builder images
 
-This repository contains official builder source code for use with the [Google Cloud Container Builder API](https://cloud.google.com/container-builder/docs/).
+This repository contains source code for official builders used with the [Google Cloud Container Builder API](https://cloud.google.com/container-builder/docs/).
 
 Pre-built images are available at `gcr.io/cloud-builders/...` and include:
 
