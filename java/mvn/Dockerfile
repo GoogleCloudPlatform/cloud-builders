@@ -4,7 +4,7 @@ FROM ${BASE_IMAGE}
 ARG MAVEN_VERSION=3.5.0
 ARG USER_HOME_DIR="/root"
 ARG SHA=beb91419245395bd69a4a6edad5ca3ec1a8b64e41457672dc687c173a495f034
-ARG BASE_URL=https://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/binaries
+ARG BASE_URL=https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries
 
 RUN apt-get update -qqy && apt-get install -qqy curl \
   && mkdir -p /usr/share/maven /usr/share/maven/ref \
