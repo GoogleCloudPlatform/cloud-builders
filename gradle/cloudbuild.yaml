@@ -1,5 +1,7 @@
 # In this directory, run the following command to build this builder.
 # $ gcloud container builds submit . --config=cloudbuild.yaml
+#
+# TODO(franklinn): Stop tagging java/mvn images once usage has dropped off.
 
 steps:
 - name: 'gcr.io/cloud-builders/docker'
@@ -8,6 +10,7 @@ steps:
   - '--build-arg=BASE_IMAGE=gcr.io/cloud-builders/java/javac:8'
   - '--build-arg=GRADLE_VERSION=4.0'
   - '--build-arg=SHA=56bd2dde29ba2a93903c557da1745cafd72cdd8b6b0b83c05a40ed7896b79dfe'
+  - '--tag=gcr.io/cloud-builders/gradle:4.0-jdk-8'
   - '--tag=gcr.io/cloud-builders/java/gradle:4.0-jdk-8'
   - '.'
   waitFor: ['-']
@@ -17,6 +20,7 @@ steps:
   - '--build-arg=BASE_IMAGE=gcr.io/cloud-builders/java/javac:7'
   - '--build-arg=GRADLE_VERSION=4.0'
   - '--build-arg=SHA=56bd2dde29ba2a93903c557da1745cafd72cdd8b6b0b83c05a40ed7896b79dfe'
+  - '--tag=gcr.io/cloud-builders/gradle:4.0-jdk-7'
   - '--tag=gcr.io/cloud-builders/java/gradle:4.0-jdk-7'
   - '.'
   waitFor: ['-']
@@ -26,7 +30,8 @@ steps:
   - '--build-arg=BASE_IMAGE=gcr.io/cloud-builders/java/javac:8'
   - '--build-arg=GRADLE_VERSION=3.5'
   - '--build-arg=SHA=0b7450798c190ff76b9f9a3d02e18b33d94553f708ebc08ebe09bdf99111d110'
-  - '--tag=gcr.io/cloud-builders/java/gradle:3.5-jdk-8'
+  - '--tag=gcr.io/cloud-builders/gradle:3.5-jdk-8'
+  - '--tag=gcr.io/cloud-builders/java/gradle:3.5-jdk-7'
   - '.'
   waitFor: ['-']
 - name: 'gcr.io/cloud-builders/docker'
@@ -35,6 +40,7 @@ steps:
   - '--build-arg=BASE_IMAGE=gcr.io/cloud-builders/java/javac:7'
   - '--build-arg=GRADLE_VERSION=3.5'
   - '--build-arg=SHA=0b7450798c190ff76b9f9a3d02e18b33d94553f708ebc08ebe09bdf99111d110'
+  - '--tag=gcr.io/cloud-builders/gradle:3.5-jdk-7'
   - '--tag=gcr.io/cloud-builders/java/gradle:3.5-jdk-7'
   - '.'
   waitFor: ['-']
@@ -43,32 +49,37 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'tag'
-  - 'gcr.io/cloud-builders/java/gradle:4.0-jdk-8'
+  - 'gcr.io/cloud-builders/gradle:4.0-jdk-8'
   - 'gcr.io/cloud-builders/java/gradle'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'tag'
+  - 'gcr.io/cloud-builders/gradle:4.0-jdk-8'
+  - 'gcr.io/cloud-builders/gradle'
 
 # Run examples
-- name: 'gcr.io/cloud-builders/java/gradle:4.0-jdk-8'
+- name: 'gcr.io/cloud-builders/gradle:4.0-jdk-8'
   args: ['build']
   dir: 'examples/spring_boot'
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '.']
   dir: 'examples/spring_boot'
 
-- name: 'gcr.io/cloud-builders/java/gradle:4.0-jdk-7'
+- name: 'gcr.io/cloud-builders/gradle:4.0-jdk-7'
   args: ['build']
   dir: 'examples/spring_boot'
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '.']
   dir: 'examples/spring_boot'
 
-- name: 'gcr.io/cloud-builders/java/gradle:3.5-jdk-8'
+- name: 'gcr.io/cloud-builders/gradle:3.5-jdk-8'
   args: ['build']
   dir: 'examples/spring_boot'
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '.']
   dir: 'examples/spring_boot'
 
-- name: 'gcr.io/cloud-builders/java/gradle:3.5-jdk-7'
+- name: 'gcr.io/cloud-builders/gradle:3.5-jdk-7'
   args: ['build']
   dir: 'examples/spring_boot'
 - name: 'gcr.io/cloud-builders/docker'
@@ -76,6 +87,11 @@ steps:
   dir: 'examples/spring_boot'
 
 images:
+- 'gcr.io/cloud-builders/gradle'
+- 'gcr.io/cloud-builders/gradle:4.0-jdk-8'
+- 'gcr.io/cloud-builders/gradle:4.0-jdk-7'
+- 'gcr.io/cloud-builders/gradle:3.5-jdk-8'
+- 'gcr.io/cloud-builders/gradle:3.5-jdk-7'
 - 'gcr.io/cloud-builders/java/gradle'
 - 'gcr.io/cloud-builders/java/gradle:4.0-jdk-8'
 - 'gcr.io/cloud-builders/java/gradle:4.0-jdk-7'
