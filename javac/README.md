@@ -1,4 +1,4 @@
-# Tool builder: `gcr.io/cloud-builders/java/javac`
+# Tool builder: `gcr.io/cloud-builders/javac`
 
 This build step runs the javac tool.
 
