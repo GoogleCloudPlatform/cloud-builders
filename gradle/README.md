@@ -1,4 +1,4 @@
-# Tool builder: `gcr.io/cloud-builders/java/gradle`
+# Tool builder: `gcr.io/cloud-builders/gradle`
 
 This Container Builder build step runs the Gradle build tool.
 
