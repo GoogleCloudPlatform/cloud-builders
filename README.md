@@ -11,10 +11,10 @@ Pre-built images are available at `gcr.io/cloud-builders/...` and include:
 *   `glide`: runs the [glide](https://glide.sh/) tool
 *   `go`: runs the [go](https://golang.org/cmd/go) tool
 *   `golang-project`: recognizes and builds conventional [Go](https://golang.org) projects into container images
+*   `gradle`: runs the [gradle](https://gradle.org/) tool
 *   `gsutil`: runs the [gsutil](https://cloud.google.com/storage/docs/gsutil) tool
-*   `java/gradle`: runs the [gradle](https://gradle.org/) tool
-*   `java/mvn`: runs the [maven](https://maven.apache.org/) tool
 *   `kubectl`: runs the [kubectl](https://kubernetes.io/docs/user-guide/kubectl-overview/) tool
+*   `mvn`: runs the [maven](https://maven.apache.org/) tool
 *   `npm`: runs the [npm](https://docs.npmjs.com/) tool
 *   `wget`: runs the [wget](https://www.gnu.org/software/wget/) tool
 *   `yarn`: runs the [yarn](https://yarnpkg.com/) tool
