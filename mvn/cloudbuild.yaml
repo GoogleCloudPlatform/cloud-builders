@@ -8,7 +8,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=BASE_IMAGE=gcr.io/cloud-builders/java/javac:8'
+  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:8'
   - '--build-arg=MAVEN_VERSION=3.3.9'
   - '--build-arg=SHA=6e3e9c949ab4695a204f74038717aa7b2689b1be94875899ac1b3fe42800ff82'
   - '--tag=gcr.io/$PROJECT_ID/mvn:3.3.9-jdk-8'
@@ -18,7 +18,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=BASE_IMAGE=gcr.io/cloud-builders/java/javac:7'
+  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:7'
   - '--build-arg=MAVEN_VERSION=3.3.9'
   - '--build-arg=SHA=6e3e9c949ab4695a204f74038717aa7b2689b1be94875899ac1b3fe42800ff82'
   - '--tag=gcr.io/$PROJECT_ID/mvn:3.3.9-jdk-7'
@@ -28,7 +28,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=BASE_IMAGE=gcr.io/cloud-builders/java/javac:8'
+  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:8'
   - '--build-arg=MAVEN_VERSION=3.5.0'
   - '--build-arg=SHA=beb91419245395bd69a4a6edad5ca3ec1a8b64e41457672dc687c173a495f034'
   - '--tag=gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-8'
@@ -38,7 +38,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=BASE_IMAGE=gcr.io/cloud-builders/java/javac:7'
+  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:7'
   - '--build-arg=MAVEN_VERSION=3.5.0'
   - '--build-arg=SHA=beb91419245395bd69a4a6edad5ca3ec1a8b64e41457672dc687c173a495f034'
   - '--tag=gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-7'

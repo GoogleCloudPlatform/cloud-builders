@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=gcr.io/cloud-builders/java/javac:8
+ARG BASE_IMAGE=gcr.io/cloud-builders/javac:8
 FROM ${BASE_IMAGE}
 
 ARG MAVEN_VERSION=3.5.0
