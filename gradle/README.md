@@ -1,6 +1,6 @@
-# Tool builder: `gcr.io/cloud-builders/java/javac`
+# Tool builder: `gcr.io/cloud-builders/gradle`
 
-This build step runs the javac tool.
+This Container Builder build step runs the Gradle build tool.
 
 ## Building this builder
 
