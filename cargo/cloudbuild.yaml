@@ -1,0 +1,8 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'cargo'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/builders/cargo', '.']
+
+timeout: 2400s
+
+images: ['gcr.io/$PROJECT_ID/builders/cargo']
