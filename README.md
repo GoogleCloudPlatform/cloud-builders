@@ -16,6 +16,7 @@ Pre-built images are available at `gcr.io/cloud-builders/...` and include:
 *   `kubectl`: runs the [kubectl](https://kubernetes.io/docs/user-guide/kubectl-overview/) tool
 *   `mvn`: runs the [maven](https://maven.apache.org/) tool
 *   `npm`: runs the [npm](https://docs.npmjs.com/) tool
+*   `scala/sbt`: runs the [sbt](http://www.scala-sbt.org/) tool
 *   `wget`: runs the [wget](https://www.gnu.org/software/wget/) tool
 *   `yarn`: runs the [yarn](https://yarnpkg.com/) tool
 
