@@ -3,12 +3,12 @@ steps:
 
 # Use a persistent volume to store the packages for this app and have them
 # available across calls to the 'dotnet' builder.
-- name: 'gcr.io/cloud-builders/csharp/dotnet'
+- name: 'gcr.io/cloud-builders/dotnet'
   args: [ 'restore', '--packages', '/packages' ]
   volumes:
   - name: 'packages'
     path: '/packages'
-- name: 'gcr.io/cloud-builders/csharp/dotnet'
+- name: 'gcr.io/cloud-builders/dotnet'
   args: [ 'publish', '-c', 'Release' ]
   volumes:
   - name: 'packages'
