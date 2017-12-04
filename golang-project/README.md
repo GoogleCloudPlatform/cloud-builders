@@ -1,3 +1,7 @@
+# !!! `golang-project` is deprecated !!!
+
+# Use `gcr.io/cloud-builders/go` instead
+
 # Native builder: `gcr.io/cloud-builders/golang-project`
 
 This Container Builder build step builds canonical Go projects.
@@ -20,8 +24,8 @@ The process is:
 
 To customize the image created, either use a `--base-image` with those
 customizations, or use the [`gcr.io/cloud-builders/docker`](../docker/README.md)
-build step with a `Dockerfile` that is built `FROM` the image produced by
-the `gcr.io/cloud-builders/golang-project` build step.
+build step with a `Dockerfile` that is built `FROM` the image produced by the
+`gcr.io/cloud-builders/golang-project` build step.
 
 ### `alpine` vs `wheezy`
 
@@ -32,8 +36,8 @@ Binaries built in an `alpine` environment don't always work in a `wheezy`-like
 
 The specific versions are available as
 
-  - gcr.io/cloud-builders/golang-project:alpine
-  - gcr.io/cloud-builders/golang-project:wheezy
+-   gcr.io/cloud-builders/golang-project:alpine
+-   gcr.io/cloud-builders/golang-project:wheezy
 
 And `gcr.io/cloud-builders/golang-project:latest` is an alias for
 `gcr.io/cloud-builders/golang-project:alpine`.
@@ -41,11 +45,11 @@ And `gcr.io/cloud-builders/golang-project:latest` is an alias for
 ### Related: `gcr.io/cloud-builders/go`
 
 The related build step, [`gcr.io/cloud-builders/go`](../go/README.md), is used
-to run the `go` directly on source. The [`gcr.io/cloud-builders/go`]
-(../go/README.md) build step and this `gcr.io/cloud-builders/golang-project`
-recognize Go workspaces in the same way, described in the
-[`gcr.io/cloud-builders/go`](../go/README.md) build step's [README]
-(../go/README.md)
+to run the `go` directly on source. The
+[`gcr.io/cloud-builders/go`](../go/README.md) build step and this
+`gcr.io/cloud-builders/golang-project` recognize Go workspaces in the same way,
+described in the [`gcr.io/cloud-builders/go`](../go/README.md) build step's
+[README](../go/README.md)
 
 ## Workspace setup
 
