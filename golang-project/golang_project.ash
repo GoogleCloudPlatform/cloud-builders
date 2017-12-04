@@ -16,4 +16,11 @@
 . /builder/prepare_workspace.inc
 prepare_workspace || exit
 echo "Documentation at https://github.com/GoogleCloudPlatform/cloud-builders/blob/master/golang-project/README.md"
+
+
+echo "***********************************************************************"
+echo "*** NOTICE: The 'golang-project' builder is deprecated, and will be ***"
+echo "*** removed in the future. Use 'gcr.io/cloud-builders/go' instead.  ***"
+echo "***********************************************************************"
+
 /builder/golang_project "$@"

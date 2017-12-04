@@ -1,3 +1,7 @@
+# !!! `golang-project` is deprecated !!!
+
+**Use `gcr.io/cloud-builders/go` instead**
+
 # Native builder: `gcr.io/cloud-builders/golang-project`
 
 This Container Builder build step builds canonical Go projects.
