@@ -195,7 +195,9 @@ func main() {
 	}
 
 	fmt.Println("Dockerfile contents:")
+	fmt.Println("--------------------")
 	io.Copy(os.Stdout, f)
+	fmt.Println("--------------------")
 	if err := f.Close(); err != nil {
 		log.Fatalf("Failed to close Dockerfile: %v", err)
 	}

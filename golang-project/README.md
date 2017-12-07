@@ -2,6 +2,52 @@
 
 **Use `gcr.io/cloud-builders/go` instead**
 
+## Migrating to `gcr.io/cloud-builders/go`
+
+When you run this builder, you should see some log lines like:
+
+```
+Dockerfile contents:
+--------------------
+FROM <BASE IMAGE>
+ENV_PATH=/golang_project_bin:$PATH
+COPY gopath/bin/hello /golang_project_bin/
+ENTRYPOINT ["/golang_project_bin/<PACKAGE>"]
+--------------------
+```
+
+Copy these contents into a new file named `Dockerfile` and fill in your
+preferred base image and binary name.
+
+Update your `cloudbuild.yaml` config. Instead of something like this:
+
+```
+steps:
+- name: 'gcr.io/cloud-builders/golang-project'
+  args: [<PACKAGE>, <IMAGE>]
+images: [<IMAGE>]
+```
+
+Use the `go` builder:
+
+```
+steps:
+- name: 'gcr.io/cloud-builders/go'
+  args: ['install']
+- name: 'gcr.io/cloud-builders/go'
+  args: ['test', './...']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', <IMAGE>, '.']
+images: [<IMAGE>]
+```
+
+This build configuration will build and test your Go package, then build a
+Docker image using the new `Dockerfile`.
+
+See [hello_world_migrated](examples/hello_world_migrated) for an example of
+the [hello_world example](examples/hello_world), migrated to use the `go`
+builder.
+
 # Native builder: `gcr.io/cloud-builders/golang-project`
 
 This Container Builder build step builds canonical Go projects.
