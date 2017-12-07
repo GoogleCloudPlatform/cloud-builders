@@ -44,6 +44,10 @@ images: [<IMAGE>]
 This build configuration will build and test your Go package, then build a
 Docker image using the new `Dockerfile`.
 
+See [hello_world_migrated](examples/hello_world_migrated) for an example of
+the [hello_world example](examples/hello_world), migrated to use the `go`
+builder.
+
 # Native builder: `gcr.io/cloud-builders/golang-project`
 
 This Container Builder build step builds canonical Go projects.
