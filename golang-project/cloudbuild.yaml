@@ -6,21 +6,13 @@ steps:
 - name: 'gcr.io/cloud-builders/go:alpine'
   args: ['install', 'golang_project']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-f', 'Dockerfile.alpine', '--tag=gcr.io/$PROJECT_ID/golang-project:alpine', '.']
-
-# clear out the alpine version of the binary
-- name: 'alpine'
-  args: ['rm', 'gopath/bin/golang_project']
-
-# build the wheezy version
-- name: 'gcr.io/cloud-builders/go:wheezy'
-  args: ['install', 'golang_project']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-f', 'Dockerfile.wheezy', '--tag=gcr.io/$PROJECT_ID/golang-project:wheezy', '.']
-
-# alpine is the default
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['tag', 'gcr.io/$PROJECT_ID/golang-project:alpine', 'gcr.io/$PROJECT_ID/golang-project']
+  args:
+  - 'build'
+  - '-f'
+  - 'Dockerfile.alpine'
+  - '--tag=gcr.io/$PROJECT_ID/golang-project'
+  - '--tag=gcr.io/$PROJECT_ID/golang-project:alpine'
+  - '.'
 
 # Test the examples.
 
@@ -37,16 +29,6 @@ steps:
   - 'product/subtool/subpkg'
   - '--entrypoint=server'
   - '--tag=gcr.io/$PROJECT_ID/golang_project_multi_bin'
-  env: ['PROJECT_ROOT=product']
-  dir: 'examples/multi_bin'
-
-- name: 'gcr.io/$PROJECT_ID/golang-project:wheezy'
-  args:
-  - 'product/server'
-  - 'product/subtool'
-  - 'product/subtool/subpkg'
-  - '--entrypoint=server'
-  - '--tag=gcr.io/$PROJECT_ID/golang_project_multi_bin:wheezy'
   env: ['PROJECT_ROOT=product']
   dir: 'examples/multi_bin'
 
@@ -72,13 +54,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--tag=ubuntu-cacerts', '-f', 'Dockerfile.cacerts.ubuntu', '.']
   dir: 'examples/custom_base'
-- name: 'gcr.io/$PROJECT_ID/golang-project:wheezy'
-  args: ['client', '--base-image=ubuntu-cacerts', '--tag=gcr.io/$PROJECT_ID/golang_project_custom_base:ubuntu']
-  dir: 'examples/custom_base'
-- name: 'gcr.io/$PROJECT_ID/golang_project_custom_base:ubuntu'
-
 
 images:
   - 'gcr.io/$PROJECT_ID/golang-project'
   - 'gcr.io/$PROJECT_ID/golang-project:alpine'
-  - 'gcr.io/$PROJECT_ID/golang-project:wheezy'
