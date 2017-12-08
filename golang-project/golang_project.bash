@@ -17,9 +17,12 @@
 prepare_workspace || exit
 echo "Documentation at https://github.com/GoogleCloudPlatform/cloud-builders/blob/master/golang-project/README.md"
 
-echo "***********************************************************************"
-echo "*** NOTICE: The 'golang-project' builder is deprecated, and will be ***"
-echo "*** removed in the future. Use 'gcr.io/cloud-builders/go' instead.  ***"
-echo "***********************************************************************"
+cat << EOF
+*******************************************************************************
+*** NOTICE: The 'golang-project:wheezy' builder is deprecated. Use          ***
+*** 'go:wheezy' instead. Starting no earlier than March 7, 2018, this       ***
+*** builder will be broken and will no longer work.                         ***
+*******************************************************************************
+EOF
 
 /builder/golang_project "$@"
