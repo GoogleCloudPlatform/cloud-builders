@@ -8,7 +8,7 @@ steps:
   args:
   - 'build'
   - '--no-cache'
-  - '--build-arg=BASE_IMAGE=openjdk:8-jdk'
+  - '--build-arg=BASE_IMAGE=gcr.io/google-appengine/openjdk:8'
   - '--build-arg=DOCKER_VERSION=17.06.0~ce-0~debian'
   - '--tag=gcr.io/$PROJECT_ID/javac:8'
   - '--tag=gcr.io/$PROJECT_ID/javac'
