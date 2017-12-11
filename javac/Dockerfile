@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=openjdk:8-jdk
+ARG BASE_IMAGE=gcr.io/google-appengine/openjdk:8
 FROM ${BASE_IMAGE}
 
 ARG DOCKER_VERSION=17.06.0~ce-0~debian
