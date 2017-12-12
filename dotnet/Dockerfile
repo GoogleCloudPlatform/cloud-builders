@@ -1,4 +1,4 @@
-FROM gcr.io/google_appengine/debian8
+FROM launcher.gcr.io/google/debian8
 
 # Install the dependencies for running the .NET Core SDK.
 RUN apt-get update \
