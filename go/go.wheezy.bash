@@ -19,17 +19,8 @@ prepare_workspace || exit
 
 cat << EOF
 *******************************************************************************
-*** NOTICE: The 'go:wheezy' builder is deprecated. Use 'go:debian' instead. ***
-*** Starting no earlier than December 12, 2017, this builder will be broken ***
-*** and will no longer work.                                                ***
+*** ERROR: The 'go:wheezy' builder is deprecated. Use 'go:debian' instead.  ***
 *******************************************************************************
 EOF
 
-if [[ "$1" == install ]]; then
-  # Give a hint about where binaries end up if we think they're using 'go install'.
-  gp=$(go env GOPATH)
-  binpath=${gp#$PWD/}/bin
-  echo "Binaries built using 'go install' will go to \"$binpath\"."
-fi
-echo "Running: go $@"
-go "$@"
+exit 1
