@@ -18,16 +18,6 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:7'
-  - '--build-arg=MAVEN_VERSION=3.3.9'
-  - '--build-arg=SHA=6e3e9c949ab4695a204f74038717aa7b2689b1be94875899ac1b3fe42800ff82'
-  - '--tag=gcr.io/$PROJECT_ID/mvn:3.3.9-jdk-7'
-  - '--tag=gcr.io/$PROJECT_ID/java/mvn:3.3.9-jdk-7'
-  - '.'
-  wait_for: ['-']
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'build'
   - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:8'
   - '--build-arg=MAVEN_VERSION=3.5.0'
   - '--build-arg=SHA=beb91419245395bd69a4a6edad5ca3ec1a8b64e41457672dc687c173a495f034'
@@ -35,14 +25,16 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/java/mvn:3.5.0-jdk-8'
   - '.'
   wait_for: ['-']
+
+# Build broken jdk7 builder.
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:7'
-  - '--build-arg=MAVEN_VERSION=3.5.0'
-  - '--build-arg=SHA=beb91419245395bd69a4a6edad5ca3ec1a8b64e41457672dc687c173a495f034'
+  - '--file=Dockerfile.jdk7'
   - '--tag=gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-7'
   - '--tag=gcr.io/$PROJECT_ID/java/mvn:3.5.0-jdk-7'
+  - '--tag=gcr.io/$PROJECT_ID/mvn:3.3.9-jdk-7'
+  - '--tag=gcr.io/$PROJECT_ID/java/mvn:3.3.9-jdk-7'
   - '.'
   wait_for: ['-']
 
@@ -66,21 +58,7 @@ steps:
   args: ['build', '.']
   dir: 'examples/spring_boot'
 
-- name: 'gcr.io/$PROJECT_ID/mvn:3.3.9-jdk-7'
-  args: ['install']
-  dir: 'examples/spring_boot'
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '.']
-  dir: 'examples/spring_boot'
-
 - name: 'gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-8'
-  args: ['install']
-  dir: 'examples/spring_boot'
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '.']
-  dir: 'examples/spring_boot'
-
-- name: 'gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-7'
   args: ['install']
   dir: 'examples/spring_boot'
 - name: 'gcr.io/cloud-builders/docker'
