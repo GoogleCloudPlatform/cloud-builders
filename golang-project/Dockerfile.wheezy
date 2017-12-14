@@ -1,30 +1,3 @@
-FROM gcr.io/cloud-builders/go:wheezy
-
-ENV DOCKER_SHA256 cadc6025c841e034506703a06cf54204e51d0cadfae4bae62628ac648d82efdd
-
-# Install Docker per https://docs.docker.com/engine/installation/linux/debian/
-RUN \
-    # This makes add-apt-repository available.
-    apt-get -qqy update && \
-    apt-get -y install software-properties-common \
-        apt-transport-https \
-        ca-certificates \
-        python-software-properties && \
-    curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
-    apt-key fingerprint 0EBFCD88 && \
-    # wheezy-backports is required for init-system-helpers which is required by Docker.
-    add-apt-repository "deb http://ftp.de.debian.org/debian wheezy-backports main" && \
-    add-apt-repository \
-        "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) edge" && \
-    grep -v deb-src /etc/apt/sources.list > /tmp/sources.list && \
-    mv /tmp/sources.list /etc/apt/sources.list && \
-    apt-get -qqy update && \
-    apt-get -y install docker-ce=17.05.0~ce-0~debian-wheezy
-
-COPY gopath/bin/golang_project /builder/golang_project
-COPY golang_project.bash /builder/bin/
-ENV PATH=/builder/bin:$PATH
-
-ENV DEFAULT_BASE_IMAGE=debian:wheezy
-
-ENTRYPOINT ["golang_project.bash"]
+FROM ubuntu
+COPY wheezy.bash /wheezy.bash
+ENTRYPOINT ["/wheezy.bash"]
