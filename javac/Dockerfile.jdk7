@@ -1,0 +1,3 @@
+FROM ubuntu
+COPY jdk7.bash /jdk7.bash
+ENTRYPOINT ["/jdk7.bash"]

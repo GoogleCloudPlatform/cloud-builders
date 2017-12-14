@@ -17,16 +17,6 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:7'
-  - '--build-arg=GRADLE_VERSION=4.0'
-  - '--build-arg=SHA=56bd2dde29ba2a93903c557da1745cafd72cdd8b6b0b83c05a40ed7896b79dfe'
-  - '--tag=gcr.io/$PROJECT_ID/gradle:4.0-jdk-7'
-  - '--tag=gcr.io/$PROJECT_ID/java/gradle:4.0-jdk-7'
-  - '.'
-  waitFor: ['-']
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'build'
   - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:8'
   - '--build-arg=GRADLE_VERSION=3.5'
   - '--build-arg=SHA=0b7450798c190ff76b9f9a3d02e18b33d94553f708ebc08ebe09bdf99111d110'
@@ -34,12 +24,14 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/java/gradle:3.5-jdk-8'
   - '.'
   waitFor: ['-']
+
+# Build broken jdk7 builder.
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:7'
-  - '--build-arg=GRADLE_VERSION=3.5'
-  - '--build-arg=SHA=0b7450798c190ff76b9f9a3d02e18b33d94553f708ebc08ebe09bdf99111d110'
+  - '--file=Dockerfile.jdk7'
+  - '--tag=gcr.io/$PROJECT_ID/gradle:4.0-jdk-7'
+  - '--tag=gcr.io/$PROJECT_ID/java/gradle:4.0-jdk-7'
   - '--tag=gcr.io/$PROJECT_ID/gradle:3.5-jdk-7'
   - '--tag=gcr.io/$PROJECT_ID/java/gradle:3.5-jdk-7'
   - '.'
@@ -65,21 +57,7 @@ steps:
   args: ['build', '.']
   dir: 'examples/spring_boot'
 
-- name: 'gcr.io/$PROJECT_ID/gradle:4.0-jdk-7'
-  args: ['build']
-  dir: 'examples/spring_boot'
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '.']
-  dir: 'examples/spring_boot'
-
 - name: 'gcr.io/$PROJECT_ID/gradle:3.5-jdk-8'
-  args: ['build']
-  dir: 'examples/spring_boot'
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '.']
-  dir: 'examples/spring_boot'
-
-- name: 'gcr.io/$PROJECT_ID/gradle:3.5-jdk-7'
   args: ['build']
   dir: 'examples/spring_boot'
 - name: 'gcr.io/cloud-builders/docker'
