@@ -20,9 +20,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--no-cache'
-  - '--build-arg=BASE_IMAGE=openjdk:7-jdk'
-  - '--build-arg=DOCKER_VERSION=17.06.0~ce-0~debian'
+  - '--file=Dockerfile.jdk7'
   - '--tag=gcr.io/$PROJECT_ID/javac:7'
   - '--tag=gcr.io/$PROJECT_ID/java/javac:7'
   - '.'
@@ -43,18 +41,6 @@ steps:
   entrypoint: 'apt-get'
   args: ['update']
   waitFor: ['BUILD_JDK_8']
-
-- name: 'gcr.io/$PROJECT_ID/javac:7'
-  args: ['-version']
-  waitFor: ['BUILD_JDK_7']
-- name: 'gcr.io/$PROJECT_ID/javac:7'
-  entrypoint: 'docker'
-  args: ['version']
-  waitFor: ['BUILD_JDK_7']
-- name: 'gcr.io/$PROJECT_ID/javac:7'
-  entrypoint: 'apt-get'
-  args: ['update']
-  waitFor: ['BUILD_JDK_7']
 
 images:
 - 'gcr.io/$PROJECT_ID/javac:8'
