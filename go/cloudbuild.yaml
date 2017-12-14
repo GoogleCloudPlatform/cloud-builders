@@ -2,11 +2,9 @@
 # $ gcloud container builds submit . --config=cloudbuild.yaml
 
 steps:
-# Build the alpine and wheezy versions.
+# Build the alpine and debian versions.
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-f', 'Dockerfile.alpine', '--tag=gcr.io/$PROJECT_ID/go:alpine', '.']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-f', 'Dockerfile.wheezy', '--tag=gcr.io/$PROJECT_ID/go:wheezy', '.']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-f', 'Dockerfile.debian', '--tag=gcr.io/$PROJECT_ID/go:debian', '.']
 
@@ -111,4 +109,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['run', 'https_test:ubuntu']
 
-images: ['gcr.io/$PROJECT_ID/go', 'gcr.io/$PROJECT_ID/go:alpine', 'gcr.io/$PROJECT_ID/go:wheezy', 'gcr.io/$PROJECT_ID/go:debian']
+images:
+- 'gcr.io/$PROJECT_ID/go'
+- 'gcr.io/$PROJECT_ID/go:alpine'
+- 'gcr.io/$PROJECT_ID/go:debian'
