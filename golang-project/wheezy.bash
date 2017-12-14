@@ -2,7 +2,8 @@
 
 cat << EOF
 *******************************************************************************
-*** ERROR: golang-project:wheezy is deprecated, use the go builder instead. ***
+*** ERROR: gcr.io/cloud-builders/golang-project:wheezy is deprecated, use   ***
+*** gcr.io/cloud-builders/go builder instead.                               ***
 *******************************************************************************
 EOF
 
