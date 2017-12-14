@@ -7,12 +7,4 @@ steps:
   - '--entrypoint=server'
   - '--tag=gcr.io/$PROJECT_ID/golang_project_multi_bin'
   env: ['PROJECT_ROOT=product']
-- name: 'gcr.io/cloud-builders/golang-project:wheezy'
-  args:
-  - 'product/server'
-  - 'product/subtool'
-  - 'product/subtool/subpkg'
-  - '--entrypoint=server'
-  - '--tag=gcr.io/$PROJECT_ID/golang_project_multi_bin:wheezy'
-  env: ['PROJECT_ROOT=product']
-images: ['gcr.io/$PROJECT_ID/golang_project_multi_bin', 'gcr.io/$PROJECT_ID/golang_project_multi_bin:wheezy']
+images: ['gcr.io/$PROJECT_ID/golang_project_multi_bin']
