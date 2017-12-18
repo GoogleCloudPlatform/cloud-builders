@@ -20,7 +20,6 @@ The specific versions are available as
 
   - gcr.io/cloud-builders/go:alpine
   - gcr.io/cloud-builders/go:debian
-  - gcr.io/cloud-builders/go:wheezy (deprecated)
 
 And `gcr.io/cloud-builders/go:latest` is an alias for
 `gcr.io/cloud-builders/go:alpine`.
