@@ -8,17 +8,4 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['run', 'gcr.io/$PROJECT_ID/https_test:alpine']
 
-# Clear out the binary that uses the wrong architecture for ubuntu.
-- name: 'alpine'
-  args: ['rm', 'gopath/bin/https_test']
-
-- name: 'gcr.io/cloud-builders/go:wheezy'
-  args: ['install', 'https_test']
-- name: 'gcr.io/cloud-builders/go:wheezy'
-  args: ['test', 'https_test']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-f', 'Dockerfile.ubuntu', '--tag=gcr.io/$PROJECT_ID/https_test:ubuntu', '.']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['run', 'gcr.io/$PROJECT_ID/https_test:ubuntu']
-
-images: ['gcr.io/$PROJECT_ID/https_test:alpine', 'gcr.io/$PROJECT_ID/https_test:ubuntu']
+images: ['gcr.io/$PROJECT_ID/https_test:alpine']
