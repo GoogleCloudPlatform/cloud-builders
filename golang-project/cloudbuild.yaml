@@ -12,10 +12,6 @@ steps:
 - name: 'alpine'
   args: ['rm', 'gopath/bin/golang_project']
 
-# build the wheezy version
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--file=Dockerfile.wheezy', '--tag=gcr.io/$PROJECT_ID/golang-project:wheezy', '.']
-
 # alpine is the default
 - name: 'gcr.io/cloud-builders/docker'
   args: ['tag', 'gcr.io/$PROJECT_ID/golang-project:alpine', 'gcr.io/$PROJECT_ID/golang-project']
@@ -64,4 +60,3 @@ steps:
 images:
   - 'gcr.io/$PROJECT_ID/golang-project'
   - 'gcr.io/$PROJECT_ID/golang-project:alpine'
-  - 'gcr.io/$PROJECT_ID/golang-project:wheezy'

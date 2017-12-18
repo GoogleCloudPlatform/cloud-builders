@@ -1,3 +1,0 @@
-FROM ubuntu
-COPY wheezy.bash /wheezy.bash
-ENTRYPOINT ["/wheezy.bash"]
