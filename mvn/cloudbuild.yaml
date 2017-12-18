@@ -26,18 +26,6 @@ steps:
   - '.'
   wait_for: ['-']
 
-# Build broken jdk7 builder.
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'build'
-  - '--file=Dockerfile.jdk7'
-  - '--tag=gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-7'
-  - '--tag=gcr.io/$PROJECT_ID/java/mvn:3.5.0-jdk-7'
-  - '--tag=gcr.io/$PROJECT_ID/mvn:3.3.9-jdk-7'
-  - '--tag=gcr.io/$PROJECT_ID/java/mvn:3.3.9-jdk-7'
-  - '.'
-  wait_for: ['-']
-
 # Tag a default builder version.
 - name: 'gcr.io/cloud-builders/docker'
   args:
@@ -67,12 +55,8 @@ steps:
 
 images:
 - 'gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-8'
-- 'gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-7'
 - 'gcr.io/$PROJECT_ID/mvn:3.3.9-jdk-8'
-- 'gcr.io/$PROJECT_ID/mvn:3.3.9-jdk-7'
 - 'gcr.io/$PROJECT_ID/mvn'
 - 'gcr.io/$PROJECT_ID/java/mvn:3.5.0-jdk-8'
-- 'gcr.io/$PROJECT_ID/java/mvn:3.5.0-jdk-7'
 - 'gcr.io/$PROJECT_ID/java/mvn:3.3.9-jdk-8'
-- 'gcr.io/$PROJECT_ID/java/mvn:3.3.9-jdk-7'
 - 'gcr.io/$PROJECT_ID/java/mvn'

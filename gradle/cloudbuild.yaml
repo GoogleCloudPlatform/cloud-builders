@@ -25,18 +25,6 @@ steps:
   - '.'
   waitFor: ['-']
 
-# Build broken jdk7 builder.
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'build'
-  - '--file=Dockerfile.jdk7'
-  - '--tag=gcr.io/$PROJECT_ID/gradle:4.0-jdk-7'
-  - '--tag=gcr.io/$PROJECT_ID/java/gradle:4.0-jdk-7'
-  - '--tag=gcr.io/$PROJECT_ID/gradle:3.5-jdk-7'
-  - '--tag=gcr.io/$PROJECT_ID/java/gradle:3.5-jdk-7'
-  - '.'
-  waitFor: ['-']
-
 # Tag the default 'latest' version
 - name: 'gcr.io/cloud-builders/docker'
   args:
@@ -67,11 +55,7 @@ steps:
 images:
 - 'gcr.io/$PROJECT_ID/gradle'
 - 'gcr.io/$PROJECT_ID/gradle:4.0-jdk-8'
-- 'gcr.io/$PROJECT_ID/gradle:4.0-jdk-7'
 - 'gcr.io/$PROJECT_ID/gradle:3.5-jdk-8'
-- 'gcr.io/$PROJECT_ID/gradle:3.5-jdk-7'
 - 'gcr.io/$PROJECT_ID/java/gradle'
 - 'gcr.io/$PROJECT_ID/java/gradle:4.0-jdk-8'
-- 'gcr.io/$PROJECT_ID/java/gradle:4.0-jdk-7'
 - 'gcr.io/$PROJECT_ID/java/gradle:3.5-jdk-8'
-- 'gcr.io/$PROJECT_ID/java/gradle:3.5-jdk-7'

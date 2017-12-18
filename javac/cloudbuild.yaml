@@ -17,15 +17,6 @@ steps:
   - '.'
   waitFor: ['-']
   id: 'BUILD_JDK_8'
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'build'
-  - '--file=Dockerfile.jdk7'
-  - '--tag=gcr.io/$PROJECT_ID/javac:7'
-  - '--tag=gcr.io/$PROJECT_ID/java/javac:7'
-  - '.'
-  waitFor: ['-']
-  id: 'BUILD_JDK_7'
 
 # Test that javac and docker are installed, for all built images, and that apt-get update will work
 # in child images
@@ -44,8 +35,6 @@ steps:
 
 images:
 - 'gcr.io/$PROJECT_ID/javac:8'
-- 'gcr.io/$PROJECT_ID/javac:7'
 - 'gcr.io/$PROJECT_ID/javac'
 - 'gcr.io/$PROJECT_ID/java/javac:8'
-- 'gcr.io/$PROJECT_ID/java/javac:7'
 - 'gcr.io/$PROJECT_ID/java/javac'
