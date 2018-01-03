@@ -6,21 +6,20 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=DOCKER_VERSION=1.12.6-0~ubuntu-trusty'
+  - '--file=Dockerfile-1.12.6'
   - '--tag=gcr.io/$PROJECT_ID/docker:1.12.6'
   - '.'
   id: '1.12.6'
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=DOCKER_VERSION=17.05.0~ce-0~ubuntu-trusty'
+  - '--file=Dockerfile-17.05.0'
   - '--tag=gcr.io/$PROJECT_ID/docker:17.05'
   - '.'
   id: '17.05'
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=DOCKER_VERSION=17.06.1~ce-0~ubuntu'
   - '--tag=gcr.io/$PROJECT_ID/docker:17.06.1'
   - '--file=Dockerfile-17.06.1'
   - '.'
@@ -31,19 +30,18 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/docker:1.12.6'
   args:
   - 'build'
-  - '--build-arg=DOCKER_VERSION=1.12.6-0~ubuntu-trusty'
+  - '--file=Dockerfile-1.12.6'
   - '.'
   wait_for: ['1.12.6']
 - name: 'gcr.io/$PROJECT_ID/docker:17.05'
   args:
   - 'build'
-  - '--build-arg=DOCKER_VERSION=17.05.0~ce-0~ubuntu-trusty'
+  - '--file=Dockerfile-17.05.0'
   - '.'
   wait_for: ['17.05']
 - name: 'gcr.io/$PROJECT_ID/docker:17.06.1'
   args:
   - 'build'
-  - '--build-arg=DOCKER_VERSION=17.06.1~ce-0~ubuntu'
   - '--file=Dockerfile-17.06.1'
   - '.'
   wait_for: ['17.06.1']
@@ -64,7 +62,7 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/docker'
   args:
   - 'build'
-  - '--build-arg=DOCKER_VERSION=1.12.6-0~ubuntu-trusty'
+  - '--file=Dockerfile-1.12.6'
   - '--tag=gcr.io/$PROJECT_ID/docker-again'
   - '.'
   wait_for: ['latest']
