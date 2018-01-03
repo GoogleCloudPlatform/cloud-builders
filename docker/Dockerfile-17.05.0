@@ -11,8 +11,8 @@ RUN apt-get -y update && \
     add-apt-repository \
        "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
        xenial \
-       stable" && \
+       edge" && \
     apt-get -y update && \
-    apt-get -y install docker-ce=17.06.0~ce-0~ubuntu
+    apt-get -y install docker-ce=17.05.0~ce-0~ubuntu-xenial
 
 ENTRYPOINT ["/usr/bin/docker"]
