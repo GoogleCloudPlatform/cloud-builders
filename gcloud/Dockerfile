@@ -1,4 +1,4 @@
-FROM ubuntu:trusty
+FROM launcher.gcr.io/google/ubuntu16_04
 
 RUN apt-get -y update && \
     apt-get -y install gcc python2.7 python-dev python-setuptools wget ca-certificates \

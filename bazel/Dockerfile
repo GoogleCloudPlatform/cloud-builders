@@ -1,4 +1,4 @@
-FROM ubuntu:xenial
+FROM launcher.gcr.io/google/ubuntu16_04
 
 RUN \
     # This makes add-apt-repository available.
