@@ -1,4 +1,4 @@
-FROM launcher.gcr.io/google/ubuntu16_04
+FROM ubuntu:trusty
 
 # Based on instructions from:
 # https://docs.docker.com/engine/installation/linux/ubuntu/
