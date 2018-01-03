@@ -1,0 +1,17 @@
+FROM launcher.gcr.io/google/ubuntu16_04
+
+# https://docs.docker.com/cs-engine/1.12/#install-on-ubuntu-1404-lts-or-1604-lts
+RUN apt-get -y update && \
+    apt-get -y install --no-install-recommends \
+        apt-transport-https \
+        curl \
+        software-properties-common && \
+    curl -fsSL 'https://sks-keyservers.net/pks/lookup?op=get&search=0xee6d536cf7dc86e2d7d56f59a178ac6c6238f52e' | apt-key add - && \
+    add-apt-repository \
+        "deb https://packages.docker.com/1.12/apt/repo/ \
+        ubuntu-xenial \
+        main" && \
+    apt-get -y update && \
+    apt-get -y install docker-engine=1.12.6~cs13-0~ubuntu-xenial
+
+ENTRYPOINT ["/usr/bin/docker"]
