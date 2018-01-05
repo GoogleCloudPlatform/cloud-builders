@@ -16,23 +16,13 @@ steps:
 
 # Build the example.
 - name: 'gcr.io/$PROJECT_ID/bazel'
-  args: ['run', '//subdir:target', '--verbose_failures']
+  args: ['run', '//:target', '--verbose_failures']
   dir: 'examples'
 
-# Example was built as bazel/subdir:target.
+# Example was built as bazel:target.
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['run', 'bazel/subdir:target']
+  args: ['run', 'bazel:target']
 
 # TODO(mattmoor): Test docker_push as well.
-
-# Build the Go binary
-- name: 'gcr.io/$PROJECT_ID/bazel'
-  args: ['build', '//subdir:hello', '--verbose_failures']
-  dir: 'examples'
-
-# Verify that the Go binary is available post-build
-- name: 'ubuntu'
-  args: ['/workspace/examples/bazel-bin/subdir/hello']
-
 
 images: ['gcr.io/$PROJECT_ID/bazel']
