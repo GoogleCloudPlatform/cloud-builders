@@ -17,12 +17,12 @@ steps:
   dir: 'configs/config-1.0.0'
 - name: 'gcr.io/$PROJECT_ID/dotnet'
   entrypoint: 'bash'
-  args: ['-c', '[[ $(dotnet --version) == "1.1.4" ]]']
-  dir: 'configs/config-1.1.4'
+  args: ['-c', '[[ $(dotnet --version) == "1.1.5" ]]']
+  dir: 'configs/config-1.1.5'
 - name: 'gcr.io/$PROJECT_ID/dotnet'
   entrypoint: 'bash'
-  args: ['-c', '[[ $(dotnet --version) == "2.0.0" ]]']
-  dir: 'configs/config-2.0.0'
+  args: ['-c', '[[ $(dotnet --version) == "2.1.3" ]]']
+  dir: 'configs/config-2.1.3'
 
 images:
 - 'gcr.io/$PROJECT_ID/dotnet'
