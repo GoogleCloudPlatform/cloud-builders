@@ -1,6 +1,7 @@
-package(default_visibility = ["//visibility:public"])
+load("@io_bazel_rules_docker//go:image.bzl", "go_image")
 
-# Go boilerplate
-load("@io_bazel_rules_go//go:def.bzl", "go_prefix")
-
-go_prefix("github.com/GoogleCloudPlatform/cloud-builders/bazel/examples")
+go_image(
+    name = "target",
+    srcs = ["main.go"],
+    importpath = "github.com/GoogleCloudPlatform/cloud-builders/bazel/examples",
+)
