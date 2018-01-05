@@ -25,15 +25,7 @@ _go_image_repos()
 
 load(
     "@io_bazel_rules_docker//container:container.bzl",
-    "container_pull",
     container_repositories = "repositories",
 )
 
 container_repositories()
-
-container_pull(
-    name = "base_image",
-    digest = "sha256:d3892ebd85bb21b161e9d170beefd6c444d9bd58aba3998e1f67aa842fbedb9d",  # wheezy
-    registry = "index.docker.io",
-    repository = "library/debian",
-)
