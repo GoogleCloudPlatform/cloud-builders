@@ -61,6 +61,5 @@ steps:
 Since Docker CLI changes may not be backward-compatible, we provide tagged
 versions of this builder for these previously-supported versions:
 
-*   `gcr.io/cloud-builders/docker:1.12.6`
 *   `gcr.io/cloud-builders/docker:17.05`
 *   `gcr.io/cloud-builders/docker:17.06.1` (`:latest`)
