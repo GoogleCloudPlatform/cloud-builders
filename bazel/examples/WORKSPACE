@@ -22,10 +22,3 @@ load(
 )
 
 _go_image_repos()
-
-load(
-    "@io_bazel_rules_docker//container:container.bzl",
-    container_repositories = "repositories",
-)
-
-container_repositories()
