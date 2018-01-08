@@ -17,18 +17,8 @@ git_repository(
 )
 
 load(
-   "@io_bazel_rules_docker//docker:docker.bzl",
-   "docker_pull",
-   "docker_repositories",
+    "@io_bazel_rules_docker//go:image.bzl",
+    _go_image_repos = "repositories",
 )
 
-# Consumers shouldn't need to do this themselves once WORKSPACE is
-# instantiated recursively.
-docker_repositories()
-
-docker_pull(
-    name = "base_image",
-    registry = "index.docker.io",
-    repository = "library/debian",
-    digest = "sha256:d3892ebd85bb21b161e9d170beefd6c444d9bd58aba3998e1f67aa842fbedb9d", # wheezy
-)
+_go_image_repos()
