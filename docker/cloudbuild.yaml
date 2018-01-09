@@ -21,6 +21,11 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/docker:17.06.1'
   args: ['run', 'hello-world']
 
+# Check that we can override entrypoint to bash.
+- name: 'gcr.io/$PROJECT_ID/docker'
+  entrypoint: 'bash'
+  args: ['-c', 'for i in ubuntu busybox alpine; do docker pull $$i; done']
+
 images:
 - 'gcr.io/$PROJECT_ID/docker:latest'
 - 'gcr.io/$PROJECT_ID/docker:17.05'
