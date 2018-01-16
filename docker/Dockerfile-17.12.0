@@ -14,6 +14,6 @@ RUN apt-get -y update && \
        xenial \
        stable" && \
     apt-get -y update && \
-    apt-get -y install docker-ce=17.12.0-ce-0~ubuntu
+    apt-get -y install docker-ce=17.12.0~ce-0~ubuntu
 
 ENTRYPOINT ["/usr/bin/docker"]
