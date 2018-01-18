@@ -3,7 +3,7 @@ FROM launcher.gcr.io/google/debian8
 
 # https://yarnpkg.com/en/docs/install#linux-tab
 RUN apt-get update && \
-    apt-get install -y curl apt-transport-https && \
+    apt-get install -y curl apt-transport-https git && \
 
     # Install newer Node version.
     curl -sL https://deb.nodesource.com/setup_8.x | bash - && \
