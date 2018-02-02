@@ -6,8 +6,8 @@ SDKs installed:
 
 + 1.0.3 with SDK Preview 2 build 3156, to support .NET Core 1.0.5 with
   project.json solutions.
-+ 1.1.5, which supports .csproj projects for .NET Core 1.0.8 and 1.1.5.
-+ 2.1.3, which supports projects for .NET Core 2.0.4
++ 1.1.7, which supports .csproj projects for .NET Core 1.0.9 and 1.1.6.
++ 2.1.4, which supports projects for .NET Core 2.0.5
 
 Any arguments passed to this builder step will be passed directly to the
 `dotnet` tool. Note that when using the `dotnet restore` command you should
