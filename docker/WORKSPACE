@@ -1,0 +1,47 @@
+workspace(name = "bazel_docker")
+
+git_repository(
+    name = "io_bazel_rules_docker",
+    remote = "https://github.com/bazelbuild/rules_docker.git",
+    tag = "v0.3.0",
+)
+
+load(
+    "@io_bazel_rules_docker//container:container.bzl",
+    "container_pull",
+    container_repositories = "repositories",
+)
+
+# Consumers shouldn't need to do this themselves once WORKSPACE is
+# instantiated recursively.
+container_repositories()
+
+# Ubuntu base image.
+container_pull(
+    name = "base_image",
+    digest = "sha256:c81e8f6bcbab8818fdbe2df6d367990ab55d85b4dab300931a53ba5d082f4296",
+    registry = "launcher.gcr.io",
+    repository = "google/ubuntu16_04",
+)
+
+# Docker 17.05.0 static binary.
+new_http_archive(
+    name = "docker_static_17_05_0",
+    build_file = "BUILD.docker",
+    # Digest as of Jan 8, 2018 @ 10:58AM EST
+    sha256 = "d8357a0825bbc3ab0f55350d494a52771ec58496d13bb2f27c453512dd0d4d4c",
+    strip_prefix = "docker",
+    type = "tgz",
+    urls = ["https://download.docker.com/linux/static/edge/x86_64/docker-17.05.0-ce.tgz"],
+)
+
+# Docker 17.06.1 static binary.
+new_http_archive(
+    name = "docker_static_17_06_1",
+    build_file = "BUILD.docker",
+    # Digest as of Jan 8, 2018 @ 10:58AM EST
+    sha256 = "e35fe12806eadbb7eb8aa63e3dfb531bda5f901cd2c14ac9cdcd54df6caed697",
+    strip_prefix = "docker",
+    type = "tgz",
+    urls = ["https://download.docker.com/linux/static/stable/x86_64/docker-17.06.1-ce.tgz"],
+)
