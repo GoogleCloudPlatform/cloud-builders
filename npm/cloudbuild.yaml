@@ -22,14 +22,14 @@ steps:
   - 'build'
   - '--build-arg=NODE_VERSION=v8.4.0'
   - '--tag=gcr.io/$PROJECT_ID/npm:node-8.4.0'
-  - '--tag=gcr.io/$PROJECT_ID/npm:current'
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  # 9.3.0 is tagged :current
   - '--build-arg=NODE_VERSION=v9.3.0'
   - '--tag=gcr.io/$PROJECT_ID/npm:node-9.3.0'
+  # 9.3.0 is tagged :current
+  - '--tag=gcr.io/$PROJECT_ID/npm:current'
   - '.'
 
 # Print for each version
