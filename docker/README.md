@@ -6,7 +6,7 @@ Arguments passed to this builder will be passed to `docker` directly, allowing
 callers to run [any Docker
 command](https://docs.docker.com/engine/reference/commandline/).
 
-By default, the version of Docker that is used by this builder is `17.06.1`.
+By default, the version of Docker that is used by this builder is `17.12.0`.
 
 ## GCR Credentials
 
@@ -62,4 +62,5 @@ Since Docker CLI changes may not be backward-compatible, we provide tagged
 versions of this builder for these previously-supported versions:
 
 *   `gcr.io/cloud-builders/docker:17.05`
-*   `gcr.io/cloud-builders/docker:17.06.1` (`:latest`)
+*   `gcr.io/cloud-builders/docker:17.06.1`
+*   `gcr.io/cloud-builders/docker:17.12.0` (`:latest`)
