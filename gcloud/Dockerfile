@@ -17,10 +17,27 @@ RUN apt-get -y update && \
         --bash-completion=false \
         --disable-installation-options && \
 
-    # Install additional components
+    # Install all available components
     /builder/google-cloud-sdk/bin/gcloud -q components install \
-        alpha beta kubectl && \
+        alpha beta \
+	app-engine-go \
+	app-engine-java \
+	app-engine-php \
+	app-engine-python \
+	app-engine-python-extras \
+	bigtable \
+	cbt \
+	cloud-datastore-emulator \
+	container-builder-local \
+	datalab \
+	docker-credential-gcr \
+	emulator-reverse-proxy \
+	kubectl \
+	pubsub-emulator \
+	&& \
+
     /builder/google-cloud-sdk/bin/gcloud -q components update && \
+    /builder/google-cloud-sdk/bin/gcloud components list && \
 
     # install crcmod: https://cloud.google.com/storage/docs/gsutil/addlhelp/CRC32CandInstallingcrcmod
     easy_install -U pip && \
