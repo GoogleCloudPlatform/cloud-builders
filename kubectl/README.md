@@ -42,7 +42,7 @@ Make sure you also grant the Container Builder service account permissions in th
 Setting the environment variables above will cause this step's entrypoint to
 first run a command to fetch cluster credentials as follows.
 
-    gcloud container clusters get-credentials --zone "$CLOUDSDK_COMPUTE_ZONE" "$CLOUDSDK_CONTAINER_CLUSTER"`
+    gcloud container clusters get-credentials --zone "$CLOUDSDK_COMPUTE_ZONE" "$CLOUDSDK_CONTAINER_CLUSTER"
 
 Then, `kubectl` will have the configuration needed to talk to your GKE cluster.
 
