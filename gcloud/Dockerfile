@@ -4,8 +4,8 @@ RUN apt-get -y update && \
     apt-get -y install gcc python2.7 python-dev python-setuptools wget ca-certificates \
        # These are necessary for add-apt-respository
        software-properties-common python-software-properties \
-	   # JRE is required for cloud-datastore-emulator
-	   default-jre && \
+       # JRE is required for cloud-datastore-emulator
+       default-jre && \
 
     # Install Git >2.0.1
     add-apt-repository ppa:git-core/ppa && \
