@@ -1,0 +1,6 @@
+steps:
+- name: 'gcr.io/cloud-builders/bazel'
+  args: ['test', '//pkg/...']
+
+- name: 'gcr.io/cloud-builders/bazel'
+  args: ['run', '//cmd:image']

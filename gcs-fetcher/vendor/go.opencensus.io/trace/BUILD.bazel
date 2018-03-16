@@ -1,0 +1,17 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "basetypes.go",
+        "doc.go",
+        "export.go",
+        "sampling.go",
+        "spanbucket.go",
+        "spanstore.go",
+        "trace.go",
+    ],
+    importpath = "go.opencensus.io/trace",
+    visibility = ["//visibility:public"],
+    deps = ["//vendor/go.opencensus.io/internal:go_default_library"],
+)
