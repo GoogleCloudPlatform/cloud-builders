@@ -1,0 +1,17 @@
+steps:
+- name: 'gcr.io/cloud-builders/bazel'
+  args: ['test', '--spawn_strategy=standalone', '//pkg/...']
+
+- name: 'gcr.io/cloud-builders/bazel'
+  args: ['run', '--spawn_strategy=standalone', '--define', 'project=$PROJECT_ID', '//cmd:push']
+
+# HACK: The previous step pushed the image directly to the registry, without
+# placing the image in the worker's local daemon. We need to pull the image
+# into the local daemon so we can "push" it in the build (even though it's a
+# no-op) so the build can record the image's digest.
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['pull', 'gcr.io/$PROJECT_ID/gcs-fetcher']
+
+images: ['gcr.io/$PROJECT_ID/gcs-fetcher']
+
+timeout: '900s'

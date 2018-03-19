@@ -1,0 +1,19 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "collate.go",
+        "index.go",
+        "option.go",
+        "sort.go",
+        "tables.go",
+    ],
+    importpath = "golang.org/x/text/collate",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/golang.org/x/text/internal/colltab:go_default_library",
+        "//vendor/golang.org/x/text/language:go_default_library",
+        "//vendor/golang.org/x/text/unicode/norm:go_default_library",
+    ],
+)

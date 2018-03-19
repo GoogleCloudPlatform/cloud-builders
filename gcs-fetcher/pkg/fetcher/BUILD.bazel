@@ -1,0 +1,16 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["fetcher.go"],
+    importpath = "github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/pkg/fetcher",
+    visibility = ["//visibility:public"],
+    deps = ["//vendor/github.com/golang/glog:go_default_library"],
+)
+
+go_test(
+    name = "go_default_test",
+    srcs = ["fetcher_test.go"],
+    embed = [":go_default_library"],
+    importpath = "github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/pkg/fetcher",
+)
