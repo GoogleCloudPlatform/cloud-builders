@@ -1,0 +1,37 @@
+workspace(name = "buildcrd")
+
+# Pull in rules_go
+git_repository(
+    name = "io_bazel_rules_go",
+    commit = "737df20c53499fd84b67f04c6ca9ccdee2e77089",
+    remote = "https://github.com/bazelbuild/rules_go.git",
+)
+
+load("@io_bazel_rules_go//go:def.bzl", "go_rules_dependencies", "go_register_toolchains", "go_repository")
+
+go_rules_dependencies()
+
+go_register_toolchains()
+
+# Pull in rules_docker
+git_repository(
+    name = "io_bazel_rules_docker",
+    # HEAD as of 2018-03-09
+    commit = "483759bba7be220a1014e7ba1cf989f052fefa2c",
+    remote = "https://github.com/bazelbuild/rules_docker.git",
+)
+
+load(
+    "@io_bazel_rules_docker//docker:docker.bzl",
+    "docker_repositories",
+)
+
+docker_repositories()
+
+# Pull in the go_image stuff.
+load(
+    "@io_bazel_rules_docker//go:image.bzl",
+    _go_image_repos = "repositories",
+)
+
+_go_image_repos()
