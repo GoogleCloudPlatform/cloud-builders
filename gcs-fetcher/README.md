@@ -1,7 +1,7 @@
 # GCS Fetcher
 
 ** This builder is experimental and currently very likely to change in breaking
-ways. **
+ways at this time. **
 
 This tool fetches objects from Google Cloud Storage, either in the form of a
 .zip archive, or based on the contents of a source manifest file.
@@ -21,7 +21,7 @@ For example:
     "sourceUrl": "gs://my-bucket/abcdef",
     "sha1sum": "<sha-1 digest>"
   },
-  "path/to/package.json": {
+  "path/to/main.go": {
     "sourceUrl": "gs://my-bucket/ghijk",
     "sha1sum": "<sha-1 digest>"
   },
@@ -38,7 +38,7 @@ To process this manifest, the tool each element:
 So in the above example, the tool fetches `gs://my-bucket/abcdef`, verifies its
 SHA-1 digest, and places the file in the working directory named as
 `Dockerfile`. It then fetches `gs://my-bucket/ghijk`, verifies its SHA-1 digest,
-and places the file in the working directory at `path/to/package.json`.
+and places the file in the working directory at `path/to/main.go`.
 
 ### Why Source Manifests?
 
@@ -47,7 +47,7 @@ sources from a client.
 
 If a user uploads the two files in the example above, then edits the contents of
 their `Dockerfile`, only that new file has to be uploaded to Cloud Storage, and
-the manifest for the next build can reuse the entry for `path/to/package.json`,
+the manifest for the next build can reuse the entry for `path/to/main.go`,
 only writing a new entry for `Dockerfile` to specify the new file's location in
 Cloud Storage.
 

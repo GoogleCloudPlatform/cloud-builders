@@ -20,6 +20,7 @@ load("@io_bazel_rules_docker//go:image.bzl", "go_image")
 go_image(
     name = "image",
     binary = ":cmd",
+    importpath = "github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/cmd",
 )
 
 go_binary(
@@ -27,4 +28,15 @@ go_binary(
     embed = [":go_default_library"],
     importpath = "github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/cmd",
     visibility = ["//visibility:public"],
+)
+
+load("@io_bazel_rules_docker//docker:docker.bzl", "container_push")
+
+container_push(
+    name = "push",
+    format = "Docker",
+    image = ":image",
+    registry = "gcr.io",
+    repository = "$(project)/gcs-fetcher",
+    stamp = True,
 )
