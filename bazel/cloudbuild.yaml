@@ -8,15 +8,9 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/bazel'
   args: ['version']
 
-# Not clear why we need this; at least some users get permission errors on the
-# next build step unless we do this first. This is a work-around for issue #53:
-# https://github.com/GoogleCloudPlatform/cloud-builders/issues/53
-- name: 'ubuntu'
-  args: ['chmod', 'a+r', '-R', '.']
-
 # Build the example.
 - name: 'gcr.io/$PROJECT_ID/bazel'
-  args: ['run', '//:target', '--verbose_failures']
+  args: ['run', '--spawn_strategy=standalone', '//:target', '--verbose_failures']
   dir: 'examples'
 
 # Example was built as bazel:target.
