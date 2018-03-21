@@ -14,4 +14,4 @@ steps:
 
 images: ['gcr.io/$PROJECT_ID/gcs-fetcher']
 
-timeout: '900s'
+timeout: '1800s'
