@@ -13,8 +13,8 @@ ENV PATH $PATH:/nodejs/bin
 RUN mkdir /yarn && curl -L https://github.com/yarnpkg/yarn/releases/download/v0.24.6/yarn-v0.24.6.tar.gz | tar xvzf - -C /yarn --strip-components=1
 ENV PATH $PATH:/yarn/bin
 
-COPY . /hello/
+COPY . /hello_world/
 
-WORKDIR /hello
+WORKDIR /hello_world
 
 CMD ["yarn", "start"]
