@@ -6,6 +6,7 @@ Cloud Container Builder API](https://cloud.google.com/container-builder/docs/).
 Pre-built images are available at `gcr.io/cloud-builders/...` and include:
 
 *   `bazel`: runs the [bazel](https://bazel.io) tool
+*   `curl`: runs the [curl](https://curl.haxx.se) tool
 *   `docker`: runs the [docker](https://docker.com) tool
 *   `gcloud`: runs the [gcloud](https://cloud.google.com/sdk/gcloud/) tool
 *   `git`: runs the [git](https://git-scm.com/) tool
