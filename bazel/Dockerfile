@@ -3,7 +3,11 @@ FROM launcher.gcr.io/google/ubuntu16_04
 RUN \
     # This makes add-apt-repository available.
     apt-get update && \
-    apt-get -y install python software-properties-common unzip && \
+    apt-get -y install \
+        python \
+        python-pkg-resources \
+        software-properties-common \
+        unzip && \
 
     # Install Git >2.0.1
     add-apt-repository ppa:git-core/ppa && \
