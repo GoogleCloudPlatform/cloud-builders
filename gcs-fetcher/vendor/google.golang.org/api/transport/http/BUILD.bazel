@@ -10,8 +10,8 @@ go_library(
     importpath = "google.golang.org/api/transport/http",
     visibility = ["//visibility:public"],
     deps = [
+        "//vendor/go.opencensus.io/exporter/stackdriver/propagation:go_default_library",
         "//vendor/go.opencensus.io/plugin/ochttp:go_default_library",
-        "//vendor/go.opencensus.io/plugin/ochttp/propagation/google:go_default_library",
         "//vendor/golang.org/x/net/context:go_default_library",
         "//vendor/golang.org/x/oauth2:go_default_library",
         "//vendor/google.golang.org/api/googleapi/transport:go_default_library",

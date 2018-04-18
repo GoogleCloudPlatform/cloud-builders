@@ -4,10 +4,10 @@ go_library(
     name = "go_default_library",
     srcs = [
         "client.go",
-        "default_format.go",
+        "client_stats.go",
         "doc.go",
+        "server.go",
         "stats.go",
-        "stats_transport.go",
         "trace.go",
     ],
     importpath = "go.opencensus.io/plugin/ochttp",

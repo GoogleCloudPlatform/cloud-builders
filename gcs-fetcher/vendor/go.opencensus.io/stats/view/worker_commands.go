@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"go.opencensus.io/stats"
+	"go.opencensus.io/stats/internal"
 	"go.opencensus.io/tag"
 )
 
@@ -40,16 +41,21 @@ type getViewByNameResp struct {
 }
 
 func (cmd *getViewByNameReq) handleCommand(w *worker) {
-	cmd.c <- &getViewByNameResp{w.views[cmd.name].view}
+	v := w.views[cmd.name]
+	if v == nil {
+		cmd.c <- &getViewByNameResp{nil}
+		return
+	}
+	cmd.c <- &getViewByNameResp{v.view}
 }
 
-// subscribeToViewReq is the command to subscribe to a view.
-type subscribeToViewReq struct {
+// registerViewReq is the command to register a view.
+type registerViewReq struct {
 	views []*View
 	err   chan error
 }
 
-func (cmd *subscribeToViewReq) handleCommand(w *worker) {
+func (cmd *registerViewReq) handleCommand(w *worker) {
 	var errstr []string
 	for _, view := range cmd.views {
 		vi, err := w.tryRegisterView(view)
@@ -57,6 +63,7 @@ func (cmd *subscribeToViewReq) handleCommand(w *worker) {
 			errstr = append(errstr, fmt.Sprintf("%s: %v", view.Name, err))
 			continue
 		}
+		internal.SubscriptionReporter(view.Measure.Name())
 		vi.subscribe()
 	}
 	if len(errstr) > 0 {
@@ -135,9 +142,12 @@ type recordReq struct {
 
 func (cmd *recordReq) handleCommand(w *worker) {
 	for _, m := range cmd.ms {
-		ref := w.getMeasureRef(m.Measure.Name())
+		if (m == stats.Measurement{}) { // not subscribed
+			continue
+		}
+		ref := w.getMeasureRef(m.Measure().Name())
 		for v := range ref.views {
-			v.addSample(cmd.tm, m.Value)
+			v.addSample(cmd.tm, m.Value())
 		}
 	}
 }

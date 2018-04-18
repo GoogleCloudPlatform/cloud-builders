@@ -38,10 +38,17 @@ var (
 	retries     = flag.Int("retries", defaultRetries, "Number of times to retry a failed GCS download.")
 	backoff     = flag.Duration("backoff", defaultBackoff, "Time to wait when retrying, will be doubled on each retry.")
 	timeoutGCS  = flag.Bool("timeout_gcs", true, "If true, a timeout will be used to avoid GCS longtails.")
+	help        = flag.Bool("help", true, "If true, prints help text and exits.")
 )
 
 func main() {
 	flag.Parse()
+
+	if *help {
+		fmt.Println("Fetches source files from Google Cloud Storage")
+		flag.PrintDefaults()
+		return
+	}
 
 	if *location == "" || *sourceType == "" {
 		glog.Fatal("Must specify --location and --type")

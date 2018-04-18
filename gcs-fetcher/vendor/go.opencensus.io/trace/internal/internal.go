@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ochttp
+// Package internal provides trace internals.
+package internal
 
-import (
-	"go.opencensus.io/plugin/ochttp/propagation/b3"
-	"go.opencensus.io/trace/propagation"
-)
-
-var defaultFormat propagation.HTTPFormat = &b3.HTTPFormat{}
+type IDGenerator interface {
+	NewTraceID() [16]byte
+	NewSpanID() [8]byte
+}
