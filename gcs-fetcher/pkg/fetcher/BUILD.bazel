@@ -12,5 +12,4 @@ go_test(
     name = "go_default_test",
     srcs = ["fetcher_test.go"],
     embed = [":go_default_library"],
-    importpath = "github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/pkg/fetcher",
 )

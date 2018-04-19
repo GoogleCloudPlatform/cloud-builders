@@ -5,6 +5,9 @@ steps:
 - name: 'gcr.io/cloud-builders/bazel'
   args: ['run', '--spawn_strategy=standalone', '--define', 'project=$PROJECT_ID', '//cmd:push']
 
+- name: 'gcr.io/$PROJECT_ID/gcs-fetcher'
+  args: ['--help']
+
 # HACK: The previous step pushed the image directly to the registry, without
 # placing the image in the worker's local daemon. We need to pull the image
 # into the local daemon so we can "push" it in the build (even though it's a
