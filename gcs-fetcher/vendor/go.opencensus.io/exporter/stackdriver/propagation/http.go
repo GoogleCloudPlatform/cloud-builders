@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package google contains a propagation.HTTPFormat implementation
-// for Google Cloud Trace and Stackdriver.
-package google // import "go.opencensus.io/plugin/ochttp/propagation/google"
+// Package propagation implement X-Cloud-Trace-Context header propagation used
+// by Google Cloud products.
+package propagation // import "go.opencensus.io/exporter/stackdriver/propagation"
 
 import (
 	"encoding/binary"
@@ -33,16 +33,16 @@ const (
 	httpHeader        = `X-Cloud-Trace-Context`
 )
 
+var _ propagation.HTTPFormat = (*HTTPFormat)(nil)
+
 // HTTPFormat implements propagation.HTTPFormat to propagate
 // traces in HTTP headers for Google Cloud Platform and Stackdriver Trace.
 type HTTPFormat struct{}
 
-var _ propagation.HTTPFormat = (*HTTPFormat)(nil)
-
 // SpanContextFromRequest extracts a Stackdriver Trace span context from incoming requests.
 func (f *HTTPFormat) SpanContextFromRequest(req *http.Request) (sc trace.SpanContext, ok bool) {
 	h := req.Header.Get(httpHeader)
-	// See https://cloud.google.com/trace/docs/faq for the header format.
+	// See https://cloud.google.com/trace/docs/faq for the header HTTPFormat.
 	// Return if the header is empty or missing, or if the header is unreasonably
 	// large, to avoid making unnecessary copies of a large string.
 	if h == "" || len(h) > httpHeaderMaxSize {

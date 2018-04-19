@@ -4,6 +4,7 @@ go_library(
     name = "go_default_library",
     srcs = [
         "basetypes.go",
+        "config.go",
         "doc.go",
         "export.go",
         "sampling.go",
@@ -13,5 +14,8 @@ go_library(
     ],
     importpath = "go.opencensus.io/trace",
     visibility = ["//visibility:public"],
-    deps = ["//vendor/go.opencensus.io/internal:go_default_library"],
+    deps = [
+        "//vendor/go.opencensus.io/internal:go_default_library",
+        "//vendor/go.opencensus.io/trace/internal:go_default_library",
+    ],
 )

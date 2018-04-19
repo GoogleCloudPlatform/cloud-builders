@@ -24,13 +24,11 @@ import (
 
 	"go.opencensus.io/stats"
 	"go.opencensus.io/tag"
-	"go.opencensus.io/trace"
 )
 
 // statsTransport is an http.RoundTripper that collects stats for the outgoing requests.
 type statsTransport struct {
-	base    http.RoundTripper
-	sampler trace.Sampler
+	base http.RoundTripper
 }
 
 // RoundTrip implements http.RoundTripper, delegating to Base and recording stats for the request.
@@ -56,10 +54,10 @@ func (t statsTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	resp, err := t.base.RoundTrip(req)
 
 	if err != nil {
-		track.statusCode = "error"
+		track.statusCode = http.StatusInternalServerError
 		track.end()
 	} else {
-		track.statusCode = strconv.Itoa(resp.StatusCode)
+		track.statusCode = resp.StatusCode
 		if resp.Body == nil {
 			track.end()
 		} else {
@@ -67,7 +65,6 @@ func (t statsTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 			resp.Body = track
 		}
 	}
-
 	return resp, err
 }
 
@@ -82,14 +79,16 @@ func (t statsTransport) CancelRequest(req *http.Request) {
 }
 
 type tracker struct {
+	ctx        context.Context
 	respSize   int64
 	reqSize    int64
-	ctx        context.Context
 	start      time.Time
 	body       io.ReadCloser
-	statusCode string
+	statusCode int
 	endOnce    sync.Once
 }
+
+var _ io.ReadCloser = (*tracker)(nil)
 
 func (t *tracker) end() {
 	t.endOnce.Do(func() {
@@ -100,12 +99,10 @@ func (t *tracker) end() {
 		if t.reqSize >= 0 {
 			m = append(m, ClientRequestBytes.M(t.reqSize))
 		}
-		ctx, _ := tag.New(t.ctx, tag.Upsert(StatusCode, t.statusCode))
+		ctx, _ := tag.New(t.ctx, tag.Upsert(StatusCode, strconv.Itoa(t.statusCode)))
 		stats.Record(ctx, m...)
 	})
 }
-
-var _ io.ReadCloser = (*tracker)(nil)
 
 func (t *tracker) Read(b []byte) (int, error) {
 	n, err := t.body.Read(b)
