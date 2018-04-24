@@ -1,20 +1,36 @@
 steps:
+# Run tests.
 - name: 'gcr.io/cloud-builders/bazel'
   args: ['test', '--spawn_strategy=standalone', '//pkg/...']
 
+# Build the images into the local Docker daemon.
 - name: 'gcr.io/cloud-builders/bazel'
-  args: ['run', '--spawn_strategy=standalone', '--define', 'project=$PROJECT_ID', '//cmd:push']
+  args: ['run', '--spawn_strategy=standalone', '--define', 'project=$PROJECT_ID', '//cmd/gcs-fetcher:image', '--', '--norun']
+- name: 'gcr.io/cloud-builders/bazel'
+  args: ['run', '--spawn_strategy=standalone', '--define', 'project=$PROJECT_ID', '//cmd/gcs-uploader:image', '--', '--norun']
 
+# Tag the images to the correct location.
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['tag', 'bazel/cmd/gcs-fetcher:image', 'gcr.io/$PROJECT_ID/gcs-fetcher']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['tag', 'bazel/cmd/gcs-uploader:image', 'gcr.io/$PROJECT_ID/gcs-uploader']
+
+# Sanity check that the images can be run.
 - name: 'gcr.io/$PROJECT_ID/gcs-fetcher'
   args: ['--help']
+- name: 'gcr.io/$PROJECT_ID/gcs-uploader'
+  args: ['--help']
 
-# HACK: The previous step pushed the image directly to the registry, without
-# placing the image in the worker's local daemon. We need to pull the image
-# into the local daemon so we can "push" it in the build (even though it's a
-# no-op) so the build can record the image's digest.
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['pull', 'gcr.io/$PROJECT_ID/gcs-fetcher']
+# Push the images.
+- name: 'gcr.io/cloud-builders/bazel'
+  args: ['run', '--spawn_strategy=standalone', '--define', 'project=$PROJECT_ID', '//cmd/gcs-fetcher:push']
+- name: 'gcr.io/cloud-builders/bazel'
+  args: ['run', '--spawn_strategy=standalone', '--define', 'project=$PROJECT_ID', '//cmd/gcs-uploader:push']
 
-images: ['gcr.io/$PROJECT_ID/gcs-fetcher']
+# These are no-ops, but they tie the build to the images they produced, since
+# Bazel-based Docker pushes are not otherwise tracked.
+images:
+- 'gcr.io/$PROJECT_ID/gcs-fetcher'
+- 'gcr.io/$PROJECT_ID/gcs-uploader'
 
-timeout: '1800s'
+timeout: '2100s'

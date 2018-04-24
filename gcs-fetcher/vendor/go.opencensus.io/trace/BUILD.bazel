@@ -12,6 +12,7 @@ go_library(
         "spanstore.go",
         "trace.go",
     ],
+    importmap = "buildcrd/vendor/go.opencensus.io/trace",
     importpath = "go.opencensus.io/trace",
     visibility = ["//visibility:public"],
     deps = [

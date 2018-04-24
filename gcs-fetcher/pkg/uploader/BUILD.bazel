@@ -2,10 +2,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
-    srcs = [
-        "glog.go",
-        "glog_file.go",
-    ],
-    importpath = "github.com/golang/glog",
+    srcs = ["uploader.go"],
+    importpath = "github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/pkg/uploader",
     visibility = ["//visibility:public"],
 )

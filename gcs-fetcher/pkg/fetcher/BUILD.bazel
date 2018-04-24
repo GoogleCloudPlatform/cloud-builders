@@ -5,7 +5,6 @@ go_library(
     srcs = ["fetcher.go"],
     importpath = "github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/pkg/fetcher",
     visibility = ["//visibility:public"],
-    deps = ["//vendor/github.com/golang/glog:go_default_library"],
 )
 
 go_test(
