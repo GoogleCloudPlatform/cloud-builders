@@ -16,12 +16,6 @@
   version = "v0.21.0"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/golang/glog"
-  packages = ["."]
-  revision = "23def4e6c14b4da8ac2ed8007337bc5eb5007998"
-
-[[projects]]
   name = "github.com/golang/protobuf"
   packages = [
     "proto",
@@ -73,7 +67,7 @@
     "lex/httplex",
     "trace"
   ]
-  revision = "d41e8174641f662c5a2d1c7a5f9e828788eb8706"
+  revision = "5f9ae10d9af5b1c89ae6904293b14b064d4ada23"
 
 [[projects]]
   branch = "master"
@@ -122,7 +116,7 @@
     "storage/v1",
     "transport/http"
   ]
-  revision = "9c79deebf7496e355d7e95d82d4af1fe4e769b2f"
+  revision = "8b8c1d4168b3aa7d5fbdb9eb159a1a7ac0cc146d"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -185,6 +179,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "cf6a3d099d82bbb336f7cd19405f49ae782b1d089b94e964dc84320b4a3a28cf"
+  inputs-digest = "8988d198dd47f2b79e82ac89eefd2f204ef92ddba033b0413a9d7ba6ce9cb0ba"
   solver-name = "gps-cdcl"
   solver-version = 1

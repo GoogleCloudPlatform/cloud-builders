@@ -18,14 +18,13 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-SCRIPT_ROOT=$(dirname ${BASH_SOURCE})/..
-
-pushd ${SCRIPT_ROOT}
-trap popd EXIT
-
 # Ensure we have everything we need under vendor/
 dep ensure
-dep prune
+
+# Remove unnecessary files, and BUILD files which we want to generate ourselves.
+rm -rf $(find vendor/ -name 'BUILD')
+rm -rf $(find vendor/ -name 'BUILD.bazel')
+rm -rf $(find vendor/ -name '*_test.go')
 
 # Make sure that BUILD files are up to date (the above removes them).
 bazel run //:gazelle
