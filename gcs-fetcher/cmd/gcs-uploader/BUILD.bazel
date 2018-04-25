@@ -28,14 +28,3 @@ go_binary(
     pure = "on",
     visibility = ["//visibility:public"],
 )
-
-load("@io_bazel_rules_docker//docker:docker.bzl", "container_push")
-
-container_push(
-    name = "push",
-    format = "Docker",
-    image = ":image",
-    registry = "gcr.io",
-    repository = "$(project)/gcs-uploader",
-    stamp = True,
-)

@@ -22,13 +22,6 @@ steps:
   args: ['--help']
 
 # Push the images.
-- name: 'gcr.io/cloud-builders/bazel'
-  args: ['run', '--spawn_strategy=standalone', '--define', 'project=$PROJECT_ID', '//cmd/gcs-fetcher:push']
-- name: 'gcr.io/cloud-builders/bazel'
-  args: ['run', '--spawn_strategy=standalone', '--define', 'project=$PROJECT_ID', '//cmd/gcs-uploader:push']
-
-# These are no-ops, but they tie the build to the images they produced, since
-# Bazel-based Docker pushes are not otherwise tracked.
 images:
 - 'gcr.io/$PROJECT_ID/gcs-fetcher'
 - 'gcr.io/$PROJECT_ID/gcs-uploader'
