@@ -23,14 +23,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"math"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/golang/glog"
 )
 
 const (
@@ -176,7 +175,7 @@ func (gf *GCSFetcher) recordFailure(j job, started time.Time, gcsTimeout time.Du
 		if isLast {
 			retryMsg = ", will no longer retry"
 		}
-		glog.Infof("Failed to fetch %s%s: %v", formatGCSName(j.bucket, j.object, j.generation), retryMsg, err)
+		log.Printf("Failed to fetch %s%s: %v", formatGCSName(j.bucket, j.object, j.generation), retryMsg, err)
 	}
 }
 
@@ -195,7 +194,7 @@ func (gf *GCSFetcher) recordSuccess(j job, started time.Time, size sizeBytes, fi
 	if attempt.duration > 0 {
 		mibps = (float64(report.size) / 1024 / 1024) / attempt.duration.Seconds()
 	}
-	glog.Infof("Fetched %s (%dB in %v, %.2fMiB/s)", formatGCSName(j.bucket, j.object, j.generation), report.size, attempt.duration, mibps)
+	log.Printf("Fetched %s (%dB in %v, %.2fMiB/s)", formatGCSName(j.bucket, j.object, j.generation), report.size, attempt.duration, mibps)
 }
 
 // fetchObject is responsible for trying (and retrying) to fetch a single file
@@ -379,7 +378,7 @@ func (gf *GCSFetcher) doWork(ctx context.Context, todo <-chan job, results chan<
 	for j := range todo {
 		report := gf.fetchObject(ctx, j)
 		if gf.Verbose {
-			glog.Infof("Report: %#v", report)
+			log.Printf("Report: %#v", report)
 		}
 		results <- *report
 	}
@@ -448,7 +447,7 @@ func (gf *GCSFetcher) processJobs(ctx context.Context, jobs []job) stats {
 
 	if failed {
 		stats.success = false
-		glog.Fatal("Failed to download at least one file. Cannot continue.")
+		log.Fatal("Failed to download at least one file. Cannot continue.")
 	}
 
 	stats.duration = time.Since(started)
@@ -482,7 +481,7 @@ func (gf *GCSFetcher) timeout(filename string, retrynum int) time.Duration {
 // assembling the list of jobs to process (i.e., files to download).
 func (gf *GCSFetcher) fetchFromManifest(ctx context.Context) error {
 	started := time.Now()
-	glog.Infof("Fetching manifest %s.", formatGCSName(gf.Bucket, gf.Object, gf.Generation))
+	log.Printf("Fetching manifest %s.", formatGCSName(gf.Bucket, gf.Object, gf.Generation))
 
 	// Download the manifest file from GCS.
 	j := job{
@@ -525,7 +524,7 @@ func (gf *GCSFetcher) fetchFromManifest(ctx context.Context) error {
 		jobs = append(jobs, j)
 	}
 
-	glog.Infof("Processing %v files.", len(jobs))
+	log.Printf("Processing %v files.", len(jobs))
 	stats := gf.processJobs(ctx, jobs)
 
 	// Final cleanup of failed downloads. We won't miss any files; these vestiges
@@ -533,7 +532,7 @@ func (gf *GCSFetcher) fetchFromManifest(ctx context.Context) error {
 	// circuit breaker and die. However, we won't wait for these remaining
 	// go routines to finish because out goal is to get done as fast as possible!
 	if err := gf.OS.RemoveAll(gf.StagingDir); err != nil {
-		glog.Infof("Failed to remove staging dir %v, continuing: %v", gf.StagingDir, err)
+		log.Printf("Failed to remove staging dir %v, continuing: %v", gf.StagingDir, err)
 	}
 
 	// Emit final stats.
@@ -547,30 +546,30 @@ func (gf *GCSFetcher) fetchFromManifest(ctx context.Context) error {
 	if !stats.success {
 		status = "FAILURE"
 	}
-	glog.Infof("******************************************************")
-	glog.Infof("Status:                      %s", status)
-	glog.Infof("Started:                     %s", started.Format(time.RFC3339))
-	glog.Infof("Completed:                   %s", time.Now().Format(time.RFC3339))
-	glog.Infof("Requested workers: %6d", gf.WorkerCount)
-	glog.Infof("Actual workers:    %6d", stats.workers)
-	glog.Infof("Total files:       %6d", stats.files)
-	glog.Infof("Total retries:     %6d", stats.retries)
+	log.Printf("******************************************************")
+	log.Printf("Status:                      %s", status)
+	log.Printf("Started:                     %s", started.Format(time.RFC3339))
+	log.Printf("Completed:                   %s", time.Now().Format(time.RFC3339))
+	log.Printf("Requested workers: %6d", gf.WorkerCount)
+	log.Printf("Actual workers:    %6d", stats.workers)
+	log.Printf("Total files:       %6d", stats.files)
+	log.Printf("Total retries:     %6d", stats.retries)
 	if gf.TimeoutGCS {
-		glog.Infof("GCS timeouts:      %6d", stats.gcsTimeouts)
+		log.Printf("GCS timeouts:      %6d", stats.gcsTimeouts)
 	}
-	glog.Infof("MiB downloaded:    %9.2f MiB", mib)
-	glog.Infof("MiB/s throughput:  %9.2f MiB/s", mibps)
+	log.Printf("MiB downloaded:    %9.2f MiB", mib)
+	log.Printf("MiB/s throughput:  %9.2f MiB/s", mibps)
 
-	glog.Infof("Time for manifest: %9.2f ms", float64(manifestDuration)/float64(time.Millisecond))
-	glog.Infof("Total time:        %9.2f s", time.Since(started).Seconds())
-	glog.Infof("******************************************************")
+	log.Printf("Time for manifest: %9.2f ms", float64(manifestDuration)/float64(time.Millisecond))
+	log.Printf("Total time:        %9.2f s", time.Since(started).Seconds())
+	log.Printf("******************************************************")
 
 	if len(stats.errs) > 0 {
-		glog.Infof("Errors (%d):", len(stats.errs))
+		log.Printf("Errors (%d):", len(stats.errs))
 		for err := range stats.errs {
-			glog.Info(err)
+			log.Print(err)
 		}
-		glog.Infof("******************************************************")
+		log.Printf("******************************************************")
 		return fmt.Errorf("file fetching failed")
 	}
 	return nil
@@ -604,7 +603,7 @@ func (gf *GCSFetcher) copyFileFromZip(file *zip.File) error {
 // responsible to fetch the zip file and unzip it into the destination folder.
 func (gf *GCSFetcher) fetchFromZip(ctx context.Context) error {
 	started := time.Now()
-	glog.Infof("Fetching archive %s.", formatGCSName(gf.Bucket, gf.Object, gf.Generation))
+	log.Printf("Fetching archive %s.", formatGCSName(gf.Bucket, gf.Object, gf.Generation))
 
 	// Download the archive from GCS.
 	j := job{
@@ -642,13 +641,13 @@ func (gf *GCSFetcher) fetchFromZip(ctx context.Context) error {
 
 	// Remove the zip file (best effort only, no harm if this fails).
 	if err := os.RemoveAll(zipfile); err != nil {
-		glog.Infof("Failed to remove zipfile %s, continuing: %v", zipfile, err)
+		log.Printf("Failed to remove zipfile %s, continuing: %v", zipfile, err)
 	}
 
 	// Final cleanup of staging directory, which is only a temporary staging
 	// location for downloading the zipfile in this case.
 	if err := gf.OS.RemoveAll(gf.StagingDir); err != nil {
-		glog.Infof("Failed to remove staging dir %q, continuing: %v", gf.StagingDir, err)
+		log.Printf("Failed to remove staging dir %q, continuing: %v", gf.StagingDir, err)
 	}
 
 	mib := float64(report.size) / 1024 / 1024
@@ -657,17 +656,17 @@ func (gf *GCSFetcher) fetchFromZip(ctx context.Context) error {
 	if zipfileDuration > 0 {
 		mibps = mib / zipfileDuration.Seconds()
 	}
-	glog.Infof("******************************************************")
-	glog.Infof("Status:                      SUCCESS")
-	glog.Infof("Started:                     %s", started.Format(time.RFC3339))
-	glog.Infof("Completed:                   %s", time.Now().Format(time.RFC3339))
-	glog.Infof("Total files:       %6d", numFiles)
-	glog.Infof("MiB downloaded:    %9.2f MiB", mib)
-	glog.Infof("MiB/s throughput:  %9.2f MiB/s", mibps)
-	glog.Infof("Time for zipfile:  %9.2f s", zipfileDuration.Seconds())
-	glog.Infof("Time to unzip:     %9.2f s", unzipDuration.Seconds())
-	glog.Infof("Total time:        %9.2f s", time.Since(started).Seconds())
-	glog.Infof("******************************************************")
+	log.Printf("******************************************************")
+	log.Printf("Status:                      SUCCESS")
+	log.Printf("Started:                     %s", started.Format(time.RFC3339))
+	log.Printf("Completed:                   %s", time.Now().Format(time.RFC3339))
+	log.Printf("Total files:       %6d", numFiles)
+	log.Printf("MiB downloaded:    %9.2f MiB", mib)
+	log.Printf("MiB/s throughput:  %9.2f MiB/s", mibps)
+	log.Printf("Time for zipfile:  %9.2f s", zipfileDuration.Seconds())
+	log.Printf("Time to unzip:     %9.2f s", unzipDuration.Seconds())
+	log.Printf("Total time:        %9.2f s", time.Since(started).Seconds())
+	log.Printf("******************************************************")
 	return nil
 }
 
