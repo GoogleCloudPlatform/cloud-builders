@@ -9,7 +9,7 @@ steps:
   - 'build'
   - '--no-cache'
   - '--build-arg=BASE_IMAGE=launcher.gcr.io/google/openjdk8'
-  - '--build-arg=DOCKER_VERSION=17.06.0~ce-0~debian'
+  - '--build-arg=DOCKER_VERSION=17.12.1~ce-0~debian'
   - '--tag=gcr.io/$PROJECT_ID/javac:8'
   - '--tag=gcr.io/$PROJECT_ID/javac'
   - '--tag=gcr.io/$PROJECT_ID/java/javac:8'
