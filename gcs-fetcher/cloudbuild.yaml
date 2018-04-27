@@ -5,9 +5,9 @@ steps:
 
 # Build the images into the local Docker daemon.
 - name: 'gcr.io/cloud-builders/bazel'
-  args: ['run', '--spawn_strategy=standalone', '--define', 'project=$PROJECT_ID', '//cmd/gcs-fetcher:image', '--', '--norun']
+  args: ['run', '--spawn_strategy=standalone', '//cmd/gcs-fetcher:image', '--', '--norun']
 - name: 'gcr.io/cloud-builders/bazel'
-  args: ['run', '--spawn_strategy=standalone', '--define', 'project=$PROJECT_ID', '//cmd/gcs-uploader:image', '--', '--norun']
+  args: ['run', '--spawn_strategy=standalone', '//cmd/gcs-uploader:image', '--', '--norun']
 
 # Tag the images to the correct location.
 - name: 'gcr.io/cloud-builders/docker'
@@ -20,6 +20,23 @@ steps:
   args: ['--help']
 - name: 'gcr.io/$PROJECT_ID/gcs-uploader'
   args: ['--help']
+
+# Test the manifest uploader.
+- name: 'gcr.io/$PROJECT_ID/gcs-uploader'
+  args:
+  - '--bucket=${PROJECT_ID}_cloudbuild'
+  - '--manifest_file=manifest-${BUILD_ID}.json'
+  - '--dir=.'
+# Fetch the manifest.
+- name: 'gcr.io/$PROJECT_ID/gcs-fetcher'
+  args:
+  - '--type=Manifest'
+  - '--location=gs://${PROJECT_ID}_cloudbuild/manifest-${BUILD_ID}.json'
+  - '--dest_dir=fetched'
+  - '--verbose'
+# Check that files were downloaded.
+- name: 'ubuntu'
+  args: ['cat', 'fetched/cloudbuild.yaml']
 
 # Push the images.
 images:
