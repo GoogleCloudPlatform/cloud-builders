@@ -1,10 +1,10 @@
-workspace(name = "buildcrd")
+workspace(name = "gcsfetcher")
 
 # Pull in rules_go
 git_repository(
     name = "io_bazel_rules_go",
-    tag = "0.11.0",
     remote = "https://github.com/bazelbuild/rules_go.git",
+    tag = "0.11.0",
 )
 
 load("@io_bazel_rules_go//go:def.bzl", "go_rules_dependencies", "go_register_toolchains", "go_repository")
@@ -16,8 +16,8 @@ go_register_toolchains()
 # Pull in rules_docker
 git_repository(
     name = "io_bazel_rules_docker",
-    tag = "v0.4.0",
     remote = "https://github.com/bazelbuild/rules_docker.git",
+    tag = "v0.4.0",
 )
 
 load(
