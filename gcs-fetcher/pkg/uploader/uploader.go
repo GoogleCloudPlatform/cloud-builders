@@ -21,15 +21,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"time"
+
+	"google.golang.org/api/googleapi"
 )
 
 type GCSUploader struct {
-	GCS          GCS
-	OS           OS
-	Root, Bucket string
+	GCS                        GCS
+	OS                         OS
+	Root, Bucket, ManifestFile string
 
 	manifest map[string]sourceInfo
 }
@@ -42,6 +46,8 @@ type sourceInfo struct {
 
 type OS interface {
 	Walk(root string, fn filepath.WalkFunc) error
+	EvalSymlinks(path string) (string, error)
+	Stat(path string) (os.FileInfo, error)
 }
 
 type GCS interface {
@@ -63,6 +69,18 @@ func (u *GCSUploader) Upload(ctx context.Context) (string, error) {
 func (u *GCSUploader) processFile(ctx context.Context, path string, info os.FileInfo, err error) error {
 	if err != nil {
 		return err
+	}
+
+	// Follow symlinks.
+	if spath, err := u.OS.EvalSymlinks(path); err != nil {
+		return err
+	} else if spath != path {
+		log.Printf("Path %q is symlink to %q", path, spath)
+		info, err = u.OS.Stat(spath)
+		if err != nil {
+			return err
+		}
+		path = spath
 	}
 
 	// Don't process dirs.
@@ -100,12 +118,30 @@ func (u *GCSUploader) processFile(ctx context.Context, path string, info os.File
 		FileMode:  info.Mode(),
 	}
 
-	return wc.Close()
+	if err := wc.Close(); err != nil && !isAlreadyExists(err) {
+		return err
+	}
+	return nil
+}
+
+func isAlreadyExists(err error) bool {
+	if gerr, ok := err.(*googleapi.Error); ok && gerr.Code == http.StatusPreconditionFailed {
+		return true
+	}
+	return false
 }
 
 func (u *GCSUploader) writeManifest(ctx context.Context) (string, error) {
-	manifest := fmt.Sprintf("manifest-%s.json", time.Now().Format(time.RFC3339))
-	wc := u.GCS.NewWriter(ctx, u.Bucket, manifest)
-	uri := fmt.Sprintf("gs://%s/%s", u.Bucket, manifest)
-	return uri, json.NewEncoder(wc).Encode(u.manifest)
+	if u.ManifestFile == "" {
+		u.ManifestFile = fmt.Sprintf("manifest-%s.json", time.Now().Format(time.RFC3339))
+	}
+	wc := u.GCS.NewWriter(ctx, u.Bucket, u.ManifestFile)
+	uri := fmt.Sprintf("gs://%s/%s", u.Bucket, u.ManifestFile)
+	if err := json.NewEncoder(wc).Encode(u.manifest); err != nil {
+		return "", err
+	}
+	if err := wc.Close(); err != nil {
+		return "", err
+	}
+	return uri, nil
 }

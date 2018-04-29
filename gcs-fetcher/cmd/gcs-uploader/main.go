@@ -22,6 +22,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 
 	"cloud.google.com/go/storage"
@@ -35,9 +36,10 @@ import (
 const userAgent = "gcs-uploader"
 
 var (
-	dir    = flag.String("dir", ".", "Directory of files to upload")
-	bucket = flag.String("bucket", "", "GCS bucket to upload files and manifest to")
-	help   = flag.Bool("help", false, "If true, prints help text and exits.")
+	dir          = flag.String("dir", ".", "Directory of files to upload")
+	bucket       = flag.String("bucket", "", "GCS bucket to upload files and manifest to")
+	manifestFile = flag.String("manifest_file", "", "If specified, manifest file name; otherwise, one will be generated")
+	help         = flag.Bool("help", false, "If true, prints help text and exits.")
 )
 
 func main() {
@@ -65,18 +67,19 @@ func main() {
 	}
 
 	u := uploader.GCSUploader{
-		GCS:    realGCS{client},
-		OS:     realOS{},
-		Root:   *dir,
-		Bucket: *bucket,
+		GCS:          realGCS{client},
+		OS:           realOS{},
+		Root:         *dir,
+		Bucket:       *bucket,
+		ManifestFile: *manifestFile,
 	}
 
-	manifest, err := u.Upload(ctx)
+	manifestURL, err := u.Upload(ctx)
 	if err != nil {
 		log.Fatalf("Failed to upload: %v", err)
 	}
 
-	log.Println("Uploaded manifest: %s", manifest)
+	log.Printf("Uploaded manifest: %s", manifestURL)
 }
 
 func buildHTTPClient(ctx context.Context) (*http.Client, error) {
@@ -112,6 +115,6 @@ func (gp realGCS) NewWriter(ctx context.Context, bucket, object string) io.Write
 // realOS merely wraps the os package implementations.
 type realOS struct{}
 
-func (realOS) Walk(root string, fn filepath.WalkFunc) error {
-	return filepath.Walk(root, fn)
-}
+func (realOS) Walk(root string, fn filepath.WalkFunc) error { return filepath.Walk(root, fn) }
+func (realOS) EvalSymlinks(path string) (string, error)     { return filepath.EvalSymlinks(path) }
+func (realOS) Stat(path string) (os.FileInfo, error)        { return os.Stat(path) }
