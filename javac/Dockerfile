@@ -7,6 +7,7 @@ ARG DOCKER_VERSION=17.12.1~ce-0~debian
 # https://docs.docker.com/engine/installation/linux/docker-ce/debian
 RUN \
    apt-get -y update && \
+   apt-get --fix-broken -y install && \
    apt-get -y install apt-transport-https ca-certificates curl gnupg2 software-properties-common && \
    curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
    apt-key fingerprint 9DC858229FC7DD38854AE2D88D81803C0EBFCD88 && \
