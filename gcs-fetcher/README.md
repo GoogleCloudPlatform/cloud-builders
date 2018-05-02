@@ -82,6 +82,8 @@ are already present in Cloud Storage, and upload a randomly named manifest JSON
 object to Cloud Storage. You can specify the location of that manifest with the
 `--manifest_file` flag.
 
+`gcs-uploader` will not delete remote objects that are not present locally.
+
 ### Caching resources
 
 The two builders can be used together to provide simple cross-build caching
@@ -103,7 +105,8 @@ steps:
 # Generate new files, ignoring those that already exist.
 - name: 'generate-new-files'
 
-# Upload all files; only new files will be uploaded to Cloud Storage.
+# Upload all files; only new and changed files will be uploaded to
+# Cloud Storage.
 - name: 'gcr.io/cloud-builders/gcs-uploader'
   - '--bucket=${PROJECT_ID}_cloudbuild_cache'
   - '--manifest_file=manifest-foo.json'
