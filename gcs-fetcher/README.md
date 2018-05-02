@@ -1,7 +1,7 @@
 # GCS Fetcher
 
-** This builder is experimental and is very likely to change in breaking ways at
-this time. **
+** Warning: This builder is experimental and is very likely to change in
+breaking ways at this time. **
 
 This tool fetches objects from Google Cloud Storage, either in the form of a
 .zip archive, or based on the contents of a source manifest file.
@@ -9,11 +9,11 @@ This tool fetches objects from Google Cloud Storage, either in the form of a
 ## Source Manifests
 
 A source manifest is a JSON object in Cloud Storage listing *other* objects in
-Cloud Storage which should be fetched. The format of the file is a mapping of
-destination file path to the location in GCS where the file's contents can be
-found.
+Cloud Storage that should be fetched. The format of the manifest is a mapping of
+destination file path to the location in Cloud Storage where the file's contents
+can be found.
 
-For example:
+The following is an example source manifest:
 
 ```
 {
@@ -29,7 +29,7 @@ For example:
 }
 ```
 
-To process this manifest, the tool each element:
+To process the above manifest, the GCS Fetcher tool processes each element:
 
 1. Fetch the object located at `sourceUrl`
 1. Verify the object's SHA-1 matches the expected digest
@@ -51,13 +51,14 @@ the manifest for the next build can reuse the entry for `path/to/main.go`,
 only writing a new entry for `Dockerfile` to specify the new file's location in
 Cloud Storage.
 
-In the case of a file move, where file contents themselves don't change, no new
-files have to be uploaded either. The new manifest simply changes the key in the
-object describing the path to place the file fetched from Cloud Storage.
+In the case of a file move, where file contents don't change, no new files have
+to be uploaded. The new manifest simply changes the key in the object describing
+the path to place the file fetched from Cloud Storage.
 
 ## Full Example
 
-To fetch source described in a source manifest:
+To fetch source described in a source manifest, add the following line to your
+build config:
 
 ```
 steps:
@@ -86,10 +87,10 @@ object to Cloud Storage. You can specify the location of that manifest with the
 
 ### Caching resources
 
-The two builders can be used together to provide simple cross-build caching
-functionality, by optimistically fetching files that are expensive to generate
-at the beginning of the build, and by uploading those files at the end of the
-build.
+`gcs-fetcher` and `gcs-uploader` can be used together to provide simple
+cross-build caching functionality, by optimistically fetching files that are
+expensive to generate at the beginning of the build, and by uploading those
+files at the end of the build.
 
 In order to benefit from this you would need to define a well-known reusable
 manifest file location.
