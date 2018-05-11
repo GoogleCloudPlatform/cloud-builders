@@ -12,7 +12,7 @@ go_library(
         "profile_not19.go",
         "validate.go",
     ],
-    importmap = "buildcrd/vendor/go.opencensus.io/tag",
+    importmap = "gcsfetcher/vendor/go.opencensus.io/tag",
     importpath = "go.opencensus.io/tag",
     visibility = ["//visibility:public"],
 )

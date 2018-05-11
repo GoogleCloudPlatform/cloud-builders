@@ -3,7 +3,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "go_default_library",
     srcs = ["http.go"],
-    importmap = "buildcrd/vendor/go.opencensus.io/exporter/stackdriver/propagation",
+    importmap = "gcsfetcher/vendor/go.opencensus.io/exporter/stackdriver/propagation",
     importpath = "go.opencensus.io/exporter/stackdriver/propagation",
     visibility = ["//visibility:public"],
     deps = [
