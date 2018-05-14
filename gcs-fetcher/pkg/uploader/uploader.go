@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -71,9 +70,8 @@ func (u *GCSUploader) Upload(ctx context.Context) (string, error) {
 				select {
 				case j, ok := <-jobs:
 					if !ok {
-						break
+						return nil
 					}
-					log.Println("Uploading", j.path) // TODO remove
 					if err := u.do(ctx, j); err != nil {
 						return err
 					}
@@ -81,8 +79,7 @@ func (u *GCSUploader) Upload(ctx context.Context) (string, error) {
 					return ctx.Err()
 				}
 			}
-			log.Println("Worker finished") // TODO remove
-			return nil
+			panic("unreachable")
 		})
 	}
 
@@ -110,7 +107,6 @@ func (u *GCSUploader) do(ctx context.Context, j job) error {
 	if spath, err := u.OS.EvalSymlinks(path); err != nil {
 		return err
 	} else if spath != path {
-		log.Printf("Path %q is symlink to %q", path, spath)
 		info, err = u.OS.Stat(spath)
 		if err != nil {
 			return err
