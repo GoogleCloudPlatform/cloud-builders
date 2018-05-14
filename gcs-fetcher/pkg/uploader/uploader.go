@@ -37,7 +37,7 @@ type GCSUploader struct {
 	Root, Bucket, ManifestFile string
 	WorkerCount                int
 
-	manifest sync.Map
+	manifest                 sync.Map
 	totalBytes, bytesSkipped int64
 }
 
