@@ -38,6 +38,7 @@ type GCSUploader struct {
 	WorkerCount                int
 
 	manifest sync.Map
+	totalBytes, bytesSkipped int64
 }
 
 type sourceInfo struct {
@@ -98,6 +99,11 @@ func (u *GCSUploader) Upload(ctx context.Context) (string, error) {
 		return "", err
 	}
 
+	fmt.Printf(`
+******************************************************
+* Uploaded %d bytes (%.2f%% incremental)
+******************************************************
+`, u.totalBytes-u.bytesSkipped, float64(100*u.bytesSkipped/u.totalBytes))
 	return u.writeManifest(ctx)
 }
 
@@ -125,9 +131,10 @@ func (u *GCSUploader) do(ctx context.Context, j job) error {
 	}
 	defer f.Close()
 
-	// Compute digest of file.
+	// Compute digest of file, and count bytes.
+	cw := &countWriter{}
 	h := sha256.New()
-	if _, err := io.Copy(h, f); err != nil {
+	if _, err := io.Copy(io.MultiWriter(cw, h), f); err != nil {
 		return err
 	}
 	digest := fmt.Sprintf("%x", h.Sum(nil))
@@ -143,16 +150,29 @@ func (u *GCSUploader) do(ctx context.Context, j job) error {
 		return err
 	}
 
+	bytes := cw.b
 	u.manifest.Store(path, sourceInfo{
 		SourceURL: fmt.Sprintf("gs://%s/%s", u.Bucket, digest),
 		SHA256:    digest,
 		FileMode:  info.Mode(),
 	})
 
-	if err := wc.Close(); err != nil && !isAlreadyExists(err) {
+	if err := wc.Close(); isAlreadyExists(err) {
+		u.bytesSkipped += bytes
+	} else if err != nil {
 		return err
 	}
+	u.totalBytes += bytes
 	return nil
+}
+
+type countWriter struct {
+	b int64
+}
+
+func (c *countWriter) Write(b []byte) (int, error) {
+	c.b += int64(len(b))
+	return len(b), nil
 }
 
 func isAlreadyExists(err error) bool {
