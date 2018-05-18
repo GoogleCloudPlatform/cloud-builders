@@ -21,12 +21,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/googleapi"
 )
 
@@ -34,9 +35,9 @@ type GCSUploader struct {
 	GCS                        GCS
 	OS                         OS
 	Root, Bucket, ManifestFile string
+	WorkerCount                int
 
-	manifest map[string]sourceInfo
-
+	manifest                 sync.Map
 	totalBytes, bytesSkipped int64
 }
 
@@ -56,12 +57,45 @@ type GCS interface {
 	NewWriter(ctx context.Context, bucket, object string) io.WriteCloser
 }
 
+type job struct {
+	path string
+	info os.FileInfo
+}
+
 func (u *GCSUploader) Upload(ctx context.Context) (string, error) {
-	u.manifest = map[string]sourceInfo{}
+	var g errgroup.Group
+	jobs := make(chan job)
+	for i := 0; i < u.WorkerCount; i++ {
+		g.Go(func() error {
+			for {
+				select {
+				case j, ok := <-jobs:
+					if !ok {
+						return nil
+					}
+					if err := u.do(ctx, j); err != nil {
+						return err
+					}
+				case <-ctx.Done():
+					return ctx.Err()
+				}
+			}
+			panic("unreachable")
+		})
+	}
 
 	if err := u.OS.Walk(u.Root, func(path string, info os.FileInfo, err error) error {
-		return u.processFile(ctx, path, info, err)
+		if err != nil {
+			return err
+		}
+		jobs <- job{path, info}
+		return nil
 	}); err != nil {
+		return "", err
+	}
+	close(jobs)
+
+	if err := g.Wait(); err != nil {
 		return "", err
 	}
 
@@ -73,16 +107,12 @@ func (u *GCSUploader) Upload(ctx context.Context) (string, error) {
 	return u.writeManifest(ctx)
 }
 
-func (u *GCSUploader) processFile(ctx context.Context, path string, info os.FileInfo, err error) error {
-	if err != nil {
-		return err
-	}
-
+func (u *GCSUploader) do(ctx context.Context, j job) error {
+	path, info := j.path, j.info
 	// Follow symlinks.
 	if spath, err := u.OS.EvalSymlinks(path); err != nil {
 		return err
 	} else if spath != path {
-		log.Printf("Path %q is symlink to %q", path, spath)
 		info, err = u.OS.Stat(spath)
 		if err != nil {
 			return err
@@ -121,12 +151,11 @@ func (u *GCSUploader) processFile(ctx context.Context, path string, info os.File
 	}
 
 	bytes := cw.b
-
-	u.manifest[path] = sourceInfo{
+	u.manifest.Store(path, sourceInfo{
 		SourceURL: fmt.Sprintf("gs://%s/%s", u.Bucket, digest),
 		SHA256:    digest,
 		FileMode:  info.Mode(),
-	}
+	})
 
 	if err := wc.Close(); isAlreadyExists(err) {
 		u.bytesSkipped += bytes
@@ -157,9 +186,15 @@ func (u *GCSUploader) writeManifest(ctx context.Context) (string, error) {
 	if u.ManifestFile == "" {
 		u.ManifestFile = fmt.Sprintf("manifest-%s.json", time.Now().Format(time.RFC3339))
 	}
+	m := map[string]sourceInfo{}
+	u.manifest.Range(func(k, v interface{}) bool {
+		m[k.(string)] = v.(sourceInfo)
+		return true
+	})
+
 	wc := u.GCS.NewWriter(ctx, u.Bucket, u.ManifestFile)
 	uri := fmt.Sprintf("gs://%s/%s", u.Bucket, u.ManifestFile)
-	if err := json.NewEncoder(wc).Encode(u.manifest); err != nil {
+	if err := json.NewEncoder(wc).Encode(m); err != nil {
 		return "", err
 	}
 	if err := wc.Close(); err != nil {

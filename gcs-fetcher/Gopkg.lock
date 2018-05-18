@@ -82,6 +82,12 @@
   revision = "6881fee410a5daf86371371f9ad451b95e168b71"
 
 [[projects]]
+  branch = "master"
+  name = "golang.org/x/sync"
+  packages = ["errgroup"]
+  revision = "1d60e4601c6fd243af51cc01ddf169918a5407ca"
+
+[[projects]]
   name = "golang.org/x/text"
   packages = [
     "collate",
@@ -179,6 +185,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "985dfd94f2d665edf899a29ce530ca1a4855954a3170c18b3ae4fcd200d36e19"
+  inputs-digest = "c7dfad8b713be5955e4975024d0a6c9f41ce276b2889eb51825ac470a56088b6"
   solver-name = "gps-cdcl"
   solver-version = 1

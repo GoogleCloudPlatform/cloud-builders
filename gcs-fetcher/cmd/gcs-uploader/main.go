@@ -39,6 +39,7 @@ var (
 	dir          = flag.String("dir", ".", "Directory of files to upload")
 	bucket       = flag.String("bucket", "", "GCS bucket to upload files and manifest to")
 	manifestFile = flag.String("manifest_file", "", "If specified, manifest file name; otherwise, one will be generated")
+	workerCount  = flag.Int("workers", 200, "The number of files to upload in parallel.")
 	help         = flag.Bool("help", false, "If true, prints help text and exits.")
 )
 
@@ -72,6 +73,7 @@ func main() {
 		Root:         *dir,
 		Bucket:       *bucket,
 		ManifestFile: *manifestFile,
+		WorkerCount:  *workerCount,
 	}
 
 	manifestURL, err := u.Upload(ctx)

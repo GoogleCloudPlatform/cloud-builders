@@ -6,7 +6,7 @@ go_library(
         "go18.go",
         "not_go18.go",
     ],
-    importmap = "buildcrd/vendor/cloud.google.com/go/internal/trace",
+    importmap = "gcsfetcher/vendor/cloud.google.com/go/internal/trace",
     importpath = "cloud.google.com/go/internal/trace",
     visibility = ["//vendor/cloud.google.com/go:__subpackages__"],
     deps = [
