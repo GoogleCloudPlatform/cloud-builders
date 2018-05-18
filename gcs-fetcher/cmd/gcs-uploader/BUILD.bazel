@@ -6,6 +6,7 @@ go_library(
     importpath = "github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/cmd/gcs-uploader",
     visibility = ["//visibility:private"],
     deps = [
+        "//pkg/common:go_default_library",
         "//pkg/uploader:go_default_library",
         "//vendor/cloud.google.com/go/storage:go_default_library",
         "//vendor/golang.org/x/oauth2:go_default_library",

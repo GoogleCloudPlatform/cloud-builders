@@ -21,19 +21,16 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/gcs-uploader'
   args: ['--help']
 
-# Test the manifest uploader.
+# Test the manifest uploader with a defined manifest location.
 - name: 'gcr.io/$PROJECT_ID/gcs-uploader'
   args:
-  - '--bucket=${PROJECT_ID}_cloudbuild'
-  - '--manifest_file=manifest-${BUILD_ID}.json'
-  - '--dir=.'
+  - '--location=gs://${PROJECT_ID}_cloudbuild/manifest-${BUILD_ID}.json'
 # Fetch the manifest.
 - name: 'gcr.io/$PROJECT_ID/gcs-fetcher'
   args:
   - '--type=Manifest'
   - '--location=gs://${PROJECT_ID}_cloudbuild/manifest-${BUILD_ID}.json'
   - '--dest_dir=fetched'
-  - '--verbose'
 # Check that files were downloaded.
 - name: 'ubuntu'
   args: ['cat', 'fetched/cloudbuild.yaml']
