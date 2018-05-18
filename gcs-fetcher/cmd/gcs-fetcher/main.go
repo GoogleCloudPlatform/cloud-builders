@@ -26,6 +26,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/pkg/common"
 	"github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/pkg/fetcher"
 
 	"cloud.google.com/go/storage"
@@ -76,7 +77,7 @@ func main() {
 		log.Fatalf("Failed to create new GCS client: %v", err)
 	}
 
-	bucket, object, generation, err := fetcher.ParseBucketObject(*location)
+	bucket, object, generation, err := common.ParseBucketObject(*location)
 	if err != nil {
 		log.Fatalf("Failed to parse --location: %v", err)
 	}

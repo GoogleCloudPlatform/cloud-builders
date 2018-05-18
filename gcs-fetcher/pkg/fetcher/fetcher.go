@@ -27,13 +27,10 @@ import (
 	"math"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 	"time"
-)
 
-const (
-	backoffMultiplier = 2
+	"github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/pkg/common"
 )
 
 var (
@@ -65,14 +62,6 @@ var (
 )
 
 type sizeBytes int64
-
-type sourceInfo struct {
-	SourceURL string `json:"sourceUrl"`
-	Sha1Sum   string `json:"sha1Sum"`
-	// TODO(jasonhall): FileMode
-}
-
-type fileMap map[string]sourceInfo
 
 // job is a file to download, corresponds to an entry in the manifest file.
 type job struct {
@@ -210,13 +199,12 @@ func (gf *GCSFetcher) fetchObject(ctx context.Context, j job) *jobReport {
 	var backoff time.Duration
 
 	for retrynum := 0; retrynum <= gf.Retries; retrynum++ {
-
 		// Apply appropriate retry backoff.
 		if retrynum > 0 {
 			if retrynum == 1 {
 				backoff = gf.Backoff
 			} else {
-				backoff *= backoffMultiplier
+				backoff *= 2
 			}
 			time.Sleep(backoff)
 		}
@@ -348,13 +336,16 @@ func (gf *GCSFetcher) fetchObjectOnce(ctx context.Context, j job, dest string, b
 		return result
 	}
 
-	// TODO(jasonhall): verify the sha1sum before declaring success
-	// if j.SHA1Sum != "" {
-	//   sha := string(h.Sum(nil))
-	//   if sha != sha1sum {
-	// 	  return fmt.Errorf("%s SHA mismatch, got %q, want %q", filename, sha, sha1sum)
-	//   }
-	// }
+	// Verify the sha1sum before declaring success.
+	if j.sha1sum != "" {
+		got := fmt.Sprintf("%x", h.Sum(nil))
+		want := j.sha1sum
+		if got != want {
+			result.err = fmt.Errorf("%s SHA mismatch, got %q, want %q", j.filename, got, want)
+			return result
+		}
+	}
+	return result
 }
 
 // ensureFolders takes a full path to a filename and makes sure that
@@ -502,7 +493,7 @@ func (gf *GCSFetcher) fetchFromManifest(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("opening manifest file %q: %v", manifestFile, err)
 	}
-	var files fileMap
+	var files map[string]common.ManifestItem
 	if err := json.NewDecoder(r).Decode(&files); err != nil {
 		return fmt.Errorf("decoding JSON from manifest file %q: %v", manifestFile, err)
 	}
@@ -510,7 +501,7 @@ func (gf *GCSFetcher) fetchFromManifest(ctx context.Context) error {
 	// Create the jobs
 	var jobs []job
 	for filename, info := range files {
-		bucket, object, generation, err := ParseBucketObject(info.SourceURL)
+		bucket, object, generation, err := common.ParseBucketObject(info.SourceURL)
 		if err != nil {
 			return fmt.Errorf("parsing bucket/object from %q: %v", info.SourceURL, err)
 		}
@@ -686,27 +677,6 @@ func (gf *GCSFetcher) Fetch(ctx context.Context) error {
 		return fmt.Errorf("misconfigured GCSFetcher, must have either -type as either Manifest or Archive: %v", gf.SourceType)
 	}
 	return nil
-}
-
-// TODO: Parse generation.
-func ParseBucketObject(filename string) (bucket, object string, generation int64, err error) {
-	switch {
-	case strings.HasPrefix(filename, "https://storage.googleapis.com/") || strings.HasPrefix(filename, "http://storage.googleapis.com/"):
-		// filename looks like "https://storage.googleapis.com/staging.my-project.appspot.com/3aa080e5e72a610b06033dbfee288483d87cfd61"
-		if parts := strings.Split(filename, "/"); len(parts) >= 5 {
-			bucket := parts[3]
-			object := strings.Join(parts[4:], "/")
-			return bucket, object, 0, nil
-		}
-	case strings.HasPrefix(filename, "gs://"):
-		// filename looks like "gs://my-bucket/manifest-20171004T175409.json"
-		if parts := strings.Split(filename, "/"); len(parts) >= 4 {
-			bucket := parts[2]
-			object := strings.Join(parts[3:], "/")
-			return bucket, object, 0, nil
-		}
-	}
-	return "", "", 0, fmt.Errorf("cannot parse bucket/object from filename %q", filename)
 }
 
 func formatGCSName(bucket, object string, generation int64) string {
