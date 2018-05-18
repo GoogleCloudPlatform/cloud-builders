@@ -30,17 +30,17 @@ import (
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 
+	"github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/pkg/common"
 	"github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/pkg/uploader"
 )
 
 const userAgent = "gcs-uploader"
 
 var (
-	dir          = flag.String("dir", ".", "Directory of files to upload")
-	bucket       = flag.String("bucket", "", "GCS bucket to upload files and manifest to")
-	manifestFile = flag.String("manifest_file", "", "If specified, manifest file name; otherwise, one will be generated")
-	workerCount  = flag.Int("workers", 200, "The number of files to upload in parallel.")
-	help         = flag.Bool("help", false, "If true, prints help text and exits.")
+	dir         = flag.String("dir", ".", "Directory of files to upload")
+	location    = flag.String("location", "", "Location of manifest file to upload; in the form gs://bucket/path/to/object")
+	workerCount = flag.Int("workers", 200, "The number of files to upload in parallel.")
+	help        = flag.Bool("help", false, "If true, prints help text and exits.")
 )
 
 func main() {
@@ -52,8 +52,15 @@ func main() {
 		return
 	}
 
-	if *bucket == "" {
-		log.Fatalf("--bucket must be specified")
+	if *location == "" {
+		log.Fatalln("Must specify --location")
+	}
+	bucket, object, generation, err := common.ParseBucketObject(*location)
+	if err != nil {
+		log.Fatalln("parsing location from %q: %v", *location, err)
+	}
+	if generation != 0 {
+		log.Fatalln("cannot specify manifest file generation")
 	}
 
 	ctx := context.Background()
@@ -68,12 +75,12 @@ func main() {
 	}
 
 	u := uploader.GCSUploader{
-		GCS:          realGCS{client},
-		OS:           realOS{},
-		Root:         *dir,
-		Bucket:       *bucket,
-		ManifestFile: *manifestFile,
-		WorkerCount:  *workerCount,
+		GCS:            realGCS{client},
+		OS:             realOS{},
+		Root:           *dir,
+		Bucket:         bucket,
+		ManifestObject: object,
+		WorkerCount:    *workerCount,
 	}
 
 	manifestURL, err := u.Upload(ctx)

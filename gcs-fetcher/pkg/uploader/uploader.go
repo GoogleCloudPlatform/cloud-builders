@@ -17,7 +17,7 @@ package uploader
 
 import (
 	"context"
-	"crypto/sha256"
+	"crypto/sha1"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -25,26 +25,21 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
-	"time"
 
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/googleapi"
+
+	"github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/pkg/common"
 )
 
 type GCSUploader struct {
-	GCS                        GCS
-	OS                         OS
-	Root, Bucket, ManifestFile string
-	WorkerCount                int
+	GCS                          GCS
+	OS                           OS
+	Root, Bucket, ManifestObject string
+	WorkerCount                  int
 
 	manifest                 sync.Map
 	totalBytes, bytesSkipped int64
-}
-
-type sourceInfo struct {
-	SourceURL string      `json:"sourceUrl"`
-	SHA256    string      `json:"sha256"`
-	FileMode  os.FileMode `json:"mode"`
 }
 
 type OS interface {
@@ -64,7 +59,7 @@ type job struct {
 
 func (u *GCSUploader) Upload(ctx context.Context) (string, error) {
 	var g errgroup.Group
-	jobs := make(chan job)
+	jobs := make(chan job, u.WorkerCount)
 	for i := 0; i < u.WorkerCount; i++ {
 		g.Go(func() error {
 			for {
@@ -133,7 +128,7 @@ func (u *GCSUploader) do(ctx context.Context, j job) error {
 
 	// Compute digest of file, and count bytes.
 	cw := &countWriter{}
-	h := sha256.New()
+	h := sha1.New()
 	if _, err := io.Copy(io.MultiWriter(cw, h), f); err != nil {
 		return err
 	}
@@ -150,19 +145,18 @@ func (u *GCSUploader) do(ctx context.Context, j job) error {
 		return err
 	}
 
-	bytes := cw.b
-	u.manifest.Store(path, sourceInfo{
+	u.manifest.Store(path, common.ManifestItem{
 		SourceURL: fmt.Sprintf("gs://%s/%s", u.Bucket, digest),
-		SHA256:    digest,
+		Sha1Sum:   digest,
 		FileMode:  info.Mode(),
 	})
 
 	if err := wc.Close(); isAlreadyExists(err) {
-		u.bytesSkipped += bytes
+		u.bytesSkipped += cw.b
 	} else if err != nil {
 		return err
 	}
-	u.totalBytes += bytes
+	u.totalBytes += cw.b
 	return nil
 }
 
@@ -183,17 +177,14 @@ func isAlreadyExists(err error) bool {
 }
 
 func (u *GCSUploader) writeManifest(ctx context.Context) (string, error) {
-	if u.ManifestFile == "" {
-		u.ManifestFile = fmt.Sprintf("manifest-%s.json", time.Now().Format(time.RFC3339))
-	}
-	m := map[string]sourceInfo{}
+	m := map[string]common.ManifestItem{}
 	u.manifest.Range(func(k, v interface{}) bool {
-		m[k.(string)] = v.(sourceInfo)
+		m[k.(string)] = v.(common.ManifestItem)
 		return true
 	})
 
-	wc := u.GCS.NewWriter(ctx, u.Bucket, u.ManifestFile)
-	uri := fmt.Sprintf("gs://%s/%s", u.Bucket, u.ManifestFile)
+	uri := fmt.Sprintf("gs://%s/%s", u.Bucket, u.ManifestObject)
+	wc := u.GCS.NewWriter(ctx, u.Bucket, u.ManifestObject)
 	if err := json.NewEncoder(wc).Encode(m); err != nil {
 		return "", err
 	}
