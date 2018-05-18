@@ -7,7 +7,7 @@ go_library(
         "go18.go",
         "not_go18.go",
     ],
-    importmap = "buildcrd/vendor/google.golang.org/api/transport/http",
+    importmap = "gcsfetcher/vendor/google.golang.org/api/transport/http",
     importpath = "google.golang.org/api/transport/http",
     visibility = ["//visibility:public"],
     deps = [
