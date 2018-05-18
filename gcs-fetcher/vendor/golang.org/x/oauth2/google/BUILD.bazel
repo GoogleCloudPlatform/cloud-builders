@@ -13,7 +13,7 @@ go_library(
         "not_go19.go",
         "sdk.go",
     ],
-    importmap = "buildcrd/vendor/golang.org/x/oauth2/google",
+    importmap = "gcsfetcher/vendor/golang.org/x/oauth2/google",
     importpath = "golang.org/x/oauth2/google",
     visibility = ["//visibility:public"],
     deps = [

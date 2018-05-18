@@ -37,9 +37,10 @@ import (
 const userAgent = "gcs-uploader"
 
 var (
-	dir      = flag.String("dir", ".", "Directory of files to upload")
-	location = flag.String("location", "", "Location of manifest file to upload; in the form gs://bucket/path/to/object")
-	help     = flag.Bool("help", false, "If true, prints help text and exits.")
+	dir         = flag.String("dir", ".", "Directory of files to upload")
+	location    = flag.String("location", "", "Location of manifest file to upload; in the form gs://bucket/path/to/object")
+	workerCount = flag.Int("workers", 200, "The number of files to upload in parallel.")
+	help        = flag.Bool("help", false, "If true, prints help text and exits.")
 )
 
 func main() {
@@ -79,6 +80,7 @@ func main() {
 		Root:           *dir,
 		Bucket:         bucket,
 		ManifestObject: object,
+		WorkerCount:    *workerCount,
 	}
 
 	manifestURL, err := u.Upload(ctx)

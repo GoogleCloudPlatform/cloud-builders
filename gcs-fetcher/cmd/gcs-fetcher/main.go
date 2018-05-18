@@ -38,10 +38,6 @@ import (
 const (
 	stagingFolder = ".download/"
 	userAgent     = "gcs-fetcher"
-
-	defaultWorkers = 200
-	defaultRetries = 3
-	defaultBackoff = 100 * time.Millisecond
 )
 
 var (
@@ -49,10 +45,10 @@ var (
 	location   = flag.String("location", "", "Location of source to fetch; in the form gs://bucket/path/to/object#generation")
 
 	destDir     = flag.String("dest_dir", "", "The root where to write the files.")
-	workerCount = flag.Int("workers", defaultWorkers, "The number of files to fetch in parallel.")
+	workerCount = flag.Int("workers", 200, "The number of files to fetch in parallel.")
 	verbose     = flag.Bool("verbose", false, "If true, additional output is logged.")
-	retries     = flag.Int("retries", defaultRetries, "Number of times to retry a failed GCS download.")
-	backoff     = flag.Duration("backoff", defaultBackoff, "Time to wait when retrying, will be doubled on each retry.")
+	retries     = flag.Int("retries", 3, "Number of times to retry a failed GCS download.")
+	backoff     = flag.Duration("backoff", 100*time.Millisecond, "Time to wait when retrying, will be doubled on each retry.")
 	timeoutGCS  = flag.Bool("timeout_gcs", true, "If true, a timeout will be used to avoid GCS longtails.")
 	help        = flag.Bool("help", false, "If true, prints help text and exits.")
 )
