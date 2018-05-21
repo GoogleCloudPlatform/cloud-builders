@@ -23,7 +23,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"path/filepath"
 	"sync"
 
 	"golang.org/x/sync/errgroup"
@@ -32,18 +31,19 @@ import (
 	"github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/pkg/common"
 )
 
-type GCSUploader struct {
-	GCS                          GCS
-	OS                           OS
-	Root, Bucket, ManifestObject string
-	WorkerCount                  int
+type Uploader struct {
+	gcs                    GCS
+	os                     OS
+	bucket, manifestObject string
+
+	group errgroup.Group
+	jobs  chan job
 
 	manifest                 sync.Map
 	totalBytes, bytesSkipped int64
 }
 
 type OS interface {
-	Walk(root string, fn filepath.WalkFunc) error
 	EvalSymlinks(path string) (string, error)
 	Stat(path string) (os.FileInfo, error)
 }
@@ -57,18 +57,26 @@ type job struct {
 	info os.FileInfo
 }
 
-func (u *GCSUploader) Upload(ctx context.Context) (string, error) {
-	var g errgroup.Group
-	jobs := make(chan job, u.WorkerCount)
-	for i := 0; i < u.WorkerCount; i++ {
-		g.Go(func() error {
+func New(ctx context.Context, gcs GCS, os OS, bucket, manifestObject string, numWorkers int) *Uploader {
+	var group errgroup.Group
+	jobs := make(chan job, numWorkers)
+	up := &Uploader{
+		gcs:            gcs,
+		os:             os,
+		bucket:         bucket,
+		manifestObject: manifestObject,
+		group:          group,
+		jobs:           jobs,
+	}
+	for i := 0; i < numWorkers; i++ {
+		group.Go(func() error {
 			for {
 				select {
 				case j, ok := <-jobs:
 					if !ok {
 						return nil
 					}
-					if err := u.do(ctx, j); err != nil {
+					if err := up.do(ctx, j); err != nil {
 						return err
 					}
 				case <-ctx.Done():
@@ -78,22 +86,18 @@ func (u *GCSUploader) Upload(ctx context.Context) (string, error) {
 			panic("unreachable")
 		})
 	}
+	return up
+}
 
-	if err := u.OS.Walk(u.Root, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		jobs <- job{path, info}
-		return nil
-	}); err != nil {
-		return "", err
+func (u *Uploader) Enqueue(path string, info os.FileInfo) {
+	u.jobs <- job{path, info}
+}
+
+func (u *Uploader) Wait(ctx context.Context) error {
+	close(u.jobs)
+	if err := u.group.Wait(); err != nil {
+		return err
 	}
-	close(jobs)
-
-	if err := g.Wait(); err != nil {
-		return "", err
-	}
-
 	fmt.Printf(`
 ******************************************************
 * Uploaded %d bytes (%.2f%% incremental)
@@ -102,13 +106,13 @@ func (u *GCSUploader) Upload(ctx context.Context) (string, error) {
 	return u.writeManifest(ctx)
 }
 
-func (u *GCSUploader) do(ctx context.Context, j job) error {
+func (u *Uploader) do(ctx context.Context, j job) error {
 	path, info := j.path, j.info
 	// Follow symlinks.
-	if spath, err := u.OS.EvalSymlinks(path); err != nil {
+	if spath, err := u.os.EvalSymlinks(path); err != nil {
 		return err
 	} else if spath != path {
-		info, err = u.OS.Stat(spath)
+		info, err = u.os.Stat(spath)
 		if err != nil {
 			return err
 		}
@@ -140,13 +144,13 @@ func (u *GCSUploader) do(ctx context.Context, j job) error {
 	if _, err := f.Seek(0, 0); err != nil {
 		return err
 	}
-	wc := u.GCS.NewWriter(ctx, u.Bucket, digest)
+	wc := u.gcs.NewWriter(ctx, u.bucket, digest)
 	if _, err := io.Copy(wc, f); err != nil {
 		return err
 	}
 
 	u.manifest.Store(path, common.ManifestItem{
-		SourceURL: fmt.Sprintf("gs://%s/%s", u.Bucket, digest),
+		SourceURL: fmt.Sprintf("gs://%s/%s", u.bucket, digest),
 		Sha1Sum:   digest,
 		FileMode:  info.Mode(),
 	})
@@ -176,20 +180,20 @@ func isAlreadyExists(err error) bool {
 	return false
 }
 
-func (u *GCSUploader) writeManifest(ctx context.Context) (string, error) {
+func (u *Uploader) writeManifest(ctx context.Context) error {
 	m := map[string]common.ManifestItem{}
 	u.manifest.Range(func(k, v interface{}) bool {
 		m[k.(string)] = v.(common.ManifestItem)
 		return true
 	})
 
-	uri := fmt.Sprintf("gs://%s/%s", u.Bucket, u.ManifestObject)
-	wc := u.GCS.NewWriter(ctx, u.Bucket, u.ManifestObject)
+	wc := u.gcs.NewWriter(ctx, u.bucket, u.manifestObject)
 	if err := json.NewEncoder(wc).Encode(m); err != nil {
-		return "", err
+		return err
 	}
 	if err := wc.Close(); err != nil {
-		return "", err
+		return err
 	}
-	return uri, nil
+	fmt.Printf("Wrote manifest object gs://%s/%s", u.bucket, u.manifestObject)
+	return nil
 }

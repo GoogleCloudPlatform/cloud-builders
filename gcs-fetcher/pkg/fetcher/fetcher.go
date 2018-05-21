@@ -124,8 +124,8 @@ type GCS interface {
 	NewReader(ctx context.Context, bucket, object string) (io.ReadCloser, error)
 }
 
-// GCSFetcher is the main workhorse of this package and does all the heavy lifting.
-type GCSFetcher struct {
+// Fetcher is the main workhorse of this package and does all the heavy lifting.
+type Fetcher struct {
 	GCS GCS
 	OS  OS
 
@@ -147,7 +147,7 @@ type GCSFetcher struct {
 	Verbose     bool
 }
 
-func (gf *GCSFetcher) recordFailure(j job, started time.Time, gcsTimeout time.Duration, err error, report *jobReport) {
+func (gf *Fetcher) recordFailure(j job, started time.Time, gcsTimeout time.Duration, err error, report *jobReport) {
 	attempt := jobAttempt{
 		started:    started,
 		duration:   time.Since(started),
@@ -168,7 +168,7 @@ func (gf *GCSFetcher) recordFailure(j job, started time.Time, gcsTimeout time.Du
 	}
 }
 
-func (gf *GCSFetcher) recordSuccess(j job, started time.Time, size sizeBytes, finalname string, report *jobReport) {
+func (gf *Fetcher) recordSuccess(j job, started time.Time, size sizeBytes, finalname string, report *jobReport) {
 	attempt := jobAttempt{
 		started:  started,
 		duration: time.Since(started),
@@ -189,7 +189,7 @@ func (gf *GCSFetcher) recordSuccess(j job, started time.Time, size sizeBytes, fi
 // fetchObject is responsible for trying (and retrying) to fetch a single file
 // from GCS. It first downloads the file to a temp file, then renames it to
 // the final location and sets the permissions on the final file.
-func (gf *GCSFetcher) fetchObject(ctx context.Context, j job) *jobReport {
+func (gf *Fetcher) fetchObject(ctx context.Context, j job) *jobReport {
 	report := &jobReport{job: j, started: time.Now()}
 	defer func() {
 		report.completed = time.Now()
@@ -264,7 +264,7 @@ func (gf *GCSFetcher) fetchObject(ctx context.Context, j job) *jobReport {
 // using a circuit breaker pattern to timeout the call if it takes too long.
 // GCS has long tail latencies, so we retry with low timeouts on the first
 // couple of attempts. On subsequent attempts, we simply wait for a long time.
-func (gf *GCSFetcher) fetchObjectOnceWithTimeout(ctx context.Context, j job, timeout time.Duration, dest string) (sizeBytes, error) {
+func (gf *Fetcher) fetchObjectOnceWithTimeout(ctx context.Context, j job, timeout time.Duration, dest string) (sizeBytes, error) {
 	result := make(chan fetchOnceResult, 1)
 	breakerSig := make(chan struct{}, 1)
 
@@ -293,7 +293,7 @@ func (gf *GCSFetcher) fetchObjectOnceWithTimeout(ctx context.Context, j job, tim
 // GCS and saving it to the dest location. If it receives a signal on
 // breakerSig, it will attempt to return quickly, though it is assumed
 // that no one is listening for a response anymore.
-func (gf *GCSFetcher) fetchObjectOnce(ctx context.Context, j job, dest string, breakerSig <-chan struct{}) fetchOnceResult {
+func (gf *Fetcher) fetchObjectOnce(ctx context.Context, j job, dest string, breakerSig <-chan struct{}) fetchOnceResult {
 	var result fetchOnceResult
 
 	r, err := gf.GCS.NewReader(ctx, j.bucket, j.object)
@@ -350,7 +350,7 @@ func (gf *GCSFetcher) fetchObjectOnce(ctx context.Context, j job, dest string, b
 
 // ensureFolders takes a full path to a filename and makes sure that
 // all the folders leading to the filename exist.
-func (gf *GCSFetcher) ensureFolders(filename string) error {
+func (gf *Fetcher) ensureFolders(filename string) error {
 	filedir := filepath.Dir(filename)
 	gf.mu.Lock()
 	defer gf.mu.Unlock()
@@ -365,7 +365,7 @@ func (gf *GCSFetcher) ensureFolders(filename string) error {
 
 // doWork is the worker routine. It listens for jobs, fetches the file,
 // and emits a job report. This continues until channel job is closed.
-func (gf *GCSFetcher) doWork(ctx context.Context, todo <-chan job, results chan<- jobReport) {
+func (gf *Fetcher) doWork(ctx context.Context, todo <-chan job, results chan<- jobReport) {
 	for j := range todo {
 		report := gf.fetchObject(ctx, j)
 		if gf.Verbose {
@@ -375,12 +375,12 @@ func (gf *GCSFetcher) doWork(ctx context.Context, todo <-chan job, results chan<
 	}
 }
 
-// processJobs is the primary concurrency mechanics for GCSFetcher.
+// processJobs is the primary concurrency mechanics for Fetcher.
 // This method spins up a set of worker goroutines, creates a
 // goroutine to send all the jobs to the workers, then waits for
 // all the jobs to complete. It also compiles and returns final
 // statistics for the jobs.
-func (gf *GCSFetcher) processJobs(ctx context.Context, jobs []job) stats {
+func (gf *Fetcher) processJobs(ctx context.Context, jobs []job) stats {
 	workerCount := gf.WorkerCount
 	if len(jobs) < workerCount {
 		workerCount = len(jobs)
@@ -449,7 +449,7 @@ func (gf *GCSFetcher) processJobs(ctx context.Context, jobs []job) stats {
 // filenum on a given retry number. GCS has long tails on occasion, so
 // in some cases, it's faster to give up early and retry on a second
 // connection.
-func (gf *GCSFetcher) timeout(filename string, retrynum int) time.Duration {
+func (gf *Fetcher) timeout(filename string, retrynum int) time.Duration {
 	if gf.TimeoutGCS == false {
 		return defaultTimeout
 	}
@@ -470,7 +470,7 @@ func (gf *GCSFetcher) timeout(filename string, retrynum int) time.Duration {
 // fetchFromManifest is used when downloading source based on a manifest file.
 // It is responsible for fetching the manifest file, decoding the JSON, and
 // assembling the list of jobs to process (i.e., files to download).
-func (gf *GCSFetcher) fetchFromManifest(ctx context.Context) error {
+func (gf *Fetcher) fetchFromManifest(ctx context.Context) error {
 	started := time.Now()
 	log.Printf("Fetching manifest %s.", formatGCSName(gf.Bucket, gf.Object, gf.Generation))
 
@@ -566,7 +566,7 @@ func (gf *GCSFetcher) fetchFromManifest(ctx context.Context) error {
 	return nil
 }
 
-func (gf *GCSFetcher) copyFileFromZip(file *zip.File) error {
+func (gf *Fetcher) copyFileFromZip(file *zip.File) error {
 	sourceReader, err := file.Open()
 	if err != nil {
 		return fmt.Errorf("failed to open source file %q: %v", file.Name, err)
@@ -592,7 +592,7 @@ func (gf *GCSFetcher) copyFileFromZip(file *zip.File) error {
 
 // fetchFromZip is used when downloading a single zip of source files. It is
 // responsible to fetch the zip file and unzip it into the destination folder.
-func (gf *GCSFetcher) fetchFromZip(ctx context.Context) error {
+func (gf *Fetcher) fetchFromZip(ctx context.Context) error {
 	started := time.Now()
 	log.Printf("Fetching archive %s.", formatGCSName(gf.Bucket, gf.Object, gf.Generation))
 
@@ -661,9 +661,9 @@ func (gf *GCSFetcher) fetchFromZip(ctx context.Context) error {
 	return nil
 }
 
-// fetch is the main entry point into GCSFetcher. Based on configuration,
+// fetch is the main entry point into Fetcher. Based on configuration,
 // it pulls source from GCS into the destination directory.
-func (gf *GCSFetcher) Fetch(ctx context.Context) error {
+func (gf *Fetcher) Fetch(ctx context.Context) error {
 	switch gf.SourceType {
 	case "Manifest":
 		if err := gf.fetchFromManifest(ctx); err != nil {
