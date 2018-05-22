@@ -31,6 +31,8 @@ import (
 	"github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/pkg/common"
 )
 
+// Uploader encapsulates methods for uploading files incrementally and
+// producing a source manifest.
 type Uploader struct {
 	gcs                    GCS
 	os                     OS
@@ -43,11 +45,13 @@ type Uploader struct {
 	totalBytes, bytesSkipped int64
 }
 
+// OS allows us to inject dependencies to facilitate testing.
 type OS interface {
 	EvalSymlinks(path string) (string, error)
 	Stat(path string) (os.FileInfo, error)
 }
 
+// GCS allows us to inject dependencies to facilitate testing.
 type GCS interface {
 	NewWriter(ctx context.Context, bucket, object string) io.WriteCloser
 }
@@ -57,6 +61,7 @@ type job struct {
 	info os.FileInfo
 }
 
+// New returns a new Uploader.
 func New(ctx context.Context, gcs GCS, os OS, bucket, manifestObject string, numWorkers int) *Uploader {
 	var group errgroup.Group
 	jobs := make(chan job, numWorkers)
@@ -89,10 +94,13 @@ func New(ctx context.Context, gcs GCS, os OS, bucket, manifestObject string, num
 	return up
 }
 
+// Enqueue enqueues the upload of the file at the given path.
 func (u *Uploader) Enqueue(path string, info os.FileInfo) {
 	u.jobs <- job{path, info}
 }
 
+// Wait blocks until ongoing uploads are complete, or until an error is
+// encountered.
 func (u *Uploader) Wait(ctx context.Context) error {
 	close(u.jobs)
 	if err := u.group.Wait(); err != nil {
