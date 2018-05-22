@@ -661,7 +661,7 @@ func (gf *Fetcher) fetchFromZip(ctx context.Context) error {
 	return nil
 }
 
-// fetch is the main entry point into Fetcher. Based on configuration,
+// Fetch is the main entry point into Fetcher. Based on configuration,
 // it pulls source from GCS into the destination directory.
 func (gf *Fetcher) Fetch(ctx context.Context) error {
 	switch gf.SourceType {
