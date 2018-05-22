@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"net/http"
 	"os"
 	"path/filepath"
 	"time"
@@ -30,8 +29,6 @@ import (
 	"github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/pkg/fetcher"
 
 	"cloud.google.com/go/storage"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 )
 
@@ -67,12 +64,7 @@ func main() {
 	}
 
 	ctx := context.Background()
-	hc, err := buildHTTPClient(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	client, err := storage.NewClient(ctx, option.WithHTTPClient(hc), option.WithUserAgent(userAgent))
+	client, err := storage.NewClient(ctx, option.WithUserAgent(userAgent))
 	if err != nil {
 		log.Fatalf("Failed to create new GCS client: %v", err)
 	}
@@ -82,7 +74,7 @@ func main() {
 		log.Fatalf("Failed to parse --location: %v", err)
 	}
 
-	gcs := &fetcher.GCSFetcher{
+	gcs := &fetcher.Fetcher{
 		GCS:         realGCS{client},
 		OS:          realOS{},
 		DestDir:     *destDir,
@@ -101,24 +93,6 @@ func main() {
 	if err := gcs.Fetch(ctx); err != nil {
 		log.Fatal(err)
 	}
-}
-func buildHTTPClient(ctx context.Context) (*http.Client, error) {
-	hc, err := google.DefaultClient(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create default client: %v", err)
-	}
-
-	ts, err := google.DefaultTokenSource(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create default token source: %v", err)
-	}
-
-	hc.Transport = &oauth2.Transport{
-		Base:   http.DefaultTransport,
-		Source: ts,
-	}
-
-	return hc, nil
 }
 
 // realGCS is a wrapper over the GCS client functions.

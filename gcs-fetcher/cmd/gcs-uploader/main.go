@@ -21,13 +21,10 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"net/http"
 	"os"
 	"path/filepath"
 
 	"cloud.google.com/go/storage"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/pkg/common"
@@ -64,50 +61,28 @@ func main() {
 	}
 
 	ctx := context.Background()
-	hc, err := buildHTTPClient(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	client, err := storage.NewClient(ctx, option.WithHTTPClient(hc), option.WithUserAgent(userAgent))
+	client, err := storage.NewClient(ctx, option.WithUserAgent(userAgent))
 	if err != nil {
 		log.Fatalf("Failed to create new GCS client: %v", err)
 	}
 
-	u := uploader.GCSUploader{
-		GCS:            realGCS{client},
-		OS:             realOS{},
-		Root:           *dir,
-		Bucket:         bucket,
-		ManifestObject: object,
-		WorkerCount:    *workerCount,
-	}
+	u := uploader.New(ctx, realGCS{client}, realOS{}, bucket, object, *workerCount)
 
-	manifestURL, err := u.Upload(ctx)
-	if err != nil {
+	filepath.Walk(*dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+
+		u.Enqueue(path, info)
+		return nil
+	})
+
+	if err := u.Wait(ctx); err != nil {
 		log.Fatalf("Failed to upload: %v", err)
 	}
-
-	log.Printf("Uploaded manifest: %s", manifestURL)
-}
-
-func buildHTTPClient(ctx context.Context) (*http.Client, error) {
-	hc, err := google.DefaultClient(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create default client: %v", err)
-	}
-
-	ts, err := google.DefaultTokenSource(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create default token source: %v", err)
-	}
-
-	hc.Transport = &oauth2.Transport{
-		Base:   http.DefaultTransport,
-		Source: ts,
-	}
-
-	return hc, nil
 }
 
 // realGCS is a wrapper over the GCS client functions.
@@ -124,6 +99,5 @@ func (gp realGCS) NewWriter(ctx context.Context, bucket, object string) io.Write
 // realOS merely wraps the os package implementations.
 type realOS struct{}
 
-func (realOS) Walk(root string, fn filepath.WalkFunc) error { return filepath.Walk(root, fn) }
-func (realOS) EvalSymlinks(path string) (string, error)     { return filepath.EvalSymlinks(path) }
-func (realOS) Stat(path string) (os.FileInfo, error)        { return os.Stat(path) }
+func (realOS) EvalSymlinks(path string) (string, error) { return filepath.EvalSymlinks(path) }
+func (realOS) Stat(path string) (os.FileInfo, error)    { return os.Stat(path) }

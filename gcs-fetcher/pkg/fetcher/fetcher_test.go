@@ -184,7 +184,7 @@ func (*fakeOS) RemoveAll(path string) error {
 }
 
 type testContext struct {
-	gf      *GCSFetcher
+	gf      *Fetcher
 	gcs     *fakeGCS
 	os      *fakeOS
 	workDir string
@@ -216,7 +216,7 @@ func buildManifestTestContext(t *testing.T) (tc *testContext, teardown func()) {
 		},
 	}
 
-	gf := &GCSFetcher{
+	gf := &Fetcher{
 		GCS:         gcs,
 		OS:          os,
 		DestDir:     workDir,
@@ -693,7 +693,7 @@ func TestFetchFromManifestSuccess(t *testing.T) {
 	}
 }
 
-func TestFetchFromManifestManifestGCSFetchFailed(t *testing.T) {
+func TestFetchFromManifestManifestFetchFailed(t *testing.T) {
 	tc, teardown := buildManifestTestContext(t)
 	defer teardown()
 
