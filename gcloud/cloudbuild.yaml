@@ -4,10 +4,14 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--tag=gcr.io/$PROJECT_ID/gcloud', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/gcloud-slim', '--build-arg=slim=true', '.']
 
-# Simple unit test: invoke the new gcloud container to confirm that it was
+# Simple sanity check: invoke the new gcloud container to confirm that it was
 # built correctly.
 - name: 'gcr.io/$PROJECT_ID/gcloud'
+  args: ['info']
+- name: 'gcr.io/$PROJECT_ID/gcloud-slim'
   args: ['info']
 
 # Invoke a command that requires auth, to check that it gets piped through
@@ -15,4 +19,6 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/gcloud'
   args: ['source', 'repos', 'clone', 'default']
 
-images: ['gcr.io/$PROJECT_ID/gcloud']
+images:
+- 'gcr.io/$PROJECT_ID/gcloud'
+- 'gcr.io/$PROJECT_ID/gcloud-slim'

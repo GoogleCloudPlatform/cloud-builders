@@ -1,5 +1,7 @@
 FROM launcher.gcr.io/google/ubuntu16_04
 
+ARG slim=
+
 RUN apt-get -y update && \
     apt-get -y install gcc python2.7 python-dev python-setuptools wget ca-certificates \
        # These are necessary for add-apt-respository
@@ -19,42 +21,46 @@ RUN apt-get -y update && \
         --bash-completion=false \
         --disable-installation-options && \
 
-    # Install all available components
-    /builder/google-cloud-sdk/bin/gcloud -q components install \
-        alpha beta \
-        app-engine-go \
-        app-engine-java \
-        app-engine-php \
-        app-engine-python \
-        app-engine-python-extras \
-        bigtable \
-        cbt \
-        cloud-datastore-emulator \
-        container-builder-local \
-        datalab \
-        docker-credential-gcr \
-        emulator-reverse-proxy \
-        kubectl \
-        pubsub-emulator \
-        && \
-
-    /builder/google-cloud-sdk/bin/gcloud -q components update && \
-    /builder/google-cloud-sdk/bin/gcloud components list && \
-
-    # install crcmod: https://cloud.google.com/storage/docs/gsutil/addlhelp/CRC32CandInstallingcrcmod
-    easy_install -U pip && \
-    pip install -U crcmod && \
-
     # TODO(jasonhall): These lines pin gcloud to a particular version.
     # /builder/google-cloud-sdk/bin/gcloud components update --version 137.0.0 && \
     # /builder/google-cloud-sdk/bin/gcloud config set component_manager/disable_update_check 1 && \
     # /builder/google-cloud-sdk/bin/gcloud -q components update && \
+
+    # install crcmod: https://cloud.google.com/storage/docs/gsutil/addlhelp/CRC32CandInstallingcrcmod
+    easy_install -U pip && \
+    pip install -U crcmod && \
 
     # Clean up
     apt-get -y remove gcc python-dev python-setuptools wget && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf ~/.config/gcloud
 
+RUN \
+    if [ -z $slim ]; then \
+      echo building fat builder && \
+      # Install all available components
+      /builder/google-cloud-sdk/bin/gcloud -q components install \
+          alpha beta \
+          app-engine-go \
+          app-engine-java \
+          app-engine-php \
+          app-engine-python \
+          app-engine-python-extras \
+          bigtable \
+          cbt \
+          cloud-datastore-emulator \
+          container-builder-local \
+          datalab \
+          docker-credential-gcr \
+          emulator-reverse-proxy \
+          kubectl \
+          pubsub-emulator \
+            && \
+
+      /builder/google-cloud-sdk/bin/gcloud -q components update && \
+      /builder/google-cloud-sdk/bin/gcloud components list \
+    ; fi
+
 ENV PATH=/builder/google-cloud-sdk/bin/:$PATH
 
-ENTRYPOINT ["gcloud"]
+ENTRYPOINT ["/builder/google-cloud-sdk/bin/gcloud"]
