@@ -19,16 +19,6 @@ RUN apt-get -y update && \
         --bash-completion=false \
         --disable-installation-options && \
 
-    # TODO(jasonhall): These lines pin gcloud to a particular version.
-    # /builder/google-cloud-sdk/bin/gcloud components update --version 137.0.0 && \
-    # /builder/google-cloud-sdk/bin/gcloud config set component_manager/disable_update_check 1 && \
-    # /builder/google-cloud-sdk/bin/gcloud -q components update && \
-
-    # TODO(jasonhall): These lines pin gcloud to a particular version.
-    # /builder/google-cloud-sdk/bin/gcloud components update --version 137.0.0 && \
-    # /builder/google-cloud-sdk/bin/gcloud config set component_manager/disable_update_check 1 && \
-    # /builder/google-cloud-sdk/bin/gcloud -q components update && \
-
     # install crcmod: https://cloud.google.com/storage/docs/gsutil/addlhelp/CRC32CandInstallingcrcmod
     easy_install -U pip && \
     pip install -U crcmod && \
