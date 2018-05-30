@@ -3,9 +3,9 @@
 
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/gcloud', '-f', 'Dockerfile', '.']
+  args: ['build', '--tag=gcloud-slim', '--tag=gcr.io/$PROJECT_ID/gcloud-slim', '-f', 'Dockerfile.slim', '.']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/gcloud-slim', '-f', 'Dockerfile.slim', '.']
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/gcloud', '-f', 'Dockerfile', '.']
 
 # Simple sanity check: invoke the new gcloud container to confirm that it was
 # built correctly.
