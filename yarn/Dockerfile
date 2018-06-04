@@ -2,7 +2,8 @@
 FROM launcher.gcr.io/google/debian8
 
 # Install updates and dependencies
-RUN apt-get update -y && apt-get install --no-install-recommends -y -q curl python build-essential ssh git ca-certificates libkrb5-dev imagemagick apt-transport-https && \
+RUN apt-get update -y && apt-get install --no-install-recommends -y -q curl python build-essential ssh git \
+    ca-certificates libkrb5-dev imagemagick apt-transport-https bzip2 && \
     apt-get clean && rm /var/lib/apt/lists/*_*
 
 ARG NODE_VERSION
