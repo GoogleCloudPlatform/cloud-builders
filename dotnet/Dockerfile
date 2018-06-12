@@ -20,19 +20,19 @@ RUN apt-get update \
 
 # Install the following SDKs:
 # + 1.0.3 with SDK Preview 2 build 3156, to support .NET Core 1.0.5 with project.json solutions.
-# + 1.1.7, which supports .csproj projects for .NET Core 1.0.9 and 1.1.6.
-# + 2.1.4, which supports .csproj projects for .NET Core 2.0.5.
+# + 1.1.7, which supports .csproj projects for .NET Core 1.0.11 and 1.1.8.
+# + 2.1.300 which supports .NET Core 2.1.0.
 RUN mkdir -p /usr/share/dotnet && \
-    curl -sL https://go.microsoft.com/fwlink/?LinkID=836302 | tar -xz -C /usr/share/dotnet && \
-    curl -sL https://download.microsoft.com/download/4/E/6/4E64A465-F02E-43AD-9A86-A08A223A82C3/dotnet-dev-debian-x64.1.1.7.tar.gz | tar -xz -C /usr/share/dotnet/ && \
-    curl -sL https://download.microsoft.com/download/1/1/5/115B762D-2B41-4AF3-9A63-92D9680B9409/dotnet-sdk-2.1.4-linux-x64.tar.gz | tar -xz -C /usr/share/dotnet && \
+    curl -sL https://download.microsoft.com/download/0/3/0/030449F5-F093-44A6-9889-E19B50A59777/sdk/dotnet-dev-debian-x64.1.0.0-preview2-003156.tar.gz | tar -xz -C /usr/share/dotnet && \
+    curl -sL https://download.microsoft.com/download/4/0/2/4022CFC7-5061-4762-B9BA-48B35632572D/dotnet-dev-debian-x64.1.1.9.tar.gz | tar -xz -C /usr/share/dotnet/ && \
+    curl -sL https://download.microsoft.com/download/8/8/5/88544F33-836A-49A5-8B67-451C24709A8F/dotnet-sdk-2.1.300-linux-x64.tar.gz | tar -xz -C /usr/share/dotnet && \
     ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
 
 # Make sure that the caches are expanded.
 ADD ./configs /configs
 RUN cd /configs/config-1.0.0/ && dotnet new && \
-    cd /configs/config-1.1.7/ && dotnet new && \
-    cd /configs/config-2.1.4/ && dotnet new && \
+    cd /configs/config-1.1.9/ && dotnet new && \
+    cd /configs/config-2.1.300/ && dotnet new && \
     rm -rf /configs
 
 # Ensure that no additional cache expansions are performed from now on, see
