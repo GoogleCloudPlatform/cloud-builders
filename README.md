@@ -8,6 +8,7 @@ Pre-built images are available at `gcr.io/cloud-builders/...` and include:
 *   `bazel`: runs the [bazel](https://bazel.io) tool
 *   `curl`: runs the [curl](https://curl.haxx.se) tool
 *   `docker`: runs the [docker](https://docker.com) tool
+*   `dotnet`: run the [dotnet](https://docs.microsoft.com/dotnet/core/tools/) tool
 *   `gcloud`: runs the [gcloud](https://cloud.google.com/sdk/gcloud/) tool
 *   `git`: runs the [git](https://git-scm.com/) tool
 *   `go`: runs the [go](https://golang.org/cmd/go) tool

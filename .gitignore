@@ -2,3 +2,4 @@
 .dockercfg
 **/project.lock.json
 .DS_Store
+/.vs
