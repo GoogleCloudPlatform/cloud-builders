@@ -16,34 +16,34 @@ steps:
   entrypoint: 'bash'
   args: ['-c', '[[ $(dotnet --version) == "1.0.0-preview2-003156" ]]']
   dir: 'configs/config-1.0.0'
-  waitFor: 'build-dotnet'
+  waitFor: ['build-dotnet']
 - name: 'gcr.io/$PROJECT_ID/dotnet'
   entrypoint: 'bash'
   args: ['-c', '[[ $(dotnet --version) == "1.1.9" ]]']
   dir: 'configs/config-1.1.9'
-  waitFor: 'build-dotnet'
+  waitFor: ['build-dotnet']
 - name: 'gcr.io/$PROJECT_ID/dotnet'
   entrypoint: 'bash'
   args: ['-c', '[[ $(dotnet --version) == "2.1.300" ]]']
   dir: 'configs/config-2.1.300'
-  waitFor: 'build-dotnet'
-- id: restoreTestApp1.1
+  waitFor: ['build-dotnet']
+- id: 'restoreTestApp1.1'
   name: 'gcr.io/$PROJECT_ID/dotnet'
   args: ['restore']
   dir: 'examples/TestApp'
-  waitFor: 'build-dotnet'
+  waitFor: ['build-dotnet']
 - name: 'gcr.io/$PROJECT_ID/dotnet'
   args: ['build']
   dir: 'examples/TestApp'
-  waitFor: restoreTestApp1.1
+  waitFor: ['restoreTestApp1.1']
 - name: 'gcr.io/$PROJECT_ID/dotnet'
   args: ['build']
   dir: 'examples/TestApp-2.0'
-  waitFor: 'build-dotnet'
+  waitFor: ['build-dotnet']
 - name: 'gcr.io/$PROJECT_ID/dotnet'
   args: ['build']
   dir: 'examples/TestApp-2.1'
-  waitFor: 'build-dotnet'
+  waitFor: ['build-dotnet']
 
 images:
 - 'gcr.io/$PROJECT_ID/dotnet'
