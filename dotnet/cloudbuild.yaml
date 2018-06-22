@@ -11,7 +11,7 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/csharp/dotnet'
   - '.'
 
-# Verify the version output of the supported SDKs.
+  # Verify the version output of the supported SDKs.
 - name: 'gcr.io/$PROJECT_ID/dotnet'
   entrypoint: 'bash'
   args: ['-c', '[[ $(dotnet --version) == "1.0.0-preview2-003156" ]]']
@@ -24,8 +24,8 @@ steps:
   waitFor: ['build-dotnet']
 - name: 'gcr.io/$PROJECT_ID/dotnet'
   entrypoint: 'bash'
-  args: ['-c', '[[ $(dotnet --version) == "2.1.300" ]]']
-  dir: 'configs/config-2.1.300'
+  args: ['-c', '[[ $(dotnet --version) == "2.1.301" ]]']
+  dir: 'configs/config-2.1.301'
   waitFor: ['build-dotnet']
 - id: 'restoreTestApp1.1'
   name: 'gcr.io/$PROJECT_ID/dotnet'
