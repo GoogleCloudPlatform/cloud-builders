@@ -12,38 +12,51 @@ steps:
   - '.'
 
   # Verify the version output of the supported SDKs.
-- name: 'gcr.io/$PROJECT_ID/dotnet'
+- id: 'test 1.0-preview sdk'
+  name: 'gcr.io/$PROJECT_ID/dotnet'
   entrypoint: 'bash'
   args: ['-c', '[[ $(dotnet --version) == "1.0.0-preview2-003156" ]]']
   dir: 'configs/config-1.0.0'
   waitFor: ['build-dotnet']
-- name: 'gcr.io/$PROJECT_ID/dotnet'
+
+- id: 'test the 1.1 sdk'
+  name: 'gcr.io/$PROJECT_ID/dotnet'
   entrypoint: 'bash'
   args: ['-c', '[[ $(dotnet --version) == "1.1.9" ]]']
   dir: 'configs/config-1.1.9'
   waitFor: ['build-dotnet']
-- name: 'gcr.io/$PROJECT_ID/dotnet'
+
+- id: 'test the 2.1 sdk'
+  name: 'gcr.io/$PROJECT_ID/dotnet'
   entrypoint: 'bash'
   args: ['-c', '[[ $(dotnet --version) == "2.1.301" ]]']
   dir: 'configs/config-2.1.301'
   waitFor: ['build-dotnet']
-- id: 'restoreTestApp1.1'
+
+  # Build the test projects
+- id: 'restore 1.1 TestApp'
   name: 'gcr.io/$PROJECT_ID/dotnet'
   args: ['restore']
   dir: 'examples/TestApp'
   waitFor: ['build-dotnet']
-- name: 'gcr.io/$PROJECT_ID/dotnet'
+
+- id: 'build 1.1 TestApp'
+  name: 'gcr.io/$PROJECT_ID/dotnet'
   args: ['build']
   dir: 'examples/TestApp'
-  waitFor: ['restoreTestApp1.1']
-- name: 'gcr.io/$PROJECT_ID/dotnet'
+  waitFor: ['restore 1.1 TestApp']
+
+- id: 'build 2.0 TestApp'
+  name: 'gcr.io/$PROJECT_ID/dotnet'
   args: ['build']
   dir: 'examples/TestApp-2.0'
-  waitFor: ['build-dotnet']
-- name: 'gcr.io/$PROJECT_ID/dotnet'
+  waitFor: ['restore 1.1 TestApp']
+
+- id: 'build 2.1 TestApp'
+  name: 'gcr.io/$PROJECT_ID/dotnet'
   args: ['build']
   dir: 'examples/TestApp-2.1'
-  waitFor: ['build-dotnet']
+  waitFor: ['restore 1.1 TestApp']
 
 images:
 - 'gcr.io/$PROJECT_ID/dotnet'
