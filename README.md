@@ -14,6 +14,7 @@ Pre-built images are available at `gcr.io/cloud-builders/...` and include:
 *   `go`: runs the [go](https://golang.org/cmd/go) tool
 *   `gradle`: runs the [gradle](https://gradle.org/) tool
 *   `gsutil`: runs the [gsutil](https://cloud.google.com/storage/docs/gsutil) tool
+*   `helm`: runs the [helm](https://helm.sh) tool
 *   `kubectl`: runs the [kubectl](https://kubernetes.io/docs/user-guide/kubectl-overview/) tool
 *   `mvn`: runs the [maven](https://maven.apache.org/) tool
 *   `npm`: runs the [npm](https://docs.npmjs.com/) tool
