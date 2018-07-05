@@ -1,3 +1,3 @@
-FROM gcr.io/cloud-builders/gcloud
+FROM gcr.io/cloud-builders/gcloud-slim
 
 ENTRYPOINT ["gsutil"]
