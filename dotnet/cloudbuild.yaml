@@ -29,7 +29,7 @@ steps:
 - id: 'test the 2.1 sdk'
   name: 'gcr.io/$PROJECT_ID/dotnet'
   entrypoint: 'bash'
-  args: ['-c', '[[ $(dotnet --version) == "2.1.301" ]]']
+  args: ['-c', '[[ $(dotnet --version) == "2.1.302" ]]']
   dir: 'configs/config-2.1.301'
   waitFor: ['build-dotnet']
 
