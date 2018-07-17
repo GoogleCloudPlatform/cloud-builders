@@ -30,7 +30,7 @@ steps:
   name: 'gcr.io/$PROJECT_ID/dotnet'
   entrypoint: 'bash'
   args: ['-c', '[[ $(dotnet --version) == "2.1.302" ]]']
-  dir: 'configs/config-2.1.301'
+  dir: 'configs/config-2.1.302'
   waitFor: ['build-dotnet']
 
   # Build the test projects
