@@ -1,6 +1,6 @@
 # Tool builder: `gcr.io/cloud-builders/yarn`
 
-This Cloud Build build step runs the `yarn` tool.
+This build step runs the `yarn` tool.
 
 ## Building this builder
 

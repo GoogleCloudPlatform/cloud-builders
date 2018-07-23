@@ -1,6 +1,6 @@
 # Tool builder: gcr.io/cloud-builders/dotnet
 
-This directory contains the description for the `dotnet` Container Build step.
+This directory contains the description for the `dotnet` Cloud Build step.
 This step will run the .NET Core `dotnet` command line. This builder has three
 SDKs installed:
 
@@ -21,12 +21,12 @@ contain a `global.json` file that specifies what version of the SDK is to be
 used. You need make sure that you specify the right SDK so an SDK that supports
 `project.json` is used to build your project.
 
-## Building this Container Build step
+## Building this builder
 
-To build this builder, run the following command on this directory:
+To build this tool, run the following command on this directory:
 
 ```bash
 gcloud builds submit --config=./cloudbuild.yaml .
 ```
 
-This will build the Container Build step in your current GCP project.
+This will build the Cloud Build step in your current GCP project.

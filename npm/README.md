@@ -1,6 +1,6 @@
 # Tool builder: `gcr.io/cloud-builders/npm`
 
-This Cloud Build build step runs the `npm` tool.
+This build step runs the `npm` tool.
 
 ## Building this builder
 

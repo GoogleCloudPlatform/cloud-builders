@@ -1,6 +1,6 @@
 # Tool builder: `gcr.io/cloud-builders/kubectl`
 
-This Cloud Build build step runs
+This build step runs
 [`kubectl`](https://kubernetes.io/docs/user-guide/kubectl-overview/).
 
 ## Using this builder with Google Kubernetes Engine
