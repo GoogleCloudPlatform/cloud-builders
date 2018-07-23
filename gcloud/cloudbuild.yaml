@@ -1,5 +1,5 @@
 # In this directory, run the following command to build this builder.
-# $ gcloud container builds submit . --config=cloudbuild.yaml
+# $ gcloud builds submit . --config=cloudbuild.yaml
 
 steps:
 - name: 'gcr.io/cloud-builders/docker'

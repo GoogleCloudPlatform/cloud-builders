@@ -4,13 +4,13 @@ This is a tool builder to simply invoke
 [`gsutil`](https://cloud.google.com/storage/docs/gsutil) commands.
 
 Arguments passed to this builder will be passed to `gsutil` directly, allowing
-callers to run [any `gsutil`
-command](https://cloud.google.com/storage/docs/gsutil).
+callers to run
+[any `gsutil` command](https://cloud.google.com/storage/docs/gsutil).
 
-When executed in the Container Builder environment, commands are executed with
-credentials of the [builder service
-account](https://cloud.google.com/container-builder/docs/permissions) for the
-project.
+When executed in the Cloud Build environment, commands are executed with
+credentials of the
+[builder service account](https://cloud.google.com/cloud-build/docs/permissions)
+for the project.
 
 The latest available version of `gsutil` is used.
 
