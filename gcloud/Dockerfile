@@ -12,6 +12,7 @@ RUN \
         bigtable \
         cbt \
         cloud-datastore-emulator \
+        cloud-build-local \
         container-builder-local \
         datalab \
         docker-credential-gcr \

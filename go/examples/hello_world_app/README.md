@@ -8,7 +8,7 @@ executing `export PROJECT_ID=my-project` prior to running the below commands.
 
 First, build the app:
 
-`gcloud container builds submit --config=cloudbuild.yaml .`
+`gcloud builds submit --config=cloudbuild.yaml .`
 
 If you have Docker installed locally, you can test your app. In one window, run:
 

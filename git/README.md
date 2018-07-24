@@ -5,9 +5,9 @@ This is a tool builder to simply invoke `git` commands.
 Arguments passed to this builder will be passed to `git` directly, allowing
 callers to run [any Git command](https://git-scm.com/docs).
 
-When executed in the Container Builder environment, commands are executed with
+When executed in the Cloud Build environment, commands are executed with
 credentials of the [builder service
-account](https://cloud.google.com/container-builder/docs/permissions) for the
+account](https://cloud.google.com/cloud-build/docs/permissions) for the
 project.
 
 ## Examples
