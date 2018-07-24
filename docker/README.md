@@ -3,17 +3,16 @@
 This is a tool builder to simply invoke `docker` commands.
 
 Arguments passed to this builder will be passed to `docker` directly, allowing
-callers to run [any Docker
-command](https://docs.docker.com/engine/reference/commandline/).
+callers to run
+[any Docker command](https://docs.docker.com/engine/reference/commandline/).
 
 By default, the version of Docker that is used by this builder is `17.12.0`.
 
 ## GCR Credentials
 
 The Docker build step is automatically set up with credentials for your
-[Cloud Build Service
-Account](https://cloud.google.com/cloud-build/docs/permissions). These
-permissions are sufficient to interact directly with GCR.
+[Cloud Build Service Account](https://cloud.google.com/cloud-build/docs/permissions).
+These permissions are sufficient to interact directly with GCR.
 
 ## Examples
 

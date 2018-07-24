@@ -1,6 +1,6 @@
 # Tool builder: `gcr.io/cloud-builders/go`
 
-This Container Builder build step runs the `go` tool.
+This Cloud Build step runs the `go` tool.
 
 ### When to use this builder
 
@@ -18,8 +18,8 @@ libc. Binaries built in an `alpine` environment don't always work in a
 
 The specific versions are available as
 
-  - gcr.io/cloud-builders/go:alpine
-  - gcr.io/cloud-builders/go:debian
+-   gcr.io/cloud-builders/go:alpine
+-   gcr.io/cloud-builders/go:debian
 
 And `gcr.io/cloud-builders/go:latest` is an alias for
 `gcr.io/cloud-builders/go:alpine`.
@@ -42,7 +42,8 @@ To determine the workspace structure, this tool checks the following, in order:
 Once the workspace is set up, the `args` to the build step are passed through to
 the `go` tool.
 
-This tool builder sets `CGO_ENABLED=0`, so that all binaries are linked statically.
+This tool builder sets `CGO_ENABLED=0`, so that all binaries are linked
+statically.
 
 ## Output files
 

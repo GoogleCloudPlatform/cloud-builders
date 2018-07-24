@@ -6,9 +6,9 @@ Arguments passed to this builder will be passed to `git` directly, allowing
 callers to run [any Git command](https://git-scm.com/docs).
 
 When executed in the Cloud Build environment, commands are executed with
-credentials of the [builder service
-account](https://cloud.google.com/cloud-build/docs/permissions) for the
-project.
+credentials of the
+[builder service account](https://cloud.google.com/cloud-build/docs/permissions)
+for the project.
 
 ## Examples
 

@@ -31,9 +31,9 @@ The following is an example source manifest:
 
 To process the above manifest, the GCS Fetcher tool processes each element:
 
-1. Fetch the object located at `sourceUrl`
-1. Verify the object's SHA-1 matches the expected digest
-1. Write the file contents to the path indicated by the object key
+1.  Fetch the object located at `sourceUrl`
+1.  Verify the object's SHA-1 matches the expected digest
+1.  Write the file contents to the path indicated by the object key
 
 So in the above example, the tool fetches `gs://my-bucket/abcdef`, verifies its
 SHA-1 digest, and places the file in the working directory named as
@@ -47,9 +47,9 @@ sources from a client.
 
 If a user uploads the two files in the example above, then edits the contents of
 their `Dockerfile`, only that new file has to be uploaded to Cloud Storage, and
-the manifest for the next build can reuse the entry for `path/to/main.go`,
-only writing a new entry for `Dockerfile` to specify the new file's location in
-Cloud Storage.
+the manifest for the next build can reuse the entry for `path/to/main.go`, only
+writing a new entry for `Dockerfile` to specify the new file's location in Cloud
+Storage.
 
 In the case of a file move, where file contents don't change, no new files have
 to be uploaded. The new manifest simply changes the key in the object describing
@@ -67,7 +67,6 @@ steps:
   - '--type=Manifest'
   - '--location=gs://${PROJECT_ID}_cloudbuild/manifest-foo.json'
 ```
-
 
 It may also be useful to _produce_ and upload source manifests describing some
 source, which you can do with `gcr.io/cloud-builders/gcs-uploader`:
@@ -115,20 +114,20 @@ steps:
 
 **Tips and Caveats**
 
-1. You can use [Cloud Storage object lifecycle
-   management](https://cloud.google.com/storage/docs/lifecycle) to automatically
-   delete objects after a certain amount of time, which may reduce storage costs
-   but negatively impact cache hit rates.
-1. Two ongoing builds that fetch from and upload to the same manifest file may
-   interact poorly with each other, leading to confusing bugs. You may want to
-   include `${BRANCH_NAME}` or some other unique value in the manifest file
-   location to avoid this.
-1. Even with incremental upload, you may find that generating the files is just
-   as fast or faster than fetching from Cloud Storage. Caching is not a magic
-   bullet, and can add more complexity than it removes.
+1.  You can use
+    [Cloud Storage object lifecycle management](https://cloud.google.com/storage/docs/lifecycle)
+    to automatically delete objects after a certain amount of time, which may
+    reduce storage costs but negatively impact cache hit rates.
+1.  Two ongoing builds that fetch from and upload to the same manifest file may
+    interact poorly with each other, leading to confusing bugs. You may want to
+    include `${BRANCH_NAME}` or some other unique value in the manifest file
+    location to avoid this.
+1.  Even with incremental upload, you may find that generating the files is just
+    as fast or faster than fetching from Cloud Storage. Caching is not a magic
+    bullet, and can add more complexity than it removes.
 
 ## Outstanding TODOs:
 
-- [ ] .tar.gz support, depending on object name extension
-- [ ] Unit tests to cover generation parsing/formatting
-- [ ] Actually verify SHA-1
+-   [ ] .tar.gz support, depending on object name extension
+-   [ ] Unit tests to cover generation parsing/formatting
+-   [ ] Actually verify SHA-1

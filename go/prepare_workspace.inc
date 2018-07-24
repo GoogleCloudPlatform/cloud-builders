@@ -19,7 +19,7 @@ prepare_workspace() {
 
     # If $GOPATH is set, do nothing. The user has already set up the workspace.
     if [[ "$GOPATH" ]]; then
-        # We allow relative paths here because of how the Container Builder
+        # We allow relative paths here because of how the Cloud Build
         # service works. But, the Go tool does not allow relative paths. To
         # accomodate the Go tool, we prepend the CWD to $GOPATH if $GOPATH is
         # not absolute.
