@@ -7,8 +7,7 @@ Arguments passed to this builder will be passed to `gcloud` directly, allowing
 callers to run
 [any `gcloud` command](https://cloud.google.com/sdk/gcloud/reference/).
 
-When executed in the Cloud Build environment, commands are executed with
-credentials of the
+When executed in the Cloud Build environment, commands are executed with credentials of the
 [builder service account](https://cloud.google.com/cloud-build/docs/permissions)
 for the project.
 

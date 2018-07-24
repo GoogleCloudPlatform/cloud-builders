@@ -39,6 +39,7 @@ If your GKE cluster is in a different project than Cloud Build, also set:
 Make sure you also grant the Cloud Build service account permissions in the GKE
 cluster project.
 
+
 Setting the environment variables above will cause this step's entrypoint to
 first run a command to fetch cluster credentials as follows.
 
