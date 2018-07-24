@@ -25,7 +25,7 @@ is used to build your project.
 To build this builder, run the following command on this directory:
 
 ```bash
-gcloud container builds submit --config=./cloudbuild.yaml .
+gcloud builds submit --config=./cloudbuild.yaml .
 ```
 
 This will build the Container Build step in your current GCP project.
