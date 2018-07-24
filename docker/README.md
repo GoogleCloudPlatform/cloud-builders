@@ -11,8 +11,8 @@ By default, the version of Docker that is used by this builder is `17.12.0`.
 ## GCR Credentials
 
 The Docker build step is automatically set up with credentials for your
-[Container Builder Service
-Account](https://cloud.google.com/container-builder/docs/permissions). These
+[Cloud Build Service
+Account](https://cloud.google.com/cloud-build/docs/permissions). These
 permissions are sufficient to interact directly with GCR.
 
 ## Examples
