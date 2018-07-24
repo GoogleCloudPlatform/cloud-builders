@@ -9,7 +9,7 @@ To run this example, make sure you have created a GCS Bucket named `$PROJECT_ID`
 and run:
 
 ```
-gcloud container builds submit --config=cloudbuild.yaml .
+gcloud builds submit --config=cloudbuild.yaml .
 ```
 
 The `hello` binary will be found in your GCS Bucket.
