@@ -1,0 +1,50 @@
+# In this directory, run the following command to build this builder.
+# $ gcloud container builds submit . --config=cloudbuild.yaml
+#
+
+steps:
+# Build the Cloud Builder Image that includes JFrog CLI
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=BASE_IMAGE=gcr.io/${PROJECT_ID}/mvn:3.3.9-jdk-8'  
+  - '--tag=gcr.io/$PROJECT_ID/java/jfrog:1.17.1'
+  - '.'
+  wait_for: ['-']
+
+# Tag a default builder version.
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'tag'
+  - 'gcr.io/$PROJECT_ID/java/jfrog:1.17.1'
+  - 'gcr.io/$PROJECT_ID/java/jfrog'
+
+# Configure JFrog CLI to point to JFrog Artifactory
+- name: 'gcr.io/$PROJECT_ID/java/jfrog'
+  entrypoint: 'bash'
+  args: ['-c', 'jfrog rt c rt-mvn-repo --url=https://[ARTIFACTORY-URL]/artifactory --user=[ARTIFACTORY-USER] --password=$$APIKEY']
+  secretEnv: ['APIKEY']
+  dir: 'examples/maven-example'
+
+# Build a sample maven project
+- name: 'gcr.io/$PROJECT_ID/java/jfrog'
+  args: ['rt', 'mvn', "clean install", 'config.yaml', '--build-name=mybuild', '--build-number=$BUILD_ID']
+  dir: 'examples/maven-example'
+
+# Containerize java app
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--tag=gcr.io/$PROJECT_ID/java-app:${BUILD_ID}'
+  - '.'
+  dir: 'examples/maven-example'
+
+secrets:
+- kmsKeyName: projects/soldev-ci/locations/global/keyRings/[KEYRING-NAME]/cryptoKeys/[KEY-NAME]
+  secretEnv:
+    APIKEY: [ENCRYPTED_API_KEY] 
+
+images:
+- 'gcr.io/$PROJECT_ID/java-app:${BUILD_ID}'
+- 'gcr.io/$PROJECT_ID/java/jfrog:1.17.1'
+- 'gcr.io/$PROJECT_ID/java/jfrog'
