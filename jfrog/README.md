@@ -74,7 +74,7 @@ The builder image for maven is located at https://github.com/GoogleCloudPlatform
   entrypoint: 'bash'
   args: ['-c', 'jfrog rt c rt-mvn-repo --url=https://[ARTIFACTORY-URL]/artifactory --user=[ARTIFACTORY-USER] --password=$$APIKEY']
   secretEnv: ['APIKEY']
-  dir: 'examples/'
+  dir: 'examples/maven-example'
 ```
 
 **Note:** There is an added step in order to use the encrypted version of APIKEY
@@ -89,7 +89,7 @@ secrets:
 ```
 - name: 'gcr.io/$PROJECT_ID/java/jfrog'
   args: ['rt', 'mvn', "clean install", 'config.yaml', '--build-name=mybuild', '--build-number=$BUILD_ID']
-  dir: 'examples/'
+  dir: 'examples/maven-example'
 ```
 The step above refers to [config.yaml](./examples/maven-example/config.yaml) that specifies the maven repositories to use in JFrog Artifactory to pulland push snapshot and release maven artifacts. Additional information can be found [here](https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-CreatingtheBuildConfigurationFile.1) 
 
@@ -103,7 +103,7 @@ The step above refers to [config.yaml](./examples/maven-example/config.yaml) tha
   - 'build'
   - '--tag=gcr.io/$PROJECT_ID/java-app:${BUILD_ID}'
   - '.'
-  dir: 'examples/'
+  dir: 'examples/maven-example'
   
 ```
 
