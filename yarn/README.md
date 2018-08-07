@@ -2,12 +2,11 @@
 
 This Cloud Build builder runs the `yarn` tool.
 
-You might also consider using the [official `node` image] and specifying the
-`yarn` entrypoint:
+You might also consider using an [official `node` image](https://hub.docker.com/_/node/) and specifying the `yarn` entrypoint:
 
 ```yaml
 steps:
-- name: node
+- name: node:10.8.0
   entrypoint: yarn
   args: ['install']
 ```
