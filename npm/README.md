@@ -2,12 +2,11 @@
 
 This Cloud Build builder runs the `npm` tool.
 
-You might also consider using the [official `node` image] and specifying the
-`npm` entrypoint:
+You might also consider using an [official `node` image](https://hub.docker.com/_/node/) and specifying the `npm` entrypoint:
 
 ```yaml
 steps:
-- name: node
+- name: node:10.8.3
   entrypoint: npm
   args: ['install']
 ```
