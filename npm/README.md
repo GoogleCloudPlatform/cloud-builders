@@ -1,6 +1,16 @@
 # Tool builder: `gcr.io/cloud-builders/npm`
 
-This Container Builder build step runs the `npm` tool.
+This Cloud Build builder runs the `npm` tool.
+
+You might also consider using the [official `node` image] and specifying the
+`npm` entrypoint:
+
+```yaml
+steps:
+- name: node
+  entrypoint: npm
+  args: ['install']
+```
 
 ## Building this builder
 

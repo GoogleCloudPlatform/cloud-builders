@@ -6,13 +6,13 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=NODE_VERSION=v6.14.0'
+  - '--build-arg=NODE_VERSION=6.14.0'
   - '--tag=gcr.io/$PROJECT_ID/npm:node-6.14.0'
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=NODE_VERSION=v8.11.0'
+  - '--build-arg=NODE_VERSION=8.11.0'
   - '--tag=gcr.io/$PROJECT_ID/npm:node-8.11.0'
   # 8.11.0 is tagged :latest
   - '--tag=gcr.io/$PROJECT_ID/npm:latest'
@@ -20,13 +20,13 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=NODE_VERSION=v8.4.0'
+  - '--build-arg=NODE_VERSION=8.4.0'
   - '--tag=gcr.io/$PROJECT_ID/npm:node-8.4.0'
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=NODE_VERSION=v9.10.0'
+  - '--build-arg=NODE_VERSION=9.10.0'
   - '--tag=gcr.io/$PROJECT_ID/npm:node-9.10.0'
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
