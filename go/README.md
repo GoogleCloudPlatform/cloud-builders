@@ -1,6 +1,6 @@
 # Tool builder: `gcr.io/cloud-builders/go`
 
-This Container Builder build step runs the `go` tool.
+This Cloud Build builder runs the `go` tool.
 
 ### When to use this builder
 
