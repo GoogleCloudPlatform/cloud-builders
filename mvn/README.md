@@ -1,7 +1,7 @@
 # Tool builder: `gcr.io/cloud-builders/mvn`
 
-This Container Builder build step runs Maven. It also includes a number of
-dependencies that are precached within the image.
+This Cloud Build builder runs Maven. It also includes a number of dependencies
+that are precached within the image.
 
 ## Building this builder
 
