@@ -34,7 +34,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=NODE_VERSION=v10.3.0'
+  - '--build-arg=NODE_VERSION=10.3.0'
   - '--tag=gcr.io/$PROJECT_ID/yarn:node-10.3.0'
   # 10.3.0 is tagged :current
   - '--tag=gcr.io/$PROJECT_ID/yarn:current'
