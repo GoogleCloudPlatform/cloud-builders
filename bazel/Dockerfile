@@ -1,5 +1,7 @@
 FROM launcher.gcr.io/google/ubuntu16_04
 
+ADD bazel.sh /builder/bazel.sh
+
 RUN \
     # This makes add-apt-repository available.
     apt-get update && \
@@ -37,6 +39,10 @@ RUN \
 
     apt-get -y install bazel && \
     apt-get -y upgrade bazel && \
+
+    mv /usr/bin/bazel /builder/bazel           && \
+    mv /usr/bin/bazel-real /builder/bazel-real && \
+    mv /builder/bazel.sh /usr/bin/bazel        && \
 
     # Unpack bazel for future use.
     bazel version
