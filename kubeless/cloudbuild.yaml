@@ -1,0 +1,7 @@
+# In this directory, run the following command to build this builder.
+# $ gcloud container builds submit . --config=cloudbuild.yaml
+
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/triggermesh/kubeless', '-f', './kubeless/Dockerfile', './kubeless']
+images: ['gcr.io/triggermesh/kubeless']
