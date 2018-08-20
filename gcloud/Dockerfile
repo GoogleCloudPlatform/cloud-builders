@@ -1,6 +1,9 @@
 FROM gcloud-slim
 
-RUN \
+RUN apt-get -y update && \
+    # JRE is required for cloud-datastore-emulator
+    apt-get -y install default-jre && \
+
     # Install all available components
     /builder/google-cloud-sdk/bin/gcloud -q components install \
         alpha beta \
