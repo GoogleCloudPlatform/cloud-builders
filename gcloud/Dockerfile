@@ -25,4 +25,7 @@ RUN apt-get -y update && \
         && \
 
     /builder/google-cloud-sdk/bin/gcloud -q components update && \
-    /builder/google-cloud-sdk/bin/gcloud components list
+    /builder/google-cloud-sdk/bin/gcloud components list && \
+
+    # Clean up
+    rm -rf /var/lib/apt/lists/*
