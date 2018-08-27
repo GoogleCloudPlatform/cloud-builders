@@ -52,7 +52,7 @@ var (
 
 func logFatalf(writer io.Writer, format string, a ...interface{}) {
 	if _, err := fmt.Fprintf(writer, format+"\n", a...); err != nil {
-		log.Fatal("Failed to write log: %v", err)
+		log.Fatalf("Failed to write log: %v", err)
 	}
 	os.Exit(1)
 }
