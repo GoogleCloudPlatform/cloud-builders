@@ -66,9 +66,7 @@ func main() {
 		return
 	}
 
-	var stdout, stderr io.Writer
-	stdout = os.Stdout
-	stderr = os.Stderr
+	var stdout, stderr io.Writer = os.Stdout, os.Stderr
 	if outputDir, ok := os.LookupEnv("BUILDER_OUTPUT"); ok {
 		if err := os.MkdirAll(outputDir, os.ModePerm); err != nil {
 			logFatalf(os.Stderr, "Failed to create folder %s: %v", outputDir, err)
@@ -78,7 +76,11 @@ func main() {
 		if err != nil {
 			logFatalf(os.Stderr, "Cannot open output file %s: %v", outfile, err)
 		}
-		defer f.Close()
+		defer func() {
+			if cerr := f.Close(); cerr != nil {
+				log.Fatalf("Failed to close %q: %v", outfile, cerr)
+			}
+		}()
 		stderr = io.MultiWriter(stderr, f)
 	}
 
@@ -116,7 +118,7 @@ func main() {
 		Stderr:      stderr,
 	}
 	if err := gcs.Fetch(ctx); err != nil {
-		logFatalf(stderr, err.Error())
+		logFatalf(stderr, "failed to Fetch: %v", err.Error())
 	}
 }
 

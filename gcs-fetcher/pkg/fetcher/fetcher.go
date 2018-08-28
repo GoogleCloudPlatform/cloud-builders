@@ -324,7 +324,7 @@ func (gf *Fetcher) fetchObjectOnce(ctx context.Context, j job, dest string, brea
 		if gerr, ok := err.(*googleapi.Error); ok && gerr.Code == http.StatusForbidden {
 			// Try to parse out the robot name.
 			match := robotRegex.FindStringSubmatch(err.Error())
-			robot := "your Cloud Build robot"
+			robot := "your Cloud Build service account"
 			if len(match) == 2 {
 				robot = match[1]
 			}
@@ -335,8 +335,8 @@ func (gf *Fetcher) fetchObjectOnce(ctx context.Context, j job, dest string, brea
 		return result
 	}
 	defer func() {
-		if err := r.Close(); err != nil {
-			log.Fatalf("Failed to close GCS reader: %v", err)
+		if cerr := r.Close(); cerr != nil {
+			result.err = fmt.Errorf("Failed to close GCS reader: %v", cerr)
 		}
 	}()
 
@@ -355,8 +355,8 @@ func (gf *Fetcher) fetchObjectOnce(ctx context.Context, j job, dest string, brea
 		return result
 	}
 	defer func() {
-		if err := f.Close(); err != nil {
-			log.Fatalf("Failed to close file %q: %v", dest, err)
+		if cerr := f.Close(); cerr != nil {
+			result.err = fmt.Errorf("Failed to close file %q: %v", dest, cerr)
 		}
 	}()
 
@@ -512,7 +512,7 @@ func (gf *Fetcher) timeout(filename string, retrynum int) time.Duration {
 // fetchFromManifest is used when downloading source based on a manifest file.
 // It is responsible for fetching the manifest file, decoding the JSON, and
 // assembling the list of jobs to process (i.e., files to download).
-func (gf *Fetcher) fetchFromManifest(ctx context.Context) error {
+func (gf *Fetcher) fetchFromManifest(ctx context.Context) (err error) {
 	started := time.Now()
 	gf.log("Fetching manifest %s.", formatGCSName(gf.Bucket, gf.Object, gf.Generation))
 
@@ -535,8 +535,8 @@ func (gf *Fetcher) fetchFromManifest(ctx context.Context) error {
 		return fmt.Errorf("opening manifest file %q: %v", manifestFile, err)
 	}
 	defer func() {
-		if err := r.Close(); err != nil {
-			log.Fatalf("Failed to close file %q: %v", manifestFile, err)
+		if cerr := r.Close(); cerr != nil {
+			err = fmt.Errorf("Failed to close file %q: %v", manifestFile, cerr)
 		}
 	}()
 	var files map[string]common.ManifestItem
@@ -612,14 +612,14 @@ func (gf *Fetcher) fetchFromManifest(ctx context.Context) error {
 	return nil
 }
 
-func (gf *Fetcher) copyFileFromZip(file *zip.File) error {
+func (gf *Fetcher) copyFileFromZip(file *zip.File) (err error) {
 	sourceReader, err := file.Open()
 	if err != nil {
 		return fmt.Errorf("failed to open source file %q: %v", file.Name, err)
 	}
 	defer func() {
-		if err := sourceReader.Close(); err != nil {
-			log.Fatalf("Failed to close file %q: %v", file.Name, err)
+		if cerr := sourceReader.Close(); cerr != nil {
+			 err = fmt.Errorf("Failed to close file %q: %v", file.Name, cerr)
 		}
 	}()
 
@@ -633,8 +633,8 @@ func (gf *Fetcher) copyFileFromZip(file *zip.File) error {
 		return fmt.Errorf("failed to open target file %q: %v", targetFile, err)
 	}
 	defer func() {
-		if err := targetWriter.Close(); err != nil {
-			log.Fatalf("Failed to close file %q: %v", targetFile, err)
+		if cerr := targetWriter.Close(); cerr != nil {
+			err = fmt.Errorf("Failed to close file %q: %v", targetFile, cerr)
 		}
 	}()
 
@@ -646,7 +646,7 @@ func (gf *Fetcher) copyFileFromZip(file *zip.File) error {
 
 // fetchFromZip is used when downloading a single zip of source files. It is
 // responsible to fetch the zip file and unzip it into the destination folder.
-func (gf *Fetcher) fetchFromZip(ctx context.Context) error {
+func (gf *Fetcher) fetchFromZip(ctx context.Context) (err error) {
 	started := time.Now()
 	gf.log("Fetching archive %s.", formatGCSName(gf.Bucket, gf.Object, gf.Generation))
 
@@ -670,8 +670,8 @@ func (gf *Fetcher) fetchFromZip(ctx context.Context) error {
 		return fmt.Errorf("failed to open archive %s: %v", zipfile, err)
 	}
 	defer func() {
-		if err := zipReader.Close(); err != nil {
-			log.Fatalf("Failed to close file %q: %v", zipfile, err)
+		if cerr := zipReader.Close(); cerr != nil {
+			err = fmt.Errorf("Failed to close file %q: %v", zipfile, cerr)
 		}
 	}()
 
