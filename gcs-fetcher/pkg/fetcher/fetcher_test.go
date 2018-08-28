@@ -23,7 +23,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"reflect"
 	"sort"
@@ -80,16 +79,17 @@ var (
 	errCreate       = fmt.Errorf("instrumented os.Create error")
 	errMkdirAll     = fmt.Errorf("instrumented os.MkdirAll error")
 	errOpen         = fmt.Errorf("instrumented os.Open error")
-	errGCS403       = fmt.Errorf("instrumented GCS AccessDenied error")
+	errGCS403       = &googleapi.Error{
+		Code: 403,
+		Body: "<Xml><Code>AccessDenied</Code><Details>some@robot has no access.</Details></Xml>",
+	}
 )
 
 type fakeGCSErrorReader struct {
-	err   error
-	sleep time.Duration
+	err error
 }
 
 func (f fakeGCSErrorReader) Read([]byte) (int, error) {
-	time.Sleep(f.sleep)
 	return 0, f.err
 }
 
@@ -104,10 +104,9 @@ type fakeGCS struct {
 	objects map[string]fakeGCSResponse
 }
 
-func (f *fakeGCS) NewReader(context context.Context, bucket, object string) (io.ReadCloser, error) {
+func (f *fakeGCS) NewReader(ctx context.Context, bucket, object string) (rc io.ReadCloser, err error) {
 	f.t.Helper()
 	name := formatGCSName(bucket, object, generation)
-
 	response, ok := f.objects[name]
 	if !ok {
 		f.t.Fatalf("no %q in instrumented responses", name)
@@ -115,16 +114,11 @@ func (f *fakeGCS) NewReader(context context.Context, bucket, object string) (io.
 	}
 
 	if response.err == errGCSNewReader {
-		return ioutil.NopCloser(bytes.NewReader([]byte(""))), response.err
+		return nil, errGCSNewReader
 	}
 
 	if response.err == errGCS403 {
-		message := "<Xml><Code>AccessDenied</Code><Details>some@robot has no access.</Details></Xml>"
-		err := &googleapi.Error{
-		  Code: 403,
-		  Body: message,
-		}
-		return ioutil.NopCloser(bytes.NewReader([]byte(""))), err
+		return nil, errGCS403
 	}
 
 	if response.err == errGCSRead {
@@ -132,14 +126,14 @@ func (f *fakeGCS) NewReader(context context.Context, bucket, object string) (io.
 	}
 
 	if response.err == errGCSSlowRead {
-		return ioutil.NopCloser(fakeGCSErrorReader{sleep: 1 * time.Second}), nil
+		<-ctx.Done()
+		return nil, errGCSTimeout
 	}
 
 	if response.err != nil {
 		f.t.Fatalf("unexpected error type %v", response.err)
 	}
-
-	return ioutil.NopCloser(bytes.NewReader(response.content)), nil
+	return ioutil.NopCloser(bytes.NewReader(response.content)), ctx.Err()
 }
 
 // fakeOS raises errors if configures, otherwise simply passes
@@ -266,13 +260,12 @@ func TestFetchObjectOnceStoresFile(t *testing.T) {
 	j := job{bucket: successBucket, object: sfile1}
 	dest := filepath.Join(tc.workDir, "sfile1.tmp")
 
-	result := tc.gf.fetchObjectOnce(context.Background(), j, dest, make(chan struct{}, 1))
-
-	if result.err != nil {
-		t.Errorf("fetchObjectOnce() result.err got %v, want nil", result.err)
+	size, err := tc.gf.fetchObjectOnce(context.Background(), j, dest)
+	if err != nil {
+		t.Errorf("fetchObjectOnce() got error %v, want nil", err)
 	}
-	if int(result.size) != len(sfile1Contents) {
-		t.Errorf("fetchObjectOnce() result.size got %d, want %d", result.size, len(sfile1Contents))
+	if int(size) != len(sfile1Contents) {
+		t.Errorf("fetchObjectOnce() got size %d, want %d", size, len(sfile1Contents))
 	}
 
 	got, err := ioutil.ReadFile(dest)
@@ -285,65 +278,32 @@ func TestFetchObjectOnceStoresFile(t *testing.T) {
 }
 
 func TestGCSAccessDenied(t *testing.T) {
-	// This is the actual test, but since it causes an os.Exit(1), we need
-	// to test if via exec.Command.
-	if os.Getenv("RUN_TEST") == "1" {
-		tc, teardown := buildManifestTestContext(t)
-		defer teardown()
-		j := job{bucket: errorBucket, object: efile4}
-		result := tc.gf.fetchObjectOnce(context.Background(), j, filepath.Join(tc.workDir, "efile4.tmp"), make(chan struct{}, 1))
-		if result.err == nil || !strings.HasSuffix(result.err.Error(), errGCS403.Error()) {
-			t.Errorf("fetchObjectOnce did not fail correctly, got err=%v, want err=%v", result.err, errGCS403)
-		}
+	tc, teardown := buildManifestTestContext(t)
+	defer teardown()
+	j := job{bucket: errorBucket, object: efile4}
+	_, err := tc.gf.fetchObjectOnce(context.Background(), j, filepath.Join(tc.workDir, "efile4.tmp"))
+	if err == nil || !strings.HasSuffix(err.Error(), errGCS403.Error()) {
+		t.Errorf("fetchObjectOnce did not fail correctly, got err=%v, want err=%v", err, errGCS403)
 	}
-
-	cmd := exec.Command(os.Args[0], "-test.run=TestGCSAccessDenied")
-	cmd.Env = append(os.Environ(), "RUN_TEST=1")
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		t.Fatalf("failed to get StderrPipe: %v", err)
-	}
-	err = cmd.Start()
-	if err != nil {
-		t.Fatalf("failed to start cmd: %v", err)
-	}
-
-	b, err := ioutil.ReadAll(stderr)
-	if err != nil {
-		t.Fatalf("failed to ReadAll: %v", err)
-	}
-	got := string(b)
-	want := `Access to bucket "error-bucket" denied. You must grant Storage Object Viewer permission to some@robot.` + "\n"
-	if got != want {
-		t.Fatalf("incorrect error message, got %q, want %q", got, want)
-	}
-
-	err = cmd.Wait()
-	if e, ok := err.(*exec.ExitError); ok && !e.Success() {
-		return
-	}
-	t.Fatalf("process ran with err %v, want exit status 1", err)
 }
 
 func TestFetchObjectOnceFailureModes(t *testing.T) {
-
 	// GCS NewReader failure
 	tc, teardown := buildManifestTestContext(t)
 	j := job{bucket: errorBucket, object: efile1}
-	result := tc.gf.fetchObjectOnce(context.Background(), j, filepath.Join(tc.workDir, "efile1.tmp"), make(chan struct{}, 1))
-	if result.err == nil || !strings.HasSuffix(result.err.Error(), errGCSNewReader.Error()) {
-		t.Errorf("fetchObjectOnce did not fail correctly, got err=%v, want err=%v", result.err, errGCSNewReader)
+	_, err := tc.gf.fetchObjectOnce(context.Background(), j, filepath.Join(tc.workDir, "efile1.tmp"))
+	if err == nil || !strings.HasSuffix(err.Error(), errGCSNewReader.Error()) {
+		t.Errorf("fetchObjectOnce did not fail correctly, got err=%v, want err=%v", err, errGCSNewReader)
 	}
 	teardown()
 
 	// Failure due to cancellation
 	tc, teardown = buildManifestTestContext(t)
-	breaker := make(chan struct{}, 1)
-	breaker <- struct{}{}
 	j = job{bucket: successBucket, object: sfile1}
-	result = tc.gf.fetchObjectOnce(context.Background(), j, filepath.Join(tc.workDir, "sfile1.tmp"), breaker)
-	if result.err == nil || result.err != errGCSTimeout {
-		t.Errorf("fetchObjectOnce did not fail correctly, got err=%v, want err=%v", result.err, errGCSTimeout)
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	if _, err = tc.gf.fetchObjectOnce(ctx, j, filepath.Join(tc.workDir, "sfile1.tmp")); err != context.Canceled {
+		t.Errorf("fetchObjectOnce did not fail correctly, got err=%v, want err=%v", err, context.Canceled)
 	}
 	teardown()
 
@@ -351,18 +311,18 @@ func TestFetchObjectOnceFailureModes(t *testing.T) {
 	tc, teardown = buildManifestTestContext(t)
 	tc.os.errorsCreate = 1
 	j = job{bucket: successBucket, object: sfile1}
-	result = tc.gf.fetchObjectOnce(context.Background(), j, filepath.Join(tc.workDir, "sfile1.tmp"), make(chan struct{}, 1))
-	if result.err == nil || !strings.HasSuffix(result.err.Error(), errCreate.Error()) {
-		t.Errorf("fetchObjectOnce did not fail correctly, got err=%v, want err=%v", result.err, errCreate)
+	_, err = tc.gf.fetchObjectOnce(context.Background(), j, filepath.Join(tc.workDir, "sfile1.tmp"))
+	if err == nil || !strings.HasSuffix(err.Error(), errCreate.Error()) {
+		t.Errorf("fetchObjectOnce did not fail correctly, got err=%v, want err=%v", err, errCreate)
 	}
 	teardown()
 
 	// GCS Copy failure
 	tc, teardown = buildManifestTestContext(t)
 	j = job{bucket: errorBucket, object: efile2}
-	result = tc.gf.fetchObjectOnce(context.Background(), j, filepath.Join(tc.workDir, "efile2.tmp"), make(chan struct{}, 1))
-	if result.err == nil || !strings.HasSuffix(result.err.Error(), errGCSRead.Error()) {
-		t.Errorf("fetchObjectOnce did not fail correctly, got err=%v, want err=%v", result.err, errGCSRead)
+	_, err = tc.gf.fetchObjectOnce(context.Background(), j, filepath.Join(tc.workDir, "efile2.tmp"))
+	if err == nil || !strings.HasSuffix(err.Error(), errGCSRead.Error()) {
+		t.Errorf("fetchObjectOnce did not fail correctly, got err=%v, want err=%v", err, errGCSRead)
 	}
 	teardown()
 
@@ -391,9 +351,8 @@ func TestFetchObjectOnceWithTimeoutFailsOnTimeout(t *testing.T) {
 	j := job{bucket: errorBucket, object: efile3} // efile3 is a slow GCS read
 	timeout := 100 * time.Millisecond
 	dest := filepath.Join(tc.workDir, "efile3.tmp")
-
-	if _, err := tc.gf.fetchObjectOnceWithTimeout(context.Background(), j, timeout, dest); err == nil {
-		t.Errorf("fetchObjectOnceWithTimeout() got err=nil, want err=%v", errGCSTimeout)
+	if _, err := tc.gf.fetchObjectOnceWithTimeout(context.Background(), j, timeout, dest); err != errGCSTimeout {
+		t.Errorf("fetchObjectOnceWithTimeout() got err=%v, want err=%v", err, errGCSTimeout)
 	}
 }
 
@@ -657,14 +616,11 @@ func TestDoWork(t *testing.T) {
 	sort.Strings(files)
 
 	// Add n jobs
-	todo := make(chan job, len(files))
 	results := make(chan jobReport, len(files))
 	for i, file := range files {
-		todo <- job{bucket: successBucket, object: file, filename: fmt.Sprintf("sfile-%d", i)}
+		j := job{bucket: successBucket, object: file, filename: fmt.Sprintf("sfile-%d", i)}
+		results <- tc.gf.doWork(context.Background(), j)
 	}
-
-	// Process the jobs
-	go tc.gf.doWork(context.Background(), todo, results)
 
 	// Get n reports
 	var gotFiles []string
@@ -684,8 +640,6 @@ func TestDoWork(t *testing.T) {
 	case report, ok := <-results:
 		if ok {
 			t.Errorf("unexpected report found on channel: %v", report)
-		} else {
-			close(todo)
 		}
 	default:
 	}
@@ -708,7 +662,10 @@ func TestProcessJobs(t *testing.T) {
 		{bucket: successBucket, object: sfile3, filename: "sfile3"},
 	}
 
-	stats := tc.gf.processJobs(context.Background(), jobs)
+	stats, err := tc.gf.processJobs(context.Background(), jobs)
+	if err != nil {
+		t.Fatalf("processJobs: %v", err)
+	}
 
 	if !stats.success {
 		t.Errorf("processJobs() stats.success got false, want true")

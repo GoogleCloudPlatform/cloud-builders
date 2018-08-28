@@ -33,6 +33,8 @@ import (
 	"sync"
 	"time"
 
+	"golang.org/x/sync/errgroup"
+
 	"github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/pkg/common"
 	"google.golang.org/api/googleapi"
 )
@@ -67,8 +69,6 @@ var (
 	robotRegex = regexp.MustCompile(`<Details>(\S+@\S+)\s`)
 )
 
-type sizeBytes int64
-
 // job is a file to download, corresponds to an entry in the manifest file.
 type job struct {
 	filename       string
@@ -92,7 +92,7 @@ type jobReport struct {
 	job       job
 	started   time.Time
 	completed time.Time
-	size      sizeBytes
+	size      int64
 	attempts  []jobAttempt
 	success   bool
 	finalname string
@@ -100,14 +100,14 @@ type jobReport struct {
 }
 
 type fetchOnceResult struct {
-	size sizeBytes
+	size int64
 	err  error
 }
 
 type stats struct {
 	workers     int
 	files       int
-	size        sizeBytes
+	size        int64
 	duration    time.Duration
 	retries     int
 	gcsTimeouts int
@@ -157,7 +157,7 @@ type Fetcher struct {
 
 func logit(writer io.Writer, format string, a ...interface{}) {
 	if _, err := fmt.Fprintf(writer, format+"\n", a...); err != nil {
-		log.Printf("Failed to write message: " + format, a...)
+		log.Printf("Failed to write message: "+format, a...)
 	}
 }
 
@@ -190,7 +190,7 @@ func (gf *Fetcher) recordFailure(j job, started time.Time, gcsTimeout time.Durat
 	}
 }
 
-func (gf *Fetcher) recordSuccess(j job, started time.Time, size sizeBytes, finalname string, report *jobReport) {
+func (gf *Fetcher) recordSuccess(j job, started time.Time, size int64, finalname string, report *jobReport) {
 	attempt := jobAttempt{
 		started:  started,
 		duration: time.Since(started),
@@ -283,41 +283,20 @@ func (gf *Fetcher) fetchObject(ctx context.Context, j job) *jobReport {
 }
 
 // fetchObjectOnceWithTimeout is merely mechanics to call fetchObjectOnce(),
-// using a circuit breaker pattern to timeout the call if it takes too long.
-// GCS has long tail latencies, so we retry with low timeouts on the first
-// couple of attempts. On subsequent attempts, we simply wait for a long time.
-func (gf *Fetcher) fetchObjectOnceWithTimeout(ctx context.Context, j job, timeout time.Duration, dest string) (sizeBytes, error) {
-	result := make(chan fetchOnceResult, 1)
-	breakerSig := make(chan struct{}, 1)
-
-	// Start the function that we want to timeout if it takes too long.
-	go func() {
-		result <- gf.fetchObjectOnce(ctx, j, dest, breakerSig)
-	}()
-
-	// Wait to see who finshes first: function or timeout
-	select {
-	case r := <-result:
-		return r.size, r.err
-	case <-ctx.Done():
-		close(breakerSig) // Signal fetchObjectOnce() to cancel
-		if ctx.Err() == context.DeadlineExceeded {
-			return 0, errGCSTimeout
-		}
-		return 0, ctx.Err()
-	case <-time.After(timeout):
-		close(breakerSig) // Signal fetchObjectOnce() to cancel
-		return 0, errGCSTimeout
-	}
+// with a timeout on the context.  GCS has long tail latencies, so we retry
+// with low timeouts on the first couple of attempts. On subsequent attempts,
+// we simply wait for a long time.
+func (gf *Fetcher) fetchObjectOnceWithTimeout(ctx context.Context, j job, timeout time.Duration, dest string) (int64, error) {
+	tctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+	return gf.fetchObjectOnce(tctx, j, dest)
 }
 
 // fetchObjectOnce has the responsibility of downloading a file from
-// GCS and saving it to the dest location. If it receives a signal on
-// breakerSig, it will attempt to return quickly, though it is assumed
-// that no one is listening for a response anymore.
-func (gf *Fetcher) fetchObjectOnce(ctx context.Context, j job, dest string, breakerSig <-chan struct{}) fetchOnceResult {
-	var result fetchOnceResult
-
+// GCS and saving it to the dest location. If the context is cancelled or times
+// out, it will attempt to return, though it is assumed that no one is
+// listening for a response anymore.
+func (gf *Fetcher) fetchObjectOnce(ctx context.Context, j job, dest string) (int64, error) {
 	r, err := gf.GCS.NewReader(ctx, j.bucket, j.object)
 	if err != nil {
 		// Check for AccessDenied failure here and return a useful error message on Stderr and exit immediately.
@@ -329,52 +308,51 @@ func (gf *Fetcher) fetchObjectOnce(ctx context.Context, j job, dest string, brea
 				robot = match[1]
 			}
 			gf.logErr("Access to bucket %q denied. You must grant Storage Object Viewer permission to %s.", j.bucket, robot)
-			os.Exit(1)
+			return 0, err
 		}
-		result.err = fmt.Errorf("creating GCS reader for %q: %v", formatGCSName(j.bucket, j.object, j.generation), err)
-		return result
+		return 0, err
+		//return 0, fmt.Errorf("creating GCS reader for %q: %v", formatGCSName(j.bucket, j.object, j.generation), err)
 	}
 	defer func() {
 		if cerr := r.Close(); cerr != nil {
-			result.err = fmt.Errorf("Failed to close GCS reader: %v", cerr)
+			if err == nil {
+				err = fmt.Errorf("Failed to close GCS reader: %v", cerr)
+			}
 		}
 	}()
 
 	// If we're cancelled, just return.
 	select {
-	case <-breakerSig:
-		result.err = errGCSTimeout
-		return result
+	case <-ctx.Done():
+		return 0, errGCSTimeout
 	default:
 		// Fallthrough
 	}
 
 	f, err := gf.OS.Create(dest)
 	if err != nil {
-		result.err = fmt.Errorf("creating destination file %q: %v", dest, err)
-		return result
+		return 0, fmt.Errorf("creating destination file %q: %v", dest, err)
 	}
 	defer func() {
 		if cerr := f.Close(); cerr != nil {
-			result.err = fmt.Errorf("Failed to close file %q: %v", dest, cerr)
+			if err == nil {
+				err = fmt.Errorf("Failed to close file %q: %v", dest, cerr)
+			}
 		}
 	}()
 
 	h := sha1.New()
 	n, err := io.Copy(f, io.TeeReader(r, h))
 	if err != nil {
-		result.err = fmt.Errorf("copying bytes from %q to %q: %v", formatGCSName(j.bucket, j.object, j.generation), dest, err)
-		return result
+		return 0, fmt.Errorf("copying bytes from %q to %q: %v", formatGCSName(j.bucket, j.object, j.generation), dest, err)
 	}
 
 	// If we're cancelled, just return.
 	select {
-	case <-breakerSig:
-		result.err = errGCSTimeout
-		return result
+	case <-ctx.Done():
+		return 0, errGCSTimeout
 	default:
-		result.size = sizeBytes(n)
-		return result
+		// Fallthrough
 	}
 
 	// Verify the sha1sum before declaring success.
@@ -382,11 +360,10 @@ func (gf *Fetcher) fetchObjectOnce(ctx context.Context, j job, dest string, brea
 		got := fmt.Sprintf("%x", h.Sum(nil))
 		want := j.sha1sum
 		if got != want {
-			result.err = fmt.Errorf("%s SHA mismatch, got %q, want %q", j.filename, got, want)
-			return result
+			return 0, fmt.Errorf("%s SHA mismatch, got %q, want %q", j.filename, got, want)
 		}
 	}
-	return result
+	return n, nil
 }
 
 // ensureFolders takes a full path to a filename and makes sure that
@@ -406,14 +383,12 @@ func (gf *Fetcher) ensureFolders(filename string) error {
 
 // doWork is the worker routine. It listens for jobs, fetches the file,
 // and emits a job report. This continues until channel job is closed.
-func (gf *Fetcher) doWork(ctx context.Context, todo <-chan job, results chan<- jobReport) {
-	for j := range todo {
-		report := gf.fetchObject(ctx, j)
-		if gf.Verbose {
-			gf.log("Report: %#v", report)
-		}
-		results <- *report
+func (gf *Fetcher) doWork(ctx context.Context, j job) jobReport {
+	report := gf.fetchObject(ctx, j)
+	if gf.Verbose {
+		gf.log("Report: %#v", report)
 	}
+	return *report
 }
 
 // processJobs is the primary concurrency mechanics for Fetcher.
@@ -421,35 +396,37 @@ func (gf *Fetcher) doWork(ctx context.Context, todo <-chan job, results chan<- j
 // goroutine to send all the jobs to the workers, then waits for
 // all the jobs to complete. It also compiles and returns final
 // statistics for the jobs.
-func (gf *Fetcher) processJobs(ctx context.Context, jobs []job) stats {
+func (gf *Fetcher) processJobs(ctx context.Context, jobs []job) (stats, error) {
 	workerCount := gf.WorkerCount
 	if len(jobs) < workerCount {
 		workerCount = len(jobs)
 	}
+
+	g, ctx := errgroup.WithContext(ctx)
+
 	todo := make(chan job, workerCount)
 	results := make(chan jobReport, workerCount)
 	stats := stats{workers: workerCount, files: len(jobs), success: true}
 
 	// Spin up our workers.
-	var wg sync.WaitGroup
 	for i := 0; i < workerCount; i++ {
-		wg.Add(1)
-		go func() {
-			gf.doWork(ctx, todo, results)
-			wg.Done()
-		}()
+		g.Go(func() error {
+			for j := range todo {
+				select {
+				case results <- gf.doWork(ctx, j):
+				case <-ctx.Done():
+					return ctx.Err()
+				}
+			}
+			return nil
+		})
 	}
 
 	// Queue the jobs.
 	started := time.Now()
-	var qwg sync.WaitGroup
-	qwg.Add(1)
-	go func() {
-		for _, j := range jobs {
-			todo <- j
-		}
-		qwg.Done()
-	}()
+	for _, j := range jobs {
+		todo <- j
+	}
 
 	// Consume the reports.
 	failed := false
@@ -472,22 +449,22 @@ func (gf *Fetcher) processJobs(ctx context.Context, jobs []job) stats {
 			}
 		}
 	}
-	qwg.Wait()
 	close(results)
 	close(todo)
-	wg.Wait()
+
+	g.Wait()
 
 	if failed {
 		stats.success = false
 		gf.logErr("Failed to download at least one file. Cannot continue.")
-		os.Exit(1)
+		return stats, errors.New("Failed to download at least one file, cannot continue.")
 	}
 
 	stats.duration = time.Since(started)
-	return stats
+	return stats, nil
 }
 
-// getTimeout returns the GCS timeout that should be used for a given
+// timeout returns the GCS timeout that should be used for a given
 // filenum on a given retry number. GCS has long tails on occasion, so
 // in some cases, it's faster to give up early and retry on a second
 // connection.
@@ -562,7 +539,10 @@ func (gf *Fetcher) fetchFromManifest(ctx context.Context) (err error) {
 	}
 
 	gf.log("Processing %v files.", len(jobs))
-	stats := gf.processJobs(ctx, jobs)
+	stats, err := gf.processJobs(ctx, jobs)
+	if err != nil {
+		return err
+	}
 
 	// Final cleanup of failed downloads. We won't miss any files; these vestiges
 	// are from go routines that have timed out and would otherwise check their
@@ -619,7 +599,7 @@ func (gf *Fetcher) copyFileFromZip(file *zip.File) (err error) {
 	}
 	defer func() {
 		if cerr := sourceReader.Close(); cerr != nil {
-			 err = fmt.Errorf("Failed to close file %q: %v", file.Name, cerr)
+			err = fmt.Errorf("Failed to close file %q: %v", file.Name, cerr)
 		}
 	}()
 
