@@ -70,8 +70,7 @@ func main() {
 	stdout = os.Stdout
 	stderr = os.Stderr
 	if outputDir, ok := os.LookupEnv("BUILDER_OUTPUT"); ok {
-		err := os.MkdirAll(outputDir, os.ModePerm)
-		if err != nil {
+		if err := os.MkdirAll(outputDir, os.ModePerm); err != nil {
 			logFatalf(os.Stderr, "Failed to create folder %s: %v", outputDir, err)
 		}
 		outfile := filepath.Join(outputDir, "output")

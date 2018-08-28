@@ -30,6 +30,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"google.golang.org/api/googleapi"
 )
 
 const (
@@ -118,7 +120,11 @@ func (f *fakeGCS) NewReader(context context.Context, bucket, object string) (io.
 
 	if response.err == errGCS403 {
 		message := "<Xml><Code>AccessDenied</Code><Details>some@robot has no access.</Details></Xml>"
-		return ioutil.NopCloser(bytes.NewReader([]byte(""))), fmt.Errorf(message)
+		err := &googleapi.Error{
+		  Code: 403,
+		  Body: message,
+		}
+		return ioutil.NopCloser(bytes.NewReader([]byte(""))), err
 	}
 
 	if response.err == errGCSRead {

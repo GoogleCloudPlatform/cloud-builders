@@ -23,7 +23,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"math"
+	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -32,6 +34,7 @@ import (
 	"time"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/pkg/common"
+	"google.golang.org/api/googleapi"
 )
 
 var (
@@ -154,7 +157,7 @@ type Fetcher struct {
 
 func logit(writer io.Writer, format string, a ...interface{}) {
 	if _, err := fmt.Fprintf(writer, format+"\n", a...); err != nil {
-		// Do nothing.
+		log.Printf("Failed to write message: " + format, a...)
 	}
 }
 
@@ -318,7 +321,7 @@ func (gf *Fetcher) fetchObjectOnce(ctx context.Context, j job, dest string, brea
 	r, err := gf.GCS.NewReader(ctx, j.bucket, j.object)
 	if err != nil {
 		// Check for AccessDenied failure here and return a useful error message on Stderr and exit immediately.
-		if strings.Contains(err.Error(), "<Code>AccessDenied</Code>") {
+		if gerr, ok := err.(*googleapi.Error); ok && gerr.Code == http.StatusForbidden {
 			// Try to parse out the robot name.
 			match := robotRegex.FindStringSubmatch(err.Error())
 			robot := "your Cloud Build robot"
@@ -331,7 +334,11 @@ func (gf *Fetcher) fetchObjectOnce(ctx context.Context, j job, dest string, brea
 		result.err = fmt.Errorf("creating GCS reader for %q: %v", formatGCSName(j.bucket, j.object, j.generation), err)
 		return result
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			log.Fatalf("Failed to close GCS reader: %v", err)
+		}
+	}()
 
 	// If we're cancelled, just return.
 	select {
@@ -347,7 +354,11 @@ func (gf *Fetcher) fetchObjectOnce(ctx context.Context, j job, dest string, brea
 		result.err = fmt.Errorf("creating destination file %q: %v", dest, err)
 		return result
 	}
-	defer f.Close()
+	defer func() {
+		if err := f.Close(); err != nil {
+			log.Fatalf("Failed to close file %q: %v", dest, err)
+		}
+	}()
 
 	h := sha1.New()
 	n, err := io.Copy(f, io.TeeReader(r, h))
@@ -520,10 +531,14 @@ func (gf *Fetcher) fetchFromManifest(ctx context.Context) error {
 	// Decode the JSON manifest
 	manifestFile := filepath.Join(gf.DestDir, j.filename)
 	r, err := gf.OS.Open(manifestFile)
-	defer r.Close()
 	if err != nil {
 		return fmt.Errorf("opening manifest file %q: %v", manifestFile, err)
 	}
+	defer func() {
+		if err := r.Close(); err != nil {
+			log.Fatalf("Failed to close file %q: %v", manifestFile, err)
+		}
+	}()
 	var files map[string]common.ManifestItem
 	if err := json.NewDecoder(r).Decode(&files); err != nil {
 		return fmt.Errorf("decoding JSON from manifest file %q: %v", manifestFile, err)
@@ -602,7 +617,11 @@ func (gf *Fetcher) copyFileFromZip(file *zip.File) error {
 	if err != nil {
 		return fmt.Errorf("failed to open source file %q: %v", file.Name, err)
 	}
-	defer sourceReader.Close()
+	defer func() {
+		if err := sourceReader.Close(); err != nil {
+			log.Fatalf("Failed to close file %q: %v", file.Name, err)
+		}
+	}()
 
 	targetFile := filepath.Join(gf.DestDir, file.Name)
 	if err := gf.ensureFolders(targetFile); err != nil {
@@ -613,7 +632,11 @@ func (gf *Fetcher) copyFileFromZip(file *zip.File) error {
 	if err != nil {
 		return fmt.Errorf("failed to open target file %q: %v", targetFile, err)
 	}
-	defer targetWriter.Close()
+	defer func() {
+		if err := targetWriter.Close(); err != nil {
+			log.Fatalf("Failed to close file %q: %v", targetFile, err)
+		}
+	}()
 
 	if _, err := io.Copy(targetWriter, sourceReader); err != nil {
 		return fmt.Errorf("failed to copy %q to %q: %v", file.Name, targetFile, err)
@@ -646,7 +669,11 @@ func (gf *Fetcher) fetchFromZip(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to open archive %s: %v", zipfile, err)
 	}
-	defer zipReader.Close()
+	defer func() {
+		if err := zipReader.Close(); err != nil {
+			log.Fatalf("Failed to close file %q: %v", zipfile, err)
+		}
+	}()
 
 	numFiles := 0
 	for _, file := range zipReader.File {
