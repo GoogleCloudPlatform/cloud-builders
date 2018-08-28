@@ -29,7 +29,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strings"
 	"sync"
 	"time"
 
@@ -94,14 +93,7 @@ type jobReport struct {
 	completed time.Time
 	size      int64
 	attempts  []jobAttempt
-	success   bool
 	finalname string
-	err       error
-}
-
-type fetchOnceResult struct {
-	size int64
-	err  error
 }
 
 type stats struct {
@@ -112,7 +104,6 @@ type stats struct {
 	retries     int
 	gcsTimeouts int
 	success     bool
-	errs        []error
 }
 
 // OS allows us to inject dependencies to facilitate testing.
@@ -176,8 +167,6 @@ func (gf *Fetcher) recordFailure(j job, started time.Time, gcsTimeout time.Durat
 		err:        err,
 		gcsTimeout: gcsTimeout,
 	}
-	report.success = false
-	report.err = err // Hold the latest error.
 	report.attempts = append(report.attempts, attempt)
 
 	isLast := len(report.attempts) == gf.Retries
@@ -195,8 +184,6 @@ func (gf *Fetcher) recordSuccess(j job, started time.Time, size int64, finalname
 		started:  started,
 		duration: time.Since(started),
 	}
-	report.success = true
-	report.err = nil
 	report.size = size
 	report.attempts = append(report.attempts, attempt)
 	report.finalname = finalname
@@ -211,7 +198,7 @@ func (gf *Fetcher) recordSuccess(j job, started time.Time, size int64, finalname
 // fetchObject is responsible for trying (and retrying) to fetch a single file
 // from GCS. It first downloads the file to a temp file, then renames it to
 // the final location and sets the permissions on the final file.
-func (gf *Fetcher) fetchObject(ctx context.Context, j job) *jobReport {
+func (gf *Fetcher) fetchObject(ctx context.Context, j job) (*jobReport, error) {
 	report := &jobReport{job: j, started: time.Now()}
 	defer func() {
 		report.completed = time.Now()
@@ -220,7 +207,9 @@ func (gf *Fetcher) fetchObject(ctx context.Context, j job) *jobReport {
 	var tmpfile string
 	var backoff time.Duration
 
+	var lastErr error
 	for retrynum := 0; retrynum <= gf.Retries; retrynum++ {
+		lastErr = nil
 		// Apply appropriate retry backoff.
 		if retrynum > 0 {
 			if retrynum == 1 {
@@ -238,29 +227,29 @@ func (gf *Fetcher) fetchObject(ctx context.Context, j job) *jobReport {
 		// clean it up later.
 		tmpfile = filepath.Join(gf.StagingDir, fmt.Sprintf("%s-%s-%d", j.bucket, j.object, retrynum))
 		if err := gf.ensureFolders(tmpfile); err != nil {
-			e := fmt.Errorf("creating folders for temp file %q: %v", tmpfile, err)
-			gf.recordFailure(j, started, noTimeout, e, report)
+			lastErr = fmt.Errorf("creating folders for temp file %q: %v", tmpfile, err)
+			gf.recordFailure(j, started, noTimeout, lastErr, report)
 			continue
 		}
 
 		allowedGCSTimeout := gf.timeout(j.filename, retrynum)
 		size, err := gf.fetchObjectOnceWithTimeout(ctx, j, allowedGCSTimeout, tmpfile)
 		if err != nil {
-			e := fmt.Errorf("fetching %q with timeout %v to temp file %q: %v", formatGCSName(j.bucket, j.object, j.generation), allowedGCSTimeout, tmpfile, err)
-			gf.recordFailure(j, started, allowedGCSTimeout, e, report)
+			lastErr = fmt.Errorf("fetching %q with timeout %v to temp file %q: %v", formatGCSName(j.bucket, j.object, j.generation), allowedGCSTimeout, tmpfile, err)
+			gf.recordFailure(j, started, allowedGCSTimeout, lastErr, report)
 			continue
 		}
 
 		// Rename the temp file to the final filename
 		finalname := filepath.Join(gf.DestDir, j.filename)
 		if err := gf.ensureFolders(finalname); err != nil {
-			e := fmt.Errorf("creating folders for final file %q: %v", finalname, err)
-			gf.recordFailure(j, started, noTimeout, e, report)
+			lastErr = fmt.Errorf("creating folders for final file %q: %v", finalname, err)
+			gf.recordFailure(j, started, noTimeout, lastErr, report)
 			continue
 		}
 		if err := gf.OS.Rename(tmpfile, finalname); err != nil {
-			e := fmt.Errorf("renaming %q to %q: %v", tmpfile, finalname, err)
-			gf.recordFailure(j, started, noTimeout, e, report)
+			lastErr = fmt.Errorf("renaming %q to %q: %v", tmpfile, finalname, err)
+			gf.recordFailure(j, started, noTimeout, lastErr, report)
 			continue
 		}
 
@@ -270,16 +259,15 @@ func (gf *Fetcher) fetchObject(ctx context.Context, j job) *jobReport {
 		// access.
 		mode := os.FileMode(0555)
 		if err := gf.OS.Chmod(finalname, mode); err != nil {
-			e := fmt.Errorf("chmod %q to %v: %v", finalname, mode, err)
-			gf.recordFailure(j, started, noTimeout, e, report)
+			lastErr = fmt.Errorf("chmod %q to %v: %v", finalname, mode, err)
+			gf.recordFailure(j, started, noTimeout, lastErr, report)
 			continue
 		}
 
 		gf.recordSuccess(j, started, size, finalname, report)
-		break // Success! No more retries needed.
+		return report, nil
 	}
-
-	return report
+	return report, lastErr
 }
 
 // fetchObjectOnceWithTimeout is merely mechanics to call fetchObjectOnce(),
@@ -311,7 +299,6 @@ func (gf *Fetcher) fetchObjectOnce(ctx context.Context, j job, dest string) (int
 			return 0, err
 		}
 		return 0, err
-		//return 0, fmt.Errorf("creating GCS reader for %q: %v", formatGCSName(j.bucket, j.object, j.generation), err)
 	}
 	defer func() {
 		if cerr := r.Close(); cerr != nil {
@@ -383,12 +370,15 @@ func (gf *Fetcher) ensureFolders(filename string) error {
 
 // doWork is the worker routine. It listens for jobs, fetches the file,
 // and emits a job report. This continues until channel job is closed.
-func (gf *Fetcher) doWork(ctx context.Context, j job) jobReport {
-	report := gf.fetchObject(ctx, j)
+func (gf *Fetcher) doWork(ctx context.Context, j job) (*jobReport, error) {
+	report, err := gf.fetchObject(ctx, j)
+	if err != nil {
+		return nil, err
+	}
 	if gf.Verbose {
 		gf.log("Report: %#v", report)
 	}
-	return *report
+	return report, nil
 }
 
 // processJobs is the primary concurrency mechanics for Fetcher.
@@ -412,11 +402,11 @@ func (gf *Fetcher) processJobs(ctx context.Context, jobs []job) (stats, error) {
 	for i := 0; i < workerCount; i++ {
 		g.Go(func() error {
 			for j := range todo {
-				select {
-				case results <- gf.doWork(ctx, j):
-				case <-ctx.Done():
-					return ctx.Err()
+				report, err := gf.doWork(ctx, j)
+				if err != nil {
+					return err
 				}
+				results <- *report
 			}
 			return nil
 		})
@@ -429,20 +419,13 @@ func (gf *Fetcher) processJobs(ctx context.Context, jobs []job) (stats, error) {
 	}
 
 	// Consume the reports.
-	failed := false
 	for n := 0; n < len(jobs); n++ {
 		report := <-results
-		if !report.success {
-			failed = true
-		}
 		stats.size += report.size
 		lastIndex := len(report.attempts) - 1
 		stats.retries += lastIndex // First attempt is not considered a "retry".
 		finalAttempt := report.attempts[lastIndex]
 		stats.duration += finalAttempt.duration
-		if finalAttempt.err != nil {
-			stats.errs = append(stats.errs, finalAttempt.err)
-		}
 		for _, attempt := range report.attempts {
 			if attempt.gcsTimeout > noTimeout {
 				stats.gcsTimeouts++
@@ -452,12 +435,9 @@ func (gf *Fetcher) processJobs(ctx context.Context, jobs []job) (stats, error) {
 	close(results)
 	close(todo)
 
-	g.Wait()
-
-	if failed {
-		stats.success = false
+	if err := g.Wait(); err != nil {
 		gf.logErr("Failed to download at least one file. Cannot continue.")
-		return stats, errors.New("Failed to download at least one file, cannot continue.")
+		return stats, err
 	}
 
 	stats.duration = time.Since(started)
@@ -500,9 +480,9 @@ func (gf *Fetcher) fetchFromManifest(ctx context.Context) (err error) {
 		object:     gf.Object,
 		generation: gf.Generation,
 	}
-	report := gf.fetchObject(ctx, j)
-	if !report.success {
-		return fmt.Errorf("failed to download manifest %s: %v", formatGCSName(gf.Bucket, gf.Object, gf.Generation), report.err)
+	report, err := gf.fetchObject(ctx, j)
+	if err != nil {
+		return fmt.Errorf("failed to download manifest %s: %v", formatGCSName(gf.Bucket, gf.Object, gf.Generation), err)
 	}
 
 	// Decode the JSON manifest
@@ -581,14 +561,6 @@ func (gf *Fetcher) fetchFromManifest(ctx context.Context) (err error) {
 	gf.log("Total time:        %9.2f s", time.Since(started).Seconds())
 	gf.log("******************************************************")
 
-	if len(stats.errs) > 0 {
-		var es []string
-		es = append(es, fmt.Sprintf("Errors (%d):", len(stats.errs)))
-		for _, e := range stats.errs {
-			es = append(es, fmt.Sprintf(" - %s", e))
-		}
-		return fmt.Errorf(strings.Join(es, "\n"))
-	}
 	return nil
 }
 
@@ -637,9 +609,9 @@ func (gf *Fetcher) fetchFromZip(ctx context.Context) (err error) {
 		object:     gf.Object,
 		generation: gf.Generation,
 	}
-	report := gf.fetchObject(ctx, j)
-	if !report.success {
-		return fmt.Errorf("failed to download archive %s: %v", formatGCSName(gf.Bucket, gf.Object, gf.Generation), report.err)
+	report, err := gf.fetchObject(ctx, j)
+	if err != nil {
+		return fmt.Errorf("failed to download archive %s: %v", formatGCSName(gf.Bucket, gf.Object, gf.Generation), err)
 	}
 
 	// Unzip into the destination directory

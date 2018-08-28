@@ -361,16 +361,13 @@ func TestFetchObjectSucceeds(t *testing.T) {
 	defer teardown()
 
 	j := job{bucket: successBucket, object: sfile1, filename: "localfile.txt"}
-	report := tc.gf.fetchObject(context.Background(), j)
+	report, err := tc.gf.fetchObject(context.Background(), j)
+	if err != nil {
+		t.Errorf("fetchObject: %v", err)
+	}
 
 	if report.job != j {
 		t.Errorf("report.job got %v, want %v", report.job, j)
-	}
-	if !report.success {
-		t.Errorf("report.success got false, want true")
-	}
-	if report.err != nil {
-		t.Errorf("report.err got %v, want nil", report.err)
 	}
 	if report.started == zeroTime {
 		t.Errorf("report.started got %v, want report.started > %v", report.started, zeroTime)
@@ -414,13 +411,9 @@ func TestFetchObjectRetriesUntilSuccess(t *testing.T) {
 	tc.os.errorsCreate = 1 // first create fails, second succeeds
 
 	j := job{bucket: successBucket, object: sfile1, filename: "localhost.txt"}
-	report := tc.gf.fetchObject(context.Background(), j)
-
-	if !report.success {
-		t.Errorf("report.success got false, want true")
-	}
-	if report.err != nil {
-		t.Errorf("report.err got %v, want nil", report.err)
+	report, err := tc.gf.fetchObject(context.Background(), j)
+	if err != nil {
+		t.Errorf("fetchObject: %v", err)
 	}
 
 	if len(report.attempts) != 2 {
@@ -454,14 +447,11 @@ func TestFetchObjectRetriesMaxTimes(t *testing.T) {
 	filename := "localfile.txt"
 	j := job{bucket: successBucket, object: sfile1, filename: filename}
 
-	report := tc.gf.fetchObject(context.Background(), j)
+	report, err := tc.gf.fetchObject(context.Background(), j)
+	if err == nil {
+		t.Errorf("fetchObject: got %v, want non-nil", err)
+	}
 
-	if report.success {
-		t.Errorf("report.success got true, want false")
-	}
-	if report.err == nil {
-		t.Errorf("report.err got %v, want non-nil", report.err)
-	}
 	if report.finalname != "" {
 		t.Errorf("report.finalname got %v want empty string", report.finalname)
 	}
@@ -486,13 +476,9 @@ func TestFetchObjectRetriesOnFolderCreationError(t *testing.T) {
 	tc.os.errorsMkdirAll = 1
 
 	j := job{bucket: successBucket, object: sfile1, filename: "localfile.txt"}
-	report := tc.gf.fetchObject(context.Background(), j)
-
-	if !report.success {
-		t.Errorf("report.success got false, want true")
-	}
-	if report.err != nil {
-		t.Errorf("report.err got %v, want nil", report.err)
+	report, err := tc.gf.fetchObject(context.Background(), j)
+	if err != nil {
+		t.Errorf("fetchObject: got %v, want nil", err)
 	}
 
 	if len(report.attempts) != 2 {
@@ -518,13 +504,9 @@ func TestFetchObjectRetriesOnFetchFail(t *testing.T) {
 	tc.os.errorsCreate = 1 // Invoked when fetching the file.
 
 	j := job{bucket: successBucket, object: sfile1, filename: "localfile.txt"}
-	report := tc.gf.fetchObject(context.Background(), j)
-
-	if !report.success {
-		t.Errorf("report.success got false, want true")
-	}
-	if report.err != nil {
-		t.Errorf("report.err got %v, want nil", report.err)
+	report, err := tc.gf.fetchObject(context.Background(), j)
+	if err != nil {
+		t.Errorf("fetchObject got %v, want nil", err)
 	}
 
 	if len(report.attempts) != 2 {
@@ -550,13 +532,9 @@ func TestFetchObjectRetriesOnRenameFailure(t *testing.T) {
 	tc.os.errorsRename = 1
 
 	j := job{bucket: successBucket, object: sfile1, filename: "localfile.txt"}
-	report := tc.gf.fetchObject(context.Background(), j)
-
-	if !report.success {
-		t.Errorf("report.success got false, want true")
-	}
-	if report.err != nil {
-		t.Errorf("report.err got %v, want nil", report.err)
+	report, err := tc.gf.fetchObject(context.Background(), j)
+	if err != nil {
+		t.Errorf("fetchObject got %v, want nil", err)
 	}
 
 	if len(report.attempts) != 2 {
@@ -582,13 +560,9 @@ func TestFetchObjectRetriesOnChmodFailure(t *testing.T) {
 	tc.os.errorsChmod = 1
 
 	j := job{bucket: successBucket, object: sfile1, filename: "localfile.txt"}
-	report := tc.gf.fetchObject(context.Background(), j)
-
-	if !report.success {
-		t.Errorf("report.success got false, want true")
-	}
-	if report.err != nil {
-		t.Errorf("report.err got %v, want nil", report.err)
+	report, err := tc.gf.fetchObject(context.Background(), j)
+	if err != nil {
+		t.Errorf("fetchObject: got %v, want nil", err)
 	}
 
 	if len(report.attempts) != 2 {
@@ -616,34 +590,28 @@ func TestDoWork(t *testing.T) {
 	sort.Strings(files)
 
 	// Add n jobs
-	results := make(chan jobReport, len(files))
+	reports := []*jobReport{}
 	for i, file := range files {
 		j := job{bucket: successBucket, object: file, filename: fmt.Sprintf("sfile-%d", i)}
-		results <- tc.gf.doWork(context.Background(), j)
+		report, err := tc.gf.doWork(context.Background(), j)
+		if err != nil {
+			t.Fatalf("doWork: %v", err)
+		}
+		reports = append(reports, report)
 	}
 
 	// Get n reports
+	if len(reports) != len(files) {
+		t.Errorf("unexpected report found, want %d: %v", len(files), reports)
+	}
 	var gotFiles []string
-	for range files {
-		report := <-results
-		if report.err != nil {
-			t.Errorf("file %q: report.err got %v, want nil", report.job.filename, report.err)
-		}
+	for i := range files {
+		report := reports[i]
 		if _, err := os.Stat(report.finalname); os.IsNotExist(err) {
 			t.Errorf("file %q: does not exist, but it should exist", report.finalname)
 		}
 		gotFiles = append(gotFiles, report.job.object)
 	}
-
-	// Ensure there is nothing more in the results channel
-	select {
-	case report, ok := <-results:
-		if ok {
-			t.Errorf("unexpected report found on channel: %v", report)
-		}
-	default:
-	}
-	close(results)
 
 	sort.Strings(gotFiles)
 	if !reflect.DeepEqual(gotFiles, files) {
@@ -669,9 +637,6 @@ func TestProcessJobs(t *testing.T) {
 
 	if !stats.success {
 		t.Errorf("processJobs() stats.success got false, want true")
-	}
-	if len(stats.errs) != 0 {
-		t.Errorf("processJobs() stats.errs got %v, want {}", stats.errs)
 	}
 	if stats.files != len(jobs) {
 		t.Errorf("processJobs stats.files got %d, want %d", stats.files, len(jobs))
