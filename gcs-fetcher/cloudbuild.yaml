@@ -1,8 +1,7 @@
 steps:
 # Run tests.
-- name: 'gcr.io/cloud-builders/go'
-  env: ["PROJECT_ROOT=github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher"]
-  args: ['test', './...']
+- name: 'gcr.io/cloud-builders/bazel'
+  args: ['test', '--spawn_strategy=standalone', '//pkg/...']
 
 # Build the images into the local Docker daemon.
 - name: 'gcr.io/cloud-builders/bazel'
