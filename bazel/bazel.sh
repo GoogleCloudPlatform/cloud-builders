@@ -4,8 +4,26 @@ set -e
 
 # Always write the build_event_text_file to a temp file we create.
 readonly BUILD_EVENT_FILE="$(mktemp --tmpdir build_event_text_file.XXXXX)"
+readonly BUILD_EVENT_FILE_FLAG="--build_event_text_file=${BUILD_EVENT_FILE}"
 
-/builder/bazel $@ --build_event_text_file="${BUILD_EVENT_FILE}"
+# --build_event_text_file will be added to the command line as the last
+# bazel-handled flag. This is not always the last argument due to
+# the `bazel run` syntax for passing through arguments:
+#
+#  $ bazel [startup flags] run //:mytool [bazel run flags] -- [mytool args]
+#
+# To handle this syntax, we split the command line before the *first* "--"
+# argument into two lists and put our new flag in the middle. When no "--"
+# appears, this is equivalent to appending the new flag.
+for ((i=1 ; i<=$# ; i++))
+do
+  [[ "${@:$i:1}" == "--" ]] && break
+done
+n=$(($#-$i+1))
+# Insert our flag at index $i out of $n. Quoting is all required for expansion.
+set -- "${@:1:$((i-1))}" "$BUILD_EVENT_FILE_FLAG" "${@:$i:$n}"
+
+/builder/bazel "$@"
 
 # Parse out the UUID from the BEP output file and write it to
 # $BUILDER_OUTPUT/output, whose first 4KB will be served inline in the Build.
