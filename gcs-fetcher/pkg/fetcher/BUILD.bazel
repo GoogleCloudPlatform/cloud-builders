@@ -5,7 +5,10 @@ go_library(
     srcs = ["fetcher.go"],
     importpath = "github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/pkg/fetcher",
     visibility = ["//visibility:public"],
-    deps = ["//pkg/common:go_default_library"],
+    deps = [
+        "//pkg/common:go_default_library",
+        "//vendor/google.golang.org/api/googleapi:go_default_library",
+    ],
 )
 
 go_test(

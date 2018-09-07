@@ -25,12 +25,16 @@ import (
 	"io"
 	"log"
 	"math"
+	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/pkg/common"
+	"google.golang.org/api/googleapi"
 )
 
 var (
@@ -59,6 +63,8 @@ var (
 	defaultTimeout = 1 * time.Hour
 	noTimeout      = 0 * time.Second
 	errGCSTimeout  = errors.New("GCS timeout")
+
+	robotRegex = regexp.MustCompile(`<Details>(\S+@\S+)\s`)
 )
 
 type sizeBytes int64
@@ -145,6 +151,22 @@ type Fetcher struct {
 	Retries     int
 	Backoff     time.Duration
 	Verbose     bool
+	Stdout      io.Writer
+	Stderr      io.Writer
+}
+
+func logit(writer io.Writer, format string, a ...interface{}) {
+	if _, err := fmt.Fprintf(writer, format+"\n", a...); err != nil {
+		log.Printf("Failed to write message: " + format, a...)
+	}
+}
+
+func (gf *Fetcher) log(format string, a ...interface{}) {
+	logit(gf.Stdout, format, a...)
+}
+
+func (gf *Fetcher) logErr(format string, a ...interface{}) {
+	logit(gf.Stderr, format, a...)
 }
 
 func (gf *Fetcher) recordFailure(j job, started time.Time, gcsTimeout time.Duration, err error, report *jobReport) {
@@ -164,7 +186,7 @@ func (gf *Fetcher) recordFailure(j job, started time.Time, gcsTimeout time.Durat
 		if isLast {
 			retryMsg = ", will no longer retry"
 		}
-		log.Printf("Failed to fetch %s%s: %v", formatGCSName(j.bucket, j.object, j.generation), retryMsg, err)
+		gf.log("Failed to fetch %s%s: %v", formatGCSName(j.bucket, j.object, j.generation), retryMsg, err)
 	}
 }
 
@@ -183,7 +205,7 @@ func (gf *Fetcher) recordSuccess(j job, started time.Time, size sizeBytes, final
 	if attempt.duration > 0 {
 		mibps = (float64(report.size) / 1024 / 1024) / attempt.duration.Seconds()
 	}
-	log.Printf("Fetched %s (%dB in %v, %.2fMiB/s)", formatGCSName(j.bucket, j.object, j.generation), report.size, attempt.duration, mibps)
+	gf.log("Fetched %s (%dB in %v, %.2fMiB/s)", formatGCSName(j.bucket, j.object, j.generation), report.size, attempt.duration, mibps)
 }
 
 // fetchObject is responsible for trying (and retrying) to fetch a single file
@@ -298,10 +320,25 @@ func (gf *Fetcher) fetchObjectOnce(ctx context.Context, j job, dest string, brea
 
 	r, err := gf.GCS.NewReader(ctx, j.bucket, j.object)
 	if err != nil {
+		// Check for AccessDenied failure here and return a useful error message on Stderr and exit immediately.
+		if gerr, ok := err.(*googleapi.Error); ok && gerr.Code == http.StatusForbidden {
+			// Try to parse out the robot name.
+			match := robotRegex.FindStringSubmatch(err.Error())
+			robot := "your Cloud Build service account"
+			if len(match) == 2 {
+				robot = match[1]
+			}
+			gf.logErr("Access to bucket %q denied. You must grant Storage Object Viewer permission to %s.", j.bucket, robot)
+			os.Exit(1)
+		}
 		result.err = fmt.Errorf("creating GCS reader for %q: %v", formatGCSName(j.bucket, j.object, j.generation), err)
 		return result
 	}
-	defer r.Close()
+	defer func() {
+		if cerr := r.Close(); cerr != nil {
+			result.err = fmt.Errorf("Failed to close GCS reader: %v", cerr)
+		}
+	}()
 
 	// If we're cancelled, just return.
 	select {
@@ -317,7 +354,11 @@ func (gf *Fetcher) fetchObjectOnce(ctx context.Context, j job, dest string, brea
 		result.err = fmt.Errorf("creating destination file %q: %v", dest, err)
 		return result
 	}
-	defer f.Close()
+	defer func() {
+		if cerr := f.Close(); cerr != nil {
+			result.err = fmt.Errorf("Failed to close file %q: %v", dest, cerr)
+		}
+	}()
 
 	h := sha1.New()
 	n, err := io.Copy(f, io.TeeReader(r, h))
@@ -369,7 +410,7 @@ func (gf *Fetcher) doWork(ctx context.Context, todo <-chan job, results chan<- j
 	for j := range todo {
 		report := gf.fetchObject(ctx, j)
 		if gf.Verbose {
-			log.Printf("Report: %#v", report)
+			gf.log("Report: %#v", report)
 		}
 		results <- *report
 	}
@@ -438,7 +479,8 @@ func (gf *Fetcher) processJobs(ctx context.Context, jobs []job) stats {
 
 	if failed {
 		stats.success = false
-		log.Fatal("Failed to download at least one file. Cannot continue.")
+		gf.logErr("Failed to download at least one file. Cannot continue.")
+		os.Exit(1)
 	}
 
 	stats.duration = time.Since(started)
@@ -470,9 +512,9 @@ func (gf *Fetcher) timeout(filename string, retrynum int) time.Duration {
 // fetchFromManifest is used when downloading source based on a manifest file.
 // It is responsible for fetching the manifest file, decoding the JSON, and
 // assembling the list of jobs to process (i.e., files to download).
-func (gf *Fetcher) fetchFromManifest(ctx context.Context) error {
+func (gf *Fetcher) fetchFromManifest(ctx context.Context) (err error) {
 	started := time.Now()
-	log.Printf("Fetching manifest %s.", formatGCSName(gf.Bucket, gf.Object, gf.Generation))
+	gf.log("Fetching manifest %s.", formatGCSName(gf.Bucket, gf.Object, gf.Generation))
 
 	// Download the manifest file from GCS.
 	j := job{
@@ -489,10 +531,14 @@ func (gf *Fetcher) fetchFromManifest(ctx context.Context) error {
 	// Decode the JSON manifest
 	manifestFile := filepath.Join(gf.DestDir, j.filename)
 	r, err := gf.OS.Open(manifestFile)
-	defer r.Close()
 	if err != nil {
 		return fmt.Errorf("opening manifest file %q: %v", manifestFile, err)
 	}
+	defer func() {
+		if cerr := r.Close(); cerr != nil {
+			err = fmt.Errorf("Failed to close file %q: %v", manifestFile, cerr)
+		}
+	}()
 	var files map[string]common.ManifestItem
 	if err := json.NewDecoder(r).Decode(&files); err != nil {
 		return fmt.Errorf("decoding JSON from manifest file %q: %v", manifestFile, err)
@@ -515,7 +561,7 @@ func (gf *Fetcher) fetchFromManifest(ctx context.Context) error {
 		jobs = append(jobs, j)
 	}
 
-	log.Printf("Processing %v files.", len(jobs))
+	gf.log("Processing %v files.", len(jobs))
 	stats := gf.processJobs(ctx, jobs)
 
 	// Final cleanup of failed downloads. We won't miss any files; these vestiges
@@ -523,7 +569,7 @@ func (gf *Fetcher) fetchFromManifest(ctx context.Context) error {
 	// circuit breaker and die. However, we won't wait for these remaining
 	// go routines to finish because out goal is to get done as fast as possible!
 	if err := gf.OS.RemoveAll(gf.StagingDir); err != nil {
-		log.Printf("Failed to remove staging dir %v, continuing: %v", gf.StagingDir, err)
+		gf.log("Failed to remove staging dir %v, continuing: %v", gf.StagingDir, err)
 	}
 
 	// Emit final stats.
@@ -537,41 +583,45 @@ func (gf *Fetcher) fetchFromManifest(ctx context.Context) error {
 	if !stats.success {
 		status = "FAILURE"
 	}
-	log.Printf("******************************************************")
-	log.Printf("Status:                      %s", status)
-	log.Printf("Started:                     %s", started.Format(time.RFC3339))
-	log.Printf("Completed:                   %s", time.Now().Format(time.RFC3339))
-	log.Printf("Requested workers: %6d", gf.WorkerCount)
-	log.Printf("Actual workers:    %6d", stats.workers)
-	log.Printf("Total files:       %6d", stats.files)
-	log.Printf("Total retries:     %6d", stats.retries)
+	gf.log("******************************************************")
+	gf.log("Status:                      %s", status)
+	gf.log("Started:                     %s", started.Format(time.RFC3339))
+	gf.log("Completed:                   %s", time.Now().Format(time.RFC3339))
+	gf.log("Requested workers: %6d", gf.WorkerCount)
+	gf.log("Actual workers:    %6d", stats.workers)
+	gf.log("Total files:       %6d", stats.files)
+	gf.log("Total retries:     %6d", stats.retries)
 	if gf.TimeoutGCS {
-		log.Printf("GCS timeouts:      %6d", stats.gcsTimeouts)
+		gf.log("GCS timeouts:      %6d", stats.gcsTimeouts)
 	}
-	log.Printf("MiB downloaded:    %9.2f MiB", mib)
-	log.Printf("MiB/s throughput:  %9.2f MiB/s", mibps)
+	gf.log("MiB downloaded:    %9.2f MiB", mib)
+	gf.log("MiB/s throughput:  %9.2f MiB/s", mibps)
 
-	log.Printf("Time for manifest: %9.2f ms", float64(manifestDuration)/float64(time.Millisecond))
-	log.Printf("Total time:        %9.2f s", time.Since(started).Seconds())
-	log.Printf("******************************************************")
+	gf.log("Time for manifest: %9.2f ms", float64(manifestDuration)/float64(time.Millisecond))
+	gf.log("Total time:        %9.2f s", time.Since(started).Seconds())
+	gf.log("******************************************************")
 
 	if len(stats.errs) > 0 {
-		log.Printf("Errors (%d):", len(stats.errs))
-		for err := range stats.errs {
-			log.Print(err)
+		var es []string
+		es = append(es, fmt.Sprintf("Errors (%d):", len(stats.errs)))
+		for _, e := range stats.errs {
+			es = append(es, fmt.Sprintf(" - %s", e))
 		}
-		log.Printf("******************************************************")
-		return fmt.Errorf("file fetching failed")
+		return fmt.Errorf(strings.Join(es, "\n"))
 	}
 	return nil
 }
 
-func (gf *Fetcher) copyFileFromZip(file *zip.File) error {
+func (gf *Fetcher) copyFileFromZip(file *zip.File) (err error) {
 	sourceReader, err := file.Open()
 	if err != nil {
 		return fmt.Errorf("failed to open source file %q: %v", file.Name, err)
 	}
-	defer sourceReader.Close()
+	defer func() {
+		if cerr := sourceReader.Close(); cerr != nil {
+			 err = fmt.Errorf("Failed to close file %q: %v", file.Name, cerr)
+		}
+	}()
 
 	targetFile := filepath.Join(gf.DestDir, file.Name)
 	if err := gf.ensureFolders(targetFile); err != nil {
@@ -582,7 +632,11 @@ func (gf *Fetcher) copyFileFromZip(file *zip.File) error {
 	if err != nil {
 		return fmt.Errorf("failed to open target file %q: %v", targetFile, err)
 	}
-	defer targetWriter.Close()
+	defer func() {
+		if cerr := targetWriter.Close(); cerr != nil {
+			err = fmt.Errorf("Failed to close file %q: %v", targetFile, cerr)
+		}
+	}()
 
 	if _, err := io.Copy(targetWriter, sourceReader); err != nil {
 		return fmt.Errorf("failed to copy %q to %q: %v", file.Name, targetFile, err)
@@ -592,9 +646,9 @@ func (gf *Fetcher) copyFileFromZip(file *zip.File) error {
 
 // fetchFromZip is used when downloading a single zip of source files. It is
 // responsible to fetch the zip file and unzip it into the destination folder.
-func (gf *Fetcher) fetchFromZip(ctx context.Context) error {
+func (gf *Fetcher) fetchFromZip(ctx context.Context) (err error) {
 	started := time.Now()
-	log.Printf("Fetching archive %s.", formatGCSName(gf.Bucket, gf.Object, gf.Generation))
+	gf.log("Fetching archive %s.", formatGCSName(gf.Bucket, gf.Object, gf.Generation))
 
 	// Download the archive from GCS.
 	j := job{
@@ -615,7 +669,11 @@ func (gf *Fetcher) fetchFromZip(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to open archive %s: %v", zipfile, err)
 	}
-	defer zipReader.Close()
+	defer func() {
+		if cerr := zipReader.Close(); cerr != nil {
+			err = fmt.Errorf("Failed to close file %q: %v", zipfile, cerr)
+		}
+	}()
 
 	numFiles := 0
 	for _, file := range zipReader.File {
@@ -632,13 +690,13 @@ func (gf *Fetcher) fetchFromZip(ctx context.Context) error {
 
 	// Remove the zip file (best effort only, no harm if this fails).
 	if err := os.RemoveAll(zipfile); err != nil {
-		log.Printf("Failed to remove zipfile %s, continuing: %v", zipfile, err)
+		gf.log("Failed to remove zipfile %s, continuing: %v", zipfile, err)
 	}
 
 	// Final cleanup of staging directory, which is only a temporary staging
 	// location for downloading the zipfile in this case.
 	if err := gf.OS.RemoveAll(gf.StagingDir); err != nil {
-		log.Printf("Failed to remove staging dir %q, continuing: %v", gf.StagingDir, err)
+		gf.log("Failed to remove staging dir %q, continuing: %v", gf.StagingDir, err)
 	}
 
 	mib := float64(report.size) / 1024 / 1024
@@ -647,17 +705,17 @@ func (gf *Fetcher) fetchFromZip(ctx context.Context) error {
 	if zipfileDuration > 0 {
 		mibps = mib / zipfileDuration.Seconds()
 	}
-	log.Printf("******************************************************")
-	log.Printf("Status:                      SUCCESS")
-	log.Printf("Started:                     %s", started.Format(time.RFC3339))
-	log.Printf("Completed:                   %s", time.Now().Format(time.RFC3339))
-	log.Printf("Total files:       %6d", numFiles)
-	log.Printf("MiB downloaded:    %9.2f MiB", mib)
-	log.Printf("MiB/s throughput:  %9.2f MiB/s", mibps)
-	log.Printf("Time for zipfile:  %9.2f s", zipfileDuration.Seconds())
-	log.Printf("Time to unzip:     %9.2f s", unzipDuration.Seconds())
-	log.Printf("Total time:        %9.2f s", time.Since(started).Seconds())
-	log.Printf("******************************************************")
+	gf.log("******************************************************")
+	gf.log("Status:                      SUCCESS")
+	gf.log("Started:                     %s", started.Format(time.RFC3339))
+	gf.log("Completed:                   %s", time.Now().Format(time.RFC3339))
+	gf.log("Total files:       %6d", numFiles)
+	gf.log("MiB downloaded:    %9.2f MiB", mib)
+	gf.log("MiB/s throughput:  %9.2f MiB/s", mibps)
+	gf.log("Time for zipfile:  %9.2f s", zipfileDuration.Seconds())
+	gf.log("Time to unzip:     %9.2f s", unzipDuration.Seconds())
+	gf.log("Total time:        %9.2f s", time.Since(started).Seconds())
+	gf.log("******************************************************")
 	return nil
 }
 
