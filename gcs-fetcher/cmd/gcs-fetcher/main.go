@@ -50,6 +50,13 @@ var (
 	help        = flag.Bool("help", false, "If true, prints help text and exits.")
 )
 
+func logFatalf(writer io.Writer, format string, a ...interface{}) {
+	if _, err := fmt.Fprintf(writer, format+"\n", a...); err != nil {
+		log.Fatalf("Failed to write log: %v", err)
+	}
+	os.Exit(1)
+}
+
 func main() {
 	flag.Parse()
 
@@ -59,19 +66,37 @@ func main() {
 		return
 	}
 
+	var stdout, stderr io.Writer = os.Stdout, os.Stderr
+	if outputDir, ok := os.LookupEnv("BUILDER_OUTPUT"); ok {
+		if err := os.MkdirAll(outputDir, os.ModePerm); err != nil {
+			logFatalf(os.Stderr, "Failed to create folder %s: %v", outputDir, err)
+		}
+		outfile := filepath.Join(outputDir, "output")
+		f, err := os.OpenFile(outfile, os.O_RDWR|os.O_CREATE, 0644)
+		if err != nil {
+			logFatalf(os.Stderr, "Cannot open output file %s: %v", outfile, err)
+		}
+		defer func() {
+			if cerr := f.Close(); cerr != nil {
+				log.Fatalf("Failed to close %q: %v", outfile, cerr)
+			}
+		}()
+		stderr = io.MultiWriter(stderr, f)
+	}
+
 	if *location == "" || *sourceType == "" {
-		log.Fatal("Must specify --location and --type")
+		logFatalf(stderr, "Must specify --location and --type")
 	}
 
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx, option.WithUserAgent(userAgent))
 	if err != nil {
-		log.Fatalf("Failed to create new GCS client: %v", err)
+		logFatalf(stderr, "Failed to create new GCS client: %v", err)
 	}
 
 	bucket, object, generation, err := common.ParseBucketObject(*location)
 	if err != nil {
-		log.Fatalf("Failed to parse --location: %v", err)
+		logFatalf(stderr, "Failed to parse --location: %v", err)
 	}
 
 	gcs := &fetcher.Fetcher{
@@ -89,9 +114,11 @@ func main() {
 		Backoff:     *backoff,
 		SourceType:  *sourceType,
 		Verbose:     *verbose,
+		Stdout:      stdout,
+		Stderr:      stderr,
 	}
 	if err := gcs.Fetch(ctx); err != nil {
-		log.Fatal(err)
+		logFatalf(stderr, "failed to Fetch: %v", err.Error())
 	}
 }
 
@@ -126,6 +153,7 @@ func (realOS) MkdirAll(path string, perm os.FileMode) error {
 func (realOS) Open(name string) (*os.File, error) {
 	return os.Open(name)
 }
+
 func (realOS) RemoveAll(path string) error {
 	return os.RemoveAll(path)
 }
