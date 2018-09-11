@@ -33,7 +33,7 @@ pushed to the Container Registry.
 ```
 docker_build(
   name = "docker_target",
-  base = "@docker_debian//:wheezy"
+  base = "@docker_debian//:wheezy",
   entrypoint = ["echo", "foo"],
 )
 ```
