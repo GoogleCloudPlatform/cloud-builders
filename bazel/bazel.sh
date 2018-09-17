@@ -23,7 +23,13 @@ n=$(($#-$i+1))
 # Insert our flag at index $i out of $n. Quoting is all required for expansion.
 set -- "${@:1:$((i-1))}" "$BUILD_EVENT_FILE_FLAG" "${@:$i:$n}"
 
-/builder/bazel "$@"
+# Run bazel with the new command line and capture the exit code.
+#
+# This script has -e enabled, so if bazel exits non-zero, we need to both
+# capture the exit code *and* replace it with zero. That is the purpose of the
+# short-circuiting OR operator.
+EXIT_CODE=0
+/builder/bazel "$@" || EXIT_CODE=$?
 
 # Parse out the UUID from the BEP output file and write it to
 # $BUILDER_OUTPUT/output, whose first 4KB will be served inline in the Build.
@@ -35,3 +41,5 @@ set -- "${@:1:$((i-1))}" "$BUILD_EVENT_FILE_FLAG" "${@:$i:$n}"
 readonly INVOCATION_ID_FIELD="$(grep -Eo 'uuid: \".{36}\"$' "${BUILD_EVENT_FILE}" | head -n 1)"
 readonly INVOCATION_ID="${INVOCATION_ID_FIELD:7:-1}"
 echo "{\"bazel.build/invocation_id\": \"${INVOCATION_ID}\"}" > "${BUILDER_OUTPUT}/output"
+
+exit "${EXIT_CODE}"
