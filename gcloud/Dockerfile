@@ -22,6 +22,7 @@ RUN apt-get -y update && \
         emulator-reverse-proxy \
         kubectl \
         pubsub-emulator \
+        make \
         && \
 
     /builder/google-cloud-sdk/bin/gcloud -q components update && \
