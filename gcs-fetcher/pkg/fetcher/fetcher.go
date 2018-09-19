@@ -183,7 +183,9 @@ func (gf *Fetcher) recordSuccess(j job, started time.Time, size sizeBytes, final
 	if attempt.duration > 0 {
 		mibps = (float64(report.size) / 1024 / 1024) / attempt.duration.Seconds()
 	}
-	log.Printf("Fetched %s (%dB in %v, %.2fMiB/s)", formatGCSName(j.bucket, j.object, j.generation), report.size, attempt.duration, mibps)
+	if gf.Verbose {
+	  log.Printf("Fetched %s (%dB in %v, %.2fMiB/s)", formatGCSName(j.bucket, j.object, j.generation), report.size, attempt.duration, mibps)
+	}
 }
 
 // fetchObject is responsible for trying (and retrying) to fetch a single file
