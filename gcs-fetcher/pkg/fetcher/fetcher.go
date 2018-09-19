@@ -157,7 +157,7 @@ type Fetcher struct {
 
 func logit(writer io.Writer, format string, a ...interface{}) {
 	if _, err := fmt.Fprintf(writer, format+"\n", a...); err != nil {
-		log.Printf("Failed to write message: " + format, a...)
+		log.Printf("Failed to write message: "+format, a...)
 	}
 }
 
@@ -205,7 +205,9 @@ func (gf *Fetcher) recordSuccess(j job, started time.Time, size sizeBytes, final
 	if attempt.duration > 0 {
 		mibps = (float64(report.size) / 1024 / 1024) / attempt.duration.Seconds()
 	}
-	gf.log("Fetched %s (%dB in %v, %.2fMiB/s)", formatGCSName(j.bucket, j.object, j.generation), report.size, attempt.duration, mibps)
+	if gf.Verbose {
+		log.Printf("Fetched %s (%dB in %v, %.2fMiB/s)", formatGCSName(j.bucket, j.object, j.generation), report.size, attempt.duration, mibps)
+	}
 }
 
 // fetchObject is responsible for trying (and retrying) to fetch a single file
@@ -619,7 +621,7 @@ func (gf *Fetcher) copyFileFromZip(file *zip.File) (err error) {
 	}
 	defer func() {
 		if cerr := sourceReader.Close(); cerr != nil {
-			 err = fmt.Errorf("Failed to close file %q: %v", file.Name, cerr)
+			err = fmt.Errorf("Failed to close file %q: %v", file.Name, cerr)
 		}
 	}()
 

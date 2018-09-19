@@ -6,7 +6,7 @@ You might also consider using an [official `node` image](https://hub.docker.com/
 
 ```yaml
 steps:
-- name: node:10.8.0
+- name: node:10.10.0
   entrypoint: yarn
   args: ['install']
 ```
