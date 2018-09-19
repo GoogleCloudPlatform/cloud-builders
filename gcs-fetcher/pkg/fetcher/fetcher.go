@@ -258,7 +258,11 @@ func (gf *Fetcher) fetchObject(ctx context.Context, j job) *jobReport {
 		allowedGCSTimeout := gf.timeout(j.filename, retrynum)
 		size, err := gf.fetchObjectOnceWithTimeout(ctx, j, allowedGCSTimeout, tmpfile)
 		if err != nil {
-			e := fmt.Errorf("fetching %q with timeout %v to temp file %q: %v", formatGCSName(j.bucket, j.object, j.generation), allowedGCSTimeout, tmpfile, err)
+			// Allow permissionError to bubble up.
+			e := err
+			if _, ok := err.(*permissionError); !ok {
+				e = fmt.Errorf("fetching %q with timeout %v to temp file %q: %v", formatGCSName(j.bucket, j.object, j.generation), allowedGCSTimeout, tmpfile, err)
+			}
 			gf.recordFailure(j, started, allowedGCSTimeout, e, report)
 			continue
 		}
