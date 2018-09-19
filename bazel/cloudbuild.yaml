@@ -15,6 +15,9 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/bazel'
   args: ['run', '--spawn_strategy=standalone', '//:checkargs', '--verbose_failures', '--', 'a', 'b', 'c']
   dir: 'examples'
+- name: 'gcr.io/$PROJECT_ID/bazel'
+  entrypoint: '/bin/bash'
+  args: ['invocation_id_test.sh']
 
 # Example was built as bazel:target.
 - name: 'gcr.io/cloud-builders/docker'
