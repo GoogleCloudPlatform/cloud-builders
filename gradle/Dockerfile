@@ -20,7 +20,5 @@ RUN apt-get update -qqy && apt-get install -qqy curl \
   && apt-get remove -qqy --purge curl \
   && rm /var/lib/apt/lists/*_*
 
-ADD gradle.properties "${GRADLE_USER_HOME}"
-
 ENTRYPOINT ["/usr/bin/gradle"]
 
