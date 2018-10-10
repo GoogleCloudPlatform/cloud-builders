@@ -65,10 +65,11 @@ type sizeBytes int64
 
 // job is a file to download, corresponds to an entry in the manifest file.
 type job struct {
-	filename       string
-	bucket, object string
-	generation     int64
-	sha1sum        string
+	filename        string
+	bucket, object  string
+	generation      int64
+	sha1sum         string
+	destDirOverride string
 }
 
 // jobAttempt is an attempt to download a particular file, may result in
@@ -232,7 +233,11 @@ func (gf *Fetcher) fetchObject(ctx context.Context, j job) *jobReport {
 		}
 
 		// Rename the temp file to the final filename
-		finalname := filepath.Join(gf.DestDir, j.filename)
+		dest := gf.DestDir
+		if j.destDirOverride != "" {
+			dest = j.destDirOverride
+		}
+		finalname := filepath.Join(dest, j.filename)
 		if err := gf.ensureFolders(finalname); err != nil {
 			e := fmt.Errorf("creating folders for final file %q: %v", finalname, err)
 			gf.recordFailure(j, started, noTimeout, e, report)
@@ -477,11 +482,13 @@ func (gf *Fetcher) fetchFromManifest(ctx context.Context) error {
 	log.Printf("Fetching manifest %s.", formatGCSName(gf.Bucket, gf.Object, gf.Generation))
 
 	// Download the manifest file from GCS.
+	manifestDir := gf.StagingDir
 	j := job{
-		filename:   gf.Object,
-		bucket:     gf.Bucket,
-		object:     gf.Object,
-		generation: gf.Generation,
+		filename:        gf.Object,
+		bucket:          gf.Bucket,
+		object:          gf.Object,
+		generation:      gf.Generation,
+		destDirOverride: manifestDir,
 	}
 	report := gf.fetchObject(ctx, j)
 	if !report.success {
@@ -489,7 +496,7 @@ func (gf *Fetcher) fetchFromManifest(ctx context.Context) error {
 	}
 
 	// Decode the JSON manifest
-	manifestFile := filepath.Join(gf.DestDir, j.filename)
+	manifestFile := filepath.Join(manifestDir, j.filename)
 	r, err := gf.OS.Open(manifestFile)
 	defer r.Close()
 	if err != nil {
@@ -599,11 +606,13 @@ func (gf *Fetcher) fetchFromZip(ctx context.Context) error {
 	log.Printf("Fetching archive %s.", formatGCSName(gf.Bucket, gf.Object, gf.Generation))
 
 	// Download the archive from GCS.
+	zipDir := gf.StagingDir
 	j := job{
-		filename:   gf.Object,
-		bucket:     gf.Bucket,
-		object:     gf.Object,
-		generation: gf.Generation,
+		filename:        gf.Object,
+		bucket:          gf.Bucket,
+		object:          gf.Object,
+		generation:      gf.Generation,
+		destDirOverride: zipDir,
 	}
 	report := gf.fetchObject(ctx, j)
 	if !report.success {
@@ -612,7 +621,7 @@ func (gf *Fetcher) fetchFromZip(ctx context.Context) error {
 
 	// Unzip into the destination directory
 	unzipStart := time.Now()
-	zipfile := filepath.Join(gf.DestDir, gf.Object)
+	zipfile := filepath.Join(zipDir, gf.Object)
 	zipReader, err := zip.OpenReader(zipfile)
 	if err != nil {
 		return fmt.Errorf("failed to open archive %s: %v", zipfile, err)
