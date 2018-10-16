@@ -18,13 +18,10 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-# Ensure we have everything we need under vendor/
-dep ensure
+# Get latest versions of all dependencies.
+go get -u
 
 # Remove unnecessary files, and BUILD files which we want to generate ourselves.
 rm -rf $(find vendor/ -name 'BUILD')
 rm -rf $(find vendor/ -name 'BUILD.bazel')
 rm -rf $(find vendor/ -name '*_test.go')
-
-# Make sure that BUILD files are up to date (the above removes them).
-bazel run //:gazelle

@@ -1,23 +1,18 @@
 steps:
 # Run tests.
-- name: 'gcr.io/cloud-builders/bazel'
-  args: ['test', '--spawn_strategy=standalone', '//pkg/...']
+- name: 'golang:stretch'
+  entrypoint: 'go'
+  args: ['build', './...']
 
-# Build the images into the local Docker daemon.
-- name: 'gcr.io/cloud-builders/bazel'
-  args: ['run', '--spawn_strategy=standalone', '//cmd/gcs-fetcher:image', '--', '--norun']
-- name: 'gcr.io/cloud-builders/bazel'
-  args: ['run', '--spawn_strategy=standalone', '//cmd/gcs-uploader:image', '--', '--norun']
-
-# Tag the images to the correct location.
+# Build the gcs-fetcher binary and put into the builder image.
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['tag', 'bazel/cmd/gcs-fetcher:image', 'gcr.io/$PROJECT_ID/gcs-fetcher']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['tag', 'bazel/cmd/gcs-uploader:image', 'gcr.io/$PROJECT_ID/gcs-uploader']
-
-# Sanity check that the images can be run.
+  args: ['build', '--build-arg=cmd=./cmd/gcs-fetcher/', '-t', 'gcr.io/$PROJECT_ID/gcs-fetcher', '.']
 - name: 'gcr.io/$PROJECT_ID/gcs-fetcher'
   args: ['--help']
+
+# Build the gcs-uploader binary and put it into the builder image.
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--build-arg=cmd=./cmd/gcs-uploader/', '-t', 'gcr.io/$PROJECT_ID/gcs-uploader', '.']
 - name: 'gcr.io/$PROJECT_ID/gcs-uploader'
   args: ['--help']
 
@@ -25,6 +20,9 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/gcs-uploader'
   args:
   - '--location=gs://${PROJECT_ID}_cloudbuild/manifest-${BUILD_ID}.json'
+# Print the manifest.
+- name: 'gcr.io/cloud-builders/gsutil'
+  args: ['cat', 'gs://${PROJECT_ID}_cloudbuild/manifest-${BUILD_ID}.json']
 # Fetch the manifest.
 - name: 'gcr.io/$PROJECT_ID/gcs-fetcher'
   args:
