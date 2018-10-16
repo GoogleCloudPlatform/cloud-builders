@@ -67,14 +67,13 @@ func New(ctx context.Context, gcs GCS, os OS, bucket, manifestObject string, num
 	}
 }
 
-
 // Wait blocks until ongoing uploads are complete, or until an error is
 // encountered.
 func (u *Uploader) Done(ctx context.Context) error {
 	uploaded := u.totalBytes - u.bytesSkipped
 	var incr float64
 	if u.totalBytes != 0 {
-		incr = float64(100*u.bytesSkipped / u.totalBytes)
+		incr = float64(100 * u.bytesSkipped / u.totalBytes)
 	}
 	fmt.Printf(`
 ******************************************************
