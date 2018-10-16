@@ -16,7 +16,9 @@ limitations under the License.
 package fetcher
 
 import (
+	"archive/tar"
 	"archive/zip"
+	"compress/gzip"
 	"context"
 	"crypto/sha1"
 	"encoding/json"
@@ -27,6 +29,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -575,26 +578,30 @@ func (gf *Fetcher) copyFileFromZip(file *zip.File) error {
 	}
 	defer sourceReader.Close()
 
-	targetFile := filepath.Join(gf.DestDir, file.Name)
+	return gf.copyFileFromArchive(sourceReader, file.Name, file.Mode())
+}
+
+func (gf *Fetcher) copyFileFromArchive(r io.Reader, name string, perm os.FileMode) error {
+	targetFile := filepath.Join(gf.DestDir, name)
 	if err := gf.ensureFolders(targetFile); err != nil {
 		return fmt.Errorf("failed to create folders for file %q: %v", targetFile, err)
 	}
 
-	targetWriter, err := os.OpenFile(targetFile, os.O_WRONLY|os.O_CREATE, file.Mode())
+	targetWriter, err := os.OpenFile(targetFile, os.O_WRONLY|os.O_CREATE, perm)
 	if err != nil {
 		return fmt.Errorf("failed to open target file %q: %v", targetFile, err)
 	}
 	defer targetWriter.Close()
 
-	if _, err := io.Copy(targetWriter, sourceReader); err != nil {
-		return fmt.Errorf("failed to copy %q to %q: %v", file.Name, targetFile, err)
+	if _, err := io.Copy(targetWriter, r); err != nil {
+		return fmt.Errorf("failed to copy %q to %q: %v", name, targetFile, err)
 	}
 	return nil
 }
 
-// fetchFromZip is used when downloading a single zip of source files. It is
-// responsible to fetch the zip file and unzip it into the destination folder.
-func (gf *Fetcher) fetchFromZip(ctx context.Context) error {
+// fetchFromArchive is used when downloading a single archive of source files. It is
+// responsible to fetch the archive file and uncompress it into the destination folder.
+func (gf *Fetcher) fetchFromArchive(ctx context.Context) error {
 	started := time.Now()
 	log.Printf("Fetching archive %s.", formatGCSName(gf.Bucket, gf.Object, gf.Generation))
 
@@ -610,31 +617,17 @@ func (gf *Fetcher) fetchFromZip(ctx context.Context) error {
 		return fmt.Errorf("failed to download archive %s: %v", formatGCSName(gf.Bucket, gf.Object, gf.Generation), report.err)
 	}
 
-	// Unzip into the destination directory
 	unzipStart := time.Now()
-	zipfile := filepath.Join(gf.DestDir, gf.Object)
-	zipReader, err := zip.OpenReader(zipfile)
+	archiveFile := filepath.Join(gf.DestDir, gf.Object)
+	numFiles, err := gf.uncompress(ctx, archiveFile)
 	if err != nil {
-		return fmt.Errorf("failed to open archive %s: %v", zipfile, err)
-	}
-	defer zipReader.Close()
-
-	numFiles := 0
-	for _, file := range zipReader.File {
-		if file.FileInfo().IsDir() {
-			continue
-		}
-
-		numFiles++
-		if err := gf.copyFileFromZip(file); err != nil {
-			return err
-		}
+		return fmt.Errorf("failed to uncompress archive %s: %v", archiveFile, report.err)
 	}
 	unzipDuration := time.Since(unzipStart)
 
 	// Remove the zip file (best effort only, no harm if this fails).
-	if err := os.RemoveAll(zipfile); err != nil {
-		log.Printf("Failed to remove zipfile %s, continuing: %v", zipfile, err)
+	if err := os.RemoveAll(archiveFile); err != nil {
+		log.Printf("Failed to remove zipfile %s, continuing: %v", archiveFile, err)
 	}
 
 	// Final cleanup of staging directory, which is only a temporary staging
@@ -663,6 +656,74 @@ func (gf *Fetcher) fetchFromZip(ctx context.Context) error {
 	return nil
 }
 
+// uncompress uncompresses a file into the destination folder based on its
+// extension.
+func (gf *Fetcher) uncompress(ctx context.Context, archiveFile string) (int, error) {
+	if strings.HasSuffix(gf.Object, ".tar.gz") || strings.HasSuffix(gf.Object, ".tar") {
+		return gf.untar(ctx, archiveFile)
+	}
+	return gf.unzip(ctx, archiveFile)
+}
+
+// unzip unzips a file into the destination folder.
+func (gf *Fetcher) unzip(ctx context.Context, archiveFile string) (int, error) {
+	zipReader, err := zip.OpenReader(archiveFile)
+	if err != nil {
+		return 0, fmt.Errorf("failed to open archive %s: %v", archiveFile, err)
+	}
+	defer zipReader.Close()
+
+	numFiles := 0
+	for _, file := range zipReader.File {
+		if file.FileInfo().IsDir() {
+			continue
+		}
+
+		numFiles++
+		if err := gf.copyFileFromZip(file); err != nil {
+			return 0, err
+		}
+	}
+	return numFiles, nil
+}
+
+// untar uncompresses a file into the destination folder.
+func (gf *Fetcher) untar(ctx context.Context, archiveFile string) (int, error) {
+	f, err := os.Open(archiveFile)
+	if err != nil {
+		return 0, fmt.Errorf("failed to open archive %s: %v", archiveFile, err)
+	}
+	defer f.Close()
+
+	var reader io.Reader = f
+	if strings.HasSuffix(archiveFile, ".gz") {
+		reader, err = gzip.NewReader(f)
+		if err != nil {
+			return 0, fmt.Errorf("failed to open gzip reader %s: %v", archiveFile, err)
+		}
+	}
+	tarReader := tar.NewReader(reader)
+
+	numFiles := 0
+	for {
+		header, err := tarReader.Next()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return 0, fmt.Errorf("failed to read tar file %s: %v", archiveFile, err)
+		}
+
+		if header.Typeflag == tar.TypeReg {
+			numFiles++
+			if err := gf.copyFileFromArchive(tarReader, header.Name, header.FileInfo().Mode()); err != nil {
+				return 0, err
+			}
+		}
+	}
+	return numFiles, nil
+}
+
 // Fetch is the main entry point into Fetcher. Based on configuration,
 // it pulls source from GCS into the destination directory.
 func (gf *Fetcher) Fetch(ctx context.Context) error {
@@ -672,7 +733,7 @@ func (gf *Fetcher) Fetch(ctx context.Context) error {
 			return err
 		}
 	case "Archive":
-		if err := gf.fetchFromZip(ctx); err != nil {
+		if err := gf.fetchFromArchive(ctx); err != nil {
 			return err
 		}
 	default:
