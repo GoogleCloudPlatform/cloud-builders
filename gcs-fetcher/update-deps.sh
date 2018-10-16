@@ -21,7 +21,5 @@ set -o pipefail
 # Get latest versions of all dependencies.
 go get -u
 
-# Remove unnecessary files, and BUILD files which we want to generate ourselves.
-rm -rf $(find vendor/ -name 'BUILD')
-rm -rf $(find vendor/ -name 'BUILD.bazel')
+# Remove tests in vendor/
 rm -rf $(find vendor/ -name '*_test.go')
