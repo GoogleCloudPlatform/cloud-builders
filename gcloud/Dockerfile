@@ -16,7 +16,6 @@ RUN apt-get -y update && \
         cbt \
         cloud-datastore-emulator \
         cloud-build-local \
-        container-builder-local \
         datalab \
         docker-credential-gcr \
         emulator-reverse-proxy \
