@@ -9,6 +9,7 @@ git.apache.org/thrift.git v0.0.0-20181016064013-5c1ecb67cde4/go.mod h1:fPE2ZNJGy
 git.apache.org/thrift.git v0.0.0-20181017132047-7a51220c02d3/go.mod h1:fPE2ZNJGynbRyZ4dJvy6G277gSllfV2HJqblrnkyeyg=
 github.com/GoogleCloudPlatform/cloud-builders v0.0.0-20181012142759-8bd6f5d1ce2b h1:dd6Fe9Lut54e2ArMQEA7nbe0crY3wQuwh61gnhzsaic=
 github.com/GoogleCloudPlatform/cloud-builders v0.0.0-20181017152520-b22c61c733a3 h1:bhUj61zMtOp6acmJI3/GxFkFjAcUJEdVf7bWNXeLw/0=
+github.com/GoogleCloudPlatform/cloud-builders v0.0.0-20181017161605-d116ea4224d3 h1:e+kTzxJdRF6qMs3bEmY9HBxnO6j3uumzEI5NIurpuTc=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b/go.mod h1:SBH7ygxi8pfUlaOkMMuAQtPIUF8ecWP5IEl/CR7VP2Q=
