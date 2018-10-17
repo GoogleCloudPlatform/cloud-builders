@@ -688,7 +688,7 @@ func TestFetchFromManifestSuccess(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ReadDir(%v) err = %v, want nil", tc.gf.DestDir, err)
 	}
-	if len(infos) != 4 { // 3 files in the manifest + the manifest itself
+	if len(infos) != 3 {
 		t.Errorf("ReadDir(%v) len(fileinfos)=%v, want 4", tc.gf.DestDir, len(infos))
 	}
 }
