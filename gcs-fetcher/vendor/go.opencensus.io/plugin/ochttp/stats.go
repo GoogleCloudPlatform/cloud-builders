@@ -22,7 +22,7 @@ import (
 
 // The following client HTTP measures are supported for use in custom views.
 var (
-	ClientRequestCount  = stats.Int64("opencensus.io/http/client/request_count", "Number of HTTP requests started", stats.UnitNone)
+	ClientRequestCount  = stats.Int64("opencensus.io/http/client/request_count", "Number of HTTP requests started", stats.UnitDimensionless)
 	ClientRequestBytes  = stats.Int64("opencensus.io/http/client/request_bytes", "HTTP request body size if set as ContentLength (uncompressed)", stats.UnitBytes)
 	ClientResponseBytes = stats.Int64("opencensus.io/http/client/response_bytes", "HTTP response body size (uncompressed)", stats.UnitBytes)
 	ClientLatency       = stats.Float64("opencensus.io/http/client/latency", "End-to-end latency", stats.UnitMilliseconds)
@@ -30,7 +30,7 @@ var (
 
 // The following server HTTP measures are supported for use in custom views:
 var (
-	ServerRequestCount  = stats.Int64("opencensus.io/http/server/request_count", "Number of HTTP requests started", stats.UnitNone)
+	ServerRequestCount  = stats.Int64("opencensus.io/http/server/request_count", "Number of HTTP requests started", stats.UnitDimensionless)
 	ServerRequestBytes  = stats.Int64("opencensus.io/http/server/request_bytes", "HTTP request body size if set as ContentLength (uncompressed)", stats.UnitBytes)
 	ServerResponseBytes = stats.Int64("opencensus.io/http/server/response_bytes", "HTTP response body size (uncompressed)", stats.UnitBytes)
 	ServerLatency       = stats.Float64("opencensus.io/http/server/latency", "End-to-end latency", stats.UnitMilliseconds)
@@ -41,6 +41,10 @@ var (
 // ClientRequestCount or ServerRequestCount, since it is recorded before the status is known.
 var (
 	// Host is the value of the HTTP Host header.
+	//
+	// The value of this tag can be controlled by the HTTP client, so you need
+	// to watch out for potentially generating high-cardinality labels in your
+	// metrics backend if you use this tag in views.
 	Host, _ = tag.NewKey("http.host")
 
 	// StatusCode is the numeric HTTP response status code,
@@ -48,10 +52,19 @@ var (
 	StatusCode, _ = tag.NewKey("http.status")
 
 	// Path is the URL path (not including query string) in the request.
+	//
+	// The value of this tag can be controlled by the HTTP client, so you need
+	// to watch out for potentially generating high-cardinality labels in your
+	// metrics backend if you use this tag in views.
 	Path, _ = tag.NewKey("http.path")
 
 	// Method is the HTTP method of the request, capitalized (GET, POST, etc.).
 	Method, _ = tag.NewKey("http.method")
+
+	// KeyServerRoute is a low cardinality string representing the logical
+	// handler of the request. This is usually the pattern registered on the a
+	// ServeMux (or similar string).
+	KeyServerRoute, _ = tag.NewKey("http_server_route")
 )
 
 // Default distributions used by views in this package.
@@ -61,7 +74,7 @@ var (
 )
 
 // Package ochttp provides some convenience views.
-// You need to subscribe to the views for data to actually be collected.
+// You need to register the views for data to actually be collected.
 var (
 	ClientRequestCountView = &view.View{
 		Name:        "opencensus.io/http/client/request_count",
