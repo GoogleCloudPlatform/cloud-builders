@@ -1,63 +1,21 @@
 # Cloud builder for the dotnet builder.
-#
-# TODO(franklinn): Stop tagging csharp/dotnet images once usage has dropped off.
 
 steps:
-- id: 'build-dotnet'
-  name: 'gcr.io/cloud-builders/docker'
+- name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
   - '--tag=gcr.io/$PROJECT_ID/dotnet'
   - '--tag=gcr.io/$PROJECT_ID/csharp/dotnet'
   - '.'
 
-  # Verify the version output of the supported SDKs.
-- id: 'test 1.0-preview sdk'
-  name: 'gcr.io/$PROJECT_ID/dotnet'
-  entrypoint: 'bash'
-  args: ['-c', '[[ $(dotnet --version) == "1.0.0-preview2-003156" ]]']
-  dir: 'configs/config-1.0.0'
-  waitFor: ['build-dotnet']
-
-- id: 'test the 1.1 sdk'
-  name: 'gcr.io/$PROJECT_ID/dotnet'
-  entrypoint: 'bash'
-  args: ['-c', '[[ $(dotnet --version) == "1.1.9" ]]']
-  dir: 'configs/config-1.1.9'
-  waitFor: ['build-dotnet']
-
-- id: 'test the 2.1 sdk'
-  name: 'gcr.io/$PROJECT_ID/dotnet'
-  entrypoint: 'bash'
-  args: ['-c', '[[ $(dotnet --version) == "2.1.302" ]]']
-  dir: 'configs/config-2.1.302'
-  waitFor: ['build-dotnet']
-
-  # Build the test projects
-- id: 'restore 1.1 TestApp'
-  name: 'gcr.io/$PROJECT_ID/dotnet'
-  args: ['restore']
-  dir: 'examples/TestApp'
-  waitFor: ['build-dotnet']
-
-- id: 'build 1.1 TestApp'
-  name: 'gcr.io/$PROJECT_ID/dotnet'
-  args: ['build']
-  dir: 'examples/TestApp'
-  waitFor: ['restore 1.1 TestApp']
-
-- id: 'build 2.0 TestApp'
-  name: 'gcr.io/$PROJECT_ID/dotnet'
+# Build the test projects
+- name: 'gcr.io/$PROJECT_ID/dotnet'
   args: ['build']
   dir: 'examples/TestApp-2.0'
-  waitFor: ['restore 1.1 TestApp']
 
-- id: 'build 2.1 TestApp'
-  name: 'gcr.io/$PROJECT_ID/dotnet'
+- name: 'gcr.io/$PROJECT_ID/dotnet'
   args: ['build']
   dir: 'examples/TestApp-2.1'
-  waitFor: ['restore 1.1 TestApp']
 
 images:
 - 'gcr.io/$PROJECT_ID/dotnet'
-- 'gcr.io/$PROJECT_ID/csharp/dotnet'
