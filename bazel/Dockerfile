@@ -28,7 +28,7 @@ RUN \
       $(lsb_release -cs) \
       stable edge" && \
     apt-get -y update && \
-    apt-get install -y docker-ce=17.12.0~ce-0~ubuntu unzip && \
+    apt-get install -y docker-ce=18.06.1~ce~3-0~ubuntu unzip && \
     apt-get update && \
 
     # Install bazel (https://docs.bazel.build/versions/master/install-ubuntu.html)
