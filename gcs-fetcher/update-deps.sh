@@ -21,5 +21,8 @@ set -o pipefail
 # Get latest versions of all dependencies.
 go get -u
 
+# Fetch dependencies into vendor/
+go mod vendor
+
 # Remove tests in vendor/
 rm -rf $(find vendor/ -name '*_test.go')
