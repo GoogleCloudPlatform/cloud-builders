@@ -25,7 +25,6 @@ import (
 	"os"
 	"sync"
 
-	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/googleapi"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gcs-fetcher/pkg/common"
@@ -37,9 +36,6 @@ type Uploader struct {
 	gcs                    GCS
 	os                     OS
 	bucket, manifestObject string
-
-	group errgroup.Group
-	jobs  chan job
 
 	manifest                 sync.Map
 	totalBytes, bytesSkipped int64
@@ -63,59 +59,31 @@ type job struct {
 
 // New returns a new Uploader.
 func New(ctx context.Context, gcs GCS, os OS, bucket, manifestObject string, numWorkers int) *Uploader {
-	var group errgroup.Group
-	jobs := make(chan job, numWorkers)
-	up := &Uploader{
+	return &Uploader{
 		gcs:            gcs,
 		os:             os,
 		bucket:         bucket,
 		manifestObject: manifestObject,
-		group:          group,
-		jobs:           jobs,
 	}
-	for i := 0; i < numWorkers; i++ {
-		group.Go(func() error {
-			for {
-				select {
-				case j, ok := <-jobs:
-					if !ok {
-						return nil
-					}
-					if err := up.do(ctx, j); err != nil {
-						return err
-					}
-				case <-ctx.Done():
-					return ctx.Err()
-				}
-			}
-			panic("unreachable")
-		})
-	}
-	return up
-}
-
-// Enqueue enqueues the upload of the file at the given path.
-func (u *Uploader) Enqueue(path string, info os.FileInfo) {
-	u.jobs <- job{path, info}
 }
 
 // Wait blocks until ongoing uploads are complete, or until an error is
 // encountered.
-func (u *Uploader) Wait(ctx context.Context) error {
-	close(u.jobs)
-	if err := u.group.Wait(); err != nil {
-		return err
+func (u *Uploader) Done(ctx context.Context) error {
+	uploaded := u.totalBytes - u.bytesSkipped
+	var incr float64
+	if u.totalBytes != 0 {
+		incr = float64(100 * u.bytesSkipped / u.totalBytes)
 	}
 	fmt.Printf(`
 ******************************************************
 * Uploaded %d bytes (%.2f%% incremental)
 ******************************************************
-`, u.totalBytes-u.bytesSkipped, float64(100*u.bytesSkipped/u.totalBytes))
+`, uploaded, incr)
 	return u.writeManifest(ctx)
 }
 
-func (u *Uploader) do(ctx context.Context, j job) error {
-	path, info := j.path, j.info
+func (u *Uploader) Do(ctx context.Context, path string, info os.FileInfo) error {
 	// Follow symlinks.
 	if spath, err := u.os.EvalSymlinks(path); err != nil {
 		return err
