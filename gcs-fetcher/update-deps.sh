@@ -24,5 +24,16 @@ go get -u
 # Fetch dependencies into vendor/
 go mod vendor
 
+# These commands need to be in your $PATH
+# github.com/mattmoor/dep-collector
+# github.com/google/licenseclassifier
+
+dep-collector -check ./cmd/gcs-fetcher
+dep-collector -check ./cmd/gcs-uploader
+
+# These require go modules to be turned off to be successfull
+GO111MODULE=off dep-collector ./cmd/gcs-fetcher > ./cmd/gcs-fetcher/VENDOR-LICENSE
+GO111MODULE=off dep-collector ./cmd/gcs-uploader > ./cmd/gcs-uploader/VENDOR-LICENSE
+
 # Remove tests in vendor/
 rm -rf $(find vendor/ -name '*_test.go')
