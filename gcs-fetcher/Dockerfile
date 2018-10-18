@@ -8,4 +8,5 @@ FROM gcr.io/distroless/base
 ARG cmd
 COPY --from=build-env /go-app /
 COPY ${cmd}/VENDOR-LICENSE /
+COPY LICENSE /
 ENTRYPOINT ["/go-app"]
