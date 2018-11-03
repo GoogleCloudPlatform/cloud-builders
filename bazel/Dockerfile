@@ -37,8 +37,7 @@ RUN \
     curl https://bazel.build/bazel-release.pub.gpg | apt-key add - && \
     apt-get update && \
 
-    apt-get -y install bazel && \
-    apt-get -y upgrade bazel && \
+    apt-get -y install bazel=0.19.0
 
     mv /usr/bin/bazel /builder/bazel           && \
     mv /usr/bin/bazel-real /builder/bazel-real && \
