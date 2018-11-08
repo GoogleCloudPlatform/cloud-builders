@@ -31,13 +31,12 @@ Before the `go` tool is used, the build step first sets up a workspace.
 To determine the workspace structure, this tool checks the following, in order:
 
 1.  Is `$GOPATH` set? Use that.
-2.  Is there a `./src` directory? Set `GOPATH=$PWD`.
-3.  Is `$PROJECT_ROOT` set? Make a temporary workspace in `GOPATH=./gopath`, and
+2.  Is `$PROJECT_ROOT` set? Make a temporary workspace in `GOPATH=./gopath`, and
     link the contents of the current directory into
     `./gopath/src/$PROJECT_ROOT/*`.
+3.  Is there a `./src` directory? Set `GOPATH=$PWD`.
 4.  Does a `.go` file in the current directory have a comment like `// import
-    "$PROJECT_ROOT"`? Use the `$PROJECT_ROOT` found in the import comment
-    instead of a provided `$PROJECT_ROOT` environment variable.
+    "$PROJECT_ROOT"`? Use the `$PROJECT_ROOT` found in the import comment.
 
 Once the workspace is set up, the `args` to the build step are passed through to
 the `go` tool.
