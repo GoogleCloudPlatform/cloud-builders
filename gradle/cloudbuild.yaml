@@ -116,11 +116,26 @@ steps:
   args: ['build', '.']
   dir: 'examples/spring_boot'
 
+- name: 'gcr.io/$PROJECT_ID/gradle:5.1.1-jdk-11'
+  args: ['build']
+  dir: 'examples/spring_boot'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-f', 'DockerfileJava11', '.']
+  dir: 'examples/spring_boot'
+
 - name: 'gcr.io/$PROJECT_ID/gradle:5.0-jdk-8'
   args: ['build']
   dir: 'examples/spring_boot'
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '.']
+  dir: 'examples/spring_boot'
+  dir: 'examples/spring_boot'
+
+- name: 'gcr.io/$PROJECT_ID/gradle:5.0-jdk-11'
+  args: ['build']
+  dir: 'examples/spring_boot'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-f', 'DockerfileJava11', '.']
   dir: 'examples/spring_boot'
 
 - name: 'gcr.io/$PROJECT_ID/gradle:4.10.3-jdk-8'
@@ -128,6 +143,14 @@ steps:
   dir: 'examples/spring_boot'
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '.']
+  dir: 'examples/spring_boot'
+  dir: 'examples/spring_boot'
+
+- name: 'gcr.io/$PROJECT_ID/gradle:4.10.3-jdk-11'
+  args: ['build']
+  dir: 'examples/spring_boot'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-f', 'DockerfileJava11', '.']
   dir: 'examples/spring_boot'
 
 - name: 'gcr.io/$PROJECT_ID/gradle:4.6-jdk-8'
@@ -154,14 +177,20 @@ steps:
 images:
 - 'gcr.io/$PROJECT_ID/gradle'
 - 'gcr.io/$PROJECT_ID/gradle:5.1.1-jdk-8'
+- 'gcr.io/$PROJECT_ID/gradle:5.1.1-jdk-11'
 - 'gcr.io/$PROJECT_ID/gradle:5.0-jdk-8'
+- 'gcr.io/$PROJECT_ID/gradle:5.0-jdk-11'
 - 'gcr.io/$PROJECT_ID/gradle:4.10.3-jdk-8'
+- 'gcr.io/$PROJECT_ID/gradle:4.10.3-jdk-11'
 - 'gcr.io/$PROJECT_ID/gradle:4.6-jdk-8'
 - 'gcr.io/$PROJECT_ID/gradle:4.0-jdk-8'
 - 'gcr.io/$PROJECT_ID/gradle:3.5-jdk-8'
 - 'gcr.io/$PROJECT_ID/java/gradle'
 - 'gcr.io/$PROJECT_ID/java/gradle:5.1.1-jdk-8'
+- 'gcr.io/$PROJECT_ID/java/gradle:5.1.1-jdk-11'
 - 'gcr.io/$PROJECT_ID/java/gradle:5.0-jdk-8'
+- 'gcr.io/$PROJECT_ID/java/gradle:5.0-jdk-11'
 - 'gcr.io/$PROJECT_ID/java/gradle:4.10.3-jdk-8'
+- 'gcr.io/$PROJECT_ID/java/gradle:4.10.3-jdk-11'
 - 'gcr.io/$PROJECT_ID/java/gradle:4.0-jdk-8'
 - 'gcr.io/$PROJECT_ID/java/gradle:3.5-jdk-8'

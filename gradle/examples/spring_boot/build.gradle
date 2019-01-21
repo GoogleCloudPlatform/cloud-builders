@@ -31,5 +31,7 @@ dependencies {
     }
     compile("org.springframework.boot:spring-boot-starter-jetty")
     compile("org.springframework.boot:spring-boot-starter-actuator")
+    //Note: jaxb for java 11 support
+    compile("javax.xml.bind:jaxb-api:2.3.0")
     testCompile("junit:junit")
 }
