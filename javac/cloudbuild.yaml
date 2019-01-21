@@ -18,6 +18,19 @@ steps:
   waitFor: ['-']
   id: 'BUILD_JDK_8'
 
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--no-cache'
+  - '--build-arg=BASE_IMAGE=openjdk:11'
+  - '--build-arg=DOCKER_VERSION=5:18.09.0~3-0~debian-stretch'
+  - '--tag=gcr.io/$PROJECT_ID/javac:11'
+  - '--tag=gcr.io/$PROJECT_ID/java/javac:11'
+  - '.'
+  waitFor: ['-']
+  id: 'BUILD_JDK_11'
+
+
 # Test that javac and docker are installed, for all built images, and that apt-get update will work
 # in child images
 
@@ -33,8 +46,22 @@ steps:
   args: ['update']
   waitFor: ['BUILD_JDK_8']
 
+- name: 'gcr.io/$PROJECT_ID/javac:11'
+  args: ['-version']
+  waitFor: ['BUILD_JDK_11']
+- name: 'gcr.io/$PROJECT_ID/javac:11'
+  entrypoint: 'docker'
+  args: ['version']
+  waitFor: ['BUILD_JDK_11']
+- name: 'gcr.io/$PROJECT_ID/javac:11'
+  entrypoint: 'apt-get'
+  args: ['update']
+  waitFor: ['BUILD_JDK_11']
+
 images:
 - 'gcr.io/$PROJECT_ID/javac:8'
 - 'gcr.io/$PROJECT_ID/javac'
 - 'gcr.io/$PROJECT_ID/java/javac:8'
 - 'gcr.io/$PROJECT_ID/java/javac'
+- 'gcr.io/$PROJECT_ID/javac:11'
+- 'gcr.io/$PROJECT_ID/java/javac:11'

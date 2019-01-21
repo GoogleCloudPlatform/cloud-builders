@@ -8,6 +8,66 @@ steps:
   args:
   - 'build'
   - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:8'
+  - '--build-arg=GRADLE_VERSION=5.1.1'
+  - '--build-arg=SHA=4953323605c5d7b89e97d0dc7779e275bccedefcdac090aec123375eae0cc798'
+  - '--tag=gcr.io/$PROJECT_ID/gradle:5.1.1-jdk-8'
+  - '--tag=gcr.io/$PROJECT_ID/java/gradle:5.1.1-jdk-8'
+  - '.'
+  waitFor: ['-']
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:11'
+  - '--build-arg=GRADLE_VERSION=5.1.1'
+  - '--build-arg=SHA=4953323605c5d7b89e97d0dc7779e275bccedefcdac090aec123375eae0cc798'
+  - '--tag=gcr.io/$PROJECT_ID/gradle:5.1.1-jdk-11'
+  - '--tag=gcr.io/$PROJECT_ID/java/gradle:5.1.1-jdk-11'
+  - '.'
+  waitFor: ['-']
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:8'
+  - '--build-arg=GRADLE_VERSION=5.0'
+  - '--build-arg=SHA=6157ac9f3410bc63644625b3b3e9e96c963afd7910ae0697792db57813ee79a6'
+  - '--tag=gcr.io/$PROJECT_ID/gradle:5.0-jdk-8'
+  - '--tag=gcr.io/$PROJECT_ID/java/gradle:5.0-jdk-8'
+  - '.'
+  waitFor: ['-']
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:11'
+  - '--build-arg=GRADLE_VERSION=5.0'
+  - '--build-arg=SHA=6157ac9f3410bc63644625b3b3e9e96c963afd7910ae0697792db57813ee79a6'
+  - '--tag=gcr.io/$PROJECT_ID/gradle:5.0-jdk-11'
+  - '--tag=gcr.io/$PROJECT_ID/java/gradle:5.0-jdk-11'
+  - '.'
+  waitFor: ['-']
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:8'
+  - '--build-arg=GRADLE_VERSION=4.10.3'
+  - '--build-arg=SHA=8626cbf206b4e201ade7b87779090690447054bc93f052954c78480fa6ed186e'
+  - '--tag=gcr.io/$PROJECT_ID/gradle:4.10.3-jdk-8'
+  - '--tag=gcr.io/$PROJECT_ID/java/gradle:4.10.3-jdk-8'
+  - '.'
+  waitFor: ['-']
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:11'
+  - '--build-arg=GRADLE_VERSION=4.10.3'
+  - '--build-arg=SHA=8626cbf206b4e201ade7b87779090690447054bc93f052954c78480fa6ed186e'
+  - '--tag=gcr.io/$PROJECT_ID/gradle:4.10.3-jdk-11'
+  - '--tag=gcr.io/$PROJECT_ID/java/gradle:4.10.3-jdk-11'
+  - '.'
+  waitFor: ['-']
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:8'
   - '--build-arg=GRADLE_VERSION=4.6'
   - '--build-arg=SHA=98bd5fd2b30e070517e03c51cbb32beee3e2ee1a84003a5a5d748996d4b1b915'
   - '--tag=gcr.io/$PROJECT_ID/gradle:4.6-jdk-8'
@@ -48,6 +108,28 @@ steps:
   - 'gcr.io/$PROJECT_ID/gradle'
 
 # Run examples
+
+- name: 'gcr.io/$PROJECT_ID/gradle:5.1.1-jdk-8'
+  args: ['build']
+  dir: 'examples/spring_boot'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '.']
+  dir: 'examples/spring_boot'
+
+- name: 'gcr.io/$PROJECT_ID/gradle:5.0-jdk-8'
+  args: ['build']
+  dir: 'examples/spring_boot'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '.']
+  dir: 'examples/spring_boot'
+
+- name: 'gcr.io/$PROJECT_ID/gradle:4.10.3-jdk-8'
+  args: ['build']
+  dir: 'examples/spring_boot'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '.']
+  dir: 'examples/spring_boot'
+
 - name: 'gcr.io/$PROJECT_ID/gradle:4.6-jdk-8'
   args: ['build']
   dir: 'examples/spring_boot'
@@ -71,9 +153,15 @@ steps:
 
 images:
 - 'gcr.io/$PROJECT_ID/gradle'
+- 'gcr.io/$PROJECT_ID/gradle:5.1.1-jdk-8'
+- 'gcr.io/$PROJECT_ID/gradle:5.0-jdk-8'
+- 'gcr.io/$PROJECT_ID/gradle:4.10.3-jdk-8'
 - 'gcr.io/$PROJECT_ID/gradle:4.6-jdk-8'
 - 'gcr.io/$PROJECT_ID/gradle:4.0-jdk-8'
 - 'gcr.io/$PROJECT_ID/gradle:3.5-jdk-8'
 - 'gcr.io/$PROJECT_ID/java/gradle'
+- 'gcr.io/$PROJECT_ID/java/gradle:5.1.1-jdk-8'
+- 'gcr.io/$PROJECT_ID/java/gradle:5.0-jdk-8'
+- 'gcr.io/$PROJECT_ID/java/gradle:4.10.3-jdk-8'
 - 'gcr.io/$PROJECT_ID/java/gradle:4.0-jdk-8'
 - 'gcr.io/$PROJECT_ID/java/gradle:3.5-jdk-8'
