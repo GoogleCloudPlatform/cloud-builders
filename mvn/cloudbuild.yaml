@@ -10,7 +10,7 @@ steps:
   - 'build'
   - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:8'
   - '--build-arg=MAVEN_VERSION=3.3.9'
-  - '--build-arg=SHA=6e3e9c949ab4695a204f74038717aa7b2689b1be94875899ac1b3fe42800ff82'
+  - '--build-arg=SHA=9b4b22aba67af48648c634e30edbb03de2a7742b7d4e58b3d637fcd20358a51ccb288dcbd473169a58b9322f7c8fbedcf5336b87d06460d0b20ce37d4c3948b0'
   - '--tag=gcr.io/$PROJECT_ID/mvn:3.3.9-jdk-8'
   - '--tag=gcr.io/$PROJECT_ID/java/mvn:3.3.9-jdk-8'
   - '.'
@@ -20,9 +20,19 @@ steps:
   - 'build'
   - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:8'
   - '--build-arg=MAVEN_VERSION=3.5.0'
-  - '--build-arg=SHA=beb91419245395bd69a4a6edad5ca3ec1a8b64e41457672dc687c173a495f034'
+  - '--build-arg=SHA=d5a520ca8765ddbc86dca71249c602e2f798dedcc7430bc4979dd01918464c8dc69b694ec0dbbeeff6044179e1b98fce72af952663dd49503203d9742e328f3b'
   - '--tag=gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-8'
   - '--tag=gcr.io/$PROJECT_ID/java/mvn:3.5.0-jdk-8'
+  - '.'
+  wait_for: ['-']
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:8'
+  - '--build-arg=MAVEN_VERSION=3.6.0'
+  - '--build-arg=SHA=fae9c12b570c3ba18116a4e26ea524b29f7279c17cbaadc3326ca72927368924d9131d11b9e851b8dc9162228b6fdea955446be41207a5cfc61283dd8a561d2f'
+  - '--tag=gcr.io/$PROJECT_ID/mvn:3.6.0-jdk-8'
+  - '--tag=gcr.io/$PROJECT_ID/java/mvn:3.6.0-jdk-8'
   - '.'
   wait_for: ['-']
 
@@ -53,10 +63,19 @@ steps:
   args: ['build', '.']
   dir: 'examples/spring_boot'
 
+- name: 'gcr.io/$PROJECT_ID/mvn:3.6.0-jdk-8'
+  args: ['install']
+  dir: 'examples/spring_boot'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '.']
+  dir: 'examples/spring_boot'
+
 images:
+- 'gcr.io/$PROJECT_ID/mvn:3.6.0-jdk-8'
 - 'gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-8'
 - 'gcr.io/$PROJECT_ID/mvn:3.3.9-jdk-8'
 - 'gcr.io/$PROJECT_ID/mvn'
+- 'gcr.io/$PROJECT_ID/java/mvn:3.6.0-jdk-8'
 - 'gcr.io/$PROJECT_ID/java/mvn:3.5.0-jdk-8'
 - 'gcr.io/$PROJECT_ID/java/mvn:3.3.9-jdk-8'
 - 'gcr.io/$PROJECT_ID/java/mvn'
