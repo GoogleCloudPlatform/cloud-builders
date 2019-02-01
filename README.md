@@ -24,5 +24,9 @@ Builders contributed by the public are available in the [Cloud Builders
 Community
 repo](https://github.com/GoogleCloudPlatform/cloud-builders-community).
 
-File issues here, or e-mail `google-cloud-dev@googlegroups.com` if you have questions about
-the usage of these build steps or the Cloud Build API in general.
+To file issues and feature requests against these builder images,
+[create an issue in this repo](https://github.com/GoogleCloudPlatform/cloud-builders/issues/new).
+If you are experiencing an issue with the Cloud Build service or
+have a feature request, e-mail google-cloud-dev@googlegroups.com
+or see our [Getting support](https://cloud.google.com/cloud-build/docs/getting-support)
+documentation.
