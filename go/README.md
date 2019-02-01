@@ -22,6 +22,9 @@ steps:
   args: ['go', 'build', './...']
 ```
 
+See [`examples/module`](https://github.com/GoogleCloudPlatform/cloud-builders/tree/master/go/examples/module)
+for a working example.
+
 ## Using `gcr.io/cloud-builders/go`
 
 ### `alpine` vs `debian`
