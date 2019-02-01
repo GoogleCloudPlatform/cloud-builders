@@ -17,7 +17,11 @@ https://issuetracker.google.com/issues/new?component=190802&template=1162743
 
 ## Expected Behavior
 
+_If reporting a regression, please include sample buildIDs of builds demonstrating the previous correct behavior._
+
 ## Actual Behavior
+
+_Please include sample buildIDs of builds demonstrating the issue you are reporting._
 
 ## Steps to Reproduce the Problem
 
