@@ -8,7 +8,7 @@ image](https://hub.docker.com/_/maven/) and specifying the `mvn` entrypoint:
 ```yaml
 steps:
 - name: maven:3.6.0-jdk-11-slim
-  entrypoint: ['mvn']
+  entrypoint: 'mvn'
   args: ['install']
 ```
 
