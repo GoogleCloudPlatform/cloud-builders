@@ -1,72 +1,52 @@
 # In this directory, run the following command to build this builder.
-# $ gcloud builds submit . --config=cloudbuild.yaml
-#
-# TODO(franklinn): Stop tagging java/mvn images once usage has dropped off.
+# $ gcloud builds submit
 
 steps:
+# Build old tagged images.
+# TODO(jasonhall): Deprecate and stop building these tagged images. Users
+# should use the official gradle image directly.
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:8'
-  - '--build-arg=GRADLE_VERSION=4.6'
-  - '--build-arg=SHA=98bd5fd2b30e070517e03c51cbb32beee3e2ee1a84003a5a5d748996d4b1b915'
+  - '--build-arg=GRADLE_VERSION=4.6-jdk8'
   - '--tag=gcr.io/$PROJECT_ID/gradle:4.6-jdk-8'
-  - '--tag=gcr.io/$PROJECT_ID/java/gradle:4.6-jdk-8'
   - '.'
-  waitFor: ['-']
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:8'
-  - '--build-arg=GRADLE_VERSION=4.0'
-  - '--build-arg=SHA=56bd2dde29ba2a93903c557da1745cafd72cdd8b6b0b83c05a40ed7896b79dfe'
+  - '--build-arg=GRADLE_VERSION=4.0-jdk8'
   - '--tag=gcr.io/$PROJECT_ID/gradle:4.0-jdk-8'
-  - '--tag=gcr.io/$PROJECT_ID/java/gradle:4.0-jdk-8'
   - '.'
-  waitFor: ['-']
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:8'
-  - '--build-arg=GRADLE_VERSION=3.5'
-  - '--build-arg=SHA=0b7450798c190ff76b9f9a3d02e18b33d94553f708ebc08ebe09bdf99111d110'
+  - '--build-arg=GRADLE_VERSION=3.5-jdk8'
   - '--tag=gcr.io/$PROJECT_ID/gradle:3.5-jdk-8'
-  - '--tag=gcr.io/$PROJECT_ID/java/gradle:3.5-jdk-8'
   - '.'
-  waitFor: ['-']
 
-# Tag the default 'latest' version
+# Build the latest version.
 - name: 'gcr.io/cloud-builders/docker'
   args:
-  - 'tag'
-  - 'gcr.io/$PROJECT_ID/gradle:4.6-jdk-8'
-  - 'gcr.io/$PROJECT_ID/java/gradle'
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'tag'
-  - 'gcr.io/$PROJECT_ID/gradle:4.6-jdk-8'
-  - 'gcr.io/$PROJECT_ID/gradle'
+  - 'build'
+  - '--tag=gcr.io/$PROJECT_ID/gradle'
+  - '.'
+
+# Minimally invoke gradle.
+- name: 'gcr.io/$PROJECT_ID/gradle'
+  args: ['--version']
 
 # Run examples
 - name: 'gcr.io/$PROJECT_ID/gradle:4.6-jdk-8'
   args: ['build']
   dir: 'examples/spring_boot'
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '.']
-  dir: 'examples/spring_boot'
-
 - name: 'gcr.io/$PROJECT_ID/gradle:4.0-jdk-8'
   args: ['build']
   dir: 'examples/spring_boot'
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '.']
-  dir: 'examples/spring_boot'
-
 - name: 'gcr.io/$PROJECT_ID/gradle:3.5-jdk-8'
   args: ['build']
   dir: 'examples/spring_boot'
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '.']
+- name: 'gcr.io/$PROJECT_ID/gradle'
+  args: ['build']
   dir: 'examples/spring_boot'
 
 images:
@@ -74,6 +54,3 @@ images:
 - 'gcr.io/$PROJECT_ID/gradle:4.6-jdk-8'
 - 'gcr.io/$PROJECT_ID/gradle:4.0-jdk-8'
 - 'gcr.io/$PROJECT_ID/gradle:3.5-jdk-8'
-- 'gcr.io/$PROJECT_ID/java/gradle'
-- 'gcr.io/$PROJECT_ID/java/gradle:4.0-jdk-8'
-- 'gcr.io/$PROJECT_ID/java/gradle:3.5-jdk-8'
