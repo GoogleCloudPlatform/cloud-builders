@@ -1,4 +1,4 @@
-com.google.cloud:google-cloud:0.17.2-alpha
+com.google.cloud:google-cloum
 org.springframework.boot:spring-boot-starter:1.5.3.RELEASE
 org.springframework.boot:spring-boot-starter:1.4.6.RELEASE
 org.springframework.boot:spring-boot-starter-web:1.5.3.RELEASE

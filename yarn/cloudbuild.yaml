@@ -1,10 +1,10 @@
 # In this directory, run the following command to build this builder.
-# $ gcloud builds submit . --config=cloudbuild.yaml
-#
-# TODO(franklinn): Stop tagging nodejs/yarn images once usage has dropped off.
+# $ gcloud builds submit
 
 steps:
 # Build all supported versions.
+# TODO(jasonhall): Deprecate and stop building these tagged images. Users
+# should use the official node image directly.
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
@@ -74,4 +74,3 @@ images:
 - 'gcr.io/$PROJECT_ID/yarn:node-8.4.0'
 - 'gcr.io/$PROJECT_ID/yarn:node-9.11.2'
 - 'gcr.io/$PROJECT_ID/yarn:node-10.10.0'
-- 'gcr.io/$PROJECT_ID/nodejs/yarn'

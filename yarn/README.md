@@ -2,17 +2,20 @@
 
 This Cloud Build builder runs the `yarn` tool.
 
-You might also consider using an [official `node` image](https://hub.docker.com/_/node/) and specifying the `yarn` entrypoint:
+You should consider instead using an [official `node`
+image](https://hub.docker.com/_/node/) and specifying the `yarn` entrypoint:
 
 ```yaml
 steps:
-- name: node:10.10.0
+- name: node:10.15.1
   entrypoint: yarn
   args: ['install']
 ```
+
+This allows you to use any supported version of Yarn.
 
 ## Building this builder
 
 To build this builder, run the following command in this directory.
 
-    $ gcloud builds submit . --config=cloudbuild.yaml
+    $ gcloud builds submit
