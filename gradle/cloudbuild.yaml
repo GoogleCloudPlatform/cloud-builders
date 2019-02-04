@@ -46,7 +46,7 @@ steps:
   dir: 'examples/spring_boot'
 
 # Demonstrate using the gradle image directly.
-- name: 'gradle'
+- name: 'gradle:5.1.1-jdk11-slim'
   args: ['gradle', 'build']
   dir: 'examples/spring_boot'
 
