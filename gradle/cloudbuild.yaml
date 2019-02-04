@@ -31,10 +31,6 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/gradle'
   - '.'
 
-# Minimally invoke gradle.
-- name: 'gcr.io/$PROJECT_ID/gradle'
-  args: ['--version']
-
 # Run examples
 - name: 'gcr.io/$PROJECT_ID/gradle:4.6-jdk-8'
   args: ['build']
@@ -47,6 +43,11 @@ steps:
   dir: 'examples/spring_boot'
 - name: 'gcr.io/$PROJECT_ID/gradle'
   args: ['build']
+  dir: 'examples/spring_boot'
+
+# Demonstrate using the gradle image directly.
+- name: 'gradle'
+  args: ['gradle', 'build']
   dir: 'examples/spring_boot'
 
 images:
