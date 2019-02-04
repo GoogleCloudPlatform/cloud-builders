@@ -1,3 +1,3 @@
 ARG MAVEN_VERSION=latest
-FROM maven:${BASE_IMAGE}
+FROM maven:${MAVEN_VERSION}
 ENTRYPOINT ["mvn"]
