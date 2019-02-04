@@ -8,7 +8,7 @@ image](https://hub.docker.com/_/gradle/) and specifying the `gradle` entrypoint:
 ```yaml
 steps:
 - name: gradle:5.1.1-jdk11-slim
-  entrypoint: ['gradle']
+  entrypoint: 'gradle'
   args: ['build']
 ```
 
