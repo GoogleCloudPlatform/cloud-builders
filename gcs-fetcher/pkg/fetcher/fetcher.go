@@ -545,7 +545,7 @@ func (gf *Fetcher) fetchFromManifest(ctx context.Context) (err error) {
 	// issue on new project creation. We'll only do this for the first file
 	// (the manifest), and then drop back to the original retry/backoff.
 	oretries, obackoff := gf.Retries, gf.Backoff
-	gf.Retries, gf.Backoff = 5, 1*time.Second // Yields 1s, 2s, 4s, 8s, 16s
+	gf.Retries, gf.Backoff = 6, 1*time.Second // Yields 1s, 2s, 4s, 8s, 16s
 	report := gf.fetchObject(ctx, j)
 	gf.Retries, gf.Backoff = oretries, obackoff
 	if !report.success {
