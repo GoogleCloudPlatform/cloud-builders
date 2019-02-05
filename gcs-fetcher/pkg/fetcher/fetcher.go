@@ -156,6 +156,15 @@ type Fetcher struct {
 	Stderr      io.Writer
 }
 
+type permissionError struct {
+	bucket string
+	robot  string
+}
+
+func (e *permissionError) Error() string {
+	return fmt.Sprintf("Access to bucket %s denied. You must grant Storage Object Viewer permission to %s.", e.bucket, e.robot)
+}
+
 func logit(writer io.Writer, format string, a ...interface{}) {
 	if _, err := fmt.Fprintf(writer, format+"\n", a...); err != nil {
 		log.Printf("Failed to write message: "+format, a...)
@@ -335,8 +344,8 @@ func (gf *Fetcher) fetchObjectOnce(ctx context.Context, j job, dest string, brea
 			if len(match) == 2 {
 				robot = match[1]
 			}
-			gf.logErr("Access to bucket %q denied. You must grant Storage Object Viewer permission to %s.", j.bucket, robot)
-			os.Exit(1)
+			result.err = &permissionError{bucket: j.bucket, robot: robot}
+			return result
 		}
 		result.err = fmt.Errorf("creating GCS reader for %q: %v", formatGCSName(j.bucket, j.object, j.generation), err)
 		return result
@@ -532,8 +541,18 @@ func (gf *Fetcher) fetchFromManifest(ctx context.Context) (err error) {
 		generation:      gf.Generation,
 		destDirOverride: manifestDir,
 	}
+	// Override the retry/backoff to span an up-to-11 second eventual consistency
+	// issue on new project creation. We'll only do this for the first file
+	// (the manifest), and then drop back to the original retry/backoff.
+	oretries, obackoff := gf.Retries, gf.Backoff
+	gf.Retries, gf.Backoff = 6, 1*time.Second // Yields 1s, 2s, 4s, 8s, 16s
 	report := gf.fetchObject(ctx, j)
+	gf.Retries, gf.Backoff = oretries, obackoff
 	if !report.success {
+		if err, ok := report.err.(*permissionError); ok {
+			gf.logErr(err.Error())
+			os.Exit(1)
+		}
 		return fmt.Errorf("failed to download manifest %s: %v", formatGCSName(gf.Bucket, gf.Object, gf.Generation), report.err)
 	}
 
