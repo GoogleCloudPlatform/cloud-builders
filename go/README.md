@@ -1,13 +1,31 @@
 # Tool builder: `gcr.io/cloud-builders/go`
 
-This Cloud Build builder runs the `go` tool.
+This builder runs the `go` tool (`go build`, `go test`, etc.)
+after placing source in `/workspace` into the `GOPATH` before
+running the tool.
 
-### When to use this builder
+This functionality is not necessary if you're building using
+[Go modules](https://github.com/golang/go/wiki/Modules), available
+in Go 1.11+, and you can **build with the standard
+[`golang`](https://hub.docker.com/_/golang) image on Dockerhub
+instead:**
 
-The `gcr.io/cloud-builders/go` build step should be used when you want to run
-the `go` tool directly on your source, similar to how a developer uses the `go`
-tool locally to build (`go build` or `go install`), test (`go test`), or manage
-source (`go get` or `go generate`).
+```
+steps:
+# If you already have a go.mod file, you can skip this step.
+- name: golang
+  args: ['go', 'mod', 'init', 'github.com/your/import/path']
+
+# Build the module.
+- name: golang
+  env: ['GO111MODULE=on']
+  args: ['go', 'build', './...']
+```
+
+See [`examples/module`](https://github.com/GoogleCloudPlatform/cloud-builders/tree/master/go/examples/module)
+for a working example.
+
+## Using `gcr.io/cloud-builders/go`
 
 ### `alpine` vs `debian`
 
