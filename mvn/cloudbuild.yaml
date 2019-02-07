@@ -1,62 +1,51 @@
 # In this directory, run the following command to build this builder.
-# $ gcloud builds submit . --config=cloudbuild.yaml
-#
-# TODO(franklinn): Stop tagging java/mvn images once usage has dropped off.
+# $ gcloud builds submit
 
 steps:
-# Build the java / maven matrix.
+# Build old tagged images.
+# TODO(jasonhall): Deprecate and stop building these tagged images. Users
+# should use the official maven image directly.
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:8'
-  - '--build-arg=MAVEN_VERSION=3.3.9'
-  - '--build-arg=SHA=6e3e9c949ab4695a204f74038717aa7b2689b1be94875899ac1b3fe42800ff82'
+  - '--build-arg=MAVEN_VERSION=3.3.9-jdk-8'
   - '--tag=gcr.io/$PROJECT_ID/mvn:3.3.9-jdk-8'
-  - '--tag=gcr.io/$PROJECT_ID/java/mvn:3.3.9-jdk-8'
   - '.'
-  wait_for: ['-']
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:8'
-  - '--build-arg=MAVEN_VERSION=3.5.0'
-  - '--build-arg=SHA=beb91419245395bd69a4a6edad5ca3ec1a8b64e41457672dc687c173a495f034'
+  - '--build-arg=MAVEN_VERSION=3.5.0-jdk-8'
   - '--tag=gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-8'
-  - '--tag=gcr.io/$PROJECT_ID/java/mvn:3.5.0-jdk-8'
   - '.'
-  wait_for: ['-']
 
-# Tag a default builder version.
+# Build the latest version.
 - name: 'gcr.io/cloud-builders/docker'
   args:
-  - 'tag'
-  - 'gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-8'
-  - 'gcr.io/$PROJECT_ID/java/mvn'
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'tag'
-  - 'gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-8'
-  - 'gcr.io/$PROJECT_ID/mvn'
+  - 'build'
+  - '--tag=gcr.io/$PROJECT_ID/mvn'
+  - '.'
 
-# run examples
+# Minimally invoke Maven.
+- name: 'gcr.io/$PROJECT_ID/mvn'
+  args: ['--version']
+
+# Run example builds.
 - name: 'gcr.io/$PROJECT_ID/mvn:3.3.9-jdk-8'
   args: ['install']
   dir: 'examples/spring_boot'
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '.']
-  dir: 'examples/spring_boot'
-
 - name: 'gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-8'
   args: ['install']
   dir: 'examples/spring_boot'
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '.']
+- name: 'gcr.io/$PROJECT_ID/mvn'
+  args: ['install']
+  dir: 'examples/spring_boot'
+
+# Demonstrate using the maven image directly.
+- name: 'maven'
+  args: ['mvn', 'install']
   dir: 'examples/spring_boot'
 
 images:
-- 'gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-8'
 - 'gcr.io/$PROJECT_ID/mvn:3.3.9-jdk-8'
+- 'gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-8'
 - 'gcr.io/$PROJECT_ID/mvn'
-- 'gcr.io/$PROJECT_ID/java/mvn:3.5.0-jdk-8'
-- 'gcr.io/$PROJECT_ID/java/mvn:3.3.9-jdk-8'
-- 'gcr.io/$PROJECT_ID/java/mvn'
