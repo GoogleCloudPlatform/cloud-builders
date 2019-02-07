@@ -2,4 +2,11 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--tag=gcr.io/$PROJECT_ID/kubectl', '.']
 
+# Minimally invoke kubectl.
+# We need to bypass kubectl.bash and only request client version because there
+# is no cluster to connect to.
+- name: 'gcr.io/$PROJECT_ID/kubectl'
+  entrypoint: 'kubectl' # Bypass kubectl.bash
+  args: ['version', '--client']
+
 images: ['gcr.io/$PROJECT_ID/kubectl']
