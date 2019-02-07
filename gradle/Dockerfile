@@ -1,5 +1,6 @@
 ARG GRADLE_VERSION=latest
 FROM gradle:${GRADLE_VERSION}
 ENV GRADLE_USER_HOME "/root/.gradle/"
+USER root
 ENTRYPOINT ["gradle"]
 
