@@ -23,7 +23,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"reflect"
 	"sort"
@@ -121,8 +120,8 @@ func (f *fakeGCS) NewReader(context context.Context, bucket, object string) (io.
 	if response.err == errGCS403 {
 		message := "<Xml><Code>AccessDenied</Code><Details>some@robot has no access.</Details></Xml>"
 		err := &googleapi.Error{
-		  Code: 403,
-		  Body: message,
+			Code: 403,
+			Body: message,
 		}
 		return ioutil.NopCloser(bytes.NewReader([]byte(""))), err
 	}
@@ -285,44 +284,21 @@ func TestFetchObjectOnceStoresFile(t *testing.T) {
 }
 
 func TestGCSAccessDenied(t *testing.T) {
-	// This is the actual test, but since it causes an os.Exit(1), we need
-	// to test if via exec.Command.
-	if os.Getenv("RUN_TEST") == "1" {
-		tc, teardown := buildManifestTestContext(t)
-		defer teardown()
-		j := job{bucket: errorBucket, object: efile4}
-		result := tc.gf.fetchObjectOnce(context.Background(), j, filepath.Join(tc.workDir, "efile4.tmp"), make(chan struct{}, 1))
-		if result.err == nil || !strings.HasSuffix(result.err.Error(), errGCS403.Error()) {
-			t.Errorf("fetchObjectOnce did not fail correctly, got err=%v, want err=%v", result.err, errGCS403)
+	tc, teardown := buildManifestTestContext(t)
+	defer teardown()
+	j := job{bucket: errorBucket, object: efile4}
+	result := tc.gf.fetchObjectOnce(context.Background(), j, filepath.Join(tc.workDir, "efile4.tmp"), make(chan struct{}, 1))
+	if result.err == nil {
+		t.Fatalf("fetchObjectOnce did not fail, got err=nil, want err!=nil")
+	}
+	if err, ok := result.err.(*permissionError); ok {
+		want := `Access to bucket error-bucket denied. You must grant Storage Object Viewer permission to some@robot.`
+		if err.Error() != want {
+			t.Fatalf("incorrect error message, got %q, want %q", err.Error(), want)
 		}
+	} else {
+		t.Fatalf("got err=%q, want permissionError", result.err)
 	}
-
-	cmd := exec.Command(os.Args[0], "-test.run=TestGCSAccessDenied")
-	cmd.Env = append(os.Environ(), "RUN_TEST=1")
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		t.Fatalf("failed to get StderrPipe: %v", err)
-	}
-	err = cmd.Start()
-	if err != nil {
-		t.Fatalf("failed to start cmd: %v", err)
-	}
-
-	b, err := ioutil.ReadAll(stderr)
-	if err != nil {
-		t.Fatalf("failed to ReadAll: %v", err)
-	}
-	got := string(b)
-	want := `Access to bucket "error-bucket" denied. You must grant Storage Object Viewer permission to some@robot.` + "\n"
-	if got != want {
-		t.Fatalf("incorrect error message, got %q, want %q", got, want)
-	}
-
-	err = cmd.Wait()
-	if e, ok := err.(*exec.ExitError); ok && !e.Success() {
-		return
-	}
-	t.Fatalf("process ran with err %v, want exit status 1", err)
 }
 
 func TestFetchObjectOnceFailureModes(t *testing.T) {
