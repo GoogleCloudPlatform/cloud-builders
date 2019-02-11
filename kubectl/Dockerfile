@@ -1,8 +1,8 @@
-FROM gcr.io/cloud-builders/gcloud-slim
+FROM google/cloud-sdk:slim
 
 # Install kubectl. gcloud's component manager is disabled, so we have to
 # install it from apt-get.
-RUN apt-get install kubectl
+RUN apt-get update && apt-get install kubectl
 
 COPY kubectl.bash /builder/kubectl.bash
 
