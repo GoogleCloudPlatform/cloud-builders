@@ -2,18 +2,21 @@
 
 This Cloud Build builder runs Gradle.
 
-You should consider instead using an [official `gradle`
-image](https://hub.docker.com/_/gradle/) and specifying the `gradle` entrypoint:
+## Using an official [`gradle`](https://hub.docker.com/_/gradle) image
 
-```yaml
-steps:
-- name: gradle:5.1.1-jdk11-slim
-  entrypoint: 'gradle'
-  args: ['build']
+Because the official `gradle` image in Dockerhub specifies `USER gradle` and GCB
+runs builds as `root`, the official `gradle` images are not currently directly
+usable in GCB.
+
+If you want to use a version of `gradle` that is not supported in this repo,
+build an image using a Dockerfile like so:
+
 ```
-
-This allows you to use any supported version of Gradle with any supported JDK
-version.
+FROM gradle:[VERSION]
+ENV GRADLE_USER_HOME "/root/.gradle/"
+USER root
+ENTRYPOINT ["gradle"]
+```
 
 ## Building this builder
 
