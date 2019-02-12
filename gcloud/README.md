@@ -1,25 +1,18 @@
-# Tool builder: `gcr.io/cloud-builders/gcloud`
+# gcloud
 
-This Cloud Build builder runs the
-[`gcloud`](https://cloud.google.com/sdk/gcloud/) tool to interact with Google
-Cloud Platform resources.
+This is a tool builder to simply invoke
+[`gcloud`](https://cloud.google.com/sdk/gcloud/) commands.
+
+Arguments passed to this builder will be passed to `gcloud` directly, allowing
+callers to run [any `gcloud`
+command](https://cloud.google.com/sdk/gcloud/reference/).
 
 When executed in the Cloud Build environment, commands are executed with
 credentials of the [builder service
 account](https://cloud.google.com/cloud-build/docs/permissions) for the
-project. The latest released version of `gcloud` is used.
+project.
 
-You should consider instead using an [official `google/cloud-sdk`
-image](https://hub.docker.com/r/google/cloud-sdk) and specifying the `gcloud` entrypoint:
-
-```yaml
-steps:
-- name: google/cloud-sdk:230.0.0
-  entrypoint: 'gcloud'
-  args: ['version']
-```
-
-This allows you to use any supported version of `gcloud`.
+The latest released version of `gcloud` is used.
 
 ## Examples
 
@@ -36,11 +29,12 @@ steps:
   args: ['source', 'repos', 'clone', 'default']
 ```
 
+
 ## `gcloud` vs `gcloud-slim`
 
 There are two variants of the `gcloud` builder:
 
-* `gcloud` has all optional gcloud components installed, and is much larger.
+* `gcloud` installs all optional gcloud components, and is much larger.
 * `gcloud-slim` installs only the `gcloud` CLI and no components, and is
   smaller.
 
