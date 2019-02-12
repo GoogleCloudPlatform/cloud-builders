@@ -1,4 +1,4 @@
-FROM google/cloud-sdk
+FROM gcr.io/cloud-builders/gcloud
 
 ENV PATH=$PATH:/builder/google-cloud-sdk/bin/
 
