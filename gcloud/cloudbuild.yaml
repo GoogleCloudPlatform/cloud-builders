@@ -19,11 +19,6 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/gcloud'
   args: ['source', 'repos', 'clone', 'default']
 
-# Demonstrate using the official gcloud image.
-- name: google/cloud-sdk:230.0.0
-  entrypoint: 'gcloud'
-  args: ['version']
-
 images:
 - 'gcr.io/$PROJECT_ID/gcloud'
 - 'gcr.io/$PROJECT_ID/gcloud-slim'
