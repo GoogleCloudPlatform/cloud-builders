@@ -1,8 +1,8 @@
-FROM gcr.io/cloud-builders/gcloud-slim
+FROM google/cloud-sdk:alpine
 
 # Install kubectl component
-RUN /builder/google-cloud-sdk/bin/gcloud -q components install kubectl
+RUN /google-cloud-sdk/bin/gcloud -q components install kubectl
 
-COPY kubectl.bash /builder/kubectl.bash
+COPY kubectl.sh /builder/kubectl.sh
 
-ENTRYPOINT ["/builder/kubectl.bash"]
+ENTRYPOINT ["/builder/kubectl.sh"]

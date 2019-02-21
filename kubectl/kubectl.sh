@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # always get a new context
 cluster=$(gcloud config get-value container/cluster 2> /dev/null)
