@@ -18,9 +18,9 @@ EOF
     [[ -z "$cluster" ]] && var_usage
     [[ -z "$zone" ]] && var_usage
 
-    echo "Running: gcloud container clusters get-credentials --project=\"$project\" --zone=\"$zone\" \"$cluster\""
+    echo "Running: gcloud container clusters get-credentials --project=\"$project\" --zone=\"$zone\" \"$cluster\""  >&2
     gcloud container clusters get-credentials --project="$project" --zone="$zone" "$cluster" || exit
 fi
 
-echo "Running: kubectl $@"
-kubectl "$@"
+echo "Running: kubectl $@" >&2
+exec kubectl "$@"
