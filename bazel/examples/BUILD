@@ -1,6 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library", "go_prefix")
-
-go_prefix("github.com/GoogleCloudPlatform/cloud-builders/bazel/examples")
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
 
 go_library(
     name = "target_default_library",

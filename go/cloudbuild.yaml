@@ -19,6 +19,14 @@ steps:
 
 # Test the examples.
 
+- name: 'golang'
+  args: ['go', 'build', '.']
+  env: ['GO111MODULE=on']
+  dir: 'examples/module'
+- name: 'busybox'
+  args: ['./module']
+  dir: 'examples/module'
+
 # examples/hello_world
 - name: 'gcr.io/$PROJECT_ID/go'
   args: ['test', 'hello']

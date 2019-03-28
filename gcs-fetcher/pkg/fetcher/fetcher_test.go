@@ -29,6 +29,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"google.golang.org/api/googleapi"
 )
 
 const (
@@ -45,6 +47,7 @@ const (
 	efile1        = "efile1"
 	efile2        = "efile2"
 	efile3        = "efile3"
+	efile4        = "efile4"
 	errorManifest = "error-manifest.json"
 	errorZipfile  = "error-source.zip"
 
@@ -76,6 +79,7 @@ var (
 	errCreate       = fmt.Errorf("instrumented os.Create error")
 	errMkdirAll     = fmt.Errorf("instrumented os.MkdirAll error")
 	errOpen         = fmt.Errorf("instrumented os.Open error")
+	errGCS403       = fmt.Errorf("instrumented GCS AccessDenied error")
 )
 
 type fakeGCSErrorReader struct {
@@ -111,6 +115,15 @@ func (f *fakeGCS) NewReader(context context.Context, bucket, object string) (io.
 
 	if response.err == errGCSNewReader {
 		return ioutil.NopCloser(bytes.NewReader([]byte(""))), response.err
+	}
+
+	if response.err == errGCS403 {
+		message := "<Xml><Code>AccessDenied</Code><Details>some@robot has no access.</Details></Xml>"
+		err := &googleapi.Error{
+			Code: 403,
+			Body: message,
+		}
+		return ioutil.NopCloser(bytes.NewReader([]byte(""))), err
 	}
 
 	if response.err == errGCSRead {
@@ -199,7 +212,7 @@ func buildManifestTestContext(t *testing.T) (tc *testContext, teardown func()) {
 		t.Fatal(err)
 	}
 
-	os := &fakeOS{}
+	fakeos := &fakeOS{}
 
 	gcs := &fakeGCS{
 		t: t,
@@ -210,6 +223,7 @@ func buildManifestTestContext(t *testing.T) (tc *testContext, teardown func()) {
 			formatGCSName(errorBucket, efile1, generation):              {err: errGCSNewReader},
 			formatGCSName(errorBucket, efile2, generation):              {err: errGCSRead},
 			formatGCSName(errorBucket, efile3, generation):              {err: errGCSSlowRead},
+			formatGCSName(errorBucket, efile4, generation):              {err: errGCS403},
 			formatGCSName(successBucket, goodManifest, generation):      {content: goodManifestContents},
 			formatGCSName(successBucket, malformedManifest, generation): {content: malformedManifestContents},
 			formatGCSName(errorBucket, errorManifest, generation):       {err: errGCSRead},
@@ -218,7 +232,7 @@ func buildManifestTestContext(t *testing.T) (tc *testContext, teardown func()) {
 
 	gf := &Fetcher{
 		GCS:         gcs,
-		OS:          os,
+		OS:          fakeos,
 		DestDir:     workDir,
 		StagingDir:  filepath.Join(workDir, ".staging/"),
 		CreatedDirs: make(map[string]bool),
@@ -227,11 +241,13 @@ func buildManifestTestContext(t *testing.T) (tc *testContext, teardown func()) {
 		TimeoutGCS:  true,
 		WorkerCount: 2,
 		Retries:     maxretries,
+		Stdout:      os.Stdout,
+		Stderr:      os.Stderr,
 	}
 
 	return &testContext{
 			workDir: workDir,
-			os:      os,
+			os:      fakeos,
 			gcs:     gcs,
 			gf:      gf,
 		},
@@ -264,6 +280,24 @@ func TestFetchObjectOnceStoresFile(t *testing.T) {
 	}
 	if !bytes.Equal(got, sfile1Contents) {
 		t.Fatalf("ReadFile(%v) got %v, want %v", dest, got, sfile1Contents)
+	}
+}
+
+func TestGCSAccessDenied(t *testing.T) {
+	tc, teardown := buildManifestTestContext(t)
+	defer teardown()
+	j := job{bucket: errorBucket, object: efile4}
+	result := tc.gf.fetchObjectOnce(context.Background(), j, filepath.Join(tc.workDir, "efile4.tmp"), make(chan struct{}, 1))
+	if result.err == nil {
+		t.Fatalf("fetchObjectOnce did not fail, got err=nil, want err!=nil")
+	}
+	if err, ok := result.err.(*permissionError); ok {
+		want := `Access to bucket error-bucket denied. You must grant Storage Object Viewer permission to some@robot.`
+		if err.Error() != want {
+			t.Fatalf("incorrect error message, got %q, want %q", err.Error(), want)
+		}
+	} else {
+		t.Fatalf("got err=%q, want permissionError", result.err)
 	}
 }
 

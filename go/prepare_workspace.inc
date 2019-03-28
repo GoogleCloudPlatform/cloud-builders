@@ -29,6 +29,11 @@ prepare_workspace() {
         return 0
     fi
 
+    # If $PROJECT_ROOT is set, map the current directory into $GOPATH/src/$PROJECT_ROOT.
+    if [[ "$PROJECT_ROOT" ]]; then
+        prepare_project_root
+        return 0
+    fi
 
     # If there is a src directory, accept that as a GOPATH indicator.
     if [[ -d src ]]; then
@@ -36,32 +41,29 @@ prepare_workspace() {
         return 0
     fi
 
-    # Otherwise, we need to set up $GOPATH and map the source in somehow.
-
-
-    # If $PROJECT_ROOT is set, map the current directory into $GOPATH/src/$PROJECT_ROOT.
-    if [[ -z "$PROJECT_ROOT" ]]; then
-        # Nothing in the environment or directory structure gives a strong enough clue, let's inspect source.
-        PROJECT_ROOT="$(/builder/go_workspace)"
-        if [[ $? != 0 ]]; then
-            echo '
+    # Nothing in the environment or directory structure gives a strong enough clue, let's inspect source.
+    PROJECT_ROOT="$(/builder/go_workspace)"
+    if [[ $? != 0 ]]; then
+        echo '
 Unable to determine the Go workspace structure.
 
 To determine the workspace structure, this tool checks the following, in order:
 1) Is $GOPATH set? Use that.
-2) Is there a ./src directory? Set GOPATH=$PWD.
-3) Is $PROJECT_ROOT set? Make a temporary workspace in GOPATH=./gopath, and link
+2) Is $PROJECT_ROOT set? Make a temporary workspace in GOPATH=./gopath, and link
    the contents of the current directory into ./gopath/src/$PROJECT_ROOT/*.
+3) Is there a ./src directory? Set GOPATH=$PWD.
 4) Does a .go file in the current directory have a comment like
    // import "$PROJECT_ROOT"? Use the $PROJECT_ROOT found in the import
-   comment instead of a provided $PROJECT_ROOT environment variable.
+   comment.
 
 You are seeing this message because none of the checks succeeded.
 '
-            return 1
-        fi
+        return 1
     fi
+    prepare_project_root
+}
 
+prepare_project_root() {
     shadow_workspace="./gopath/src/$PROJECT_ROOT"
     link_dir="$(dirname "$shadow_workspace")"
 

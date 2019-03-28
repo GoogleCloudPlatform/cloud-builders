@@ -1,13 +1,31 @@
 # Tool builder: `gcr.io/cloud-builders/go`
 
-This Cloud Build builder runs the `go` tool.
+This builder runs the `go` tool (`go build`, `go test`, etc.)
+after placing source in `/workspace` into the `GOPATH` before
+running the tool.
 
-### When to use this builder
+This functionality is not necessary if you're building using
+[Go modules](https://github.com/golang/go/wiki/Modules), available
+in Go 1.11+, and you can **build with the standard
+[`golang`](https://hub.docker.com/_/golang) image on Dockerhub
+instead:**
 
-The `gcr.io/cloud-builders/go` build step should be used when you want to run
-the `go` tool directly on your source, similar to how a developer uses the `go`
-tool locally to build (`go build` or `go install`), test (`go test`), or manage
-source (`go get` or `go generate`).
+```
+steps:
+# If you already have a go.mod file, you can skip this step.
+- name: golang
+  args: ['go', 'mod', 'init', 'github.com/your/import/path']
+
+# Build the module.
+- name: golang
+  env: ['GO111MODULE=on']
+  args: ['go', 'build', './...']
+```
+
+See [`examples/module`](https://github.com/GoogleCloudPlatform/cloud-builders/tree/master/go/examples/module)
+for a working example.
+
+## Using `gcr.io/cloud-builders/go`
 
 ### `alpine` vs `debian`
 
@@ -31,13 +49,12 @@ Before the `go` tool is used, the build step first sets up a workspace.
 To determine the workspace structure, this tool checks the following, in order:
 
 1.  Is `$GOPATH` set? Use that.
-2.  Is there a `./src` directory? Set `GOPATH=$PWD`.
-3.  Is `$PROJECT_ROOT` set? Make a temporary workspace in `GOPATH=./gopath`, and
+2.  Is `$PROJECT_ROOT` set? Make a temporary workspace in `GOPATH=./gopath`, and
     link the contents of the current directory into
     `./gopath/src/$PROJECT_ROOT/*`.
+3.  Is there a `./src` directory? Set `GOPATH=$PWD`.
 4.  Does a `.go` file in the current directory have a comment like `// import
-    "$PROJECT_ROOT"`? Use the `$PROJECT_ROOT` found in the import comment
-    instead of a provided `$PROJECT_ROOT` environment variable.
+    "$PROJECT_ROOT"`? Use the `$PROJECT_ROOT` found in the import comment.
 
 Once the workspace is set up, the `args` to the build step are passed through to
 the `go` tool.

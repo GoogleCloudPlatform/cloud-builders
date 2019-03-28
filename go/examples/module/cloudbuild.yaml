@@ -1,7 +1,6 @@
 steps:
-- name: 'golang:1.11.1-stretch'
-  entrypoint: 'go'
-  args: ['build', '.']
+- name: 'golang'
+  args: ['go', 'build', '.']
   env: ['GO111MODULE=on']
 - name: 'busybox'
   args: ['./module']
