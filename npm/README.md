@@ -18,4 +18,6 @@ This allows you to use any supported version of NPM.
 
 To build this builder, run the following command in this directory.
 
-    $ gcloud builds submit
+```bash
+$ gcloud builds submit
+```
