@@ -1,5 +1,5 @@
 # Use the base App Engine Docker image, based on debian jessie.
-FROM gcr.io/google-appengine/debian8
+FROM gcr.io/google-appengine/debian9
 
 # Install updates and dependencies
 RUN apt-get update -y && apt-get install --no-install-recommends -y -q curl python build-essential git ca-certificates libkrb5-dev imagemagick && \

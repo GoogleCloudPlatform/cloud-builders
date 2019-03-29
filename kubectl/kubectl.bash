@@ -1,10 +1,12 @@
 #!/bin/bash
 
-# always get a new context
-cluster=$(gcloud config get-value container/cluster 2> /dev/null)
-region=${CLOUDSDK_COMPUTE_REGION:-$(gcloud config get-value compute/region 2> /dev/null)}
-zone=$(gcloud config get-value compute/zone 2> /dev/null)
-project=$(gcloud config get-value core/project 2> /dev/null)
+# If there is no current context, get one.
+if [[ $(kubectl config current-context 2> /dev/null) == "" ]]; then
+  cluster=$(gcloud config get-value container/cluster 2> /dev/null)
+  region=${CLOUDSDK_COMPUTE_REGION:-$(gcloud config get-value compute/region 2> /dev/null)}
+  zone=$(gcloud config get-value compute/zone 2> /dev/null)
+  project=$(gcloud config get-value core/project 2> /dev/null)
+fi
 
 function var_usage() {
     cat <<EOF
@@ -13,7 +15,7 @@ CLOUDSDK_COMPUTE_REGION=<cluster region> (regional clusters)
 CLOUDSDK_COMPUTE_ZONE=<cluster zone>
 CLOUDSDK_CONTAINER_CLUSTER=<cluster name>
 EOF
-    exit 1
+  exit 1
 }
 
 [[ -z "$cluster" ]] && var_usage
@@ -27,5 +29,5 @@ else
   gcloud container clusters get-credentials --project="$project" --zone="$zone" "$cluster" || exit
 fi
 
-echo "Running: kubectl $@"
-kubectl "$@"
+echo "Running: kubectl $@" >&2
+exec kubectl "$@"
