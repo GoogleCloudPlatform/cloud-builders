@@ -29,7 +29,12 @@ gcloud projects add-iam-policy-binding $PROJECT \
 For most use, kubectl will need to be configured to point to a specific GKE
 cluster. You can configure the cluster by setting environment variables.
 
+    # Set region for regional GKE clusters or Zone for Zonal clusters
+    CLOUDSDK_COMPUTE_REGION=<your cluster's region>
+    # or
     CLOUDSDK_COMPUTE_ZONE=<your cluster's zone>
+
+    # Name of GKE cluster    
     CLOUDSDK_CONTAINER_CLUSTER=<your cluster's name>
 
 
