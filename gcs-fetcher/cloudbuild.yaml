@@ -1,3 +1,5 @@
+# testing GitHub PR CI
+
 steps:
 # Run tests.
 - name: 'golang:stretch'
