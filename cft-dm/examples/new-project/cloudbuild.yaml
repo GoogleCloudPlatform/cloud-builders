@@ -1,0 +1,19 @@
+steps:
+- name: 'gcr.io/cloud-builders/git'
+  args:
+  - 'clone'
+  - 'https://github.com/GoogleCloudPlatform/deploymentmanager-samples.git'
+
+- name: 'gcr.io/$PROJECT_ID/cft-dm'
+  dir: './deploymentmanager-samples/community/cloud-foundation'
+  args:
+  - 'apply'
+  - 'pipeline/project/project.yaml'
+
+  env:
+  - 'CLOUD_FOUNDATION_PROJECT_ID=$_CLOUD_FOUNDATION_PROJECT_ID'
+  - 'CFT_ORGANIZATION_FOLDER_ID=$_CFT_ORGANIZATION_FOLDER_ID'
+  - 'CFT_BILLING_ACCOUNT_ID=$_CFT_BILLING_ACCOUNT_ID'
+  - 'CFT_CHILD_PROJECT=$_CFT_CHILD_PROJECT'
+
+timeout: 3600s
