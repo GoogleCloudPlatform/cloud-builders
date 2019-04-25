@@ -1,0 +1,11 @@
+steps:
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    for config in $(ls */cloudbuild.yaml); do
+      d=$(dirname "${config}")
+      echo "=> $config ... "
+      gcloud builds submit $d --config=${config} --async --quiet
+    done
