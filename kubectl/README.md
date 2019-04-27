@@ -34,7 +34,7 @@ cluster. You can configure the cluster by setting environment variables.
     # or
     CLOUDSDK_COMPUTE_ZONE=<your cluster's zone>
 
-    # Name of GKE cluster    
+    # Name of GKE cluster
     CLOUDSDK_CONTAINER_CLUSTER=<your cluster's name>
 
 
