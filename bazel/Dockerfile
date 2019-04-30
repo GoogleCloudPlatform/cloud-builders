@@ -52,4 +52,7 @@ RUN \
 RUN mkdir -p /workspace
 RUN echo 'startup --output_base=/workspace/.bazel' > ~/.bazelrc
 
+# Cleanup
+RUN rm -rf /tmp && mkdir /tmp && chmod a+rwxt /tmp
+
 ENTRYPOINT ["bazel"]
