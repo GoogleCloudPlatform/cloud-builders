@@ -8,6 +8,17 @@ callers to run
 
 By default, the version of Docker that is used by this builder is `18.06.1`.
 
+You should consider instead using an [official `docker`
+image](https://hub.docker.com/_/docker/):
+
+```yaml
+steps:
+- name: docker
+  args: ['build', '-t', '...']
+```
+
+This allows you to use any supported version of Docker (e.g., `docker:19.03.1`)
+
 ## GCR Credentials
 
 The Docker build step is automatically set up with credentials for your
