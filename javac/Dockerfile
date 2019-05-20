@@ -1,7 +1,7 @@
 ARG BASE_IMAGE=launcher.gcr.io/google/openjdk8
 FROM ${BASE_IMAGE}
 
-ARG DOCKER_VERSION=5:18.09.0~3-0~debian-stretch
+ARG DOCKER_VERSION=5:18.09.6~3-0~debian-stretch
 
 # Install Docker based on instructions from:
 # https://docs.docker.com/engine/installation/linux/docker-ce/debian
