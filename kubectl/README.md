@@ -11,7 +11,7 @@ will need IAM permissions sufficient for the operations you want to perform. For
 typical read-only usage, the "Kubernetes Engine Viewer" role is sufficient. To
 deploy container images on a GKE cluster, the "Kubernetes Engine Developer" role
 is sufficient. Check the
-[GKE IAM page](https://cloud.google.com/kubernetes-engine/docs/iam-integration)
+[GKE IAM page](https://cloud.google.com/kubernetes-engine/docs/how-to/iam#roles)
 for details.
 
 Running the following command will give Cloud Build Service Account
