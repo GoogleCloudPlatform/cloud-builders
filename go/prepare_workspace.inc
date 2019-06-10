@@ -19,7 +19,7 @@ prepare_workspace() {
 
     # If $GIT_CONFIG_VAL is set, set global git config value
     if [[ "$GIT_CONFIG_VAL" ]]; then
-        prepare_git
+        eval "git config --global $GIT_CONFIG_VAL"
     fi
 
     # If $GOPATH is set, do nothing. The user has already set up the workspace.
@@ -90,8 +90,4 @@ prepare_project_root() {
     # they were read or written from the original directory, except that the new
     # working directory will be properly couched in GOPATH.
     cd "$shadow_workspace"
-}
-
-prepare_git() {
-    eval "git config --global $GIT_CONFIG_VAL"
 }
