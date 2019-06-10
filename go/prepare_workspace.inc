@@ -17,7 +17,7 @@ prepare_workspace() {
     # remember, and sometimes this function changes directory.
     export WORKSPACE="$PWD"
 
-     # If $GIT_CONFIG_VAL is set, set global git config value
+    # If $GIT_CONFIG_VAL is set, set global git config value
     if [[ "$GIT_CONFIG_VAL" ]]; then
         prepare_git
     fi
