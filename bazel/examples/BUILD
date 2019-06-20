@@ -22,18 +22,3 @@ go_image(
     binary = ":target-bin",
     visibility = ["//visibility:public"],
 )
-
-go_library(
-    name = "checkargs_default_library",
-    srcs = ["main_checkargs.go"],
-    importpath = "github.com/GoogleCloudPlatform/cloud-builders/bazel/examples",
-    visibility = ["//visibility:private"],
-    deps = [],
-)
-
-go_binary(
-    name = "checkargs",
-    embed = [":checkargs_default_library"],
-    pure = "on",
-    visibility = ["//visibility:public"],
-)

@@ -2,9 +2,16 @@
 
 This is a tool builder to simply invoke [`bazel`](https://bazel.io) commands.
 
-Arguments passed to this builder will be passed to `bazel` directly.
+You should consider instead using an [official `bazel`
+image](https://launcher.gcr.io/google/bazel):
 
-The latest available version of `bazel` is used.
+```yaml
+steps:
+- name: launcher.gcr.io/google/bazel:0.26.0
+  args: ['version']
+```
+
+This allows you to use any supported version of Bazel.
 
 ## Examples
 
