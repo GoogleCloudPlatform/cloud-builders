@@ -1,0 +1,46 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"extensions/v1beta1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"test-app"},"name":"test-app-deployment","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"test-app"}},"template":{"metadata":{"labels":{"app":"test-app"}},"spec":{"containers":[{"image":"gcr.io/cbd-test/test-app:latest","name":"test-app"}]}}}}
+  creationTimestamp: 2019-06-10T19:40:35Z
+  generation: 1
+  labels:
+    app: test-app
+  name: test-app-deployment
+  namespace: default
+  resourceVersion: "5213481"
+  selfLink: /apis/extensions/v1beta1/namespaces/default/deployments/test-app-deployment
+  uid: 9de75df4-8bb7-11e9-8840-42010a8e00dc
+spec:
+  progressDeadlineSeconds: 2147483647
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: test-app
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: test-app
+    spec:
+      containers:
+      - image: gcr.io/cbd-test/test-app:latest
+        imagePullPolicy: Always
+        name: test-app
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status: {}

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod
+spec:
+  containers:
+  - image: gcr.io/cbd-test/test-app:1
+    name: test-app-1
+  - image: gcr.io/cbd-test/test-app:2
+    name: test-app-2
+  - image: gcr.io/cbd-test/do-not-update:latest
+    name: do-not-update

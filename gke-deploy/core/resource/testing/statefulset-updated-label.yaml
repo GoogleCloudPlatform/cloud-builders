@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: StatefulSet
+metadata:
+  labels:
+    foo: bar
+  name: test-stateful-set
+spec:
+  replicas: 3
+  serviceName: test-stateful-set
+  template:
+    metadata:
+      labels:
+        app: test-stateful-set
+        foo: bar
+    spec:
+      containers:
+      - image: gcr.io/cbd-test/test-app:latest
+        name: test-app
+        terminateGracePeriodSeconds: 10

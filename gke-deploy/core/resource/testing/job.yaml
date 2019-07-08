@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: test-job
+spec:
+  template:
+    metadata:
+      labels:
+        app: test-job
+    spec:
+      containers:
+      - image: gcr.io/cbd-test/test-app:latest
+        name: test-app
+      restartPolicy: Never

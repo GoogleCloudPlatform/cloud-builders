@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: ReplicaSet
+metadata:
+  labels:
+    foo: bar
+  name: test-replica-set
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: test-replica-set
+        foo: bar
+    spec:
+      containers:
+      - image: gcr.io/cbd-test/test-app:latest
+        name: test-app

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: test-replication-controller
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: test-replication-controller
+    spec:
+      containers:
+      - image: REPLACED
+        name: test-app

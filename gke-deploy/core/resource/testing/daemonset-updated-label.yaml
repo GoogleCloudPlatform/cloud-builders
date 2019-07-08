@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  labels:
+    foo: bar
+  name: test-daemon-set
+spec:
+  template:
+    metadata:
+      labels:
+        app: test-daemon-set
+        foo: bar
+    spec:
+      containers:
+      - image: gcr.io/cbd-test/test-app:latest
+        name: test-app

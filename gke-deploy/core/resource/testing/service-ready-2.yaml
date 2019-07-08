@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"a":"b","app":"test-app","app.kubernetes.io/managed-by":"gcp-cloud-build-deploy","app.kubernetes.io/name":"test-app","app.kubernetes.io/version":"deploy","c":"d"},"name":"test-app","namespace":"foobar"},"spec":{"ports":[{"port":80,"protocol":"TCP","targetPort":8080}],"selector":{"app":"test-app"},"type":"ClusterIP"}}
+  creationTimestamp: 2019-06-07T16:17:00Z
+  labels:
+    a: b
+    app: test-app
+    app.kubernetes.io/managed-by: gcp-cloud-build-deploy
+    app.kubernetes.io/name: test-app
+    app.kubernetes.io/version: test
+    c: d
+  name: test-app
+  namespace: foobar
+  resourceVersion: "4472092"
+  selfLink: /api/v1/namespaces/foobar/services/test-app
+  uid: ad9e1a2c-893f-11e9-8840-42010a8e00dc
+spec:
+  clusterIP: 10.31.241.11
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: test-app
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
