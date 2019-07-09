@@ -1,0 +1,19 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  labels:
+    foo: bar
+  name: test-cron-job
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            foo: bar
+        spec:
+          containers:
+          - image: gcr.io/cbd-test/test-app:latest
+            name: test-app
+          restartPolicy: OnFailure

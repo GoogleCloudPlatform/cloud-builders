@@ -1,0 +1,14 @@
+apiVersion: extensions/v1beta1
+kind: ReplicaSet
+metadata:
+  name: test-replica-set
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: test-replica-set
+    spec:
+      containers:
+      - image: REPLACED
+        name: test-app

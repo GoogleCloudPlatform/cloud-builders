@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kubernetes.io/limit-ranger: 'LimitRanger plugin set: cpu request for container
+      test-app'
+  creationTimestamp: 2019-06-10T18:44:09Z
+  generateName: test-app-deployment-58c8c7fffc-
+  labels:
+    app: test-app
+    pod-template-hash: 58c8c7fffc
+  name: test-app-deployment-58c8c7fffc-pzxjb
+  namespace: default
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: test-app-deployment-58c8c7fffc
+    uid: bb793403-8baf-11e9-8840-42010a8e00dc
+  resourceVersion: "5203659"
+  selfLink: /api/v1/namespaces/default/pods/test-app-deployment-58c8c7fffc-pzxjb
+  uid: bb7d32d8-8baf-11e9-8840-42010a8e00dc
+spec:
+  containers:
+  - image: gcr.io/cbd-test/test-app:latest
+    imagePullPolicy: Always
+    name: test-app
+    resources:
+      requests:
+        cpu: 100m
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: default-token-lpg8w
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  nodeName: gke-gke-deploy-test-default-pool-c9c1d579-cb1q
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: default-token-lpg8w
+    secret:
+      defaultMode: 420
+      secretName: default-token-lpg8w
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: 2019-06-10T18:44:09Z
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: 2019-06-10T18:44:11Z
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: null
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: 2019-06-10T18:44:09Z
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: docker://ecdbd3c09855e53d3097c8a8afc50e0401ec6c0d5782bf270e9e48def301e870
+    image: gcr.io/cbd-test/test-app:latest
+    imageID: docker-pullable://gcr.io/cbd-test/test-app@sha256:1c7c73c049dafddcc82f61bd50c70a8061c301bb63065fca6cff1f1ef10b9afc
+    lastState: {}
+    name: test-app
+    ready: true
+    restartCount: 0
+    state:
+      running:
+        startedAt: 2019-06-10T18:44:11Z
+  hostIP: 10.142.0.3
+  phase: Running
+  podIP: 10.28.3.34
+  qosClass: Burstable
+  startTime: 2019-06-10T18:44:09Z

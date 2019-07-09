@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Pod","metadata":{"annotations":{},"name":"test-app-pod","namespace":"default"},"spec":{"containers":[{"image":"gcr.io/cbd-test/test-app:latest","name":"test-app"}]}}
+    kubernetes.io/limit-ranger: 'LimitRanger plugin set: cpu request for container
+      test-app'
+  creationTimestamp: 2019-06-10T19:53:03Z
+  name: test-app-pod
+  namespace: default
+  resourceVersion: "5215707"
+  selfLink: /api/v1/namespaces/default/pods/test-app-pod
+  uid: 5bbb0c2e-8bb9-11e9-8840-42010a8e00dc
+spec:
+  containers:
+    - image: gcr.io/cbd-test/test-app:latest
+      imagePullPolicy: Always
+      name: test-app
+      resources:
+        requests:
+          cpu: 100m
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+        - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+          name: default-token-lpg8w
+          readOnly: true
+  dnsPolicy: ClusterFirst
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+  volumes:
+    - name: default-token-lpg8w
+      secret:
+        defaultMode: 420
+        secretName: default-token-lpg8w
+status:
+  phase: Pending
+  qosClass: Burstable

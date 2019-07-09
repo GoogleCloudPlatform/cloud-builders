@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"a":"b","app":"test-app","app.kubernetes.io/managed-by":"gcp-cloud-build-deploy","app.kubernetes.io/name":"test-app","app.kubernetes.io/version":"deploy","c":"d"},"name":"test-app","namespace":"foobar"},"spec":{"externalName":"test-app.example.com","ports":[{"port":80,"protocol":"TCP","targetPort":8080}],"selector":{"app":"test-app"},"type":"ExternalName"}}
+  creationTimestamp: 2019-06-07T16:25:13Z
+  labels:
+    a: b
+    app: test-app
+    app.kubernetes.io/managed-by: gcp-cloud-build-deploy
+    app.kubernetes.io/name: test-app
+    app.kubernetes.io/version: test
+    c: d
+  name: test-app-service-externalname
+  namespace: foobar
+  resourceVersion: "4473624"
+  selfLink: /api/v1/namespaces/foobar/services/test-app
+  uid: d3cd3686-8940-11e9-8840-42010a8e00dc
+spec:
+  externalName: test-app.example.com
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: test-app
+  sessionAffinity: None
+  type: ExternalName
+status:
+  loadBalancer: {}
