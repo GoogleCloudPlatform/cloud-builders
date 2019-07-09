@@ -12,24 +12,10 @@ limitations under the License.
 */
 package resource
 
-import (
-	"fmt"
-	"os"
-
-	"github.com/gobuffalo/packr/v2"
+const (
+	namespaceTemplate = `apiVersion: v1
+kind: Namespace
+metadata:
+  name:
+`
 )
-
-var (
-	box = packr.New("configTemplates", "./templates")
-
-	namespaceTemplateBytes = readConfigTemplate("namespace.yaml")
-)
-
-func readConfigTemplate(filename string) []byte {
-	in, err := box.Find(filename)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to read resource config template %q: %v", filename, err)
-		os.Exit(1)
-	}
-	return in
-}
