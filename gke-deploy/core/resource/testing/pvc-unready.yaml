@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"test-app-pvc","namespace":"default"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"1Mi"}}}}
+  creationTimestamp: 2019-06-10T20:02:54Z
+  finalizers:
+    - kubernetes.io/pvc-protection
+  name: test-app-pvc
+  namespace: default
+  resourceVersion: "5217359"
+  selfLink: /api/v1/namespaces/default/persistentvolumeclaims/test-app-pvc
+  uid: bc11de92-8bba-11e9-8840-42010a8e00dc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  dataSource: null
+  resources:
+    requests:
+      storage: 1Mi
+  storageClassName: standard
+status:
+  phase: Pending
