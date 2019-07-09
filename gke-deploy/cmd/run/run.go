@@ -17,6 +17,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/container"
+
 	"github.com/spf13/cobra"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/cmd/common"
@@ -93,7 +95,8 @@ func NewRunCommand() *cobra.Command {
 func run(cmd *cobra.Command, options *options) error {
 	ctx := context.Background()
 
-	if err := common.ValidateImages(options.images); err != nil {
+	images, err := container.ParseImages(ctx, options.images)
+	if err != nil {
 		return err
 	}
 
@@ -123,7 +126,7 @@ func run(cmd *cobra.Command, options *options) error {
 		return err
 	}
 
-	if err := d.Prepare(ctx, options.images, options.appName, options.appVersion, options.filename, options.output, options.namespace, labelsMap); err != nil {
+	if err := d.Prepare(ctx, images, options.appName, options.appVersion, options.filename, options.output, options.namespace, labelsMap); err != nil {
 		return fmt.Errorf("failed to prepare deployment: %v", err)
 	}
 	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, options.output, options.namespace, options.waitTimeout); err != nil {

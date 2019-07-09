@@ -43,7 +43,7 @@ type Deployer struct {
 }
 
 // Prepare handles preparing deployment.
-func (d *Deployer) Prepare(ctx context.Context, images []string, appName, appVersion, config, output, namespace string, labels map[string]string) error {
+func (d *Deployer) Prepare(ctx context.Context, images []container.Image, appName, appVersion, config, output, namespace string, labels map[string]string) error {
 	fmt.Printf("Preparing deployment.\n")
 
 	objs, err := resource.ParseConfigs(ctx, config, d.Clients.OS)
@@ -53,11 +53,15 @@ func (d *Deployer) Prepare(ctx context.Context, images []string, appName, appVer
 	fmt.Printf("Configs to prepare: %v\n", objs)
 
 	for _, image := range images {
+		// name.Digest
 		imageDigest, err := container.GetDigest(ctx, image, d.Clients.Gcloud)
 		if err != nil {
 			return fmt.Errorf("failed to get image digest: %v", err)
 		}
-		imageName := strings.Split(image, ":")[0]
+		imageName, err := container.GetName(ctx, image)
+		if err != nil {
+			return fmt.Errorf("failed to get image name: %v", err)
+		}
 		imageWithDigest := fmt.Sprintf("%s@%s", imageName, imageDigest)
 
 		fmt.Printf("Got digest for image: %s --> %s\n", image, imageWithDigest)

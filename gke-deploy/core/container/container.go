@@ -17,17 +17,83 @@ import (
 	"fmt"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
+	"github.com/google/go-containerregistry/pkg/name"
 )
 
 const (
 	imageDigestFormat = "value(image_summary.digest)"
 )
 
-// GetDigest uses an image string to get its corresponding digest.
-func GetDigest(ctx context.Context, image string, gs services.GcloudService) (string, error) {
-	digest, err := gs.ContainerImagesDescribe(ctx, image, imageDigestFormat)
-	if err != nil {
-		return "", fmt.Errorf("failed to get image digest: %v", err)
+// Image is an alias to name.Reference.
+type Image = name.Reference
+
+// ParseImages parses a slice of image strings.
+func ParseImages(ctx context.Context, images []string) ([]Image, error) {
+	var ims []Image
+
+	exists := make(map[string]bool)
+	for _, image := range images {
+		im, err := parseImage(ctx, image)
+		if err != nil {
+			return nil, err
+		}
+
+		imName, err := GetName(ctx, im)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get image name: %v", err)
+		}
+
+		if ok := exists[imName]; ok {
+			return nil, fmt.Errorf("duplicate image name: %q", imName)
+		}
+		exists[imName] = true
+		ims = append(ims, im)
 	}
-	return digest, nil
+
+	return ims, nil
+}
+
+func parseImage(ctx context.Context, image string) (Image, error) {
+	im, err := name.ParseReference(image)
+	if err != nil {
+		return nil, fmt.Errorf("image is invalid: %q", image)
+	}
+	return im, nil
+}
+
+// GetNameFromString gets an image's name, given a string representation of the image.
+func GetNameFromString(ctx context.Context, image string) (string, error) {
+	im, err := parseImage(ctx, image)
+	if err != nil {
+		return "", err
+	}
+	return GetName(ctx, im)
+}
+
+// GetName gets an image's name.
+func GetName(ctx context.Context, image Image) (string, error) {
+	switch t := image.(type) {
+	case name.Tag:
+		return fmt.Sprintf("%s/%s", t.RegistryStr(), t.RepositoryStr()), nil
+	case name.Digest:
+		return fmt.Sprintf("%s/%s", t.RegistryStr(), t.RepositoryStr()), nil
+	default:
+		return "", fmt.Errorf("invalid image type: %s", t)
+	}
+}
+
+// GetDigest gets an image's corresponding digest.
+func GetDigest(ctx context.Context, image Image, gs services.GcloudService) (string, error) {
+	switch t := image.(type) {
+	case name.Tag:
+		digest, err := gs.ContainerImagesDescribe(ctx, t.Name(), imageDigestFormat)
+		if err != nil {
+			return "", fmt.Errorf("failed to get image digest: %v", err)
+		}
+		return digest, nil
+	case name.Digest:
+		return image.Identifier(), nil
+	default:
+		return "", fmt.Errorf("invalid image type: %s", t)
+	}
 }

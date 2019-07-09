@@ -22,6 +22,8 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/container"
+
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -199,7 +201,12 @@ func UpdateMatchingContainerImage(ctx context.Context, objs Objects, imageName, 
 				continue
 			}
 
-			if strings.HasPrefix(im, imageName) {
+			imName, err := container.GetNameFromString(ctx, im)
+			if err != nil {
+				return fmt.Errorf("failed to get name of image %s: %v", im, err)
+			}
+
+			if imName == imageName {
 				fmt.Printf("Updating container of resource: %v\n", obj)
 				if err := unstructured.SetNestedField(conMap, replace, "image"); err != nil {
 					return fmt.Errorf("failed to set image field: %v", err)

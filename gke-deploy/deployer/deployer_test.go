@@ -21,6 +21,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/container"
+	"github.com/google/go-containerregistry/pkg/name"
+
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/testservices"
 )
@@ -32,7 +35,7 @@ func TestPrepare(t *testing.T) {
 	testServiceFile := "testing/service.yaml"
 	testMultiResourceFile := "testing/multi-resource.yaml"
 
-	images := []string{"my-image:1.0.0"}
+	images := []container.Image{newImageWithTag(t, "my-image:1.0.0")}
 	appName := "my-app"
 	appVersion := "b2e43cb"
 	outputDir := "path/to/outputDir"
@@ -48,7 +51,7 @@ func TestPrepare(t *testing.T) {
 	tests := []struct {
 		name string
 
-		images      []string
+		images      []container.Image
 		appName     string
 		appVersion  string
 		config      string
@@ -431,7 +434,7 @@ func TestPrepareErrors(t *testing.T) {
 
 	testDeploymentFile := "testing/deployment.yaml"
 
-	images := []string{"my-image:1.0.0"}
+	images := []container.Image{newImageWithTag(t, "my-image:1.0.0")}
 	appName := "my-app"
 	appVersion := "b2e43cb"
 	outputDir := "path/to/outputDir"
@@ -444,7 +447,7 @@ func TestPrepareErrors(t *testing.T) {
 	tests := []struct {
 		name string
 
-		images     []string
+		images     []container.Image
 		appName    string
 		appVersion string
 		config     string
@@ -1545,4 +1548,12 @@ func fileContents(t *testing.T, filename string) []byte {
 		t.Fatalf("failed to read file %s", filename)
 	}
 	return contents
+}
+
+func newImageWithTag(t *testing.T, image string) container.Image {
+	ref, err := name.NewTag(image)
+	if err != nil {
+		t.Fatalf("failed to create image with tag: %v", err)
+	}
+	return ref
 }
