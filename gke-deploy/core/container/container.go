@@ -20,21 +20,18 @@ import (
 	"github.com/google/go-containerregistry/pkg/name"
 )
 
-// Image is an alias to name.Reference.
-type Image = name.Reference
-
 // ParseImages parses a slice of image strings.
-func ParseImages(ctx context.Context, images []string) ([]Image, error) {
-	var ims []Image
+func ParseImages(ctx context.Context, images []string) ([]name.Reference, error) {
+	var refs []name.Reference
 
 	exists := make(map[string]bool)
 	for _, image := range images {
-		im, err := parseImage(ctx, image)
+		ref, err := parseImage(ctx, image)
 		if err != nil {
 			return nil, err
 		}
 
-		imName, err := GetName(ctx, im)
+		imName, err := GetName(ctx, ref)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get image name: %v", err)
 		}
@@ -43,13 +40,13 @@ func ParseImages(ctx context.Context, images []string) ([]Image, error) {
 			return nil, fmt.Errorf("duplicate image name: %q", imName)
 		}
 		exists[imName] = true
-		ims = append(ims, im)
+		refs = append(refs, ref)
 	}
 
-	return ims, nil
+	return refs, nil
 }
 
-func parseImage(ctx context.Context, image string) (Image, error) {
+func parseImage(ctx context.Context, image string) (name.Reference, error) {
 	im, err := name.ParseReference(image)
 	if err != nil {
 		return nil, fmt.Errorf("image is invalid: %q", image)
@@ -67,7 +64,7 @@ func GetNameFromString(ctx context.Context, image string) (string, error) {
 }
 
 // GetName gets an image's name.
-func GetName(ctx context.Context, image Image) (string, error) {
+func GetName(ctx context.Context, image name.Reference) (string, error) {
 	switch t := image.(type) {
 	case name.Tag:
 		return fmt.Sprintf("%s/%s", t.RegistryStr(), t.RepositoryStr()), nil
@@ -79,7 +76,7 @@ func GetName(ctx context.Context, image Image) (string, error) {
 }
 
 // GetDigest gets an image's corresponding digest.
-func GetDigest(ctx context.Context, image Image, rs services.RemoteService) (string, error) {
+func GetDigest(ctx context.Context, image name.Reference, rs services.RemoteService) (string, error) {
 	im, err := rs.Image(image)
 	if err != nil {
 		return "", fmt.Errorf("failed to get remote image reference: %v", err)

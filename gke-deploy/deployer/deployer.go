@@ -22,6 +22,8 @@ import (
 	"text/tabwriter"
 	"time"
 
+	"github.com/google/go-containerregistry/pkg/name"
+
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/container"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/cluster"
@@ -44,7 +46,7 @@ type Deployer struct {
 }
 
 // Prepare handles preparing deployment.
-func (d *Deployer) Prepare(ctx context.Context, images []container.Image, appName, appVersion, config, output, namespace string, labels map[string]string) error {
+func (d *Deployer) Prepare(ctx context.Context, images []name.Reference, appName, appVersion, config, output, namespace string, labels map[string]string) error {
 	fmt.Printf("Preparing deployment.\n")
 
 	objs, err := resource.ParseConfigs(ctx, config, d.Clients.OS)

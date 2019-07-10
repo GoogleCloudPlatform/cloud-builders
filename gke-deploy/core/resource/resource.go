@@ -22,8 +22,6 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/container"
-
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -31,6 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
 	"k8s.io/apimachinery/pkg/util/yaml"
 
+	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/container"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
 )
 

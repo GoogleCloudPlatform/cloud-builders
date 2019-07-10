@@ -36,7 +36,7 @@ func TestParseImages(t *testing.T) {
 
 		images []string
 
-		want []Image
+		want []name.Reference
 	}{
 		{
 			name: "No images",
@@ -54,7 +54,7 @@ func TestParseImages(t *testing.T) {
 				image3,
 			},
 
-			want: []Image{
+			want: []name.Reference{
 				newImageWithTag(t, image),
 				newImageWithDigest(t, image2),
 				newImageWithTag(t, image3),
@@ -124,7 +124,7 @@ func TestGetName(t *testing.T) {
 	tests := []struct {
 		name string
 
-		image Image
+		image name.Reference
 
 		want string
 	}{
@@ -166,7 +166,7 @@ func TestGetDigest(t *testing.T) {
 	tests := []struct {
 		name string
 
-		image Image
+		image name.Reference
 		rs    *testservices.TestRemote
 
 		want string
@@ -206,7 +206,7 @@ func TestGetDigestErrors(t *testing.T) {
 	tests := []struct {
 		name string
 
-		image Image
+		image name.Reference
 		rs    *testservices.TestRemote
 	}{
 		{
@@ -241,7 +241,7 @@ func TestGetDigestErrors(t *testing.T) {
 	}
 }
 
-func newImageWithTag(t *testing.T, image string) Image {
+func newImageWithTag(t *testing.T, image string) name.Reference {
 	ref, err := name.NewTag(image)
 	if err != nil {
 		t.Fatalf("failed to create image with tag: %v", err)
@@ -249,7 +249,7 @@ func newImageWithTag(t *testing.T, image string) Image {
 	return ref
 }
 
-func newImageWithDigest(t *testing.T, image string) Image {
+func newImageWithDigest(t *testing.T, image string) name.Reference {
 	ref, err := name.NewDigest(image)
 	if err != nil {
 		t.Fatalf("failed to create image with digest: %v", err)
