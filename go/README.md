@@ -4,11 +4,11 @@ This builder runs the `go` tool (`go build`, `go test`, etc.)
 after placing source in `/workspace` into the `GOPATH` before
 running the tool.
 
-# Using `Golang` and [Go Modules](https://github.com/golang/go/wiki/Modules)
+# Using `golang` and [Go Modules](https://github.com/golang/go/wiki/Modules)
 
 This Builder (`gcr.io/cloud-builders/go`) is not necessary if you're building using
 [Go modules](https://github.com/golang/go/wiki/Modules), available
-in Go 1.11+. You can **build** with the `golang` image (not a Builder) from [Dockerhub](hub.docker.com/library/golang) and Google's Container Registry [mirror](mirror.gcr.io/library/golang):
+in Go 1.11+. You can **build** with the `golang` image (not `gcr.io/cloud-builders/go`) from [Dockerhub](hub.docker.com/library/golang) and Google's Container Registry [mirror](mirror.gcr.io/library/golang):
 
 ```
 steps:
@@ -52,6 +52,8 @@ One advantage with Go Modules is that packages are now semantically versioned an
     path: /go
 ```
 In the above, if the `volumes` section were omitted, the second step would fail. This is because `/go` would be created anew for the step and `github.com/golang/glob` would not be present in it.
+
+**NB** Cloud Build supports using build-wide settings for `env` and `volumes` using `options` (see [link](https://cloud.google.com/cloud-build/docs/build-config#options)). I've duplicated here to aid clarity.
 
 ## Note #3 Golang Module Mirror
 
