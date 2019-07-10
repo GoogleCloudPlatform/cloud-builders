@@ -21,6 +21,10 @@ import (
 	"testing"
 	"time"
 
+	v1 "github.com/google/go-containerregistry/pkg/v1"
+
+	"github.com/google/go-containerregistry/pkg/name"
+
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/testservices"
 )
@@ -32,7 +36,7 @@ func TestPrepare(t *testing.T) {
 	testServiceFile := "testing/service.yaml"
 	testMultiResourceFile := "testing/multi-resource.yaml"
 
-	images := []string{"my-image:1.0.0"}
+	images := []name.Reference{newImageWithTag(t, "my-image:1.0.0")}
 	appName := "my-app"
 	appVersion := "b2e43cb"
 	outputDir := "path/to/outputDir"
@@ -48,7 +52,7 @@ func TestPrepare(t *testing.T) {
 	tests := []struct {
 		name string
 
-		images      []string
+		images      []name.Reference
 		appName     string
 		appVersion  string
 		config      string
@@ -128,9 +132,15 @@ func TestPrepare(t *testing.T) {
 							filepath.Join(outputDir, "multi-resource-service-test-app-2.yaml"):    nil,
 						},
 					},
-					Gcloud: &testservices.TestGcloud{
-						ContainerImagesDescribeResp: "sha256:foobar",
-						ContainerImagesDescribeErr:  nil,
+					Remote: &testservices.TestRemote{
+						ImageResp: &testservices.TestImage{
+							Hash: v1.Hash{
+								Algorithm: "sha256",
+								Hex:       "foobar",
+							},
+							Err: nil,
+						},
+						ImageErr: nil,
 					},
 				},
 			},
@@ -175,9 +185,15 @@ func TestPrepare(t *testing.T) {
 							filepath.Join(outputDir, "multi-resource-service-test-app.yaml"):    nil,
 						},
 					},
-					Gcloud: &testservices.TestGcloud{
-						ContainerImagesDescribeResp: "sha256:foobar",
-						ContainerImagesDescribeErr:  nil,
+					Remote: &testservices.TestRemote{
+						ImageResp: &testservices.TestImage{
+							Hash: v1.Hash{
+								Algorithm: "sha256",
+								Hex:       "foobar",
+							},
+							Err: nil,
+						},
+						ImageErr: nil,
 					},
 				},
 			},
@@ -236,9 +252,15 @@ func TestPrepare(t *testing.T) {
 							filepath.Join(outputDir, deploymentYaml): nil,
 						},
 					},
-					Gcloud: &testservices.TestGcloud{
-						ContainerImagesDescribeResp: "sha256:foobar",
-						ContainerImagesDescribeErr:  nil,
+					Remote: &testservices.TestRemote{
+						ImageResp: &testservices.TestImage{
+							Hash: v1.Hash{
+								Algorithm: "sha256",
+								Hex:       "foobar",
+							},
+							Err: nil,
+						},
+						ImageErr: nil,
 					},
 				},
 			},
@@ -293,9 +315,15 @@ func TestPrepare(t *testing.T) {
 							filepath.Join(outputDir, deploymentYaml): nil,
 						},
 					},
-					Gcloud: &testservices.TestGcloud{
-						ContainerImagesDescribeResp: "sha256:foobar",
-						ContainerImagesDescribeErr:  nil,
+					Remote: &testservices.TestRemote{
+						ImageResp: &testservices.TestImage{
+							Hash: v1.Hash{
+								Algorithm: "sha256",
+								Hex:       "foobar",
+							},
+							Err: nil,
+						},
+						ImageErr: nil,
 					},
 				},
 			},
@@ -351,9 +379,15 @@ func TestPrepare(t *testing.T) {
 							filepath.Join(outputDir, namespaceYaml):  nil,
 						},
 					},
-					Gcloud: &testservices.TestGcloud{
-						ContainerImagesDescribeResp: "sha256:foobar",
-						ContainerImagesDescribeErr:  nil,
+					Remote: &testservices.TestRemote{
+						ImageResp: &testservices.TestImage{
+							Hash: v1.Hash{
+								Algorithm: "sha256",
+								Hex:       "foobar",
+							},
+							Err: nil,
+						},
+						ImageErr: nil,
 					},
 				},
 			},
@@ -408,9 +442,15 @@ func TestPrepare(t *testing.T) {
 							filepath.Join(outputDir, serviceYaml): nil,
 						},
 					},
-					Gcloud: &testservices.TestGcloud{
-						ContainerImagesDescribeResp: "sha256:foobar",
-						ContainerImagesDescribeErr:  nil,
+					Remote: &testservices.TestRemote{
+						ImageResp: &testservices.TestImage{
+							Hash: v1.Hash{
+								Algorithm: "sha256",
+								Hex:       "foobar",
+							},
+							Err: nil,
+						},
+						ImageErr: nil,
 					},
 				},
 			},
@@ -431,7 +471,7 @@ func TestPrepareErrors(t *testing.T) {
 
 	testDeploymentFile := "testing/deployment.yaml"
 
-	images := []string{"my-image:1.0.0"}
+	images := []name.Reference{newImageWithTag(t, "my-image:1.0.0")}
 	appName := "my-app"
 	appVersion := "b2e43cb"
 	outputDir := "path/to/outputDir"
@@ -444,7 +484,7 @@ func TestPrepareErrors(t *testing.T) {
 	tests := []struct {
 		name string
 
-		images     []string
+		images     []name.Reference
 		appName    string
 		appVersion string
 		config     string
@@ -526,9 +566,9 @@ func TestPrepareErrors(t *testing.T) {
 							},
 						},
 					},
-					Gcloud: &testservices.TestGcloud{
-						ContainerImagesDescribeResp: "",
-						ContainerImagesDescribeErr:  fmt.Errorf("failed to describe container image"),
+					Remote: &testservices.TestRemote{
+						ImageResp: nil,
+						ImageErr:  fmt.Errorf("failed to get remote image"),
 					},
 				},
 			},
@@ -583,9 +623,15 @@ func TestPrepareErrors(t *testing.T) {
 							filepath.Join(outputDir, deploymentYaml): fmt.Errorf("failed to write file"),
 						},
 					},
-					Gcloud: &testservices.TestGcloud{
-						ContainerImagesDescribeResp: "sha256:foobar",
-						ContainerImagesDescribeErr:  nil,
+					Remote: &testservices.TestRemote{
+						ImageResp: &testservices.TestImage{
+							Hash: v1.Hash{
+								Algorithm: "sha256",
+								Hex:       "foobar",
+							},
+							Err: nil,
+						},
+						ImageErr: nil,
 					},
 				},
 			},
@@ -638,9 +684,15 @@ func TestPrepareErrors(t *testing.T) {
 							filepath.Join(outputDir, deploymentYaml): nil,
 						},
 					},
-					Gcloud: &testservices.TestGcloud{
-						ContainerImagesDescribeResp: "sha256:foobar",
-						ContainerImagesDescribeErr:  nil,
+					Remote: &testservices.TestRemote{
+						ImageResp: &testservices.TestImage{
+							Hash: v1.Hash{
+								Algorithm: "sha256",
+								Hex:       "foobar",
+							},
+							Err: nil,
+						},
+						ImageErr: nil,
 					},
 				},
 			},
@@ -693,9 +745,15 @@ func TestPrepareErrors(t *testing.T) {
 							filepath.Join(outputDir, deploymentYaml): nil,
 						},
 					},
-					Gcloud: &testservices.TestGcloud{
-						ContainerImagesDescribeResp: "sha256:foobar",
-						ContainerImagesDescribeErr:  nil,
+					Remote: &testservices.TestRemote{
+						ImageResp: &testservices.TestImage{
+							Hash: v1.Hash{
+								Algorithm: "sha256",
+								Hex:       "foobar",
+							},
+							Err: nil,
+						},
+						ImageErr: nil,
 					},
 				},
 			},
@@ -748,9 +806,15 @@ func TestPrepareErrors(t *testing.T) {
 							filepath.Join(outputDir, deploymentYaml): nil,
 						},
 					},
-					Gcloud: &testservices.TestGcloud{
-						ContainerImagesDescribeResp: "sha256:foobar",
-						ContainerImagesDescribeErr:  nil,
+					Remote: &testservices.TestRemote{
+						ImageResp: &testservices.TestImage{
+							Hash: v1.Hash{
+								Algorithm: "sha256",
+								Hex:       "foobar",
+							},
+							Err: nil,
+						},
+						ImageErr: nil,
 					},
 				},
 			},
@@ -1545,4 +1609,12 @@ func fileContents(t *testing.T, filename string) []byte {
 		t.Fatalf("failed to read file %s", filename)
 	}
 	return contents
+}
+
+func newImageWithTag(t *testing.T, image string) name.Reference {
+	ref, err := name.NewTag(image)
+	if err != nil {
+		t.Fatalf("failed to create image with tag: %v", err)
+	}
+	return ref
 }

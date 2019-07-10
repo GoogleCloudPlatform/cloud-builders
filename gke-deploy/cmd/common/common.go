@@ -21,22 +21,6 @@ import (
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
 )
 
-func ValidateImages(images []string) error {
-	exists := make(map[string]bool)
-	for _, image := range images {
-		split := strings.Split(image, ":")
-		if len(split) != 2 {
-			return fmt.Errorf("image should be of the format <image>:<tag>: %q", image)
-		}
-		imageName := split[0]
-		if ok := exists[imageName]; ok {
-			return fmt.Errorf("duplicate image name: %q", imageName)
-		}
-		exists[imageName] = true
-	}
-	return nil
-}
-
 func CreateLabelsMap(labels []string) (map[string]string, error) {
 	labelsMap := make(map[string]string)
 	for _, label := range labels {

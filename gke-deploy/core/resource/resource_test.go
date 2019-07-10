@@ -1023,6 +1023,8 @@ func TestUpdateMatchingContainerImage(t *testing.T) {
 	testStatefulsetFile := "testing/statefulset.yaml"
 	testStatefulsetUpdatedFile := "testing/statefulset-updated.yaml"
 	testDeployment2File := "testing/deployment-2.yaml"
+	testDeployment3File := "testing/deployment-3.yaml"
+	testDeploymentUpdated3File := "testing/deployment-updated-2.yaml"
 
 	cronjobYaml := "cronjob.yaml"
 	daemonsetYaml := "daemonset.yaml"
@@ -1099,6 +1101,20 @@ func TestUpdateMatchingContainerImage(t *testing.T) {
 			},
 			want: Objects{
 				deploymentYaml: newObjectFromFile(t, testDeployment2File),
+			},
+		},
+		{
+			name: "Second image is substring of first",
+
+			objs: Objects{
+				deploymentYaml: newObjectFromFile(t, testDeployment3File),
+			},
+
+			beforeUpdate: Objects{
+				deploymentYaml: newObjectFromFile(t, testDeployment3File),
+			},
+			want: Objects{
+				deploymentYaml: newObjectFromFile(t, testDeploymentUpdated3File),
 			},
 		},
 	}

@@ -15,6 +15,9 @@ package services
 import (
 	"context"
 	"os"
+
+	"github.com/google/go-containerregistry/pkg/name"
+	v1 "github.com/google/go-containerregistry/pkg/v1"
 )
 
 // Clients is a wrapper around HTTP clients and CLIs.
@@ -22,6 +25,7 @@ type Clients struct {
 	Gcloud  GcloudService
 	Kubectl KubectlService
 	OS      OSService
+	Remote  RemoteService
 }
 
 // OSService is an interface for os operations.
@@ -35,7 +39,6 @@ type OSService interface {
 
 // GcloudService is an interface for gcloud operations.
 type GcloudService interface {
-	ContainerImagesDescribe(ctx context.Context, image, format string) (string, error)
 	ContainerClustersGetCredentials(ctx context.Context, clusterName, clusterLocation, clusterProject string) error
 	ConfigGetValue(ctx context.Context, property string) (string, error)
 }
@@ -44,6 +47,11 @@ type GcloudService interface {
 type KubectlService interface {
 	Apply(ctx context.Context, configs, namespace string) error
 	Get(ctx context.Context, kind, name, namespace, format string) (string, error)
+}
+
+// RemoteService is an interface for github.com/google/go-containerregistry/pkg/v1/remote.
+type RemoteService interface {
+	Image(ref name.Reference) (v1.Image, error)
 }
 
 // NewClients returns a new Clients object with default services.
@@ -60,10 +68,15 @@ func NewClients(ctx context.Context, printCommands bool) (*Clients, error) {
 	if err != nil {
 		return nil, err
 	}
+	rs, err := NewRemote(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	return &Clients{
 		OS:      oss,
 		Gcloud:  gs,
 		Kubectl: ks,
+		Remote:  rs,
 	}, nil
 }
