@@ -4,34 +4,15 @@ This command will execute only the [Apply](../README.md#apply-step) phase.
 
 ## Parameters
 
-| Flag                    | Default Value | Description                        |
-| ----------------------- | ------------- | ---------------------------------- |
-| `--filename`&#124;`-f`  |               | Config file or directory of config |
-:                         :               : files to use to create the         :
-:                         :               : Kubernetes resources (file or      :
-:                         :               : files in directory must end with   :
-:                         :               : \".yml\" or \".yaml\"). If this is :
-:                         :               : omitted, base YAMLs will be        :
-:                         :               : generated for the user.            :
-| `--namespace`&#124;`-n` | `default`     | Kubernetes namespace in which to   |
-:                         :               : deploy the app.                    :
-| `--label`&#124;`-L`     |               | Label(s) to add to Kubernetes      |
-:                         :               : resources (k1=v1). Labels can be   :
-:                         :               : set comma-delimited or as separate :
-:                         :               : flags. If two or more labels with  :
-:                         :               : the same key are listed, the last  :
-:                         :               : one is used.                       :
-| `--cluster`&#124;`-c`   |               | Name of GKE cluster to deploy to.  |
-| `--location`&#124;`-l`  |               | Region/zone of GKE cluster to      |
-:                         :               : deploy to.                         :
-| `--project`&#124;`-p`   |               | Project of GKE cluster to deploy   |
-:                         :               : to. If this field is not provided, :
-:                         :               : the current set GCP project is     :
-:                         :               : used.                              :
-| `--timeout`&#124;`-t`   | 5m            | Timeout limit for waiting for      |
-:                         :               : resources to finish applying.      :
-| `--verbose`&#124;`-V`   | false         | Prints underlying commands being   |
-:                         :               : called to stdout.                  :
+Flag | Default Value | Description
+--- | --- | --- |
+`--filename`&#124;`-f` | | Config file or directory of config files to use to create the Kubernetes resources (file or files in directory must end with \".yml\" or \".yaml\"). If this is omitted, base YAMLs will be generated for the user.
+`--namespace`&#124;`-n` | `default` | Kubernetes namespace in which to deploy the app.
+`--cluster`&#124;`-c` | | Name of GKE cluster to deploy to.
+`--location`&#124;`-l` | | Region/zone of GKE cluster to deploy to.
+`--project`&#124;`-p` | | Project of GKE cluster to deploy  to. If this field is not provided the current set GCP project is used.
+`--timeout`&#124;`-t` | 5m | Timeout limit for waiting for resources to finish applying.
+`--verbose`&#124;`-V` | false | Prints underlying commands being called to stdout.
 
 ## Run Binary Locally
 
