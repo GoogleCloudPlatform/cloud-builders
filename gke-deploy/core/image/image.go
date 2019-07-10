@@ -20,22 +20,18 @@ import (
 	"github.com/google/go-containerregistry/pkg/name"
 )
 
-// ParseImages parses a slice of image strings.
-func ParseImages(images []string) ([]name.Reference, error) {
+// ParseReferences parses a slice of image strings into References.
+func ParseReferences(images []string) ([]name.Reference, error) {
 	var refs []name.Reference
 
 	exists := make(map[string]bool)
 	for _, image := range images {
-		ref, err := parseImage(image)
+		ref, err := name.ParseReference(image)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("image is invalid: %q", image)
 		}
 
-		imName, err := GetName(ref)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get image name: %v", err)
-		}
-
+		imName := Name(ref)
 		if ok := exists[imName]; ok {
 			return nil, fmt.Errorf("duplicate image name: %q", imName)
 		}
@@ -46,39 +42,16 @@ func ParseImages(images []string) ([]name.Reference, error) {
 	return refs, nil
 }
 
-func parseImage(image string) (name.Reference, error) {
-	im, err := name.ParseReference(image)
-	if err != nil {
-		return nil, fmt.Errorf("image is invalid: %q", image)
-	}
-	return im, nil
+// Name gets an image's name from a Reference.
+// e.g., If the string representation of the Reference is "gcr.io/my-project/my-image:1.0.0", this
+// returns "gcr.io/my-project/my-image".
+func Name(ref name.Reference) string {
+	return fmt.Sprintf("%s/%s", ref.Context().RegistryStr(), ref.Context().RepositoryStr())
 }
 
-// ParseImageReference gets an image's name, given a string representation of the image.
-// e.g., given "gcr.io/my-project/my-app:1.0.0", returns "gcr.io/project/my-app"
-func ParseImageReference(image string) (string, error) {
-	im, err := parseImage(image)
-	if err != nil {
-		return "", err
-	}
-	return GetName(im)
-}
-
-// GetName gets an image's name.
-func GetName(image name.Reference) (string, error) {
-	switch t := image.(type) {
-	case name.Tag:
-		return fmt.Sprintf("%s/%s", t.RegistryStr(), t.RepositoryStr()), nil
-	case name.Digest:
-		return fmt.Sprintf("%s/%s", t.RegistryStr(), t.RepositoryStr()), nil
-	default:
-		return "", fmt.Errorf("invalid image type: %s", t)
-	}
-}
-
-// GetDigest gets an image's corresponding digest.
-func GetDigest(ctx context.Context, image name.Reference, rs services.RemoteService) (string, error) {
-	im, err := rs.Image(image)
+// ResolveDigest gets an image's corresponding digest.
+func ResolveDigest(ctx context.Context, ref name.Reference, rs services.RemoteService) (string, error) {
+	im, err := rs.Image(ref)
 	if err != nil {
 		return "", fmt.Errorf("failed to get remote image reference: %v", err)
 	}

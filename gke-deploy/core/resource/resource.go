@@ -22,6 +22,8 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"github.com/google/go-containerregistry/pkg/name"
+
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -200,12 +202,11 @@ func UpdateMatchingContainerImage(ctx context.Context, objs Objects, imageName, 
 				continue
 			}
 
-			imName, err := image.ParseImageReference(im)
+			ref, err := name.ParseReference(im)
 			if err != nil {
-				return fmt.Errorf("failed to get name of image %s: %v", im, err)
+				return fmt.Errorf("failed to parse reference from image %q: %v", im, err)
 			}
-
-			if imName == imageName {
+			if image.Name(ref) == imageName {
 				fmt.Printf("Updating container of resource: %v\n", obj)
 				if err := unstructured.SetNestedField(conMap, replace, "image"); err != nil {
 					return fmt.Errorf("failed to set image field: %v", err)

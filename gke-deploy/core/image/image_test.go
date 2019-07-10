@@ -62,8 +62,8 @@ func TestParseImages(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if got, err := ParseImages(tc.images); !reflect.DeepEqual(got, tc.want) || err != nil {
-				t.Errorf("ParseImages(%v) = %v, %v; want %v, <nil>", tc.images, got, err, tc.want)
+			if got, err := ParseReferences(tc.images); !reflect.DeepEqual(got, tc.want) || err != nil {
+				t.Errorf("ParseReferences(%v) = %v, %v; want %v, <nil>", tc.images, got, err, tc.want)
 			}
 		})
 	}
@@ -107,14 +107,14 @@ func TestParseImagesErrors(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if got, err := ParseImages(tc.images); err == nil {
-				t.Errorf("ParseImages(%v) = %v, <nil>; want <nil>, err", tc.images, got)
+			if got, err := ParseReferences(tc.images); err == nil {
+				t.Errorf("ParseReferences(%v) = %v, <nil>; want <nil>, err", tc.images, got)
 			}
 		})
 	}
 }
 
-func TestGetName(t *testing.T) {
+func TestName(t *testing.T) {
 	tests := []struct {
 		name string
 
@@ -147,14 +147,14 @@ func TestGetName(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if got, err := GetName(tc.image); got != tc.want || err != nil {
-				t.Errorf("GetName(%v) = %s, %v; want %s, <nil>", tc.image, got, err, tc.want)
+			if got := Name(tc.image); got != tc.want {
+				t.Errorf("Name(%v) = %s; want %s", tc.image, got, tc.want)
 			}
 		})
 	}
 }
 
-func TestGetDigest(t *testing.T) {
+func TestResolveDigest(t *testing.T) {
 	ctx := context.Background()
 
 	tests := []struct {
@@ -186,14 +186,14 @@ func TestGetDigest(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if got, err := GetDigest(ctx, tc.image, tc.rs); got != tc.want || err != nil {
-				t.Errorf("GetDigest(ctx, %v, rs) = %s, %v; want %s, <nil>", tc.image, got, err, tc.want)
+			if got, err := ResolveDigest(ctx, tc.image, tc.rs); got != tc.want || err != nil {
+				t.Errorf("ResolveDigest(ctx, %v, rs) = %s, %v; want %s, <nil>", tc.image, got, err, tc.want)
 			}
 		})
 	}
 }
 
-func TestGetDigestErrors(t *testing.T) {
+func TestResolveDigestErrors(t *testing.T) {
 	ctx := context.Background()
 	image := newImageWithTag(t, "my-image:1.0.0")
 
@@ -228,8 +228,8 @@ func TestGetDigestErrors(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if got, err := GetDigest(ctx, image, tc.rs); got != "" || err == nil {
-				t.Errorf("GetDigest(ctx, %v, rs) = %s, %v; want \"\", error", image, got, err)
+			if got, err := ResolveDigest(ctx, image, tc.rs); got != "" || err == nil {
+				t.Errorf("ResolveDigest(ctx, %v, rs) = %s, %v; want \"\", error", image, got, err)
 			}
 		})
 	}

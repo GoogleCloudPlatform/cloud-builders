@@ -56,11 +56,11 @@ func (d *Deployer) Prepare(ctx context.Context, images []name.Reference, appName
 	fmt.Printf("Configs to prepare: %v\n", objs)
 
 	for _, im := range images {
-		imageDigest, err := image.GetDigest(ctx, im, d.Clients.Remote)
+		imageDigest, err := image.ResolveDigest(ctx, im, d.Clients.Remote)
 		if err != nil {
 			return fmt.Errorf("failed to get image digest: %v", err)
 		}
-		imageName, err := image.GetName(im)
+		imageName := image.Name(im)
 		if err != nil {
 			return fmt.Errorf("failed to get image name: %v", err)
 		}
