@@ -8,7 +8,7 @@ recommended best practices.
 
 ## gke-deploy vs kubectl
 
-Using `gke-deploy` to deploy an application to GKE differs from kubectl in that
+Using `gke-deploy` to deploy an application to GKE differs from `kubectl` in that
 a `gke-deploy` deployment follows Google's recommended best practices by doing
 the following:
 
@@ -22,7 +22,7 @@ the following:
 
 1.  `gke-deploy` gets authorized to access a GKE cluster.
 
-2.  `gke-deploy` applies the set of Kubernetes resource YAML configs that were
+2.  `gke-deploy` applies (using `kubectl`) the set of Kubernetes resource YAML configs that were
     modified in the prepare step.
 
 3.  `gke-deploy` waits for applied Kubernetes resources to be ready.
