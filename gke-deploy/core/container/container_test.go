@@ -18,9 +18,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/google/go-containerregistry/pkg/name"
-
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/testservices"
+	v1 "github.com/google/go-containerregistry/pkg/v1"
+
+	"github.com/google/go-containerregistry/pkg/name"
 )
 
 func TestParseImages(t *testing.T) {
@@ -166,34 +167,33 @@ func TestGetDigest(t *testing.T) {
 		name string
 
 		image Image
-		gs    *testservices.TestGcloud
+		rs    *testservices.TestRemote
 
 		want string
 	}{
 		{
-			name: "Get digest from image with tag",
+			name: "Get digest from remote image",
 
 			image: newImageWithTag(t, "my-image:1.0.0"),
-			gs: &testservices.TestGcloud{
-				ContainerImagesDescribeResp: "sha256:foobar",
-				ContainerImagesDescribeErr:  nil,
+			rs: &testservices.TestRemote{
+				ImageResp: &testservices.TestImage{
+					Hash: v1.Hash{
+						Algorithm: "sha256",
+						Hex:       "foobar",
+					},
+					Err: nil,
+				},
+				ImageErr: nil,
 			},
 
 			want: "sha256:foobar",
-		},
-		{
-			name:  "Get digest from image with digest",
-			image: newImageWithDigest(t, "my-image@sha256:929665b8eb2bb286535d29cd73c71808d7e1ad830046333f6cf0ce497996eb79"),
-			gs:    nil,
-
-			want: "sha256:929665b8eb2bb286535d29cd73c71808d7e1ad830046333f6cf0ce497996eb79",
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if got, err := GetDigest(ctx, tc.image, tc.gs); got != tc.want || err != nil {
-				t.Errorf("GetDigest(ctx, %v, gs) = %s, %v; want %s, <nil>", tc.image, got, err, tc.want)
+			if got, err := GetDigest(ctx, tc.image, tc.rs); got != tc.want || err != nil {
+				t.Errorf("GetDigest(ctx, %v, rs) = %s, %v; want %s, <nil>", tc.image, got, err, tc.want)
 			}
 		})
 	}
@@ -202,13 +202,42 @@ func TestGetDigest(t *testing.T) {
 func TestGetDigestErrors(t *testing.T) {
 	ctx := context.Background()
 	image := newImageWithTag(t, "my-image:1.0.0")
-	gs := &testservices.TestGcloud{
-		ContainerImagesDescribeResp: "",
-		ContainerImagesDescribeErr:  fmt.Errorf("failed to describe container image"),
+
+	tests := []struct {
+		name string
+
+		image Image
+		rs    *testservices.TestRemote
+	}{
+		{
+			name: "Fail to get remote image",
+
+			image: image,
+			rs: &testservices.TestRemote{
+				ImageResp: nil,
+				ImageErr:  fmt.Errorf("failed to get remote image"),
+			},
+		},
+		{
+			name: "Fail to get digest from remote image",
+
+			image: image,
+			rs: &testservices.TestRemote{
+				ImageResp: &testservices.TestImage{
+					Hash: v1.Hash{},
+					Err:  fmt.Errorf("failed to get digest"),
+				},
+				ImageErr: nil,
+			},
+		},
 	}
 
-	if got, err := GetDigest(ctx, image, gs); got != "" || err == nil {
-		t.Errorf("GetDigest(ctx, %v, gs) = %s, %v; want \"\", error", image, got, err)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if got, err := GetDigest(ctx, image, tc.rs); got != "" || err == nil {
+				t.Errorf("GetDigest(ctx, %v, rs) = %s, %v; want \"\", error", image, got, err)
+			}
+		})
 	}
 }
 

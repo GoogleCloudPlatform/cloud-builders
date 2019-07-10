@@ -34,15 +34,6 @@ func NewGcloud(ctx context.Context, printCommands bool) (*Gcloud, error) {
 	}, nil
 }
 
-// ContainerImageDescribe calls `gcloud container images describe <image> --format=<format>` and returns stdout.
-func (g *Gcloud) ContainerImagesDescribe(ctx context.Context, image, format string) (string, error) {
-	out, err := runCommand(g.printCommands, "gcloud", "container", "images", "describe", image, fmt.Sprintf("--format=%s", format), "--quiet")
-	if err != nil {
-		return "", fmt.Errorf("command to describe container image failed: %v", err)
-	}
-	return strings.TrimSpace(out), nil
-}
-
 // ContainerClustersGetCredentials calls `gcloud container clusters get-credentials <clusterName> --zone=<clusterLocation> --project=<clusterProject>`.
 // Both region and zone can be passed to the --zone flag.
 func (g *Gcloud) ContainerClustersGetCredentials(ctx context.Context, clusterName, clusterLocation, clusterProject string) error {

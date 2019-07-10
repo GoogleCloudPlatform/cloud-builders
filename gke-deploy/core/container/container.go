@@ -20,10 +20,6 @@ import (
 	"github.com/google/go-containerregistry/pkg/name"
 )
 
-const (
-	imageDigestFormat = "value(image_summary.digest)"
-)
-
 // Image is an alias to name.Reference.
 type Image = name.Reference
 
@@ -83,17 +79,14 @@ func GetName(ctx context.Context, image Image) (string, error) {
 }
 
 // GetDigest gets an image's corresponding digest.
-func GetDigest(ctx context.Context, image Image, gs services.GcloudService) (string, error) {
-	switch t := image.(type) {
-	case name.Tag:
-		digest, err := gs.ContainerImagesDescribe(ctx, t.Name(), imageDigestFormat)
-		if err != nil {
-			return "", fmt.Errorf("failed to get image digest: %v", err)
-		}
-		return digest, nil
-	case name.Digest:
-		return image.Identifier(), nil
-	default:
-		return "", fmt.Errorf("invalid image type: %s", t)
+func GetDigest(ctx context.Context, image Image, rs services.RemoteService) (string, error) {
+	im, err := rs.Image(image)
+	if err != nil {
+		return "", fmt.Errorf("failed to get remote image reference: %v", err)
 	}
+	digest, err := im.Digest()
+	if err != nil {
+		return "", fmt.Errorf("failed to get image digest: %v", err)
+	}
+	return fmt.Sprintf("%s:%s", digest.Algorithm, digest.Hex), nil
 }

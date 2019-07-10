@@ -22,8 +22,9 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/cluster"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/container"
+
+	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/cluster"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/gcp"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/resource"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
@@ -53,8 +54,7 @@ func (d *Deployer) Prepare(ctx context.Context, images []container.Image, appNam
 	fmt.Printf("Configs to prepare: %v\n", objs)
 
 	for _, image := range images {
-		// name.Digest
-		imageDigest, err := container.GetDigest(ctx, image, d.Clients.Gcloud)
+		imageDigest, err := container.GetDigest(ctx, image, d.Clients.Remote)
 		if err != nil {
 			return fmt.Errorf("failed to get image digest: %v", err)
 		}

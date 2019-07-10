@@ -16,11 +16,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/container"
-
 	"github.com/spf13/cobra"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/cmd/common"
+	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/container"
 )
 
 const (
