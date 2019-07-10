@@ -1,0 +1,24 @@
+options:
+  env:
+  - GO111MODULE=on
+  - GOPROXY=https://proxy.golang.org
+  volumes:
+  - name: go-modules
+    path: /go
+
+steps:
+
+- name: golang:1.12
+  dir: foo
+  args: ["go","build","-o","/go/bin/foo","main.go"]
+
+- name: golang:1.12
+  dir: bar
+  args: ["go","build","-o","/go/bin/bar","main.go"]
+
+- name: busybox
+  args:
+  - ls
+  - -l
+  - /go/bin
+  

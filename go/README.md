@@ -55,6 +55,9 @@ In the above, if the `volumes` section were omitted, the second step would fail.
 
 **NB** Cloud Build supports using build-wide settings for `env` and `volumes` using `options` (see [link](https://cloud.google.com/cloud-build/docs/build-config#options)). I've duplicated here to aid clarity.
 
+See [`examples/multi_step`](https://github.com/GoogleCloudPlatform/cloud-builders/tree/master/go/examples/multi_step/README.md)
+for a working example.
+
 ## Note #3 Golang Module Mirror
 
 The Go team provides a Golang Module Mirror ([https://proxy.golang.org/](https://proxy.golang.org/)). You may utilize the Mirror by including `GOPROXY=https://proxy.golang.org` in your build steps, e.g.:
