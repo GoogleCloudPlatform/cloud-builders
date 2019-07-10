@@ -10,24 +10,25 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package container
+package services
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
+	"github.com/google/go-containerregistry/pkg/name"
+	v1 "github.com/google/go-containerregistry/pkg/v1"
+	"github.com/google/go-containerregistry/pkg/v1/remote"
 )
 
-const (
-	imageDigestFormat = "value(image_summary.digest)"
-)
+// Remote implements the RemoteService interface.
+type Remote struct{}
 
-// GetDigest uses an image string to get its corresponding digest.
-func GetDigest(ctx context.Context, image string, gs services.GcloudService) (string, error) {
-	digest, err := gs.ContainerImagesDescribe(ctx, image, imageDigestFormat)
-	if err != nil {
-		return "", fmt.Errorf("failed to get image digest: %v", err)
-	}
-	return digest, nil
+// NewRemote returns a new Remote object.
+func NewRemote(ctx context.Context) (*Remote, error) {
+	return &Remote{}, nil
+}
+
+// Image gets a remote image from a reference.
+func (*Remote) Image(ref name.Reference) (v1.Image, error) {
+	return remote.Image(ref)
 }

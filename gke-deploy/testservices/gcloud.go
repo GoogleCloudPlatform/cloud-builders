@@ -18,18 +18,10 @@ import (
 
 // TestGcloud implements the GcloudService interface.
 type TestGcloud struct {
-	ContainerImagesDescribeResp string
-	ContainerImagesDescribeErr  error
-
 	ContainerClustersGetCredentialsErr error
 
 	ConfigGetValueResp string
 	ConfigGetValueErr  error
-}
-
-// ContainerImageDescribe calls `gcloud container images describe <image> --format=<format>` and returns stdout.
-func (g *TestGcloud) ContainerImagesDescribe(ctx context.Context, image, format string) (string, error) {
-	return g.ContainerImagesDescribeResp, g.ContainerImagesDescribeErr
 }
 
 // ContainerClustersGetCredentials calls `gcloud container clusters get-credentials <clusterName> --zone=<clusterLocation> --project=<clusterProject>`.

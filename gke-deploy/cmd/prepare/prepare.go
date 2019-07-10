@@ -19,6 +19,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/cmd/common"
+	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/image"
 )
 
 const (
@@ -81,7 +82,8 @@ func NewPrepareCommand() *cobra.Command {
 func prepare(cmd *cobra.Command, options *options) error {
 	ctx := context.Background()
 
-	if err := common.ValidateImages(options.images); err != nil {
+	images, err := image.ParseReferences(options.images)
+	if err != nil {
 		return err
 	}
 
@@ -108,7 +110,7 @@ func prepare(cmd *cobra.Command, options *options) error {
 		return err
 	}
 
-	if err := d.Prepare(ctx, options.images, options.appName, options.appVersion, options.filename, options.output, options.namespace, labelsMap); err != nil {
+	if err := d.Prepare(ctx, images, options.appName, options.appVersion, options.filename, options.output, options.namespace, labelsMap); err != nil {
 		return fmt.Errorf("failed to prepare deployment: %v", err)
 	}
 
