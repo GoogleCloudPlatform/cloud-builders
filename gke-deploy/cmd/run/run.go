@@ -94,7 +94,7 @@ func NewRunCommand() *cobra.Command {
 func run(cmd *cobra.Command, options *options) error {
 	ctx := context.Background()
 
-	images, err := container.ParseImages(ctx, options.images)
+	images, err := container.ParseImages(options.images)
 	if err != nil {
 		return err
 	}

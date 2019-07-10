@@ -60,7 +60,7 @@ func (d *Deployer) Prepare(ctx context.Context, images []name.Reference, appName
 		if err != nil {
 			return fmt.Errorf("failed to get image digest: %v", err)
 		}
-		imageName, err := container.GetName(ctx, image)
+		imageName, err := container.GetName(image)
 		if err != nil {
 			return fmt.Errorf("failed to get image name: %v", err)
 		}

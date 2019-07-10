@@ -82,7 +82,7 @@ func NewPrepareCommand() *cobra.Command {
 func prepare(cmd *cobra.Command, options *options) error {
 	ctx := context.Background()
 
-	images, err := container.ParseImages(ctx, options.images)
+	images, err := container.ParseImages(options.images)
 	if err != nil {
 		return err
 	}

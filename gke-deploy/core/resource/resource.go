@@ -200,7 +200,7 @@ func UpdateMatchingContainerImage(ctx context.Context, objs Objects, imageName, 
 				continue
 			}
 
-			imName, err := container.GetNameFromString(ctx, im)
+			imName, err := container.ParseImageReference(im)
 			if err != nil {
 				return fmt.Errorf("failed to get name of image %s: %v", im, err)
 			}

@@ -21,17 +21,17 @@ import (
 )
 
 // ParseImages parses a slice of image strings.
-func ParseImages(ctx context.Context, images []string) ([]name.Reference, error) {
+func ParseImages(images []string) ([]name.Reference, error) {
 	var refs []name.Reference
 
 	exists := make(map[string]bool)
 	for _, image := range images {
-		ref, err := parseImage(ctx, image)
+		ref, err := parseImage(image)
 		if err != nil {
 			return nil, err
 		}
 
-		imName, err := GetName(ctx, ref)
+		imName, err := GetName(ref)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get image name: %v", err)
 		}
@@ -46,7 +46,7 @@ func ParseImages(ctx context.Context, images []string) ([]name.Reference, error)
 	return refs, nil
 }
 
-func parseImage(ctx context.Context, image string) (name.Reference, error) {
+func parseImage(image string) (name.Reference, error) {
 	im, err := name.ParseReference(image)
 	if err != nil {
 		return nil, fmt.Errorf("image is invalid: %q", image)
@@ -54,17 +54,18 @@ func parseImage(ctx context.Context, image string) (name.Reference, error) {
 	return im, nil
 }
 
-// GetNameFromString gets an image's name, given a string representation of the image.
-func GetNameFromString(ctx context.Context, image string) (string, error) {
-	im, err := parseImage(ctx, image)
+// ParseImageReference gets an image's name, given a string representation of the image.
+// e.g., given "gcr.io/my-project/my-app:1.0.0", returns "gcr.io/project/my-app"
+func ParseImageReference(image string) (string, error) {
+	im, err := parseImage(image)
 	if err != nil {
 		return "", err
 	}
-	return GetName(ctx, im)
+	return GetName(im)
 }
 
 // GetName gets an image's name.
-func GetName(ctx context.Context, image name.Reference) (string, error) {
+func GetName(image name.Reference) (string, error) {
 	switch t := image.(type) {
 	case name.Tag:
 		return fmt.Sprintf("%s/%s", t.RegistryStr(), t.RepositoryStr()), nil

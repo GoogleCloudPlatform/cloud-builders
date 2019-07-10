@@ -25,8 +25,6 @@ import (
 )
 
 func TestParseImages(t *testing.T) {
-	ctx := context.Background()
-
 	image := "gcr.io/my-project/my-image:1.0.0"
 	image2 := "gcr.io/my-project/my-image-2@sha256:929665b8eb2bb286535d29cd73c71808d7e1ad830046333f6cf0ce497996eb79"
 	image3 := "gcr.io/my-project/my-image-3"
@@ -64,16 +62,14 @@ func TestParseImages(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if got, err := ParseImages(ctx, tc.images); !reflect.DeepEqual(got, tc.want) || err != nil {
-				t.Errorf("ParseImages(ctx, %v) = %v, %v; want %v, <nil>", tc.images, got, err, tc.want)
+			if got, err := ParseImages(tc.images); !reflect.DeepEqual(got, tc.want) || err != nil {
+				t.Errorf("ParseImages(%v) = %v, %v; want %v, <nil>", tc.images, got, err, tc.want)
 			}
 		})
 	}
 }
 
 func TestParseImagesErrors(t *testing.T) {
-	ctx := context.Background()
-
 	image := "gcr.io/my-project/my-image:1.0.0"
 	image2 := "gcr.io/my-project/my-image@sha256:929665b8eb2bb286535d29cd73c71808d7e1ad830046333f6cf0ce497996eb79"
 	image3 := "gcr.io/my-project/my-image"
@@ -111,16 +107,14 @@ func TestParseImagesErrors(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if got, err := ParseImages(ctx, tc.images); err == nil {
-				t.Errorf("ParseImages(ctx, %v) = %v, <nil>; want <nil>, err", tc.images, got)
+			if got, err := ParseImages(tc.images); err == nil {
+				t.Errorf("ParseImages(%v) = %v, <nil>; want <nil>, err", tc.images, got)
 			}
 		})
 	}
 }
 
 func TestGetName(t *testing.T) {
-	ctx := context.Background()
-
 	tests := []struct {
 		name string
 
@@ -153,8 +147,8 @@ func TestGetName(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if got, err := GetName(ctx, tc.image); got != tc.want || err != nil {
-				t.Errorf("GetName(ctx, %v) = %s, %v; want %s, <nil>", tc.image, got, err, tc.want)
+			if got, err := GetName(tc.image); got != tc.want || err != nil {
+				t.Errorf("GetName(%v) = %s, %v; want %s, <nil>", tc.image, got, err, tc.want)
 			}
 		})
 	}
