@@ -29,7 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
 	"k8s.io/apimachinery/pkg/util/yaml"
 
-	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/container"
+	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/image"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
 )
 
@@ -200,7 +200,7 @@ func UpdateMatchingContainerImage(ctx context.Context, objs Objects, imageName, 
 				continue
 			}
 
-			imName, err := container.ParseImageReference(im)
+			imName, err := image.ParseImageReference(im)
 			if err != nil {
 				return fmt.Errorf("failed to get name of image %s: %v", im, err)
 			}

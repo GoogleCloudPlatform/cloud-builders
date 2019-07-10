@@ -22,9 +22,9 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/google/go-containerregistry/pkg/name"
+	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/image"
 
-	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/container"
+	"github.com/google/go-containerregistry/pkg/name"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/cluster"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/gcp"
@@ -55,18 +55,18 @@ func (d *Deployer) Prepare(ctx context.Context, images []name.Reference, appName
 	}
 	fmt.Printf("Configs to prepare: %v\n", objs)
 
-	for _, image := range images {
-		imageDigest, err := container.GetDigest(ctx, image, d.Clients.Remote)
+	for _, im := range images {
+		imageDigest, err := image.GetDigest(ctx, im, d.Clients.Remote)
 		if err != nil {
 			return fmt.Errorf("failed to get image digest: %v", err)
 		}
-		imageName, err := container.GetName(image)
+		imageName, err := image.GetName(im)
 		if err != nil {
 			return fmt.Errorf("failed to get image name: %v", err)
 		}
 		imageWithDigest := fmt.Sprintf("%s@%s", imageName, imageDigest)
 
-		fmt.Printf("Got digest for image: %s --> %s\n", image, imageWithDigest)
+		fmt.Printf("Got digest for image: %s --> %s\n", im, imageWithDigest)
 		fmt.Printf("Updating resource containers that have image name %q\n", imageName)
 
 		if err := resource.UpdateMatchingContainerImage(ctx, objs, imageName, imageWithDigest); err != nil {

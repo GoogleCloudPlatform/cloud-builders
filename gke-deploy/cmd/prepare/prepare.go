@@ -19,7 +19,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/cmd/common"
-	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/container"
+	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/image"
 )
 
 const (
@@ -82,7 +82,7 @@ func NewPrepareCommand() *cobra.Command {
 func prepare(cmd *cobra.Command, options *options) error {
 	ctx := context.Background()
 
-	images, err := container.ParseImages(options.images)
+	images, err := image.ParseImages(options.images)
 	if err != nil {
 		return err
 	}
