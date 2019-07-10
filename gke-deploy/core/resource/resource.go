@@ -299,7 +299,7 @@ func CreateNamespaceObject(ctx context.Context, name string) (*Object, error) {
 	if name == "default" {
 		return nil, fmt.Errorf("namespace name should not be \"default\"")
 	}
-	obj, err := DecodeFromYAML(ctx, namespaceTemplateBytes)
+	obj, err := DecodeFromYAML(ctx, []byte(namespaceTemplate))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create template namespace object")
 	}

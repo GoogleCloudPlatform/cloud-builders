@@ -17,8 +17,9 @@ require (
 	github.com/go-openapi/spec v0.19.2 // indirect
 	github.com/go-openapi/swag v0.19.4 // indirect
 	github.com/gobuffalo/logger v1.0.1 // indirect
-	github.com/gobuffalo/packr/v2 v2.5.2
+	github.com/gobuffalo/packr/v2 v2.5.2 // indirect
 	github.com/golang/groupcache v0.0.0-20190702054246-869f871628b6 // indirect
+	github.com/golang/protobuf v1.3.2 // indirect
 	github.com/google/go-containerregistry v0.0.0-20190708223311-46a3528b8227
 	github.com/googleapis/gnostic v0.3.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.9.4 // indirect
@@ -44,8 +45,8 @@ require (
 	golang.org/x/image v0.0.0-20190703141733-d6a02ce849c9 // indirect
 	golang.org/x/mobile v0.0.0-20190607214518-6fa95d984e88 // indirect
 	golang.org/x/net v0.0.0-20190628185345-da137c7871d7 // indirect
-	golang.org/x/sys v0.0.0-20190626221950-04f50cda93cb // indirect
-	golang.org/x/tools v0.0.0-20190709184527-e491332ed8cc // indirect
+	golang.org/x/sys v0.0.0-20190710143415-6ec70d6a5542 // indirect
+	golang.org/x/tools v0.0.0-20190710165951-554846603d9b // indirect
 	google.golang.org/genproto v0.0.0-20190708153700-3bdd9d9f5532 // indirect
 	google.golang.org/grpc v1.22.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
