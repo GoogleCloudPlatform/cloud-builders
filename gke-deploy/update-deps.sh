@@ -19,10 +19,10 @@ set -o nounset
 set -o pipefail
 
 # Get latest versions of all dependencies.
-go get -u
+GO111MODULE=on go get -u
 
 # Fetch dependencies into vendor/
-go mod vendor
+GO111MODULE=on go mod vendor
 
 # These commands need to be in your $PATH
 # github.com/mattmoor/dep-collector

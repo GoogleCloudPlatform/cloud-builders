@@ -1,3 +1,16 @@
+# github.com/GoogleCloudPlatform/cloud-builders/gke-deploy v0.0.0-20190710184435-b7d9677b1860
+github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/cmd
+github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/cmd/apply
+github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/cmd/prepare
+github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/cmd/run
+github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/cmd/common
+github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/deployer
+github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services
+github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/image
+github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/resource
+github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/cluster
+github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/gcp
+github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/testservices
 # github.com/gogo/protobuf v1.2.1
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/sortkeys
@@ -41,7 +54,7 @@ golang.org/x/text/transform
 gopkg.in/inf.v0
 # gopkg.in/yaml.v2 v2.2.2
 gopkg.in/yaml.v2
-# k8s.io/apimachinery v0.0.0-20190703205208-4cfb76a8bf76
+# k8s.io/apimachinery v0.0.0-20190712095106-75ce4d1e60f1
 k8s.io/apimachinery/pkg/api/meta
 k8s.io/apimachinery/pkg/apis/meta/v1/unstructured
 k8s.io/apimachinery/pkg/runtime
