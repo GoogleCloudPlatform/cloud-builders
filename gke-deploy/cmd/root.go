@@ -33,9 +33,8 @@ Prepare Phase:
 Apply Phase:
   - Apply Kubernetes config YAMLs to the target cluster with the provided namespace.
   - Wait for deployed resources to be ready before exiting.
-
-Examples:
-  # Modify configs and deploy to GKE cluster.
+`
+	example = `  # Modify configs and deploy to GKE cluster.
   gke-deploy run -f configs -i gcr.io/my-project/my-app:1.0.0 -a my-app -v 1.0.0 -o modified -n my-namespace -c my-cluster -l us-east1-b
 
   # Deploy to GKE cluster that kubectl is currently targeting.
@@ -50,8 +49,7 @@ Examples:
   # Execute prepare and apply, with an intermediary step in between (e.g., manually check modified YAMLs)
   gke-deploy prepare -f configs -i gcr.io/my-project/my-app:1.0.0 -a my-app -v 1.0.0 -o modified -n my-namespace
   cat modified/*
-  gke-deploy apply -f modified -c my-cluster -n my-namespace -c my-cluster -l us-east1-b  # Pass modified directory to -f
-`
+  gke-deploy apply -f modified -c my-cluster -n my-namespace -c my-cluster -l us-east1-b  # Pass modified directory to -f`
 	version = "" // TODO(joonlim): Create plan for versioning.
 )
 
@@ -60,6 +58,7 @@ func NewCommand() *cobra.Command {
 		Use:     "gke-deploy",
 		Short:   short,
 		Long:    long,
+		Example: example,
 		Version: version,
 	}
 

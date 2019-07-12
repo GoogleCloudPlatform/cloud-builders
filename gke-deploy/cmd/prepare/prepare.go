@@ -30,16 +30,14 @@ const (
   - Set the digest of images that match the [--image|-i] flag, if provided.
   - Add app.kubernetes.io/name=[--app|-a] label, if provided.
   - Add app.kubernetes.io/version=[--version|-v] label, if provided.
-
-Examples:
-  # Prepare only.
+`
+	example = `  # Prepare only.
   gke-deploy prepare -f configs -i gcr.io/my-project/my-app:1.0.0 -a my-app -v 1.0.0 -o modified -n my-namespace
 
   # Execute prepare and apply, with an intermediary step in between (e.g., manually check modified YAMLs)
   gke-deploy prepare -f configs -i gcr.io/my-project/my-app:1.0.0 -a my-app -v 1.0.0 -o modified -n my-namespace
   cat modified/*
-  gke-deploy apply -f modified -c my-cluster -n my-namespace -c my-cluster -l us-east1-b  # Pass modified directory to -f
-`
+  gke-deploy apply -f modified -c my-cluster -n my-namespace -c my-cluster -l us-east1-b  # Pass modified directory to -f`
 )
 
 type options struct {
@@ -61,6 +59,7 @@ func NewPrepareCommand() *cobra.Command {
 		Aliases: []string{"p"},
 		Short:   short,
 		Long:    long,
+		Example: example,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			return prepare(cmd, options)
 		},
@@ -96,9 +95,6 @@ func prepare(cmd *cobra.Command, options *options) error {
 	}
 	if options.output == "" {
 		return fmt.Errorf("value of -o|--output cannot be empty")
-	}
-	if options.namespace == "" {
-		return fmt.Errorf("value of -n|--namespace cannot be empty")
 	}
 
 	labelsMap, err := common.CreateLabelsMap(options.labels)
