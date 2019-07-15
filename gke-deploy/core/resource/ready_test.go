@@ -80,379 +80,325 @@ func TestIsReady(t *testing.T) {
 		obj *Object
 
 		want bool
-	}{
-		{
-			name: "DaemonSet is ready",
+	}{{
+		name: "DaemonSet is ready",
 
-			obj: newObjectFromFile(t, testDaemonsetReadyFile),
+		obj: newObjectFromFile(t, testDaemonsetReadyFile),
 
-			want: true,
-		},
-		{
-			name: "DaemonSet is not ready, status.numberReady != status.desiredNumberScheduled",
+		want: true,
+	}, {
+		name: "DaemonSet is not ready, status.numberReady != status.desiredNumberScheduled",
 
-			obj: newObjectFromFile(t, testDaemonsetUnreadyFile),
+		obj: newObjectFromFile(t, testDaemonsetUnreadyFile),
 
-			want: false,
-		},
-		{
-			name: "DaemonSet is not ready, status.numberAvailable != status.desiredNumberScheduled",
+		want: false,
+	}, {
+		name: "DaemonSet is not ready, status.numberAvailable != status.desiredNumberScheduled",
 
-			obj: newObjectFromFile(t, testDaemonsetUnready2File),
+		obj: newObjectFromFile(t, testDaemonsetUnready2File),
 
-			want: false,
-		},
-		{
-			name: "DaemonSet is not ready, status.numberAvailable is empty",
+		want: false,
+	}, {
+		name: "DaemonSet is not ready, status.numberAvailable is empty",
 
-			obj: newObjectFromFile(t, testDaemonsetUnready3File),
+		obj: newObjectFromFile(t, testDaemonsetUnready3File),
 
-			want: false,
-		},
-		{
-			name: "DaemonSet is not ready, status.observedGeneration != metadata.generation",
+		want: false,
+	}, {
+		name: "DaemonSet is not ready, status.observedGeneration != metadata.generation",
 
-			obj: newObjectFromFile(t, testDaemonsetUnready4File),
+		obj: newObjectFromFile(t, testDaemonsetUnready4File),
 
-			want: false,
-		},
-		{
-			name: "Deployment is ready",
+		want: false,
+	}, {
+		name: "Deployment is ready",
 
-			obj: newObjectFromFile(t, testDeploymentReadyFile),
+		obj: newObjectFromFile(t, testDeploymentReadyFile),
 
-			want: true,
-		},
-		{
-			name: "Deployment is not ready, Available condition status is False",
+		want: true,
+	}, {
+		name: "Deployment is not ready, Available condition status is False",
 
-			obj: newObjectFromFile(t, testDeploymentUnreadyFile),
+		obj: newObjectFromFile(t, testDeploymentUnreadyFile),
 
-			want: false,
-		},
-		{
-			name: "Deployment is not ready, ReplicaFailure condition status is True",
+		want: false,
+	}, {
+		name: "Deployment is not ready, ReplicaFailure condition status is True",
 
-			obj: newObjectFromFile(t, testDeploymentUnready2File),
+		obj: newObjectFromFile(t, testDeploymentUnready2File),
 
-			want: false,
-		},
-		{
-			name: "Deployment is not ready, Progressing condition with ReplicaSetUpdated reason status is False",
+		want: false,
+	}, {
+		name: "Deployment is not ready, Progressing condition with ReplicaSetUpdated reason status is False",
 
-			obj: newObjectFromFile(t, testDeploymentUnready3File),
+		obj: newObjectFromFile(t, testDeploymentUnready3File),
 
-			want: false,
-		},
-		{
-			name: "Deployment is not ready, status.readyReplicas != spec.replicas",
+		want: false,
+	}, {
+		name: "Deployment is not ready, status.readyReplicas != spec.replicas",
 
-			obj: newObjectFromFile(t, testDeploymentUnready4File),
+		obj: newObjectFromFile(t, testDeploymentUnready4File),
 
-			want: false,
-		},
-		{
-			name: "Deployment is not ready, status.availableReplicas != spec.replicas",
+		want: false,
+	}, {
+		name: "Deployment is not ready, status.availableReplicas != spec.replicas",
 
-			obj: newObjectFromFile(t, testDeploymentUnready5File),
+		obj: newObjectFromFile(t, testDeploymentUnready5File),
 
-			want: false,
-		},
-		{
-			name: "Deployment is not ready, status.conditions is empty",
+		want: false,
+	}, {
+		name: "Deployment is not ready, status.conditions is empty",
 
-			obj: newObjectFromFile(t, testDeploymentUnready6File),
+		obj: newObjectFromFile(t, testDeploymentUnready6File),
 
-			want: false,
-		},
-		{
-			name: "Deployment is not ready, status has no fields",
+		want: false,
+	}, {
+		name: "Deployment is not ready, status has no fields",
 
-			obj: newObjectFromFile(t, testDeploymentUnready7File),
+		obj: newObjectFromFile(t, testDeploymentUnready7File),
 
-			want: false,
-		},
-		{
-			name: "Deployment is not ready, status.replicas != spec.replicas",
+		want: false,
+	}, {
+		name: "Deployment is not ready, status.replicas != spec.replicas",
 
-			obj: newObjectFromFile(t, testDeploymentUnready8File),
+		obj: newObjectFromFile(t, testDeploymentUnready8File),
 
-			want: false,
-		},
-		{
-			name: "Deployment is not ready, status.observedGeneration != metadata.generation",
+		want: false,
+	}, {
+		name: "Deployment is not ready, status.observedGeneration != metadata.generation",
 
-			obj: newObjectFromFile(t, testDeploymentUnready9File),
+		obj: newObjectFromFile(t, testDeploymentUnready9File),
 
-			want: false,
-		},
-		{
-			name: "PersistentVolumeClaim is ready",
+		want: false,
+	}, {
+		name: "PersistentVolumeClaim is ready",
 
-			obj: newObjectFromFile(t, testPvcReadyFile),
+		obj: newObjectFromFile(t, testPvcReadyFile),
 
-			want: true,
-		},
-		{
-			name: "PersistentVolumeClaim is not ready, status.phase is Pending",
+		want: true,
+	}, {
+		name: "PersistentVolumeClaim is not ready, status.phase is Pending",
 
-			obj: newObjectFromFile(t, testPvcUnreadyFile),
+		obj: newObjectFromFile(t, testPvcUnreadyFile),
 
-			want: false,
-		},
-		{
-			name: "Pod is ready, Ready condition status is True",
+		want: false,
+	}, {
+		name: "Pod is ready, Ready condition status is True",
 
-			obj: newObjectFromFile(t, testPodReadyFile),
+		obj: newObjectFromFile(t, testPodReadyFile),
 
-			want: true,
-		},
-		{
-			name: "Pod is ready, Ready condition reason is PodCompleted",
+		want: true,
+	}, {
+		name: "Pod is ready, Ready condition reason is PodCompleted",
 
-			obj: newObjectFromFile(t, testPodReady2File),
+		obj: newObjectFromFile(t, testPodReady2File),
 
-			want: true,
-		},
-		{
-			name: "Pod is not ready, No Ready condition with status True or reason PodCompleted",
+		want: true,
+	}, {
+		name: "Pod is not ready, No Ready condition with status True or reason PodCompleted",
 
-			obj: newObjectFromFile(t, testPodUnreadyFile),
+		obj: newObjectFromFile(t, testPodUnreadyFile),
 
-			want: false,
-		},
-		{
-			name: "Pod is not ready, status.conditions is empty",
+		want: false,
+	}, {
+		name: "Pod is not ready, status.conditions is empty",
 
-			obj: newObjectFromFile(t, testPodUnready2File),
+		obj: newObjectFromFile(t, testPodUnready2File),
 
-			want: false,
-		},
-		{
-			name: "PodDisruptionBudget is ready, status.desiredHealthy == spec.minAvailable and status.currentHealthy > status.desiredHealthy",
+		want: false,
+	}, {
+		name: "PodDisruptionBudget is ready, status.desiredHealthy == spec.minAvailable and status.currentHealthy > status.desiredHealthy",
 
-			obj: newObjectFromFile(t, testPdbReadyFile),
+		obj: newObjectFromFile(t, testPdbReadyFile),
 
-			want: true,
-		},
-		{
-			name: "PodDisruptionBudget is ready, status.desiredHealthy == spec.minAvailable and status.currentHealthy > status.desiredHealthy, spec.minAvailable == 0",
+		want: true,
+	}, {
+		name: "PodDisruptionBudget is ready, status.desiredHealthy == spec.minAvailable and status.currentHealthy > status.desiredHealthy, spec.minAvailable == 0",
 
-			obj: newObjectFromFile(t, testPdbReady2File),
+		obj: newObjectFromFile(t, testPdbReady2File),
 
-			want: true,
-		},
-		{
-			name: "PodDisruptionBudget is ready, status.desiredHealthy == spec.minAvailable and status.currentHealthy == status.desiredHealthy",
+		want: true,
+	}, {
+		name: "PodDisruptionBudget is ready, status.desiredHealthy == spec.minAvailable and status.currentHealthy == status.desiredHealthy",
 
-			obj: newObjectFromFile(t, testPdbReady3File),
+		obj: newObjectFromFile(t, testPdbReady3File),
 
-			want: true,
-		},
-		{
-			name: "PodDisruptionBudget is not ready, status.desiredHealthy != spec.minAvailable",
+		want: true,
+	}, {
+		name: "PodDisruptionBudget is not ready, status.desiredHealthy != spec.minAvailable",
 
-			obj: newObjectFromFile(t, testPdbUnreadyFile),
+		obj: newObjectFromFile(t, testPdbUnreadyFile),
 
-			want: false,
-		},
-		{
-			name: "PodDisruptionBudget is not ready, status.currentHealthy < status.desiredHealthy",
+		want: false,
+	}, {
+		name: "PodDisruptionBudget is not ready, status.currentHealthy < status.desiredHealthy",
 
-			obj: newObjectFromFile(t, testPdbUnready2File),
+		obj: newObjectFromFile(t, testPdbUnready2File),
 
-			want: false,
-		},
-		{
-			name: "PodDisruptionBudget is not ready, status.observedGeneration != metadata.generation",
+		want: false,
+	}, {
+		name: "PodDisruptionBudget is not ready, status.observedGeneration != metadata.generation",
 
-			obj: newObjectFromFile(t, testPdbUnready3File),
+		obj: newObjectFromFile(t, testPdbUnready3File),
 
-			want: false,
-		},
-		{
-			name: "ReplicaSet is ready",
+		want: false,
+	}, {
+		name: "ReplicaSet is ready",
 
-			obj: newObjectFromFile(t, testReplicasetReadyFile),
+		obj: newObjectFromFile(t, testReplicasetReadyFile),
 
-			want: true,
-		},
-		{
-			name: "ReplicaSet is not ready, status.readyReplicas != spec.replicas",
+		want: true,
+	}, {
+		name: "ReplicaSet is not ready, status.readyReplicas != spec.replicas",
 
-			obj: newObjectFromFile(t, testReplicasetUnreadyFile),
+		obj: newObjectFromFile(t, testReplicasetUnreadyFile),
 
-			want: false,
-		},
-		{
-			name: "ReplicaSet is not ready, status.availableReplicas != spec.replicas",
+		want: false,
+	}, {
+		name: "ReplicaSet is not ready, status.availableReplicas != spec.replicas",
 
-			obj: newObjectFromFile(t, testReplicasetUnready2File),
+		obj: newObjectFromFile(t, testReplicasetUnready2File),
 
-			want: false,
-		},
-		{
-			name: "ReplicaSet is not ready, status.readyReplicas and status.availableReplicas are empty",
+		want: false,
+	}, {
+		name: "ReplicaSet is not ready, status.readyReplicas and status.availableReplicas are empty",
 
-			obj: newObjectFromFile(t, testReplicasetUnready3File),
+		obj: newObjectFromFile(t, testReplicasetUnready3File),
 
-			want: false,
-		},
-		{
-			name: "ReplicaSet is not ready, status.replicas != spec.replicas",
+		want: false,
+	}, {
+		name: "ReplicaSet is not ready, status.replicas != spec.replicas",
 
-			obj: newObjectFromFile(t, testReplicasetUnready4File),
+		obj: newObjectFromFile(t, testReplicasetUnready4File),
 
-			want: false,
-		},
-		{
-			name: "ReplicaSet is not ready, status.observedGeneration != metadata.generation",
+		want: false,
+	}, {
+		name: "ReplicaSet is not ready, status.observedGeneration != metadata.generation",
 
-			obj: newObjectFromFile(t, testReplicasetUnready5File),
+		obj: newObjectFromFile(t, testReplicasetUnready5File),
 
-			want: false,
-		},
-		{
-			name: "ReplicationController is ready",
+		want: false,
+	}, {
+		name: "ReplicationController is ready",
 
-			obj: newObjectFromFile(t, testReplicationcontrollerReadyFile),
+		obj: newObjectFromFile(t, testReplicationcontrollerReadyFile),
 
-			want: true,
-		},
-		{
-			name: "ReplicationController is not ready, status.replicas != spec.replicas",
+		want: true,
+	}, {
+		name: "ReplicationController is not ready, status.replicas != spec.replicas",
 
-			obj: newObjectFromFile(t, testReplicationcontrollerUnreadyFile),
+		obj: newObjectFromFile(t, testReplicationcontrollerUnreadyFile),
 
-			want: false,
-		},
-		{
-			name: "ReplicationController is not ready, status.availableReplicas != spec.replicas",
+		want: false,
+	}, {
+		name: "ReplicationController is not ready, status.availableReplicas != spec.replicas",
 
-			obj: newObjectFromFile(t, testReplicationcontrollerUnready2File),
+		obj: newObjectFromFile(t, testReplicationcontrollerUnready2File),
 
-			want: false,
-		},
-		{
-			name: "ReplicationController is not ready, status.readyReplicas != spec.replicas",
+		want: false,
+	}, {
+		name: "ReplicationController is not ready, status.readyReplicas != spec.replicas",
 
-			obj: newObjectFromFile(t, testReplicationcontrollerUnready3File),
+		obj: newObjectFromFile(t, testReplicationcontrollerUnready3File),
 
-			want: false,
-		},
-		{
-			name: "ReplicationController is not ready, status.readyReplicas and status.availableReplicas are empty",
+		want: false,
+	}, {
+		name: "ReplicationController is not ready, status.readyReplicas and status.availableReplicas are empty",
 
-			obj: newObjectFromFile(t, testReplicationcontrollerUnready4File),
+		obj: newObjectFromFile(t, testReplicationcontrollerUnready4File),
 
-			want: false,
-		},
-		{
-			name: "ReplicationController is not ready, status.observedGeneration != metadata.generation",
+		want: false,
+	}, {
+		name: "ReplicationController is not ready, status.observedGeneration != metadata.generation",
 
-			obj: newObjectFromFile(t, testReplicationcontrollerUnready5File),
+		obj: newObjectFromFile(t, testReplicationcontrollerUnready5File),
 
-			want: false,
-		},
-		{
-			name: "Service with LoadBalancer type is ready",
+		want: false,
+	}, {
+		name: "Service with LoadBalancer type is ready",
 
-			obj: newObjectFromFile(t, testServiceReadyFile),
+		obj: newObjectFromFile(t, testServiceReadyFile),
 
-			want: true,
-		},
-		{
-			name: "Service with ClusterIP type is ready",
+		want: true,
+	}, {
+		name: "Service with ClusterIP type is ready",
 
-			obj: newObjectFromFile(t, testServiceReady2File),
+		obj: newObjectFromFile(t, testServiceReady2File),
 
-			want: true,
-		},
-		{
-			name: "Service with NodePort type is ready",
+		want: true,
+	}, {
+		name: "Service with NodePort type is ready",
 
-			obj: newObjectFromFile(t, testServiceReady3File),
+		obj: newObjectFromFile(t, testServiceReady3File),
 
-			want: true,
-		},
-		{
-			name: "Service with ExternalName type is ready",
+		want: true,
+	}, {
+		name: "Service with ExternalName type is ready",
 
-			obj: newObjectFromFile(t, testServiceReady4File),
+		obj: newObjectFromFile(t, testServiceReady4File),
 
-			want: true,
-		},
-		{
-			name: "Service is not ready, LoadBalancer type and status.loadBalancer.ingress is empty",
+		want: true,
+	}, {
+		name: "Service is not ready, LoadBalancer type and status.loadBalancer.ingress is empty",
 
-			obj: newObjectFromFile(t, testServiceUnreadyFile),
+		obj: newObjectFromFile(t, testServiceUnreadyFile),
 
-			want: false,
-		},
-		{
-			name: "Service is not ready, LoadBalancer type and status.loadBalancer.ingress has item with empty ip",
+		want: false,
+	}, {
+		name: "Service is not ready, LoadBalancer type and status.loadBalancer.ingress has item with empty ip",
 
-			obj: newObjectFromFile(t, testServiceUnready2File),
+		obj: newObjectFromFile(t, testServiceUnready2File),
 
-			want: false,
-		},
-		{
-			name: "Service is not ready, LoadBalancer type and spec.clusterIP is empty",
+		want: false,
+	}, {
+		name: "Service is not ready, LoadBalancer type and spec.clusterIP is empty",
 
-			obj: newObjectFromFile(t, testServiceUnready3File),
+		obj: newObjectFromFile(t, testServiceUnready3File),
 
-			want: false,
-		},
-		{
-			name: "StatefulSet is ready",
+		want: false,
+	}, {
+		name: "StatefulSet is ready",
 
-			obj: newObjectFromFile(t, testStatefulsetReadyFile),
+		obj: newObjectFromFile(t, testStatefulsetReadyFile),
 
-			want: true,
-		},
-		{
-			name: "StatefulSet is not ready, status.readyReplicas != spec.replicas",
+		want: true,
+	}, {
+		name: "StatefulSet is not ready, status.readyReplicas != spec.replicas",
 
-			obj: newObjectFromFile(t, testStatefulsetUnreadyFile),
+		obj: newObjectFromFile(t, testStatefulsetUnreadyFile),
 
-			want: false,
-		},
-		{
-			name: "StatefulSet is not ready, status.currentReplicas != spec.replicas",
+		want: false,
+	}, {
+		name: "StatefulSet is not ready, status.currentReplicas != spec.replicas",
 
-			obj: newObjectFromFile(t, testStatefulsetUnready2File),
+		obj: newObjectFromFile(t, testStatefulsetUnready2File),
 
-			want: false,
-		},
-		{
-			name: "StatefulSet is not ready, status.readyReplicas and status.currentReplicas are empty",
+		want: false,
+	}, {
+		name: "StatefulSet is not ready, status.readyReplicas and status.currentReplicas are empty",
 
-			obj: newObjectFromFile(t, testStatefulsetUnready3File),
+		obj: newObjectFromFile(t, testStatefulsetUnready3File),
 
-			want: false,
-		},
-		{
-			name: "StatefulSet is not ready, status.replicas != spec.replicas",
+		want: false,
+	}, {
+		name: "StatefulSet is not ready, status.replicas != spec.replicas",
 
-			obj: newObjectFromFile(t, testStatefulsetUnready4File),
+		obj: newObjectFromFile(t, testStatefulsetUnready4File),
 
-			want: false,
-		},
-		{
-			name: "StatefulSet is not ready, status.observedGeneration != metadata.generation",
+		want: false,
+	}, {
+		name: "StatefulSet is not ready, status.observedGeneration != metadata.generation",
 
-			obj: newObjectFromFile(t, testStatefulsetUnready5File),
+		obj: newObjectFromFile(t, testStatefulsetUnready5File),
 
-			want: false,
-		},
-		{
-			name: "Default kind is always ready",
+		want: false,
+	}, {
+		name: "Default kind is always ready",
 
-			obj: newObjectFromFile(t, testHpaFile),
+		obj: newObjectFromFile(t, testHpaFile),
 
-			want: true,
-		},
-	}
+		want: true,
+	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

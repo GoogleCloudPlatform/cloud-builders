@@ -24,105 +24,97 @@ func TestCreateLabelsMap(t *testing.T) {
 		labels []string
 
 		want map[string]string
-	}{
-		{
-			name: "Normal case",
+	}{{
+		name: "Normal case",
 
-			labels: []string{
-				"a=b",
-				"c=d",
-				"d=f",
-			},
-
-			want: map[string]string{
-				"a": "b",
-				"c": "d",
-				"d": "f",
-			},
+		labels: []string{
+			"a=b",
+			"c=d",
+			"d=f",
 		},
-		{
-			name: "No labels",
 
-			labels: []string{},
-
-			want: map[string]string{},
+		want: map[string]string{
+			"a": "b",
+			"c": "d",
+			"d": "f",
 		},
-		{
-			name: "Trailing comma",
+	}, {
+		name: "No labels",
 
-			labels: []string{
-				"a=b",
-				"c=d",
-				"d=f,",
-			},
+		labels: []string{},
 
-			want: map[string]string{
-				"a": "b",
-				"c": "d",
-				"d": "f",
-			},
+		want: map[string]string{},
+	}, {
+		name: "Trailing comma",
+
+		labels: []string{
+			"a=b",
+			"c=d",
+			"d=f,",
 		},
-		{
-			name: "Leading comma",
 
-			labels: []string{
-				",a=b",
-				"c=d",
-				"d=f",
-			},
-
-			want: map[string]string{
-				"a": "b",
-				"c": "d",
-				"d": "f",
-			},
+		want: map[string]string{
+			"a": "b",
+			"c": "d",
+			"d": "f",
 		},
-		{
-			name: "Trailing whitespace",
+	}, {
+		name: "Leading comma",
 
-			labels: []string{
-				"a=b",
-				"c=d",
-				"d=f    ",
-			},
-
-			want: map[string]string{
-				"a": "b",
-				"c": "d",
-				"d": "f",
-			},
+		labels: []string{
+			",a=b",
+			"c=d",
+			"d=f",
 		},
-		{
-			name: "Leading whitespace",
 
-			labels: []string{
-				"     a=b",
-				"c=d",
-				"d=f",
-			},
-
-			want: map[string]string{
-				"a": "b",
-				"c": "d",
-				"d": "f",
-			},
+		want: map[string]string{
+			"a": "b",
+			"c": "d",
+			"d": "f",
 		},
-		{
-			name: "Handles whitespace",
+	}, {
+		name: "Trailing whitespace",
 
-			labels: []string{
-				" \n a = b  \n\n",
-				"\t c = \nd ",
-				"d =  f\t",
-			},
-
-			want: map[string]string{
-				"a": "b",
-				"c": "d",
-				"d": "f",
-			},
+		labels: []string{
+			"a=b",
+			"c=d",
+			"d=f    ",
 		},
-	}
+
+		want: map[string]string{
+			"a": "b",
+			"c": "d",
+			"d": "f",
+		},
+	}, {
+		name: "Leading whitespace",
+
+		labels: []string{
+			"     a=b",
+			"c=d",
+			"d=f",
+		},
+
+		want: map[string]string{
+			"a": "b",
+			"c": "d",
+			"d": "f",
+		},
+	}, {
+		name: "Handles whitespace",
+
+		labels: []string{
+			" \n a = b  \n\n",
+			"\t c = \nd ",
+			"d =  f\t",
+		},
+
+		want: map[string]string{
+			"a": "b",
+			"c": "d",
+			"d": "f",
+		},
+	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -138,36 +130,31 @@ func TestCreateLabelsMapErrors(t *testing.T) {
 		name string
 
 		labels []string
-	}{
-		{
-			name: "No =",
+	}{{
+		name: "No =",
 
-			labels: []string{
-				"a",
-			},
+		labels: []string{
+			"a",
 		},
-		{
-			name: "More than one =",
+	}, {
+		name: "More than one =",
 
-			labels: []string{
-				"a=b=",
-			},
+		labels: []string{
+			"a=b=",
 		},
-		{
-			name: "No key",
+	}, {
+		name: "No key",
 
-			labels: []string{
-				"=b",
-			},
+		labels: []string{
+			"=b",
 		},
-		{
-			name: "No value",
+	}, {
+		name: "No value",
 
-			labels: []string{
-				"a=",
-			},
+		labels: []string{
+			"a=",
 		},
-	}
+	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
