@@ -25,6 +25,7 @@ import (
 	"io"
 	"log"
 	"math"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"sync"
@@ -198,6 +199,12 @@ func (gf *Fetcher) fetchObject(ctx context.Context, j job) *jobReport {
 	var tmpfile string
 	var backoff time.Duration
 
+	// Within a manifest, multiple files may have the same SHA. This can lead
+	// to a race condition within the goworkers that are downloading the files
+	// concurrently. To mitigate this issue, we add some randomness to the name
+	// of the temp file being pulled.
+	fuzz := rand.Intn(999999)
+
 	for retrynum := 0; retrynum <= gf.Retries; retrynum++ {
 		// Apply appropriate retry backoff.
 		if retrynum > 0 {
@@ -211,10 +218,10 @@ func (gf *Fetcher) fetchObject(ctx context.Context, j job) *jobReport {
 
 		started := time.Now()
 
-		// Download to temp location [DestDir]/[StagingDir]/[Bucket]-[Object]-[retry]
+		// Download to temp location [DestDir]/[StagingDir]/[Bucket]-[Object]-[fuzz]-[retry]
 		// If fetchObjectOnceWithTimeout() times out, this file will be orphaned and we can
-		// clean it up later.
-		tmpfile = filepath.Join(gf.StagingDir, fmt.Sprintf("%s-%s-%d", j.bucket, j.object, retrynum))
+		// clean it up .later
+		tmpfile = filepath.Join(gf.StagingDir, fmt.Sprintf("%s-%s-%d-%d", j.bucket, j.object, fuzz, retrynum))
 		if err := gf.ensureFolders(tmpfile); err != nil {
 			e := fmt.Errorf("creating folders for temp file %q: %v", tmpfile, err)
 			gf.recordFailure(j, started, noTimeout, e, report)
