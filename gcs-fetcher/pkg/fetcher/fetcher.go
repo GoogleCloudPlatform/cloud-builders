@@ -233,7 +233,7 @@ func (gf *Fetcher) fetchObject(ctx context.Context, j job) *jobReport {
 	var tmpfile string
 	var backoff time.Duration
 
-  // Within a manifest, multiple files may have the same SHA. This can lead
+	// Within a manifest, multiple files may have the same SHA. This can lead
 	// to a race condition within the goworkers that are downloading the files
 	// concurrently. To mitigate this issue, we add some randomness to the name
 	// of the temp file being pulled.
