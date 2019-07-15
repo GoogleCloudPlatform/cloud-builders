@@ -10,6 +10,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+// Package run contains the logic for `gke-deploy run` subcommand.
 package run
 
 import (
@@ -59,6 +60,7 @@ type options struct {
 	waitTimeout     time.Duration
 }
 
+// NewRunCommand creates the `gke-deploy run` subcommand.
 func NewRunCommand() *cobra.Command {
 	options := &options{}
 

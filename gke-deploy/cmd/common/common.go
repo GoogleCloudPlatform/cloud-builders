@@ -10,6 +10,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+// Package common functionality shared between commands.
 package common
 
 import (
@@ -21,6 +22,7 @@ import (
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
 )
 
+// CreateLabelsMap creates a map[string]string from a slice of "="-delimited strings.
 func CreateLabelsMap(labels []string) (map[string]string, error) {
 	labelsMap := make(map[string]string)
 	for _, label := range labels {
@@ -46,6 +48,7 @@ func CreateLabelsMap(labels []string) (map[string]string, error) {
 	return labelsMap, nil
 }
 
+// CreateDeployer creates a Deployer with initialized clients.
 func CreateDeployer(ctx context.Context, verbose bool) (*deployer.Deployer, error) {
 	c, err := services.NewClients(ctx, verbose)
 	if err != nil {
