@@ -227,6 +227,7 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 	end := start.Add(waitTimeout)
 	periodicMsgInterval := 30 * time.Second
 	nextPeriodicMsg := time.Now().Add(periodicMsgInterval)
+	ticker := time.NewTicker(5 * time.Second)
 	for len(objs) > 0 {
 		for key, obj := range objs {
 			kind := resource.ResourceKind(obj)
@@ -249,6 +250,10 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 				delete(objs, key)
 			}
 		}
+		if len(objs) == 0 {
+			// Break out here to avoid waiting for ticker.
+			break
+		}
 		if time.Now().After(end) {
 			timedOut = true
 			break
@@ -258,7 +263,7 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 			nextPeriodicMsg = nextPeriodicMsg.Add(periodicMsgInterval)
 		}
 		select {
-		case <-time.After(5 * time.Second):
+		case <-ticker.C:
 		}
 	}
 
