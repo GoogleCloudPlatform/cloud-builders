@@ -35,30 +35,27 @@ func TestParseImages(t *testing.T) {
 		images []string
 
 		want []name.Reference
-	}{
-		{
-			name: "No images",
+	}{{
+		name: "No images",
 
-			images: []string{},
+		images: []string{},
 
-			want: nil,
+		want: nil,
+	}, {
+		name: "Success with multiple images",
+
+		images: []string{
+			image,
+			image2,
+			image3,
 		},
-		{
-			name: "Success with multiple images",
 
-			images: []string{
-				image,
-				image2,
-				image3,
-			},
-
-			want: []name.Reference{
-				newImageWithTag(t, image),
-				newImageWithDigest(t, image2),
-				newImageWithTag(t, image3),
-			},
+		want: []name.Reference{
+			newImageWithTag(t, image),
+			newImageWithDigest(t, image2),
+			newImageWithTag(t, image3),
 		},
-	}
+	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -78,32 +75,28 @@ func TestParseImagesErrors(t *testing.T) {
 		name string
 
 		images []string
-	}{
-		{
-			name: "Duplicate image name 1",
+	}{{
+		name: "Duplicate image name 1",
 
-			images: []string{
-				image,
-				image2,
-			},
+		images: []string{
+			image,
+			image2,
 		},
-		{
-			name: "Duplicate image name 2",
+	}, {
+		name: "Duplicate image name 2",
 
-			images: []string{
-				image,
-				image3,
-			},
+		images: []string{
+			image,
+			image3,
 		},
-		{
-			name: "Duplicate image name 3",
+	}, {
+		name: "Duplicate image name 3",
 
-			images: []string{
-				image2,
-				image3,
-			},
+		images: []string{
+			image2,
+			image3,
 		},
-	}
+	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -121,29 +114,25 @@ func TestName(t *testing.T) {
 		image name.Reference
 
 		want string
-	}{
-		{
-			name: "Get name from image with tag",
+	}{{
+		name: "Get name from image with tag",
 
-			image: newImageWithTag(t, "gcr.io/my-project/my-image:1.0.0"),
+		image: newImageWithTag(t, "gcr.io/my-project/my-image:1.0.0"),
 
-			want: "gcr.io/my-project/my-image",
-		},
-		{
-			name: "Get name from image with digest",
+		want: "gcr.io/my-project/my-image",
+	}, {
+		name: "Get name from image with digest",
 
-			image: newImageWithDigest(t, "gcr.io/my-project/my-image-2@sha256:929665b8eb2bb286535d29cd73c71808d7e1ad830046333f6cf0ce497996eb79"),
+		image: newImageWithDigest(t, "gcr.io/my-project/my-image-2@sha256:929665b8eb2bb286535d29cd73c71808d7e1ad830046333f6cf0ce497996eb79"),
 
-			want: "gcr.io/my-project/my-image-2",
-		},
-		{
-			name: "Get name from image with latest tag",
+		want: "gcr.io/my-project/my-image-2",
+	}, {
+		name: "Get name from image with latest tag",
 
-			image: newImageWithTag(t, "gcr.io/my-project/my-image-3:latest"),
+		image: newImageWithTag(t, "gcr.io/my-project/my-image-3:latest"),
 
-			want: "gcr.io/my-project/my-image-3",
-		},
-	}
+		want: "gcr.io/my-project/my-image-3",
+	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -157,39 +146,22 @@ func TestName(t *testing.T) {
 func TestResolveDigest(t *testing.T) {
 	ctx := context.Background()
 
-	tests := []struct {
-		name string
-
-		image name.Reference
-		rs    *testservices.TestRemote
-
-		want string
-	}{
-		{
-			name: "Get digest from remote image",
-
-			image: newImageWithTag(t, "my-image:1.0.0"),
-			rs: &testservices.TestRemote{
-				ImageResp: &testservices.TestImage{
-					Hash: v1.Hash{
-						Algorithm: "sha256",
-						Hex:       "foobar",
-					},
-					Err: nil,
-				},
-				ImageErr: nil,
+	image := newImageWithTag(t, "my-image:1.0.0")
+	rs := &testservices.TestRemote{
+		ImageResp: &testservices.TestImage{
+			Hash: v1.Hash{
+				Algorithm: "sha256",
+				Hex:       "foobar",
 			},
-
-			want: "sha256:foobar",
+			Err: nil,
 		},
+		ImageErr: nil,
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			if got, err := ResolveDigest(ctx, tc.image, tc.rs); got != tc.want || err != nil {
-				t.Errorf("ResolveDigest(ctx, %v, rs) = %s, %v; want %s, <nil>", tc.image, got, err, tc.want)
-			}
-		})
+	want := "sha256:foobar"
+
+	if got, err := ResolveDigest(ctx, image, rs); got != want || err != nil {
+		t.Errorf("ResolveDigest(ctx, %v, rs) = %s, %v; want %s, <nil>", image, got, err, want)
 	}
 }
 
@@ -202,29 +174,26 @@ func TestResolveDigestErrors(t *testing.T) {
 
 		image name.Reference
 		rs    *testservices.TestRemote
-	}{
-		{
-			name: "Fail to get remote image",
+	}{{
+		name: "Fail to get remote image",
 
-			image: image,
-			rs: &testservices.TestRemote{
-				ImageResp: nil,
-				ImageErr:  fmt.Errorf("failed to get remote image"),
-			},
+		image: image,
+		rs: &testservices.TestRemote{
+			ImageResp: nil,
+			ImageErr:  fmt.Errorf("failed to get remote image"),
 		},
-		{
-			name: "Fail to get digest from remote image",
+	}, {
+		name: "Fail to get digest from remote image",
 
-			image: image,
-			rs: &testservices.TestRemote{
-				ImageResp: &testservices.TestImage{
-					Hash: v1.Hash{},
-					Err:  fmt.Errorf("failed to get digest"),
-				},
-				ImageErr: nil,
+		image: image,
+		rs: &testservices.TestRemote{
+			ImageResp: &testservices.TestImage{
+				Hash: v1.Hash{},
+				Err:  fmt.Errorf("failed to get digest"),
 			},
+			ImageErr: nil,
 		},
-	}
+	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

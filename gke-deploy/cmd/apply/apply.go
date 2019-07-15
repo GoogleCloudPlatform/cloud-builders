@@ -10,6 +10,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+// Package apply contains the logic for `gke-deploy apply` subcommand.
 package apply
 
 import (
@@ -48,6 +49,7 @@ type options struct {
 	waitTimeout     time.Duration
 }
 
+// NewApplyCommand creates the `gke-deploy apply` subcommand.
 func NewApplyCommand() *cobra.Command {
 	options := &options{}
 

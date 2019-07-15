@@ -99,54 +99,51 @@ func TestGetDeployedObjects(t *testing.T) {
 		ks        services.KubectlService
 
 		want runtime.Object
-	}{
-		{
-			name: "Get deployed deployment",
+	}{{
+		name: "Get deployed deployment",
 
-			kind:      "Deployment",
-			objName:   "test-app",
-			namespace: "default",
-			ks: &testservices.TestKubectl{
-				GetResponse: map[string]map[string]*testservices.GetResponse{
-					"Deployment": {
-						"test-app": {
-							Res: []string{
-								string(fileContents(t, testDeploymentFile)),
-							},
-							Err: []error{
-								nil,
-							},
+		kind:      "Deployment",
+		objName:   "test-app",
+		namespace: "default",
+		ks: &testservices.TestKubectl{
+			GetResponse: map[string]map[string]*testservices.GetResponse{
+				"Deployment": {
+					"test-app": {
+						Res: []string{
+							string(fileContents(t, testDeploymentFile)),
+						},
+						Err: []error{
+							nil,
 						},
 					},
 				},
 			},
-
-			want: newObjectFromFile(t, testDeploymentFile),
 		},
-		{
-			name: "Get deployed service",
 
-			kind:      "Service",
-			objName:   "test-app",
-			namespace: "default",
-			ks: &testservices.TestKubectl{
-				GetResponse: map[string]map[string]*testservices.GetResponse{
-					"Service": {
-						"test-app": {
-							Res: []string{
-								string(fileContents(t, testServiceFile)),
-							},
-							Err: []error{
-								nil,
-							},
+		want: newObjectFromFile(t, testDeploymentFile),
+	}, {
+		name: "Get deployed service",
+
+		kind:      "Service",
+		objName:   "test-app",
+		namespace: "default",
+		ks: &testservices.TestKubectl{
+			GetResponse: map[string]map[string]*testservices.GetResponse{
+				"Service": {
+					"test-app": {
+						Res: []string{
+							string(fileContents(t, testServiceFile)),
+						},
+						Err: []error{
+							nil,
 						},
 					},
 				},
 			},
-
-			want: newObjectFromFile(t, testServiceFile),
 		},
-	}
+
+		want: newObjectFromFile(t, testServiceFile),
+	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

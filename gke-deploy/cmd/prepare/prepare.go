@@ -10,6 +10,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+// Package prepare contains the logic for `gke-deploy prepare` subcommand.
 package prepare
 
 import (
@@ -51,6 +52,7 @@ type options struct {
 	verbose    bool
 }
 
+// NewPrepareCommand creates the `gke-deploy prepare` subcommand.
 func NewPrepareCommand() *cobra.Command {
 	options := &options{}
 

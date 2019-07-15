@@ -10,6 +10,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+// Package cmd contains the logic for `gke-deploy` top-level command.
 package cmd
 
 import (
@@ -53,6 +54,7 @@ Apply Phase:
 	version = "" // TODO(joonlim): Create plan for versioning.
 )
 
+// NewCommand creates the `gke-deploy` top-level command.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "gke-deploy",
@@ -69,6 +71,7 @@ func NewCommand() *cobra.Command {
 	return cmd
 }
 
+// Execute executes the `gke-deploy` top-level command.
 func Execute() error {
 	return NewCommand().Execute()
 }
