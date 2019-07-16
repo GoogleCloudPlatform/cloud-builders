@@ -49,6 +49,7 @@ type options struct {
 	labels     []string
 	namespace  string
 	output     string
+	exposePort int
 	verbose    bool
 }
 
@@ -75,6 +76,7 @@ func NewPrepareCommand() *cobra.Command {
 	cmd.Flags().StringSliceVarP(&options.labels, "label", "L", nil, "Label(s) to add to Kubernetes resources (k1=v1). Labels can be set comma-delimited or as separate flags. If two or more labels with the same key are listed, the last one is used.")
 	cmd.Flags().StringVarP(&options.namespace, "namespace", "n", "default", "Name of GKE cluster to deploy to.")
 	cmd.Flags().StringVarP(&options.output, "output", "o", "./output", "Target directory to store modified Kubernetes resource configs.")
+	cmd.Flags().IntVarP(&options.exposePort, "expose", "x", 0, "Creates a Service resource that connects to a deployed resource using a selector that matches the value provided by --app. The port provided will be used to expose the deployed resource (i.e., port and targetPort will be set to the value provided in this flag).")
 	cmd.Flags().BoolVarP(&options.verbose, "verbose", "V", false, "Prints underlying commands being called to stdout.")
 
 	return cmd
@@ -99,6 +101,13 @@ func prepare(cmd *cobra.Command, options *options) error {
 		return fmt.Errorf("value of -o|--output cannot be empty")
 	}
 
+	if options.exposePort < 0 {
+		return fmt.Errorf("value of -x|--expose must be > 0")
+	}
+	if options.exposePort > 0 && options.appName == "" {
+		return fmt.Errorf("exposing a deployed resource requires -a|--app to be set")
+	}
+
 	labelsMap, err := common.CreateLabelsMap(options.labels)
 	if err != nil {
 		return err
@@ -108,7 +117,7 @@ func prepare(cmd *cobra.Command, options *options) error {
 		return err
 	}
 
-	if err := d.Prepare(ctx, images, options.appName, options.appVersion, options.filename, options.output, options.namespace, labelsMap); err != nil {
+	if err := d.Prepare(ctx, images, options.appName, options.appVersion, options.filename, options.output, options.namespace, labelsMap, options.exposePort); err != nil {
 		return fmt.Errorf("failed to prepare deployment: %v", err)
 	}
 
