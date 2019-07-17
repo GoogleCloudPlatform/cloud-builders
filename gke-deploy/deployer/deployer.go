@@ -47,50 +47,71 @@ type Deployer struct {
 }
 
 // Prepare handles preparing deployment.
-func (d *Deployer) Prepare(ctx context.Context, images []name.Reference, appName, appVersion, config, output, namespace string, labels map[string]string, exposePort int) error {
+func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appVersion, config, output, namespace string, labels map[string]string, exposePort int) error {
 	fmt.Printf("Preparing deployment.\n")
 
-	objs, err := resource.ParseConfigs(ctx, config, d.Clients.OS)
-	if err != nil {
-		return fmt.Errorf("failed to parse configs %q: %v", config, err)
+	var objs resource.Objects
+	if config != "" {
+		parsed, err := resource.ParseConfigs(ctx, config, d.Clients.OS)
+		if err != nil {
+			return fmt.Errorf("failed to parse configs %q: %v", config, err)
+		}
+		objs = parsed
+		fmt.Printf("Configs to prepare: %v\n", objs)
+	} else {
+		objs = resource.Objects{}
+		fmt.Println("Starting with no configs")
 	}
-	fmt.Printf("Configs to prepare: %v\n", objs)
 
-	for _, im := range images {
-		imageDigest, err := image.ResolveDigest(ctx, im, d.Clients.Remote)
+	createdObjs := resource.Objects{}
+	if config == "" && appName != "" && im != nil {
+		deploymentName := appName
+		fmt.Printf("Creating Deployment resource %q\n", deploymentName)
+		dObj, err := resource.CreateDeploymentObject(ctx, appName, appName, image.Name(im))
 		if err != nil {
-			return fmt.Errorf("failed to get image digest: %v", err)
+			return fmt.Errorf("failed to create Deployment object: %v", err)
 		}
-		imageName := image.Name(im)
+		if err = resource.AddObject(ctx, objs, dObj); err != nil {
+			return fmt.Errorf("failed to add Deployment object to objects to hydrate: %v", err)
+		}
+		if err = resource.AddObject(ctx, createdObjs, dObj); err != nil {
+			return fmt.Errorf("failed to add Deployment object to created objects: %v", err)
+		}
+
+		hpaName := fmt.Sprintf("%s-hpa", appName)
+		fmt.Printf("Creating HorizontalPodAutoscaler resource %q\n", hpaName)
+		hpaObj, err := resource.CreateHorizontalPodAutoscalerObject(ctx, hpaName, deploymentName)
 		if err != nil {
-			return fmt.Errorf("failed to get image name: %v", err)
+			return fmt.Errorf("failed to create HorizontalPodAutoscaler object: %v", err)
 		}
-		imageWithDigest := fmt.Sprintf("%s@%s", imageName, imageDigest)
-
-		fmt.Printf("Got digest for image: %s --> %s\n", im, imageWithDigest)
-		fmt.Printf("Updating resource containers that have image name %q\n", imageName)
-
-		if err := resource.UpdateMatchingContainerImage(ctx, objs, imageName, imageWithDigest); err != nil {
-			return fmt.Errorf("failed to update container of objects: %v", err)
+		if err = resource.AddObject(ctx, objs, hpaObj); err != nil {
+			return fmt.Errorf("failed to add HorizontalPodAutoscaler object to objects to hydrate: %v", err)
+		}
+		if err = resource.AddObject(ctx, createdObjs, hpaObj); err != nil {
+			return fmt.Errorf("failed to add HorizontalPodAutoscaler object to created objects: %v", err)
 		}
 	}
 
 	if namespace != "default" {
 		ok, err := resource.HasObject(ctx, objs, "Namespace", namespace)
 		if err != nil {
-			return fmt.Errorf("failed to check if namespace %q exists: %v", namespace, err)
+			return fmt.Errorf("failed to check if Namespace %q exists: %v", namespace, err)
 		}
 		if !ok {
-			fmt.Printf("Creating namespace resource %q\n", namespace)
+			fmt.Printf("Creating Namespace resource %q\n", namespace)
 			nsObj, err := resource.CreateNamespaceObject(ctx, namespace)
 			if err != nil {
-				return fmt.Errorf("failed to create namespace object: %v", err)
+				return fmt.Errorf("failed to create Namespace object: %v", err)
 			}
 			if err = resource.AddObject(ctx, objs, nsObj); err != nil {
-				return fmt.Errorf("failed to add namespace object: %v", err)
+				return fmt.Errorf("failed to add Namespace object to objects to hydrate: %v", err)
+			}
+			if err = resource.AddObject(ctx, createdObjs, nsObj); err != nil {
+				return fmt.Errorf("failed to add Namespace object to created objects: %v", err)
 			}
 		}
 	}
+
 	if exposePort > 0 && appName != "" {
 		service := fmt.Sprintf("%s-service", appName)
 		ok, err := resource.HasObject(ctx, objs, "Service", service)
@@ -104,12 +125,38 @@ func (d *Deployer) Prepare(ctx context.Context, images []name.Reference, appName
 				return fmt.Errorf("failed to create Service object: %v", err)
 			}
 			if err = resource.AddObject(ctx, objs, svcObj); err != nil {
-				return fmt.Errorf("failed to add Service object: %v", err)
+				return fmt.Errorf("failed to add Service object to objects to hydrate: %v", err)
+			}
+			if err = resource.AddObject(ctx, createdObjs, svcObj); err != nil {
+				return fmt.Errorf("failed to add Service object to created objects: %v", err)
 			}
 		}
 	}
 
-	fmt.Printf("Hydrating resources.\n")
+	if len(createdObjs) > 0 {
+		createdOutput := filepath.Join(output, "created")
+		fmt.Printf("Saving created resource configs to %q\n", createdOutput)
+		if err := resource.SaveAsConfigs(ctx, createdObjs, createdOutput, d.Clients.OS); err != nil {
+			return fmt.Errorf("failed to save created configs to %q: %v", createdOutput, err)
+		}
+	}
+
+	fmt.Printf("\nHydrating resources.\n")
+
+	if im != nil {
+		imageName := image.Name(im)
+		imageDigest, err := image.ResolveDigest(ctx, im, d.Clients.Remote)
+		if err != nil {
+			return fmt.Errorf("failed to get image digest: %v", err)
+		}
+		imageWithDigest := fmt.Sprintf("%s@%s", image.Name(im), imageDigest)
+		fmt.Printf("Got digest for image: %s --> %s\n", im, imageWithDigest)
+
+		fmt.Printf("Updating resource containers that have image name %q to use image with digest %q\n", imageName, imageWithDigest)
+		if err := resource.UpdateMatchingContainerImage(ctx, objs, imageName, imageWithDigest); err != nil {
+			return fmt.Errorf("failed to update container of objects: %v", err)
+		}
+	}
 
 	if err := resource.UpdateNamespace(ctx, objs, namespace); err != nil {
 		return fmt.Errorf("failed to update namespace: %v", err)
@@ -150,9 +197,10 @@ func (d *Deployer) Prepare(ctx context.Context, images []name.Reference, appName
 		}
 	}
 
-	fmt.Printf("Saving hydrated resource configs to output: %q\n", output)
-	if err := resource.SaveAsConfigs(ctx, objs, output, d.Clients.OS); err != nil {
-		return fmt.Errorf("failed to save hydrated configs to output: %v", err)
+	hydratedOutput := filepath.Join(output, "hydrated")
+	fmt.Printf("Saving hydrated resource configs to %q\n", hydratedOutput)
+	if err := resource.SaveAsConfigs(ctx, objs, hydratedOutput, d.Clients.OS); err != nil {
+		return fmt.Errorf("failed to save hydrated configs to %q: %v", hydratedOutput, err)
 	}
 
 	fmt.Printf("Finished preparing deployment.\n\n")
@@ -227,7 +275,7 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 		if resource.ResourceKind(obj) == "Namespace" {
 			nsFile := filepath.Join(config, baseName)
 			if err := cluster.ApplyConfigs(ctx, nsFile, "", d.Clients.Kubectl); err != nil {
-				return fmt.Errorf("failed to apply namespace config to cluster: %v", err)
+				return fmt.Errorf("failed to apply Namespace config to cluster: %v", err)
 			}
 			// TODO(joonlim): Wait for deployed namespace to be ready before applying other objects
 		}
@@ -240,7 +288,7 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 	deployedObjs := resource.Objects{}
 	timedOut := false
 
-	fmt.Printf("Waiting for deployed objects to be ready with timeout of %v\n", waitTimeout)
+	fmt.Printf("\nWaiting for deployed objects to be ready with timeout of %v\n", waitTimeout)
 	start := time.Now()
 	end := start.Add(waitTimeout)
 	periodicMsgInterval := 30 * time.Second

@@ -296,23 +296,44 @@ func AddObject(ctx context.Context, objs Objects, obj *Object) error {
 	return nil
 }
 
-// CreateNamespaceObject creates a namespace object with the given name.
+// CreateDeploymentObject creates a Deployment object with the given name and image.
+// The created Deployment will have 3 replicas.
+func CreateDeploymentObject(ctx context.Context, name string, selectorValue, image string) (*Object, error) {
+	obj, err := DecodeFromYAML(ctx, []byte(fmt.Sprintf(deploymentTemplate, name, "app", selectorValue, "app", selectorValue, name, image)))
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode Deployment object from template")
+	}
+	return obj, nil
+}
+
+// CreateHorizontalPodAutoscalerObject creates a Namespace object with the given name.
+// The created HorizontalPodAutoscaler will have minReplicas set to 1, maxReplicas set to 5, and a
+// cpu targetAverageUtilization of 80.
+func CreateHorizontalPodAutoscalerObject(ctx context.Context, name, deploymentName string) (*Object, error) {
+	obj, err := DecodeFromYAML(ctx, []byte(fmt.Sprintf(horizontalPodAutoscalerTemplate, name, deploymentName)))
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode HorizontalPodAutoscaler object from template")
+	}
+	return obj, nil
+}
+
+// CreateNamespaceObject creates a Namespace object with the given name.
 func CreateNamespaceObject(ctx context.Context, name string) (*Object, error) {
 	if name == "default" {
 		return nil, fmt.Errorf("namespace name should not be \"default\"")
 	}
 	obj, err := DecodeFromYAML(ctx, []byte(fmt.Sprintf(namespaceTemplate, name)))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create template namespace object")
+		return nil, fmt.Errorf("failed to decode Namespace object from template")
 	}
 	return obj, nil
 }
 
-// CreateServiceObject creates a Service object with the given name with service type ClusterIP.
+// CreateServiceObject creates a Service object with the given name with service type LoadBalancer.
 func CreateServiceObject(ctx context.Context, name, selectorKey, selectorValue string, port int) (*Object, error) {
 	obj, err := DecodeFromYAML(ctx, []byte(fmt.Sprintf(serviceTemplate, name, selectorKey, selectorValue, port, port)))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create template namespace object")
+		return nil, fmt.Errorf("failed to decode Service object from template")
 	}
 	return obj, nil
 }

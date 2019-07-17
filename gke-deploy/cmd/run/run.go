@@ -16,12 +16,13 @@ package run
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 	"time"
 
+	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/spf13/cobra"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/cmd/common"
-	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/image"
 )
 
 const (
@@ -52,7 +53,7 @@ type options struct {
 	clusterLocation string
 	clusterName     string
 	clusterProject  string
-	images          []string
+	image           string
 	labels          []string
 	namespace       string
 	output          string
@@ -79,11 +80,11 @@ func NewRunCommand() *cobra.Command {
 
 	cmd.Flags().StringVarP(&options.appName, "app", "a", "", "Application name of the Kubernetes deployment.")
 	cmd.Flags().StringVarP(&options.appVersion, "version", "v", "", "Version of the Kubernetes deployment.")
-	cmd.Flags().StringVarP(&options.filename, "filename", "f", "", "Config file or directory of config files to use to create the Kubernetes resources (file or files in directory must end with \".yml\" or \".yaml\").")
+	cmd.Flags().StringVarP(&options.filename, "filename", "f", "", "Config file or directory of config files to use to create the Kubernetes resources (file or files in directory must end with \".yml\" or \".yaml\"). If this field is not provided, base configs will be created: Deployment with image provided by --image and HorizontalPodAutoscaler.")
 	cmd.Flags().StringVarP(&options.clusterLocation, "location", "l", "", "Region/zone of GKE cluster to deploy to.")
 	cmd.Flags().StringVarP(&options.clusterName, "cluster", "c", "", "Name of GKE cluster to deploy to.")
 	cmd.Flags().StringVarP(&options.clusterProject, "project", "p", "", "Project of GKE cluster to deploy to. If this field is not provided, the current set GCP project is used.")
-	cmd.Flags().StringSliceVarP(&options.images, "image", "i", nil, "Image(s) to be deployed. Images can be set comma-delimited or as separate flags.")
+	cmd.Flags().StringVarP(&options.image, "image", "i", "", "Image to be deployed.")
 	cmd.Flags().StringSliceVarP(&options.labels, "label", "L", nil, "Label(s) to add to Kubernetes resources (k1=v1). Labels can be set comma-delimited or as separate flags. If two or more labels with the same key are listed, the last one is used.")
 	cmd.Flags().StringVarP(&options.namespace, "namespace", "n", "default", "Namespace of GKE cluster to deploy to.")
 	cmd.Flags().StringVarP(&options.output, "output", "o", "./output", "Target directory to store modified Kubernetes resource configs.")
@@ -94,17 +95,20 @@ func NewRunCommand() *cobra.Command {
 	return cmd
 }
 
-func run(cmd *cobra.Command, options *options) error {
+func run(_ *cobra.Command, options *options) error {
 	ctx := context.Background()
 
-	images, err := image.ParseReferences(options.images)
-	if err != nil {
-		return err
+	var im name.Reference
+	if options.image != "" {
+		ref, err := name.ParseReference(options.image)
+		if err != nil {
+			return err
+		}
+		im = ref
 	}
 
-	if options.filename == "" {
-		// TODO(joonlim): Generate base configs if user does not supply any.
-		return fmt.Errorf("required -f|--filename flag is not set")
+	if options.filename == "" && (options.appName == "" || options.image == "") {
+		return fmt.Errorf("omitting -f|--filename requires -a|--app and -i|--image to be set")
 	}
 	if options.namespace == "" {
 		return fmt.Errorf("value of -n|--namespace cannot be empty")
@@ -135,10 +139,10 @@ func run(cmd *cobra.Command, options *options) error {
 		return err
 	}
 
-	if err := d.Prepare(ctx, images, options.appName, options.appVersion, options.filename, options.output, options.namespace, labelsMap, options.exposePort); err != nil {
+	if err := d.Prepare(ctx, im, options.appName, options.appVersion, options.filename, options.output, options.namespace, labelsMap, options.exposePort); err != nil {
 		return fmt.Errorf("failed to prepare deployment: %v", err)
 	}
-	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, options.output, options.namespace, options.waitTimeout); err != nil {
+	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, filepath.Join(options.output, "hydrated"), options.namespace, options.waitTimeout); err != nil {
 		return fmt.Errorf("failed to apply deployment: %v", err)
 	}
 

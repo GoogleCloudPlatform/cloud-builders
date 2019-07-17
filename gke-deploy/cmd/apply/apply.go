@@ -76,11 +76,10 @@ func NewApplyCommand() *cobra.Command {
 	return cmd
 }
 
-func apply(cmd *cobra.Command, options *options) error {
+func apply(_ *cobra.Command, options *options) error {
 	ctx := context.Background()
 
 	if options.filename == "" {
-		// TODO(joonlim): Generate base configs if user does not supply any.
 		return fmt.Errorf("required -f|--filename flag is not set")
 	}
 	if options.namespace == "" {

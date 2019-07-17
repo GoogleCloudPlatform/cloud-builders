@@ -21,9 +21,8 @@ import (
 	"testing"
 	"time"
 
-	v1 "github.com/google/go-containerregistry/pkg/v1"
-
 	"github.com/google/go-containerregistry/pkg/name"
+	"github.com/google/go-containerregistry/pkg/v1"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/testservices"
@@ -36,10 +35,12 @@ func TestPrepare(t *testing.T) {
 	testServiceFile := "testing/service.yaml"
 	testMultiResourceFile := "testing/multi-resource.yaml"
 
-	images := []name.Reference{newImageWithTag(t, "my-image:1.0.0")}
+	image := newImageWithTag(t, "my-image:1.0.0")
 	appName := "my-app"
 	appVersion := "b2e43cb"
 	outputDir := "path/to/outputDir"
+	createdDir := filepath.Join(outputDir, "created")
+	hydratedDir := filepath.Join(outputDir, "hydrated")
 	namespace := "default"
 	labels := make(map[string]string)
 
@@ -47,31 +48,33 @@ func TestPrepare(t *testing.T) {
 	deploymentYaml := "deployment.yaml"
 	multiResourceYaml := "multi-resource.yaml"
 	namespaceYaml := "namespace.yaml"
+	hpaYaml := "horizontalpodautoscaler.yaml"
 	serviceYaml := "service.yaml"
 
 	tests := []struct {
 		name string
 
-		images      []name.Reference
-		appName     string
-		appVersion  string
-		config      string
-		output      string
-		namespace   string
-		labels      map[string]string
-		waitTimeout time.Duration
+		image      name.Reference
+		appName    string
+		appVersion string
+		config     string
+		output     string
+		namespace  string
+		labels     map[string]string
+		exposePort int
 
 		deployer *Deployer
 	}{{
 		name: "Config is directory",
 
-		images:     images,
+		image:      image,
 		appName:    appName,
 		appVersion: appVersion,
 		config:     configDir,
 		output:     outputDir,
 		labels:     labels,
 		namespace:  namespace,
+		exposePort: 0,
 
 		deployer: &Deployer{
 			Clients: &services.Clients{
@@ -83,7 +86,7 @@ func TestPrepare(t *testing.T) {
 							},
 							Err: nil,
 						},
-						outputDir: {
+						hydratedDir: {
 							Res: nil,
 							Err: os.ErrNotExist,
 						},
@@ -122,13 +125,13 @@ func TestPrepare(t *testing.T) {
 						},
 					},
 					MkdirAllResponse: map[string]error{
-						outputDir: nil,
+						hydratedDir: nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(outputDir, "multi-resource-deployment-test-app.yaml"):   nil,
-						filepath.Join(outputDir, "multi-resource-service-test-app.yaml"):      nil,
-						filepath.Join(outputDir, "multi-resource-deployment-test-app-2.yaml"): nil,
-						filepath.Join(outputDir, "multi-resource-service-test-app-2.yaml"):    nil,
+						filepath.Join(hydratedDir, "multi-resource-deployment-test-app.yaml"):   nil,
+						filepath.Join(hydratedDir, "multi-resource-service-test-app.yaml"):      nil,
+						filepath.Join(hydratedDir, "multi-resource-deployment-test-app-2.yaml"): nil,
+						filepath.Join(hydratedDir, "multi-resource-service-test-app-2.yaml"):    nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -146,13 +149,14 @@ func TestPrepare(t *testing.T) {
 	}, {
 		name: "Config is file",
 
-		images:     images,
+		image:      image,
 		appName:    appName,
 		appVersion: appVersion,
 		config:     multiResourceYaml,
 		output:     outputDir,
 		labels:     labels,
 		namespace:  namespace,
+		exposePort: 0,
 
 		deployer: &Deployer{
 			Clients: &services.Clients{
@@ -164,7 +168,7 @@ func TestPrepare(t *testing.T) {
 							},
 							Err: nil,
 						},
-						outputDir: {
+						hydratedDir: {
 							Res: nil,
 							Err: os.ErrNotExist,
 						},
@@ -176,11 +180,11 @@ func TestPrepare(t *testing.T) {
 						},
 					},
 					MkdirAllResponse: map[string]error{
-						outputDir: nil,
+						hydratedDir: nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(outputDir, "multi-resource-deployment-test-app.yaml"): nil,
-						filepath.Join(outputDir, "multi-resource-service-test-app.yaml"):    nil,
+						filepath.Join(hydratedDir, "multi-resource-deployment-test-app.yaml"): nil,
+						filepath.Join(hydratedDir, "multi-resource-service-test-app.yaml"):    nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -198,7 +202,7 @@ func TestPrepare(t *testing.T) {
 	}, {
 		name: "Add custom labels",
 
-		images:     images,
+		image:      image,
 		appName:    appName,
 		appVersion: appVersion,
 		config:     configDir,
@@ -208,7 +212,8 @@ func TestPrepare(t *testing.T) {
 			"hi":          "bye",
 			"a/b/c.d.f.g": "h/i/j.k.l.m",
 		},
-		namespace: namespace,
+		namespace:  namespace,
+		exposePort: 0,
 
 		deployer: &Deployer{
 			Clients: &services.Clients{
@@ -220,7 +225,7 @@ func TestPrepare(t *testing.T) {
 							},
 							Err: nil,
 						},
-						outputDir: {
+						hydratedDir: {
 							Res: nil,
 							Err: os.ErrNotExist,
 						},
@@ -243,10 +248,10 @@ func TestPrepare(t *testing.T) {
 						},
 					},
 					MkdirAllResponse: map[string]error{
-						outputDir: nil,
+						hydratedDir: nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(outputDir, deploymentYaml): nil,
+						filepath.Join(hydratedDir, deploymentYaml): nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -264,13 +269,14 @@ func TestPrepare(t *testing.T) {
 	}, {
 		name: "AppName and AppVersion not set",
 
-		images:     images,
+		image:      image,
 		appName:    "",
 		appVersion: "",
 		config:     configDir,
 		output:     outputDir,
 		labels:     labels,
 		namespace:  namespace,
+		exposePort: 0,
 
 		deployer: &Deployer{
 			Clients: &services.Clients{
@@ -282,7 +288,7 @@ func TestPrepare(t *testing.T) {
 							},
 							Err: nil,
 						},
-						outputDir: {
+						hydratedDir: {
 							Res: nil,
 							Err: os.ErrNotExist,
 						},
@@ -305,10 +311,10 @@ func TestPrepare(t *testing.T) {
 						},
 					},
 					MkdirAllResponse: map[string]error{
-						outputDir: nil,
+						hydratedDir: nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(outputDir, deploymentYaml): nil,
+						filepath.Join(hydratedDir, deploymentYaml): nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -326,13 +332,14 @@ func TestPrepare(t *testing.T) {
 	}, {
 		name: "Namespace is not default",
 
-		images:     images,
+		image:      image,
 		appName:    appName,
 		appVersion: appVersion,
 		config:     configDir,
 		output:     outputDir,
 		labels:     labels,
 		namespace:  "foobar",
+		exposePort: 0,
 
 		deployer: &Deployer{
 			Clients: &services.Clients{
@@ -344,7 +351,11 @@ func TestPrepare(t *testing.T) {
 							},
 							Err: nil,
 						},
-						outputDir: {
+						createdDir: {
+							Res: nil,
+							Err: os.ErrNotExist,
+						},
+						hydratedDir: {
 							Res: nil,
 							Err: os.ErrNotExist,
 						},
@@ -367,11 +378,13 @@ func TestPrepare(t *testing.T) {
 						},
 					},
 					MkdirAllResponse: map[string]error{
-						outputDir: nil,
+						createdDir:  nil,
+						hydratedDir: nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(outputDir, deploymentYaml): nil,
-						filepath.Join(outputDir, namespaceYaml):  nil,
+						filepath.Join(createdDir, namespaceYaml):   nil,
+						filepath.Join(hydratedDir, deploymentYaml): nil,
+						filepath.Join(hydratedDir, namespaceYaml):  nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -389,13 +402,14 @@ func TestPrepare(t *testing.T) {
 	}, {
 		name: "Wait for service object to be ready",
 
-		images:     images,
+		image:      image,
 		appName:    appName,
 		appVersion: appVersion,
 		config:     configDir,
 		output:     outputDir,
 		labels:     labels,
 		namespace:  namespace,
+		exposePort: 0,
 
 		deployer: &Deployer{
 			Clients: &services.Clients{
@@ -407,7 +421,7 @@ func TestPrepare(t *testing.T) {
 							},
 							Err: nil,
 						},
-						outputDir: {
+						hydratedDir: {
 							Res: nil,
 							Err: os.ErrNotExist,
 						},
@@ -430,10 +444,151 @@ func TestPrepare(t *testing.T) {
 						},
 					},
 					MkdirAllResponse: map[string]error{
-						outputDir: nil,
+						hydratedDir: nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(outputDir, serviceYaml): nil,
+						filepath.Join(hydratedDir, serviceYaml): nil,
+					},
+				},
+				Remote: &testservices.TestRemote{
+					ImageResp: &testservices.TestImage{
+						Hash: v1.Hash{
+							Algorithm: "sha256",
+							Hex:       "foobar",
+						},
+						Err: nil,
+					},
+					ImageErr: nil,
+				},
+			},
+		},
+	}, {
+		name: "No config arg",
+
+		image:      image,
+		appName:    appName,
+		appVersion: appVersion,
+		config:     "",
+		output:     outputDir,
+		labels:     labels,
+		namespace:  namespace,
+		exposePort: 0,
+
+		deployer: &Deployer{
+			Clients: &services.Clients{
+				OS: &testservices.TestOS{
+					StatResponse: map[string]testservices.StatResponse{
+						configDir: {
+							Res: &testservices.TestFileInfo{
+								IsDirectory: true,
+							},
+							Err: nil,
+						},
+						createdDir: {
+							Res: nil,
+							Err: os.ErrNotExist,
+						},
+						hydratedDir: {
+							Res: nil,
+							Err: os.ErrNotExist,
+						},
+					},
+					ReadDirResponse: map[string]testservices.ReadDirResponse{
+						configDir: {
+							Res: []os.FileInfo{
+								&testservices.TestFileInfo{
+									BaseName:    deploymentYaml,
+									IsDirectory: false,
+								},
+							},
+							Err: nil,
+						},
+					},
+					ReadFileResponse: map[string]testservices.ReadFileResponse{
+						filepath.Join(configDir, deploymentYaml): {
+							Res: fileContents(t, testDeploymentFile),
+							Err: nil,
+						},
+					},
+					MkdirAllResponse: map[string]error{
+						createdDir:  nil,
+						hydratedDir: nil,
+					},
+					WriteFileResponse: map[string]error{
+						filepath.Join(createdDir, deploymentYaml):  nil,
+						filepath.Join(createdDir, hpaYaml):         nil,
+						filepath.Join(hydratedDir, deploymentYaml): nil,
+						filepath.Join(hydratedDir, hpaYaml):        nil,
+					},
+				},
+				Remote: &testservices.TestRemote{
+					ImageResp: &testservices.TestImage{
+						Hash: v1.Hash{
+							Algorithm: "sha256",
+							Hex:       "foobar",
+						},
+						Err: nil,
+					},
+					ImageErr: nil,
+				},
+			},
+		},
+	}, {
+		name: "Expose application",
+
+		image:      image,
+		appName:    appName,
+		appVersion: appVersion,
+		config:     configDir,
+		output:     outputDir,
+		labels:     labels,
+		namespace:  namespace,
+		exposePort: 80,
+
+		deployer: &Deployer{
+			Clients: &services.Clients{
+				OS: &testservices.TestOS{
+					StatResponse: map[string]testservices.StatResponse{
+						configDir: {
+							Res: &testservices.TestFileInfo{
+								IsDirectory: true,
+							},
+							Err: nil,
+						},
+						createdDir: {
+							Res: nil,
+							Err: os.ErrNotExist,
+						},
+						hydratedDir: {
+							Res: nil,
+							Err: os.ErrNotExist,
+						},
+					},
+					ReadDirResponse: map[string]testservices.ReadDirResponse{
+						configDir: {
+							Res: []os.FileInfo{
+								&testservices.TestFileInfo{
+									BaseName:    deploymentYaml,
+									IsDirectory: false,
+								},
+							},
+							Err: nil,
+						},
+					},
+					ReadFileResponse: map[string]testservices.ReadFileResponse{
+						filepath.Join(configDir, deploymentYaml): {
+							Res: fileContents(t, testDeploymentFile),
+							Err: nil,
+						},
+					},
+					MkdirAllResponse: map[string]error{
+						createdDir:  nil,
+						hydratedDir: nil,
+					},
+					WriteFileResponse: map[string]error{
+						filepath.Join(createdDir, serviceYaml):     nil,
+						filepath.Join(hydratedDir, deploymentYaml): nil,
+						filepath.Join(hydratedDir, serviceYaml):    nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -452,8 +607,8 @@ func TestPrepare(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if err := tc.deployer.Prepare(ctx, tc.images, tc.appName, tc.appVersion, tc.config, tc.output, tc.namespace, tc.labels, 0); err != nil {
-				t.Errorf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %v) = %v; want <nil>", tc.images, tc.appName, tc.appVersion, tc.config, tc.output, tc.namespace, tc.labels, err)
+			if err := tc.deployer.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, tc.output, tc.namespace, tc.labels, tc.exposePort); err != nil {
+				t.Errorf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %v) = %v; want <nil>", tc.image, tc.appName, tc.appVersion, tc.config, tc.output, tc.namespace, tc.labels, err)
 			}
 		})
 	}
@@ -464,10 +619,11 @@ func TestPrepareErrors(t *testing.T) {
 
 	testDeploymentFile := "testing/deployment.yaml"
 
-	images := []name.Reference{newImageWithTag(t, "my-image:1.0.0")}
+	image := newImageWithTag(t, "my-image:1.0.0")
 	appName := "my-app"
 	appVersion := "b2e43cb"
 	outputDir := "path/to/outputDir"
+	hydratedDir := filepath.Join(outputDir, "hydrated")
 	namespace := "default"
 	labels := make(map[string]string)
 
@@ -477,7 +633,7 @@ func TestPrepareErrors(t *testing.T) {
 	tests := []struct {
 		name string
 
-		images     []name.Reference
+		image      name.Reference
 		appName    string
 		appVersion string
 		config     string
@@ -489,7 +645,7 @@ func TestPrepareErrors(t *testing.T) {
 	}{{
 		name: "Failed to parse resources",
 
-		images:     images,
+		image:      image,
 		appName:    appName,
 		appVersion: appVersion,
 		config:     configDir,
@@ -520,7 +676,7 @@ func TestPrepareErrors(t *testing.T) {
 	}, {
 		name: "Failed to get image digest",
 
-		images:     images,
+		image:      image,
 		appName:    appName,
 		appVersion: appVersion,
 		config:     configDir,
@@ -566,7 +722,7 @@ func TestPrepareErrors(t *testing.T) {
 	}, {
 		name: "Failed to save configs",
 
-		images:     images,
+		image:      image,
 		appName:    appName,
 		appVersion: appVersion,
 		config:     configDir,
@@ -584,7 +740,7 @@ func TestPrepareErrors(t *testing.T) {
 							},
 							Err: nil,
 						},
-						outputDir: {
+						hydratedDir: {
 							Res: nil,
 							Err: os.ErrNotExist,
 						},
@@ -607,10 +763,10 @@ func TestPrepareErrors(t *testing.T) {
 						},
 					},
 					MkdirAllResponse: map[string]error{
-						outputDir: nil,
+						hydratedDir: nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(outputDir, deploymentYaml): fmt.Errorf("failed to write file"),
+						filepath.Join(hydratedDir, deploymentYaml): fmt.Errorf("failed to write file"),
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -628,7 +784,7 @@ func TestPrepareErrors(t *testing.T) {
 	}, {
 		name: "Cannot set app.kubernetes.io/name label via custom labels",
 
-		images:     images,
+		image:      image,
 		appName:    appName,
 		appVersion: appVersion,
 		config:     configDir,
@@ -667,10 +823,10 @@ func TestPrepareErrors(t *testing.T) {
 						},
 					},
 					MkdirAllResponse: map[string]error{
-						outputDir: nil,
+						hydratedDir: nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(outputDir, deploymentYaml): nil,
+						filepath.Join(hydratedDir, deploymentYaml): nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -688,7 +844,7 @@ func TestPrepareErrors(t *testing.T) {
 	}, {
 		name: "Cannot set app.kubernetes.io/version label via custom labels",
 
-		images:     images,
+		image:      image,
 		appName:    appName,
 		appVersion: appVersion,
 		config:     configDir,
@@ -727,10 +883,10 @@ func TestPrepareErrors(t *testing.T) {
 						},
 					},
 					MkdirAllResponse: map[string]error{
-						outputDir: nil,
+						hydratedDir: nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(outputDir, deploymentYaml): nil,
+						filepath.Join(hydratedDir, deploymentYaml): nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -748,7 +904,7 @@ func TestPrepareErrors(t *testing.T) {
 	}, {
 		name: "Cannot set app.kubernetes.io/managed-by label via custom labels",
 
-		images:     images,
+		image:      image,
 		appName:    appName,
 		appVersion: appVersion,
 		config:     configDir,
@@ -787,10 +943,10 @@ func TestPrepareErrors(t *testing.T) {
 						},
 					},
 					MkdirAllResponse: map[string]error{
-						outputDir: nil,
+						hydratedDir: nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(outputDir, deploymentYaml): nil,
+						filepath.Join(hydratedDir, deploymentYaml): nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -809,8 +965,8 @@ func TestPrepareErrors(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if err := tc.deployer.Prepare(ctx, tc.images, tc.appName, tc.appVersion, tc.config, tc.output, tc.namespace, tc.labels, 0); err == nil {
-				t.Errorf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %v) = <nil>; want error", tc.images, tc.appName, tc.appVersion, tc.config, tc.output, tc.namespace, tc.labels)
+			if err := tc.deployer.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, tc.output, tc.namespace, tc.labels, 0); err == nil {
+				t.Errorf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %v) = <nil>; want error", tc.image, tc.appName, tc.appVersion, tc.config, tc.output, tc.namespace, tc.labels)
 			}
 		})
 	}

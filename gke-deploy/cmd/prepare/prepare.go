@@ -17,10 +17,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/spf13/cobra"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/cmd/common"
-	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/image"
 )
 
 const (
@@ -45,7 +45,7 @@ type options struct {
 	appName    string
 	appVersion string
 	filename   string
-	images     []string
+	image      string
 	labels     []string
 	namespace  string
 	output     string
@@ -71,8 +71,8 @@ func NewPrepareCommand() *cobra.Command {
 
 	cmd.Flags().StringVarP(&options.appName, "app", "a", "", "Application name of the Kubernetes deployment.")
 	cmd.Flags().StringVarP(&options.appVersion, "version", "v", "", "Version of the Kubernetes deployment.")
-	cmd.Flags().StringVarP(&options.filename, "filename", "f", "", "Config file or directory of config files to use to create the Kubernetes resources (file or files in directory must end with \".yml\" or \".yaml\").")
-	cmd.Flags().StringSliceVarP(&options.images, "image", "i", nil, "Image(s) to be deployed. Images can be set comma-delimited or as separate flags.")
+	cmd.Flags().StringVarP(&options.filename, "filename", "f", "", "Config file or directory of config files to use to create the Kubernetes resources (file or files in directory must end with \".yml\" or \".yaml\"). If this field is not provided, base configs will be created: Deployment with image provided by --image and HorizontalPodAutoscaler.")
+	cmd.Flags().StringVarP(&options.image, "image", "i", "", "Image to be deployed.")
 	cmd.Flags().StringSliceVarP(&options.labels, "label", "L", nil, "Label(s) to add to Kubernetes resources (k1=v1). Labels can be set comma-delimited or as separate flags. If two or more labels with the same key are listed, the last one is used.")
 	cmd.Flags().StringVarP(&options.namespace, "namespace", "n", "default", "Namespace of GKE cluster to deploy to.")
 	cmd.Flags().StringVarP(&options.output, "output", "o", "./output", "Target directory to store modified Kubernetes resource configs.")
@@ -82,17 +82,20 @@ func NewPrepareCommand() *cobra.Command {
 	return cmd
 }
 
-func prepare(cmd *cobra.Command, options *options) error {
+func prepare(_ *cobra.Command, options *options) error {
 	ctx := context.Background()
 
-	images, err := image.ParseReferences(options.images)
-	if err != nil {
-		return err
+	var im name.Reference
+	if options.image != "" {
+		ref, err := name.ParseReference(options.image)
+		if err != nil {
+			return err
+		}
+		im = ref
 	}
 
-	if options.filename == "" {
-		// TODO(joonlim): Generate base configs if user does not supply any.
-		return fmt.Errorf("required -f|--filename flag is not set")
+	if options.filename == "" && (options.appName == "" || options.image == "") {
+		return fmt.Errorf("omitting -f|--filename requires -a|--app and -i|--image to be set")
 	}
 	if options.namespace == "" {
 		return fmt.Errorf("value of -n|--namespace cannot be empty")
@@ -117,7 +120,7 @@ func prepare(cmd *cobra.Command, options *options) error {
 		return err
 	}
 
-	if err := d.Prepare(ctx, images, options.appName, options.appVersion, options.filename, options.output, options.namespace, labelsMap, options.exposePort); err != nil {
+	if err := d.Prepare(ctx, im, options.appName, options.appVersion, options.filename, options.output, options.namespace, labelsMap, options.exposePort); err != nil {
 		return fmt.Errorf("failed to prepare deployment: %v", err)
 	}
 
