@@ -36,13 +36,13 @@ gke-deploy run [flags]
 ```
   -a, --app string         Application name of the Kubernetes deployment.
   -c, --cluster string     Name of GKE cluster to deploy to.
-  -x, --expose int         Creates a Service resource that connects to a deployed resource using a selector that matches the value provided by --app. The port provided will be used to expose the deployed resource (i.e., port and targetPort will be set to the value provided in this flag).
+  -x, --expose int         Creates a Service resource that connects to a deployed resource using a selector that matches the label with key as app.kubernetes.io/name and value provided by --app. The port provided will be used to expose the deployed resource (i.e., port and targetPort will be set to the value provided in this flag).
   -f, --filename string    Config file or directory of config files to use to create the Kubernetes resources (file or files in directory must end with ".yml" or ".yaml").
   -h, --help               help for run
   -i, --image strings      Image(s) to be deployed. Images can be set comma-delimited or as separate flags.
   -L, --label strings      Label(s) to add to Kubernetes resources (k1=v1). Labels can be set comma-delimited or as separate flags. If two or more labels with the same key are listed, the last one is used.
   -l, --location string    Region/zone of GKE cluster to deploy to.
-  -n, --namespace string   Name of GKE cluster to deploy to. (default "default")
+  -n, --namespace string   Namespace of GKE cluster to deploy to. (default "default")
   -o, --output string      Target directory to store modified Kubernetes resource configs. (default "./output")
   -p, --project string     Project of GKE cluster to deploy to. If this field is not provided, the current set GCP project is used.
   -t, --timeout duration   Timeout limit for waiting for resources to finish applying. (default 5m0s)

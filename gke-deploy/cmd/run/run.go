@@ -85,9 +85,9 @@ func NewRunCommand() *cobra.Command {
 	cmd.Flags().StringVarP(&options.clusterProject, "project", "p", "", "Project of GKE cluster to deploy to. If this field is not provided, the current set GCP project is used.")
 	cmd.Flags().StringSliceVarP(&options.images, "image", "i", nil, "Image(s) to be deployed. Images can be set comma-delimited or as separate flags.")
 	cmd.Flags().StringSliceVarP(&options.labels, "label", "L", nil, "Label(s) to add to Kubernetes resources (k1=v1). Labels can be set comma-delimited or as separate flags. If two or more labels with the same key are listed, the last one is used.")
-	cmd.Flags().StringVarP(&options.namespace, "namespace", "n", "default", "Name of GKE cluster to deploy to.")
+	cmd.Flags().StringVarP(&options.namespace, "namespace", "n", "default", "Namespace of GKE cluster to deploy to.")
 	cmd.Flags().StringVarP(&options.output, "output", "o", "./output", "Target directory to store modified Kubernetes resource configs.")
-	cmd.Flags().IntVarP(&options.exposePort, "expose", "x", 0, "Creates a Service resource that connects to a deployed resource using a selector that matches the value provided by --app. The port provided will be used to expose the deployed resource (i.e., port and targetPort will be set to the value provided in this flag).")
+	cmd.Flags().IntVarP(&options.exposePort, "expose", "x", 0, "Creates a Service resource that connects to a deployed resource using a selector that matches the label with key as app.kubernetes.io/name and value provided by --app. The port provided will be used to expose the deployed resource (i.e., port and targetPort will be set to the value provided in this flag).")
 	cmd.Flags().BoolVarP(&options.verbose, "verbose", "V", false, "Prints underlying commands being called to stdout.")
 	cmd.Flags().DurationVarP(&options.waitTimeout, "timeout", "t", 5*time.Minute, "Timeout limit for waiting for resources to finish applying.")
 
