@@ -56,6 +56,7 @@ type options struct {
 	labels          []string
 	namespace       string
 	output          string
+	exposePort      int
 	verbose         bool
 	waitTimeout     time.Duration
 }
@@ -84,8 +85,9 @@ func NewRunCommand() *cobra.Command {
 	cmd.Flags().StringVarP(&options.clusterProject, "project", "p", "", "Project of GKE cluster to deploy to. If this field is not provided, the current set GCP project is used.")
 	cmd.Flags().StringSliceVarP(&options.images, "image", "i", nil, "Image(s) to be deployed. Images can be set comma-delimited or as separate flags.")
 	cmd.Flags().StringSliceVarP(&options.labels, "label", "L", nil, "Label(s) to add to Kubernetes resources (k1=v1). Labels can be set comma-delimited or as separate flags. If two or more labels with the same key are listed, the last one is used.")
-	cmd.Flags().StringVarP(&options.namespace, "namespace", "n", "default", "Name of GKE cluster to deploy to.")
+	cmd.Flags().StringVarP(&options.namespace, "namespace", "n", "default", "Namespace of GKE cluster to deploy to.")
 	cmd.Flags().StringVarP(&options.output, "output", "o", "./output", "Target directory to store modified Kubernetes resource configs.")
+	cmd.Flags().IntVarP(&options.exposePort, "expose", "x", 0, "Creates a Service resource that connects to a deployed resource using a selector that matches the label with key as 'app.kubernetes.io/name' and value provided by --app. The port provided will be used to expose the deployed resource (i.e., port and targetPort will be set to the value provided in this flag).")
 	cmd.Flags().BoolVarP(&options.verbose, "verbose", "V", false, "Prints underlying commands being called to stdout.")
 	cmd.Flags().DurationVarP(&options.waitTimeout, "timeout", "t", 5*time.Minute, "Timeout limit for waiting for resources to finish applying.")
 
@@ -117,6 +119,13 @@ func run(cmd *cobra.Command, options *options) error {
 		return fmt.Errorf("you must set -l|--location flag because -c|--cluster flag is set")
 	}
 
+	if options.exposePort < 0 {
+		return fmt.Errorf("value of -x|--expose must be > 0")
+	}
+	if options.exposePort > 0 && options.appName == "" {
+		return fmt.Errorf("exposing a deployed resource requires -a|--app to be set")
+	}
+
 	labelsMap, err := common.CreateLabelsMap(options.labels)
 	if err != nil {
 		return err
@@ -126,7 +135,7 @@ func run(cmd *cobra.Command, options *options) error {
 		return err
 	}
 
-	if err := d.Prepare(ctx, images, options.appName, options.appVersion, options.filename, options.output, options.namespace, labelsMap); err != nil {
+	if err := d.Prepare(ctx, images, options.appName, options.appVersion, options.filename, options.output, options.namespace, labelsMap, options.exposePort); err != nil {
 		return fmt.Errorf("failed to prepare deployment: %v", err)
 	}
 	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, options.output, options.namespace, options.waitTimeout); err != nil {

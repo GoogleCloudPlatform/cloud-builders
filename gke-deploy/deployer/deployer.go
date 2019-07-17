@@ -47,7 +47,7 @@ type Deployer struct {
 }
 
 // Prepare handles preparing deployment.
-func (d *Deployer) Prepare(ctx context.Context, images []name.Reference, appName, appVersion, config, output, namespace string, labels map[string]string) error {
+func (d *Deployer) Prepare(ctx context.Context, images []name.Reference, appName, appVersion, config, output, namespace string, labels map[string]string, exposePort int) error {
 	fmt.Printf("Preparing deployment.\n")
 
 	objs, err := resource.ParseConfigs(ctx, config, d.Clients.OS)
@@ -88,6 +88,23 @@ func (d *Deployer) Prepare(ctx context.Context, images []name.Reference, appName
 			}
 			if err = resource.AddObject(ctx, objs, nsObj); err != nil {
 				return fmt.Errorf("failed to add namespace object: %v", err)
+			}
+		}
+	}
+	if exposePort > 0 && appName != "" {
+		service := fmt.Sprintf("%s-service", appName)
+		ok, err := resource.HasObject(ctx, objs, "Service", service)
+		if err != nil {
+			return fmt.Errorf("failed to check if Service %q exists: %v", service, err)
+		}
+		if !ok {
+			fmt.Printf("Creating Service resource %q\n", service)
+			svcObj, err := resource.CreateServiceObject(ctx, service, appNameLabelKey, appName, exposePort)
+			if err != nil {
+				return fmt.Errorf("failed to create Service object: %v", err)
+			}
+			if err = resource.AddObject(ctx, objs, svcObj); err != nil {
+				return fmt.Errorf("failed to add Service object: %v", err)
 			}
 		}
 	}

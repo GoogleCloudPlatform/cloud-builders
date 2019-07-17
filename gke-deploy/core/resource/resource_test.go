@@ -1474,6 +1474,23 @@ func TestCreateNamespaceObjectErrors(t *testing.T) {
 	}
 }
 
+func TestCreateServiceObject(t *testing.T) {
+	ctx := context.Background()
+
+	testServiceFile := "testing/service-2.yaml"
+
+	objName := "test-app-service"
+	selectorKey := "app"
+	selectorValue := "test-app"
+	port := 100
+
+	want := newObjectFromFile(t, testServiceFile)
+
+	if got, err := CreateServiceObject(ctx, objName, selectorKey, selectorValue, port); !reflect.DeepEqual(got, want) || err != nil {
+		t.Errorf("CreateServiceObject(ctx, %s, %s, %s, %d) = %v, %v; want %v, <nil>", objName, selectorKey, selectorValue, port, got, err, want)
+	}
+}
+
 func TestDeploySummary(t *testing.T) {
 	ctx := context.Background()
 

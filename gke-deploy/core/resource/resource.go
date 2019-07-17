@@ -301,13 +301,18 @@ func CreateNamespaceObject(ctx context.Context, name string) (*Object, error) {
 	if name == "default" {
 		return nil, fmt.Errorf("namespace name should not be \"default\"")
 	}
-	obj, err := DecodeFromYAML(ctx, []byte(namespaceTemplate))
+	obj, err := DecodeFromYAML(ctx, []byte(fmt.Sprintf(namespaceTemplate, name)))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create template namespace object")
 	}
+	return obj, nil
+}
 
-	if err := setResourceName(obj, name); err != nil {
-		return nil, fmt.Errorf("failed to set name field: %v", err)
+// CreateServiceObject creates a Service object with the given name with service type ClusterIP.
+func CreateServiceObject(ctx context.Context, name, selectorKey, selectorValue string, port int) (*Object, error) {
+	obj, err := DecodeFromYAML(ctx, []byte(fmt.Sprintf(serviceTemplate, name, selectorKey, selectorValue, port, port)))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create template namespace object")
 	}
 	return obj, nil
 }

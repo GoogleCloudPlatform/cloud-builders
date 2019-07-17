@@ -452,7 +452,7 @@ func TestPrepare(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if err := tc.deployer.Prepare(ctx, tc.images, tc.appName, tc.appVersion, tc.config, tc.output, tc.namespace, tc.labels); err != nil {
+			if err := tc.deployer.Prepare(ctx, tc.images, tc.appName, tc.appVersion, tc.config, tc.output, tc.namespace, tc.labels, 0); err != nil {
 				t.Errorf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %v) = %v; want <nil>", tc.images, tc.appName, tc.appVersion, tc.config, tc.output, tc.namespace, tc.labels, err)
 			}
 		})
@@ -809,7 +809,7 @@ func TestPrepareErrors(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if err := tc.deployer.Prepare(ctx, tc.images, tc.appName, tc.appVersion, tc.config, tc.output, tc.namespace, tc.labels); err == nil {
+			if err := tc.deployer.Prepare(ctx, tc.images, tc.appName, tc.appVersion, tc.config, tc.output, tc.namespace, tc.labels, 0); err == nil {
 				t.Errorf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %v) = <nil>; want error", tc.images, tc.appName, tc.appVersion, tc.config, tc.output, tc.namespace, tc.labels)
 			}
 		})

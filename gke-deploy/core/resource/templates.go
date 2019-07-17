@@ -16,6 +16,20 @@ const (
 	namespaceTemplate = `apiVersion: v1
 kind: Namespace
 metadata:
-  name:
+  name: %s
+`
+
+	serviceTemplate = `apiVersion: v1
+kind: Service
+metadata:
+  name: %s
+spec:
+  selector:
+    %s: %s
+  ports:
+  - protocol: TCP
+    port: %d
+    targetPort: %d
+  type: LoadBalancer
 `
 )
