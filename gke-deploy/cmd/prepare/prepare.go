@@ -76,7 +76,7 @@ func NewPrepareCommand() *cobra.Command {
 	cmd.Flags().StringSliceVarP(&options.labels, "label", "L", nil, "Label(s) to add to Kubernetes resources (k1=v1). Labels can be set comma-delimited or as separate flags. If two or more labels with the same key are listed, the last one is used.")
 	cmd.Flags().StringVarP(&options.namespace, "namespace", "n", "default", "Namespace of GKE cluster to deploy to.")
 	cmd.Flags().StringVarP(&options.output, "output", "o", "./output", "Target directory to store modified Kubernetes resource configs.")
-	cmd.Flags().IntVarP(&options.exposePort, "expose", "x", 0, "Creates a Service resource that connects to a deployed resource using a selector that matches the label with key as app.kubernetes.io/name and value provided by --app. The port provided will be used to expose the deployed resource (i.e., port and targetPort will be set to the value provided in this flag).")
+	cmd.Flags().IntVarP(&options.exposePort, "expose", "x", 0, "Creates a Service resource that connects to a deployed resource using a selector that matches the label with key as 'app.kubernetes.io/name' and value provided by --app. The port provided will be used to expose the deployed resource (i.e., port and targetPort will be set to the value provided in this flag).")
 	cmd.Flags().BoolVarP(&options.verbose, "verbose", "V", false, "Prints underlying commands being called to stdout.")
 
 	return cmd
