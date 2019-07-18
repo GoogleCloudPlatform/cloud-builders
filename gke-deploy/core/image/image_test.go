@@ -15,97 +15,13 @@ package image
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"testing"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/testservices"
-	v1 "github.com/google/go-containerregistry/pkg/v1"
+	"github.com/google/go-containerregistry/pkg/v1"
 
 	"github.com/google/go-containerregistry/pkg/name"
 )
-
-func TestParseImages(t *testing.T) {
-	image := "gcr.io/my-project/my-image:1.0.0"
-	image2 := "gcr.io/my-project/my-image-2@sha256:929665b8eb2bb286535d29cd73c71808d7e1ad830046333f6cf0ce497996eb79"
-	image3 := "gcr.io/my-project/my-image-3"
-
-	tests := []struct {
-		name string
-
-		images []string
-
-		want []name.Reference
-	}{{
-		name: "No images",
-
-		images: []string{},
-
-		want: nil,
-	}, {
-		name: "Success with multiple images",
-
-		images: []string{
-			image,
-			image2,
-			image3,
-		},
-
-		want: []name.Reference{
-			newImageWithTag(t, image),
-			newImageWithDigest(t, image2),
-			newImageWithTag(t, image3),
-		},
-	}}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			if got, err := ParseReferences(tc.images); !reflect.DeepEqual(got, tc.want) || err != nil {
-				t.Errorf("ParseReferences(%v) = %v, %v; want %v, <nil>", tc.images, got, err, tc.want)
-			}
-		})
-	}
-}
-
-func TestParseImagesErrors(t *testing.T) {
-	image := "gcr.io/my-project/my-image:1.0.0"
-	image2 := "gcr.io/my-project/my-image@sha256:929665b8eb2bb286535d29cd73c71808d7e1ad830046333f6cf0ce497996eb79"
-	image3 := "gcr.io/my-project/my-image"
-
-	tests := []struct {
-		name string
-
-		images []string
-	}{{
-		name: "Duplicate image name 1",
-
-		images: []string{
-			image,
-			image2,
-		},
-	}, {
-		name: "Duplicate image name 2",
-
-		images: []string{
-			image,
-			image3,
-		},
-	}, {
-		name: "Duplicate image name 3",
-
-		images: []string{
-			image2,
-			image3,
-		},
-	}}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			if got, err := ParseReferences(tc.images); err == nil {
-				t.Errorf("ParseReferences(%v) = %v, <nil>; want <nil>, err", tc.images, got)
-			}
-		})
-	}
-}
 
 func TestName(t *testing.T) {
 	tests := []struct {

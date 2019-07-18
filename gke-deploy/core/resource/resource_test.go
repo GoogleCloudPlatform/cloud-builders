@@ -1450,6 +1450,37 @@ func TestAddObject(t *testing.T) {
 	}
 }
 
+func TestCreateDeploymentObject(t *testing.T) {
+	ctx := context.Background()
+
+	testDeploymentFile := "testing/deployment-4.yaml"
+
+	objName := "test-app"
+	selectorValue := "foo"
+	image := "bar"
+
+	want := newObjectFromFile(t, testDeploymentFile)
+
+	if got, err := CreateDeploymentObject(ctx, objName, selectorValue, image); !reflect.DeepEqual(got, want) || err != nil {
+		t.Errorf("CreateDeploymentObject(ctx, %s  %s, %s) = %v, %v; want %v, <nil>", objName, selectorValue, image, got, err, want)
+	}
+}
+
+func TestCreateHorizontalPodAutoscalerObject(t *testing.T) {
+	ctx := context.Background()
+
+	testHorizontalPodAutoscalerFile := "testing/hpa-2.yaml"
+
+	objName := "test-app-hpa"
+	deploymentName := "test-app"
+
+	want := newObjectFromFile(t, testHorizontalPodAutoscalerFile)
+
+	if got, err := CreateHorizontalPodAutoscalerObject(ctx, objName, deploymentName); !reflect.DeepEqual(got, want) || err != nil {
+		t.Errorf("CreateHorizontalPodAutoscalerObject(ctx, %s, %s) = %v, %v; want %v, <nil>", objName, deploymentName, got, err, want)
+	}
+}
+
 func TestCreateNamespaceObject(t *testing.T) {
 	ctx := context.Background()
 

@@ -21,28 +21,6 @@ import (
 	"github.com/google/go-containerregistry/pkg/name"
 )
 
-// ParseReferences parses a slice of image strings into References.
-func ParseReferences(images []string) ([]name.Reference, error) {
-	var refs []name.Reference
-
-	exists := make(map[string]bool)
-	for _, image := range images {
-		ref, err := name.ParseReference(image)
-		if err != nil {
-			return nil, fmt.Errorf("image is invalid: %q", image)
-		}
-
-		imName := Name(ref)
-		if ok := exists[imName]; ok {
-			return nil, fmt.Errorf("duplicate image name: %q", imName)
-		}
-		exists[imName] = true
-		refs = append(refs, ref)
-	}
-
-	return refs, nil
-}
-
 // Name gets an image's name from a Reference.
 // e.g., If the string representation of the Reference is "gcr.io/my-project/my-image:1.0.0", this
 // returns "gcr.io/my-project/my-image".

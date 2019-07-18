@@ -26,6 +26,9 @@ Apply Phase:
   # Deploy to GKE cluster that kubectl is currently targeting.
   gke-deploy run -f configs
 
+  # Deploy to GKE cluster that kubectl is currently targeting without supplying any configs. Have gke-deploy generate base configs for your application using an image, app name, and service port.
+  gke-deploy run -i nginx -a nginx -x 80
+
   # Prepare only.
   gke-deploy prepare -f configs -i gcr.io/my-project/my-app:1.0.0 -a my-app -v 1.0.0 -o modified -n my-namespace
 

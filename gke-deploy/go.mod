@@ -48,7 +48,7 @@ require (
 	golang.org/x/mobile v0.0.0-20190711165009-e47acb2ca7f9 // indirect
 	golang.org/x/net v0.0.0-20190628185345-da137c7871d7 // indirect
 	golang.org/x/sys v0.0.0-20190712062909-fae7ac547cb7 // indirect
-	golang.org/x/tools v0.0.0-20190716221150-e98af2309876 // indirect
+	golang.org/x/tools v0.0.0-20190717194535-128ec6dfca09 // indirect
 	google.golang.org/genproto v0.0.0-20190716160619-c506a9f90610 // indirect
 	google.golang.org/grpc v1.22.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
