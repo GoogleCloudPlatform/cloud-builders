@@ -63,31 +63,57 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 	}
 
 	createdObjs := resource.Objects{}
-	if config == "" && appName != "" && im != nil {
-		deploymentName := appName
-		fmt.Printf("Creating Deployment resource %q\n", deploymentName)
-		dObj, err := resource.CreateDeploymentObject(ctx, appName, appName, image.Name(im))
-		if err != nil {
-			return fmt.Errorf("failed to create Deployment object: %v", err)
-		}
-		if err = resource.AddObject(ctx, objs, dObj); err != nil {
-			return fmt.Errorf("failed to add Deployment object to objects to hydrate: %v", err)
-		}
-		if err = resource.AddObject(ctx, createdObjs, dObj); err != nil {
-			return fmt.Errorf("failed to add Deployment object to created objects: %v", err)
+	if im != nil {
+		// e.g., Resolve "gcr.io/my-project/my-app:1.0.0" to name suffix "my-app".
+		imageNameSplit := strings.Split(image.Name(im), "/")
+		imageNameSuffix := imageNameSplit[len(imageNameSplit)-1]
+
+		if config == "" {
+			fmt.Printf("Creating Deployment resource %q\n", imageNameSuffix)
+			dObj, err := resource.CreateDeploymentObject(ctx, imageNameSuffix, imageNameSuffix, image.Name(im))
+			if err != nil {
+				return fmt.Errorf("failed to create Deployment object: %v", err)
+			}
+			if err = resource.AddObject(ctx, objs, dObj); err != nil {
+				return fmt.Errorf("failed to add Deployment object to objects to hydrate: %v", err)
+			}
+			if err = resource.AddObject(ctx, createdObjs, dObj); err != nil {
+				return fmt.Errorf("failed to add Deployment object to created objects: %v", err)
+			}
+
+			hpaName := fmt.Sprintf("%s-hpa", imageNameSuffix)
+			fmt.Printf("Creating HorizontalPodAutoscaler resource %q\n", hpaName)
+			hpaObj, err := resource.CreateHorizontalPodAutoscalerObject(ctx, hpaName, imageNameSuffix)
+			if err != nil {
+				return fmt.Errorf("failed to create HorizontalPodAutoscaler object: %v", err)
+			}
+			if err = resource.AddObject(ctx, objs, hpaObj); err != nil {
+				return fmt.Errorf("failed to add HorizontalPodAutoscaler object to objects to hydrate: %v", err)
+			}
+			if err = resource.AddObject(ctx, createdObjs, hpaObj); err != nil {
+				return fmt.Errorf("failed to add HorizontalPodAutoscaler object to created objects: %v", err)
+			}
 		}
 
-		hpaName := fmt.Sprintf("%s-hpa", appName)
-		fmt.Printf("Creating HorizontalPodAutoscaler resource %q\n", hpaName)
-		hpaObj, err := resource.CreateHorizontalPodAutoscalerObject(ctx, hpaName, deploymentName)
-		if err != nil {
-			return fmt.Errorf("failed to create HorizontalPodAutoscaler object: %v", err)
-		}
-		if err = resource.AddObject(ctx, objs, hpaObj); err != nil {
-			return fmt.Errorf("failed to add HorizontalPodAutoscaler object to objects to hydrate: %v", err)
-		}
-		if err = resource.AddObject(ctx, createdObjs, hpaObj); err != nil {
-			return fmt.Errorf("failed to add HorizontalPodAutoscaler object to created objects: %v", err)
+		if exposePort > 0 {
+			service := fmt.Sprintf("%s-service", imageNameSuffix)
+			ok, err := resource.HasObject(ctx, objs, "Service", service)
+			if err != nil {
+				return fmt.Errorf("failed to check if Service %q exists: %v", service, err)
+			}
+			if !ok {
+				fmt.Printf("Creating Service resource %q\n", service)
+				svcObj, err := resource.CreateServiceObject(ctx, service, "app", imageNameSuffix, exposePort)
+				if err != nil {
+					return fmt.Errorf("failed to create Service object: %v", err)
+				}
+				if err = resource.AddObject(ctx, objs, svcObj); err != nil {
+					return fmt.Errorf("failed to add Service object to objects to hydrate: %v", err)
+				}
+				if err = resource.AddObject(ctx, createdObjs, svcObj); err != nil {
+					return fmt.Errorf("failed to add Service object to created objects: %v", err)
+				}
+			}
 		}
 	}
 
@@ -107,27 +133,6 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 			}
 			if err = resource.AddObject(ctx, createdObjs, nsObj); err != nil {
 				return fmt.Errorf("failed to add Namespace object to created objects: %v", err)
-			}
-		}
-	}
-
-	if exposePort > 0 && appName != "" {
-		service := fmt.Sprintf("%s-service", appName)
-		ok, err := resource.HasObject(ctx, objs, "Service", service)
-		if err != nil {
-			return fmt.Errorf("failed to check if Service %q exists: %v", service, err)
-		}
-		if !ok {
-			fmt.Printf("Creating Service resource %q\n", service)
-			svcObj, err := resource.CreateServiceObject(ctx, service, appNameLabelKey, appName, exposePort)
-			if err != nil {
-				return fmt.Errorf("failed to create Service object: %v", err)
-			}
-			if err = resource.AddObject(ctx, objs, svcObj); err != nil {
-				return fmt.Errorf("failed to add Service object to objects to hydrate: %v", err)
-			}
-			if err = resource.AddObject(ctx, createdObjs, svcObj); err != nil {
-				return fmt.Errorf("failed to add Service object to created objects: %v", err)
 			}
 		}
 	}
