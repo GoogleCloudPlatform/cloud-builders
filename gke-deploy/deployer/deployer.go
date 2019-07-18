@@ -113,6 +113,8 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 				if err = resource.AddObject(ctx, createdObjs, svcObj); err != nil {
 					return fmt.Errorf("failed to add Service object to created objects: %v", err)
 				}
+			} else {
+				fmt.Fprintf(os.Stderr, "\nWARNING: Service %q already exists in provided configs. Not generating new Service.\n\n", service)
 			}
 		}
 	}
