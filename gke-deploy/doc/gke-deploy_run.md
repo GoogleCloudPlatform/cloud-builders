@@ -29,6 +29,9 @@ gke-deploy run [flags]
 
   # Deploy to GKE cluster that kubectl is currently targeting.
   gke-deploy run -f configs
+
+  # Deploy to GKE cluster that kubectl is currently targeting without supplying any configs. Have gke-deploy generate base configs for your application using an image, app name, and service port.
+  gke-deploy run -i nginx -a nginx -x 80
 ```
 
 ### Options
