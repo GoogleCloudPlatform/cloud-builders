@@ -24,7 +24,6 @@ import (
 	"time"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/image"
-
 	"github.com/google/go-containerregistry/pkg/name"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/cluster"
@@ -47,7 +46,7 @@ type Deployer struct {
 }
 
 // Prepare handles preparing deployment.
-func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appVersion, config, output, namespace string, labels map[string]string, exposePort int) error {
+func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appVersion, config, createdOutput, hydratedOutput, namespace string, labels map[string]string, exposePort int) error {
 	fmt.Printf("Preparing deployment.\n")
 
 	var objs resource.Objects
@@ -134,7 +133,6 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 	}
 
 	if len(createdObjs) > 0 {
-		createdOutput := filepath.Join(output, "created")
 		fmt.Printf("Saving created resource configs to %q\n", createdOutput)
 		if err := resource.SaveAsConfigs(ctx, createdObjs, createdOutput, d.Clients.OS); err != nil {
 			return fmt.Errorf("failed to save created configs to %q: %v", createdOutput, err)
@@ -197,7 +195,6 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 		}
 	}
 
-	hydratedOutput := filepath.Join(output, "hydrated")
 	fmt.Printf("Saving hydrated resource configs to %q\n", hydratedOutput)
 	if err := resource.SaveAsConfigs(ctx, objs, hydratedOutput, d.Clients.OS); err != nil {
 		return fmt.Errorf("failed to save hydrated configs to %q: %v", hydratedOutput, err)

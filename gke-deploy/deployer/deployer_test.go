@@ -38,9 +38,8 @@ func TestPrepare(t *testing.T) {
 	image := newImageWithTag(t, "my-image:1.0.0")
 	appName := "my-app"
 	appVersion := "b2e43cb"
-	outputDir := "path/to/outputDir"
-	createdDir := filepath.Join(outputDir, "created")
-	hydratedDir := filepath.Join(outputDir, "hydrated")
+	createdDir := "path/to/outputDir/created"
+	hydratedDir := "path/to/outputDir/hydrated"
 	namespace := "default"
 	labels := make(map[string]string)
 
@@ -54,27 +53,29 @@ func TestPrepare(t *testing.T) {
 	tests := []struct {
 		name string
 
-		image      name.Reference
-		appName    string
-		appVersion string
-		config     string
-		output     string
-		namespace  string
-		labels     map[string]string
-		exposePort int
+		image          name.Reference
+		appName        string
+		appVersion     string
+		config         string
+		createdOutput  string
+		hydratedOutput string
+		namespace      string
+		labels         map[string]string
+		exposePort     int
 
 		deployer *Deployer
 	}{{
 		name: "Config is directory",
 
-		image:      image,
-		appName:    appName,
-		appVersion: appVersion,
-		config:     configDir,
-		output:     outputDir,
-		labels:     labels,
-		namespace:  namespace,
-		exposePort: 0,
+		image:          image,
+		appName:        appName,
+		appVersion:     appVersion,
+		config:         configDir,
+		createdOutput:  createdDir,
+		hydratedOutput: hydratedDir,
+		labels:         labels,
+		namespace:      namespace,
+		exposePort:     0,
 
 		deployer: &Deployer{
 			Clients: &services.Clients{
@@ -149,14 +150,15 @@ func TestPrepare(t *testing.T) {
 	}, {
 		name: "Config is file",
 
-		image:      image,
-		appName:    appName,
-		appVersion: appVersion,
-		config:     multiResourceYaml,
-		output:     outputDir,
-		labels:     labels,
-		namespace:  namespace,
-		exposePort: 0,
+		image:          image,
+		appName:        appName,
+		appVersion:     appVersion,
+		config:         multiResourceYaml,
+		createdOutput:  createdDir,
+		hydratedOutput: hydratedDir,
+		labels:         labels,
+		namespace:      namespace,
+		exposePort:     0,
 
 		deployer: &Deployer{
 			Clients: &services.Clients{
@@ -202,11 +204,12 @@ func TestPrepare(t *testing.T) {
 	}, {
 		name: "Add custom labels",
 
-		image:      image,
-		appName:    appName,
-		appVersion: appVersion,
-		config:     configDir,
-		output:     outputDir,
+		image:          image,
+		appName:        appName,
+		appVersion:     appVersion,
+		config:         configDir,
+		createdOutput:  createdDir,
+		hydratedOutput: hydratedDir,
 		labels: map[string]string{
 			"foo":         "bar",
 			"hi":          "bye",
@@ -269,14 +272,15 @@ func TestPrepare(t *testing.T) {
 	}, {
 		name: "AppName and AppVersion not set",
 
-		image:      image,
-		appName:    "",
-		appVersion: "",
-		config:     configDir,
-		output:     outputDir,
-		labels:     labels,
-		namespace:  namespace,
-		exposePort: 0,
+		image:          image,
+		appName:        "",
+		appVersion:     "",
+		config:         configDir,
+		createdOutput:  createdDir,
+		hydratedOutput: hydratedDir,
+		labels:         labels,
+		namespace:      namespace,
+		exposePort:     0,
 
 		deployer: &Deployer{
 			Clients: &services.Clients{
@@ -332,14 +336,15 @@ func TestPrepare(t *testing.T) {
 	}, {
 		name: "Namespace is not default",
 
-		image:      image,
-		appName:    appName,
-		appVersion: appVersion,
-		config:     configDir,
-		output:     outputDir,
-		labels:     labels,
-		namespace:  "foobar",
-		exposePort: 0,
+		image:          image,
+		appName:        appName,
+		appVersion:     appVersion,
+		config:         configDir,
+		createdOutput:  createdDir,
+		hydratedOutput: hydratedDir,
+		labels:         labels,
+		namespace:      "foobar",
+		exposePort:     0,
 
 		deployer: &Deployer{
 			Clients: &services.Clients{
@@ -402,14 +407,15 @@ func TestPrepare(t *testing.T) {
 	}, {
 		name: "Wait for service object to be ready",
 
-		image:      image,
-		appName:    appName,
-		appVersion: appVersion,
-		config:     configDir,
-		output:     outputDir,
-		labels:     labels,
-		namespace:  namespace,
-		exposePort: 0,
+		image:          image,
+		appName:        appName,
+		appVersion:     appVersion,
+		config:         configDir,
+		createdOutput:  createdDir,
+		hydratedOutput: hydratedDir,
+		labels:         labels,
+		namespace:      namespace,
+		exposePort:     0,
 
 		deployer: &Deployer{
 			Clients: &services.Clients{
@@ -465,14 +471,15 @@ func TestPrepare(t *testing.T) {
 	}, {
 		name: "No config arg",
 
-		image:      image,
-		appName:    appName,
-		appVersion: appVersion,
-		config:     "",
-		output:     outputDir,
-		labels:     labels,
-		namespace:  namespace,
-		exposePort: 0,
+		image:          image,
+		appName:        appName,
+		appVersion:     appVersion,
+		config:         "",
+		createdOutput:  createdDir,
+		hydratedOutput: hydratedDir,
+		labels:         labels,
+		namespace:      namespace,
+		exposePort:     0,
 
 		deployer: &Deployer{
 			Clients: &services.Clients{
@@ -536,14 +543,15 @@ func TestPrepare(t *testing.T) {
 	}, {
 		name: "Expose application",
 
-		image:      image,
-		appName:    appName,
-		appVersion: appVersion,
-		config:     configDir,
-		output:     outputDir,
-		labels:     labels,
-		namespace:  namespace,
-		exposePort: 80,
+		image:          image,
+		appName:        appName,
+		appVersion:     appVersion,
+		config:         configDir,
+		createdOutput:  createdDir,
+		hydratedOutput: hydratedDir,
+		labels:         labels,
+		namespace:      namespace,
+		exposePort:     80,
 
 		deployer: &Deployer{
 			Clients: &services.Clients{
@@ -607,8 +615,8 @@ func TestPrepare(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if err := tc.deployer.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, tc.output, tc.namespace, tc.labels, tc.exposePort); err != nil {
-				t.Errorf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %v) = %v; want <nil>", tc.image, tc.appName, tc.appVersion, tc.config, tc.output, tc.namespace, tc.labels, err)
+			if err := tc.deployer.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, tc.createdOutput, tc.hydratedOutput, tc.namespace, tc.labels, tc.exposePort); err != nil {
+				t.Errorf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %v) = %v; want <nil>", tc.image, tc.appName, tc.appVersion, tc.config, tc.createdOutput, tc.hydratedOutput, tc.namespace, tc.labels, err)
 			}
 		})
 	}
@@ -622,8 +630,8 @@ func TestPrepareErrors(t *testing.T) {
 	image := newImageWithTag(t, "my-image:1.0.0")
 	appName := "my-app"
 	appVersion := "b2e43cb"
-	outputDir := "path/to/outputDir"
-	hydratedDir := filepath.Join(outputDir, "hydrated")
+	createdDir := "path/to/created"
+	hydratedDir := "path/to/hydrated"
 	namespace := "default"
 	labels := make(map[string]string)
 
@@ -633,25 +641,27 @@ func TestPrepareErrors(t *testing.T) {
 	tests := []struct {
 		name string
 
-		image      name.Reference
-		appName    string
-		appVersion string
-		config     string
-		output     string
-		namespace  string
-		labels     map[string]string
+		image          name.Reference
+		appName        string
+		appVersion     string
+		config         string
+		createdOutput  string
+		hydratedOutput string
+		namespace      string
+		labels         map[string]string
 
 		deployer *Deployer
 	}{{
 		name: "Failed to parse resources",
 
-		image:      image,
-		appName:    appName,
-		appVersion: appVersion,
-		config:     configDir,
-		output:     outputDir,
-		labels:     labels,
-		namespace:  namespace,
+		image:          image,
+		appName:        appName,
+		appVersion:     appVersion,
+		config:         configDir,
+		createdOutput:  createdDir,
+		hydratedOutput: hydratedDir,
+		labels:         labels,
+		namespace:      namespace,
 
 		deployer: &Deployer{
 			Clients: &services.Clients{
@@ -676,13 +686,14 @@ func TestPrepareErrors(t *testing.T) {
 	}, {
 		name: "Failed to get image digest",
 
-		image:      image,
-		appName:    appName,
-		appVersion: appVersion,
-		config:     configDir,
-		output:     outputDir,
-		labels:     labels,
-		namespace:  namespace,
+		image:          image,
+		appName:        appName,
+		appVersion:     appVersion,
+		config:         configDir,
+		createdOutput:  createdDir,
+		hydratedOutput: hydratedDir,
+		labels:         labels,
+		namespace:      namespace,
 
 		deployer: &Deployer{
 			Clients: &services.Clients{
@@ -722,13 +733,14 @@ func TestPrepareErrors(t *testing.T) {
 	}, {
 		name: "Failed to save configs",
 
-		image:      image,
-		appName:    appName,
-		appVersion: appVersion,
-		config:     configDir,
-		output:     outputDir,
-		labels:     labels,
-		namespace:  namespace,
+		image:          image,
+		appName:        appName,
+		appVersion:     appVersion,
+		config:         configDir,
+		createdOutput:  createdDir,
+		hydratedOutput: hydratedDir,
+		labels:         labels,
+		namespace:      namespace,
 
 		deployer: &Deployer{
 			Clients: &services.Clients{
@@ -784,11 +796,12 @@ func TestPrepareErrors(t *testing.T) {
 	}, {
 		name: "Cannot set app.kubernetes.io/name label via custom labels",
 
-		image:      image,
-		appName:    appName,
-		appVersion: appVersion,
-		config:     configDir,
-		output:     outputDir,
+		image:          image,
+		appName:        appName,
+		appVersion:     appVersion,
+		config:         configDir,
+		createdOutput:  createdDir,
+		hydratedOutput: hydratedDir,
 		labels: map[string]string{
 			"app.kubernetes.io/name": "foobar",
 		},
@@ -844,11 +857,12 @@ func TestPrepareErrors(t *testing.T) {
 	}, {
 		name: "Cannot set app.kubernetes.io/version label via custom labels",
 
-		image:      image,
-		appName:    appName,
-		appVersion: appVersion,
-		config:     configDir,
-		output:     outputDir,
+		image:          image,
+		appName:        appName,
+		appVersion:     appVersion,
+		config:         configDir,
+		createdOutput:  createdDir,
+		hydratedOutput: hydratedDir,
 		labels: map[string]string{
 			"app.kubernetes.io/version": "foobar",
 		},
@@ -904,11 +918,12 @@ func TestPrepareErrors(t *testing.T) {
 	}, {
 		name: "Cannot set app.kubernetes.io/managed-by label via custom labels",
 
-		image:      image,
-		appName:    appName,
-		appVersion: appVersion,
-		config:     configDir,
-		output:     outputDir,
+		image:          image,
+		appName:        appName,
+		appVersion:     appVersion,
+		config:         configDir,
+		createdOutput:  createdDir,
+		hydratedOutput: hydratedDir,
 		labels: map[string]string{
 			"app.kubernetes.io/managed-by": "foobar",
 		},
@@ -965,8 +980,8 @@ func TestPrepareErrors(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if err := tc.deployer.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, tc.output, tc.namespace, tc.labels, 0); err == nil {
-				t.Errorf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %v) = <nil>; want error", tc.image, tc.appName, tc.appVersion, tc.config, tc.output, tc.namespace, tc.labels)
+			if err := tc.deployer.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, tc.createdOutput, tc.hydratedOutput, tc.namespace, tc.labels, 0); err == nil {
+				t.Errorf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %v) = <nil>; want error", tc.image, tc.appName, tc.appVersion, tc.config, tc.createdOutput, tc.hydratedOutput, tc.namespace, tc.labels)
 			}
 		})
 	}

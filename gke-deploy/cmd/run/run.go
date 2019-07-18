@@ -16,7 +16,6 @@ package run
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 	"time"
 
 	"github.com/google/go-containerregistry/pkg/name"
@@ -142,10 +141,11 @@ func run(_ *cobra.Command, options *options) error {
 		return err
 	}
 
-	if err := d.Prepare(ctx, im, options.appName, options.appVersion, options.filename, options.output, options.namespace, labelsMap, options.exposePort); err != nil {
+	hydratedOutput := common.HydratedOutputPath(options.output)
+	if err := d.Prepare(ctx, im, options.appName, options.appVersion, options.filename, common.CreatedOutputPath(options.output), hydratedOutput, options.namespace, labelsMap, options.exposePort); err != nil {
 		return fmt.Errorf("failed to prepare deployment: %v", err)
 	}
-	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, filepath.Join(options.output, "hydrated"), options.namespace, options.waitTimeout); err != nil {
+	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, hydratedOutput, options.namespace, options.waitTimeout); err != nil {
 		return fmt.Errorf("failed to apply deployment: %v", err)
 	}
 

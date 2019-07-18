@@ -16,6 +16,7 @@ package common
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/deployer"
@@ -58,4 +59,16 @@ func CreateDeployer(ctx context.Context, verbose bool) (*deployer.Deployer, erro
 		Clients: c,
 	}
 	return d, nil
+}
+
+// CreatedOutputPath takes a root output directory and returns the path where
+// created configs should be stored.
+func CreatedOutputPath(root string) string {
+	return filepath.Join(root, "created")
+}
+
+// HydratedOutputPath takes a root output directory and returns the path where
+// hydrated configs should be stored.
+func HydratedOutputPath(root string) string {
+	return filepath.Join(root, "hydrated")
 }
