@@ -23,11 +23,11 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/image"
 	"github.com/google/go-containerregistry/pkg/name"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/cluster"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/gcp"
+	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/image"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/resource"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
 )
