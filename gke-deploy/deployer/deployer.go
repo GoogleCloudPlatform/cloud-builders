@@ -42,7 +42,8 @@ const (
 
 // Deployer handles the deployment of an image to a cluster.
 type Deployer struct {
-	Clients *services.Clients
+	Clients   *services.Clients
+	UseGcloud bool
 }
 
 // Prepare handles preparing deployment.
@@ -219,7 +220,7 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 	if (clusterName != "" && clusterLocation == "") || (clusterName == "" && clusterLocation != "") {
 		return fmt.Errorf("clusterName and clusterLocation either must both be provided, or neither should be provided")
 	}
-	if clusterProject == "" {
+	if clusterProject == "" && d.UseGcloud {
 		currentProject, err := gcp.GetProject(ctx, d.Clients.Gcloud)
 		if err != nil {
 			return fmt.Errorf("failed to get GCP project: %v", err)
@@ -227,7 +228,7 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 		clusterProject = currentProject
 	}
 
-	if clusterName != "" && clusterLocation != "" {
+	if clusterName != "" && clusterLocation != "" && d.UseGcloud {
 		fmt.Printf("Getting access to cluster %q in %q.\n", clusterName, clusterLocation)
 		if err := cluster.AuthorizeAccess(ctx, clusterName, clusterLocation, clusterProject, d.Clients.Gcloud); err != nil {
 			account, err2 := gcp.GetAccount(ctx, d.Clients.Gcloud)
@@ -350,13 +351,15 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 
 	fmt.Printf("################################################################################\n")
 
-	links, err := d.gkeLinks(clusterProject)
-	if err != nil {
-		return fmt.Errorf("failed to get GKE links: %v", err)
-	}
+	if clusterProject != "" {
+		links, err := d.gkeLinks(clusterProject)
+		if err != nil {
+			return fmt.Errorf("failed to get GKE links: %v", err)
+		}
 
-	fmt.Printf("> GKE\n\n")
-	fmt.Printf("%s\n", links)
+		fmt.Printf("> GKE\n\n")
+		fmt.Printf("%s\n", links)
+	}
 
 	if timedOut {
 		return fmt.Errorf("timed out after %v while waiting for deployed objects to be ready", waitTimeout)

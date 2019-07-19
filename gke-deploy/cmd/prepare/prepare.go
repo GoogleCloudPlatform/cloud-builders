@@ -115,7 +115,7 @@ func prepare(_ *cobra.Command, options *options) error {
 	if err != nil {
 		return err
 	}
-	d, err := common.CreateDeployer(ctx, options.verbose)
+	d, err := common.CreateDeployer(ctx, false, options.verbose)
 	if err != nil {
 		return err
 	}
