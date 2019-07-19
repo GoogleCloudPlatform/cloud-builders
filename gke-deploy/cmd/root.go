@@ -28,7 +28,7 @@ const (
 Prepare Phase:
   - Modify Kubernetes config YAMLs:
     - Set the digest of images that match the [--image|-i] flag, if provided.
-    - Add app.kubernetes.io/name=[--name|-a] label, if provided.
+    - Add app.kubernetes.io/name=[--app|-a] label, if provided.
     - Add app.kubernetes.io/version=[--version|-v] label, if provided.
 
 Apply Phase:
