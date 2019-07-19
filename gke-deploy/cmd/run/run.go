@@ -125,8 +125,8 @@ func run(_ *cobra.Command, options *options) error {
 		return fmt.Errorf("you must set -l|--location flag because -c|--cluster flag is set")
 	}
 
-	gcloud := common.GcloudInPath()
-	if !gcloud && options.clusterName != "" && options.clusterLocation != "" {
+	useGcloud := common.GcloudInPath()
+	if !useGcloud && options.clusterName != "" && options.clusterLocation != "" {
 		return fmt.Errorf("gcloud must be installed and in PATH to use -c|--cluster and -l|--location")
 	}
 
@@ -141,7 +141,7 @@ func run(_ *cobra.Command, options *options) error {
 	if err != nil {
 		return err
 	}
-	d, err := common.CreateDeployer(ctx, gcloud, options.verbose)
+	d, err := common.CreateDeployer(ctx, useGcloud, options.verbose)
 	if err != nil {
 		return err
 	}
