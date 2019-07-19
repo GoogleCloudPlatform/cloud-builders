@@ -16,6 +16,7 @@ package common
 import (
 	"context"
 	"fmt"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -51,12 +52,17 @@ func CreateLabelsMap(labels []string) (map[string]string, error) {
 
 // CreateDeployer creates a Deployer with initialized clients.
 func CreateDeployer(ctx context.Context, verbose bool) (*deployer.Deployer, error) {
-	c, err := services.NewClients(ctx, verbose)
+	var noGcloud bool
+	if _, err := exec.LookPath("gcloud"); err != nil {
+		noGcloud = true
+	}
+	c, err := services.NewClients(ctx, verbose, noGcloud)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize Clients: %v", err)
 	}
 	d := &deployer.Deployer{
-		Clients: c,
+		Clients:  c,
+		NoGcloud: noGcloud,
 	}
 	return d, nil
 }

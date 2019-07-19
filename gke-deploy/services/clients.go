@@ -56,14 +56,18 @@ type RemoteService interface {
 }
 
 // NewClients returns a new Clients object with default services.
-func NewClients(ctx context.Context, printCommands bool) (*Clients, error) {
+func NewClients(ctx context.Context, printCommands bool, noGcloud bool) (*Clients, error) {
 	oss, err := NewOS(ctx)
 	if err != nil {
 		return nil, err
 	}
-	gs, err := NewGcloud(ctx, printCommands)
-	if err != nil {
-		return nil, err
+	var gs GcloudService
+	if !noGcloud {
+		svc, err := NewGcloud(ctx, printCommands)
+		if err != nil {
+			return nil, err
+		}
+		gs = svc
 	}
 	ks, err := NewKubectl(ctx, printCommands)
 	if err != nil {
