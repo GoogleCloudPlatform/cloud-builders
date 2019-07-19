@@ -16,6 +16,7 @@ package common
 import (
 	"context"
 	"fmt"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -50,13 +51,14 @@ func CreateLabelsMap(labels []string) (map[string]string, error) {
 }
 
 // CreateDeployer creates a Deployer with initialized clients.
-func CreateDeployer(ctx context.Context, verbose bool) (*deployer.Deployer, error) {
-	c, err := services.NewClients(ctx, verbose)
+func CreateDeployer(ctx context.Context, useGcloud, verbose bool) (*deployer.Deployer, error) {
+	c, err := services.NewClients(ctx, useGcloud, verbose)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize Clients: %v", err)
 	}
 	d := &deployer.Deployer{
-		Clients: c,
+		Clients:   c,
+		UseGcloud: useGcloud,
 	}
 	return d, nil
 }
@@ -71,4 +73,12 @@ func CreatedOutputPath(root string) string {
 // hydrated configs should be stored.
 func HydratedOutputPath(root string) string {
 	return filepath.Join(root, "hydrated")
+}
+
+// GcloudInPath returns true if the `gcloud` command is in this machine's PATH.
+func GcloudInPath() bool {
+	if _, err := exec.LookPath("gcloud"); err != nil {
+		return false
+	}
+	return true
 }
