@@ -1,0 +1,106 @@
+steps:
+- name: 'alpine'
+  entrypoint: 'sh'
+  args:
+  - '-c'
+  - |
+    cat >resource.yaml <<"EOF"
+    apiVersion: "apps/v1"
+    kind: "Deployment"
+    metadata:
+      name: "nginx"
+      labels:
+        app: "nginx"
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: "nginx"
+      template:
+        metadata:
+          labels:
+            app: "nginx"
+        spec:
+          containers:
+          - name: "nginx"
+            image: "gcr.io/google-containers/nginx:latest"
+    ---
+    apiVersion: "autoscaling/v2beta1"
+    kind: "HorizontalPodAutoscaler"
+    metadata:
+      name: "nginx-hpa"
+      namespace: "default"
+      labels:
+        app: "nginx"
+    spec:
+      scaleTargetRef:
+        kind: "Deployment"
+        name: "nginx-1"
+        apiVersion: "apps/v1"
+      minReplicas: 1
+      maxReplicas: 2
+      metrics:
+      - type: "Resource"
+        resource:
+          name: "cpu"
+          targetAverageUtilization: 80
+    ---
+    apiVersion: "v1"
+    kind: "Service"
+    metadata:
+      name: "nginx-service"
+      labels:
+        app: "nginx"
+    spec:
+      ports:
+      - protocol: "TCP"
+        port: 80
+      selector:
+        app: "nginx"
+      type: "LoadBalancer"
+      loadBalancerIP: ""
+    EOF
+- name: 'gcr.io/$PROJECT_ID/gke-deploy'
+  args:
+  - 'run'
+  - '--filename=resource.yaml'
+  - '--image=gcr.io/google-containers/nginx:latest'
+  - '--app=test-name'
+  - '--version=test-version'
+  - '--namespace=$_NAMESPACE'
+  - '--label=foo=bar'
+  - '--output=output'
+  - '--cluster=$_CLUSTER'
+  - '--location=$_LOCATION'
+  - '--project=$PROJECT_ID'
+- name: 'gcr.io/cloud-builders/kubectl'
+  entrypoint: 'sh'
+  args:
+  - '-c'
+  - |
+    set -x  # Print commands
+    set -e  # Fail if any command below fails
+    mkdir check && cd check
+    gcloud container clusters get-credentials $_CLUSTER --zone $_LOCATION --project $PROJECT_ID
+    kubectl get deployment nginx -n $_NAMESPACE -o yaml > deployment.yaml
+    grep -Fq "app.kubernetes.io/managed-by: gcp-cloud-build-deploy" deployment.yaml
+    grep -Fq "app.kubernetes.io/name: test-name" deployment.yaml
+    grep -Fq "app.kubernetes.io/version: test-version" deployment.yaml
+    grep -Fq "foo: bar" deployment.yaml
+    grep -Fq "gcr.io/google-containers/nginx@sha256" deployment.yaml  # Can't guarantee digest won't change, but can check that a digest was added.
+    kubectl get service nginx-service -n $_NAMESPACE -o yaml > service.yaml
+    SERVICE_IP="$(grep -F "ip:" service.yaml | awk '{print $$NF}')"
+    curl "$${SERVICE_IP}"
+- name: 'alpine'
+  entrypoint: 'sh'  # Run in shell for bash expansion of *
+  args:
+  - '-c'
+  - |
+    set -e  # Fail if any command below fails
+    tail -n +1 output/created/*
+    tail -n +1 output/hydrated/*
+
+substitutions:
+  _CLUSTER:
+  _LOCATION:
+  _NAMESPACE:

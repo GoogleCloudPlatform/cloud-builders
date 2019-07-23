@@ -6,6 +6,12 @@ breaking ways at this time. **
 This tool deploys an application to a GKE cluster, following Google's
 recommended best practices.
 
+## Install Locally
+
+```bash
+go install github.com/GoogleCloudPlatform/cloud-builders/gke-deploy
+```
+
 ## gke-deploy vs kubectl
 
 Using `gke-deploy` to deploy an application to GKE differs from `kubectl` in that

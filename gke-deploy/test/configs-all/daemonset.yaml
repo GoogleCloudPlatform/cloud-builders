@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: test-daemonset
+spec:
+  selector:
+    matchLabels:
+      app: test-daemonset
+  template:
+    metadata:
+      labels:
+        app: test-daemonset
+    spec:
+      containers:
+      - name: nginx
+        image: gcr.io/google-containers/nginx
