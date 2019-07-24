@@ -15,6 +15,7 @@ package services
 import (
 	"context"
 
+	"github.com/google/go-containerregistry/pkg/authn"
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/google/go-containerregistry/pkg/v1"
 	"github.com/google/go-containerregistry/pkg/v1/remote"
@@ -30,5 +31,5 @@ func NewRemote(ctx context.Context) (*Remote, error) {
 
 // Image gets a remote image from a reference.
 func (*Remote) Image(ref name.Reference) (v1.Image, error) {
-	return remote.Image(ref)
+	return remote.Image(ref, remote.WithAuthFromKeychain(authn.DefaultKeychain))
 }
