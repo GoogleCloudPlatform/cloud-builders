@@ -11,9 +11,6 @@ EOF
   exit 1
 }
 
-# If there is no kubectl context, use gcloud to get one, otherwise we can
-# assume the user hase configured the context with some kubectl related env
-# var.
 cluster=$(gcloud config get-value container/cluster 2> /dev/null)
 region=${CLOUDSDK_COMPUTE_REGION:-$(gcloud config get-value compute/region 2> /dev/null)}
 zone=$(gcloud config get-value compute/zone 2> /dev/null)
