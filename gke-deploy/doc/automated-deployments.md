@@ -1,4 +1,4 @@
-# Automated Deployments with GCB
+# Automated Deployments with Cloud Build
 
 You can set up automated deployments of a repository in
 [CSR](https://cloud.google.com/source-repositories/) using the following
@@ -47,7 +47,6 @@ curl -H "Authorization: Bearer $(gcloud auth print-access-token --project=$PROJE
           "--version=$SHORT_SHA",
           "--namespace=$_K8S_NAMESPACE",
           "--label=$_K8S_LABELS,gcb-build-id=$BUILD_ID",
-          "--output=output",
           "--cluster=$_GKE_CLUSTER",
           "--location=$_GKE_LOCATION",
         ]
@@ -58,8 +57,8 @@ curl -H "Authorization: Bearer $(gcloud auth print-access-token --project=$PROJE
     ],
     "artifacts": {
       "objects": {
-        "location": "gs://$_OUTPUT_BUCKET/$BUILD_ID",
-        "paths": ["output/*"]
+        "location": "gs://$_OUTPUT_BUCKET/$BUILD_ID/hydrated",
+        "paths": ["output/hydrated/*"]
       }
     },
     "substitutions": {
