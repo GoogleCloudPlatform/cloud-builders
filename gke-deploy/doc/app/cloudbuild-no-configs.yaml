@@ -10,6 +10,7 @@ steps:
   args:
   - 'run'
   - '--image=$_IMAGE_NAME:$_IMAGE_VERSION'
+  - '--expose=80'
   - '--app=$_K8S_APP_NAME'
   - '--version=$_IMAGE_VERSION'
   - '--namespace=$_K8S_NAMESPACE'
