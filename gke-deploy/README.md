@@ -52,7 +52,7 @@ deployment that follows Google's recommended best practices by:
 
 *   Adding several [recommended
     labels](https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels)
-    to a set of Kubernetes resource YAML configs
+    to the set of Kubernetes resource YAML configs
 
 *   Getting authorized to access a GKE cluster
 
