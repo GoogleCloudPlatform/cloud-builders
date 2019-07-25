@@ -1,55 +1,90 @@
 # GKE Deploy
 
-This tool deploys an application to a GKE cluster, following Google's
-recommended best practices.
+This tool deploys an application to a Kubernetes Engine cluster, following
+Google's recommended best practices.
 
 ## Install Locally
 
-```bash
-go install github.com/GoogleCloudPlatform/cloud-builders/gke-deploy
-```
+Although `gke-deploy` is meant to be used as a build step with [Cloud
+Build](https://cloud.google.com/cloud-build/), that doesn't mean that it can't
+be used locally.
 
-## gke-deploy vs kubectl
+1.  First, install
+    [`kubectl`](https://kubernetes.io/docs/tasks/tools/install-kubectl/) as a
+    dependency.
 
-Using `gke-deploy` to deploy an application to GKE differs from `kubectl` in that
-a `gke-deploy` deployment follows Google's recommended best practices by doing
-the following:
+2.  Next, install `gke-deploy`:
 
-### Prepare Step
+    ```bash
+    go install github.com/GoogleCloudPlatform/cloud-builders/gke-deploy
+    gke-deploy -h
+    ```
 
-*   The `gke-deploy` builder modifies a set of Kubernetes resource YAML configs
-    to use a container image's digest instead of a tag.
+3.  If your `kubectl` is pointing to a cluster, you can test out a deployment by
+    deploying an application with one simple command:
 
-*   The builder adds
-    [recommended labels](https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#applications-and-instances-of-applications).
+    ```bash
+    # Deploy an nginx Deployment with a load balancer exposing port 80.
+    gke-deploy run -i nginx -x 80
+    ```
 
-### Apply Step
+4.  After the command finishes successfully, gke-deploy will print a table
+    displaying deployed resources. You can visit the IP address printed in the
+    Service row.
 
-The `gke-deploy` does the following:
+    e.g.,
 
-1.  Gets authorized to access a GKE cluster
+    ![deployed-resources](doc/deployed-resources.png)
 
-2.  Applies (using `kubectl`) the set of Kubernetes resource YAML configs that were
-    modified in the prepare step
+    ```bash
+    curl 35.231.198.229
+    ```
 
-3.  Waits for applied Kubernetes resources to be ready
+## `gke-deploy` vs `kubectl`
+
+Using `gke-deploy` to deploy an application to Kubernetes Engine differs from
+`kubectl` in that `gke-deploy` is a wrapper around a [`kubectl
+apply`](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#apply)
+deployment that follows Google's recommended best practices by:
+
+*   Modifying a set of Kubernetes resource YAML configs to use a container
+    image's digest instead of a tag
+
+*   Adding several [recommended
+    labels](https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels)
+    to the set of Kubernetes resource YAML configs
+
+*   Getting authorized to access a GKE cluster
+
+*   Applying the set of Kubernetes resource YAML configs that were modified in
+    the prepare step, using `kubectl apply`
+
+*   Waiting for applied Kubernetes resources to be ready
 
 ## Usage
 
 [`gke-deploy run [flags]`](doc/gke-deploy_run.md)
 
-This command will execute both the [Prepare](#prepare-step) and
-[Apply](#apply-step) phases mentioned above.
+This command executes all of the best practices mentioned above, in sequence.
 
 [`gke-deploy prepare [flags]`](doc/gke-deploy_prepare.md)
 
-This command will execute only the [Prepare](#prepare-step) phase mentioned
-above.
+This command executes the steps to modify and add labels to a set of Kubernetes
+resource YAML configs, and skips the steps to get authorized to access a GKE
+cluster, apply configs, and wait.
 
 [`gke-deploy apply [flags]`](doc/gke-deploy_apply.md)
 
-This command will execute only the [Apply](#apply-step) phase mentioned above.
+This command skips the steps to modify and add labels to a set of Kubernetes
+resource YAML configs, and executes the steps to get authorized to access a GKE
+cluster, apply configs, and wait.
 
-## [Automated Deployments with GCB](doc/automated-deployments.md)
+## [Deploying with Cloud Build](doc/deploying-with-cloud-build.md)
 
-Follow [these instructions](doc/automated-deployments.md) to set up continuous deployment.
+View [this page](doc/deploying-with-cloud-build.md) for examples on how to use
+`gke-deploy` with Cloud Build.
+
+## [Automated Deployments with Cloud Build](doc/automated-deployments.md)
+
+Follow [these instructions](doc/automated-deployments.md) to set up continuous
+deployment.
