@@ -45,21 +45,21 @@ be used locally.
 Using `gke-deploy` to deploy an application to Kubernetes Engine differs from
 `kubectl` in that `gke-deploy` is a wrapper around a [`kubectl
 apply`](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#apply)
-deployment that follows Google's recommended best practices by:
+deployment that follows Google's recommended best practices by...
 
-*   Modifying a set of Kubernetes resource YAML configs to use a container
-    image's digest instead of a tag
+*   Modifying a set of Kubernetes configuration files to use a container image's
+    digest instead of a tag
 
 *   Adding several [recommended
     labels](https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels)
-    to the set of Kubernetes resource YAML configs
+    to the set of Kubernetes configuration files
 
 *   Getting authorized to access a GKE cluster
 
-*   Applying the set of Kubernetes resource YAML configs that were modified in
-    the prepare step, using `kubectl apply`
+*   Applying the set of Kubernetes configuration files that were modified in the
+    prepare step, using `kubectl apply`
 
-*   Waiting for applied Kubernetes resources to be ready
+*   Waiting for applied Kubernetes configuration to be ready
 
 ## Usage
 
@@ -70,14 +70,14 @@ This command executes all of the best practices mentioned above, in sequence.
 [`gke-deploy prepare [flags]`](doc/gke-deploy_prepare.md)
 
 This command executes the steps to modify and add labels to a set of Kubernetes
-resource YAML configs, and skips the steps to get authorized to access a GKE
-cluster, apply configs, and wait.
+configuration files, and skips the steps to get authorized to access a GKE
+cluster, apply configuration, and wait.
 
 [`gke-deploy apply [flags]`](doc/gke-deploy_apply.md)
 
 This command skips the steps to modify and add labels to a set of Kubernetes
-resource YAML configs, and executes the steps to get authorized to access a GKE
-cluster, apply configs, and wait.
+configuration files, and executes the steps to get authorized to access a GKE
+cluster, apply configuration, and wait.
 
 ## [Deploying with Cloud Build](doc/deploying-with-cloud-build.md)
 

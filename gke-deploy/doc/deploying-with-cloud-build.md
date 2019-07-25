@@ -40,14 +40,15 @@ gsutil mb -p $PROJECT gs://$BUCKET
 
 ## Examples
 
-### Build, push, and deploy application with no Kubernetes configs
+### Build, push, and deploy application with no Kubernetes configuration files
 
 This build calls the `docker` build step to create a Docker image and push it to
 Container Registry. Then, the build calls the `gke-deploy` build step to create
-and deploy Deployment, Horizontal Pod Autoscaler, and Service configs to your
-GKE cluster. Finally, the build calls the `gsutil` build step to copy any base
-configs created by `gke-deploy` to your bucket. The configs hydrated by
-`gke-deploy` are copied to your bucket via the `artifacts` field.
+and deploy Deployment, Horizontal Pod Autoscaler, and Service configuration
+files to your GKE cluster. Finally, the build calls the `gsutil` build step to
+copy any base Kubernetes configuration files created by `gke-deploy` to your
+bucket. The files hydrated by `gke-deploy` are copied to your bucket via the
+`artifacts` field.
 
 ```bash
 # Go to directory containing test app.
@@ -66,12 +67,12 @@ NAMESPACE=my-namespace
 gcloud builds submit . --project=$PROJECT --config cloudbuild-no-configs.yaml --substitutions=_IMAGE_NAME=$IMAGE_NAME,_IMAGE_VERSION=$VERSION,_GKE_CLUSTER=$CLUSTER,_GKE_LOCATION=$LOCATION,_K8S_APP_NAME=$APP,_K8S_NAMESPACE=$NAMESPACE,_OUTPUT_BUCKET=$BUCKET
 ```
 
-### Build, push, and deploy application with Kubernetes configs
+### Build, push, and deploy application with Kubernetes configuration files
 
 This build calls the `docker` build step to create a Docker image and push it to
 Container Registry. Then, the build calls the `gke-deploy` build step to deploy
-your configs to your GKE cluster. The configs hydrated by `gke-deploy` are
-copied to your bucket via the `artifacts` field.
+your Kubernetes configuration files to your GKE cluster. The files hydrated by
+`gke-deploy` are copied to your bucket via the `artifacts` field.
 
 ```bash
 # Go to directory containing test app.
