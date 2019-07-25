@@ -37,6 +37,9 @@ cluster. You can configure the cluster by setting environment variables.
     # Name of GKE cluster
     CLOUDSDK_CONTAINER_CLUSTER=<your cluster's name>
 
+**You must set these environment variables on every step that uses the `kubectl`
+builder; this context is not persisted across steps.**
+
 
 If your GKE cluster is in a different project than Cloud Build, also set:
 
