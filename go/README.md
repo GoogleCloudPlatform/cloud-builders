@@ -4,26 +4,74 @@ This builder runs the `go` tool (`go build`, `go test`, etc.)
 after placing source in `/workspace` into the `GOPATH` before
 running the tool.
 
-This functionality is not necessary if you're building using
+# Using `golang` and [Go Modules](https://github.com/golang/go/wiki/Modules)
+
+This Builder (`gcr.io/cloud-builders/go`) is not necessary if you're building using
 [Go modules](https://github.com/golang/go/wiki/Modules), available
-in Go 1.11+, and you can **build with the standard
-[`golang`](https://hub.docker.com/_/golang) image on Dockerhub
-instead:**
+in Go 1.11+. You can **build** with the `golang` image (not `gcr.io/cloud-builders/go`) from [Dockerhub](hub.docker.com/library/golang) and Google's Container Registry [mirror](mirror.gcr.io/library/golang):
 
 ```
 steps:
 # If you already have a go.mod file, you can skip this step.
-- name: golang
+- name: mirror.gcr.io/library/golang
   args: ['go', 'mod', 'init', 'github.com/your/import/path']
 
 # Build the module.
-- name: golang
+- name: mirror.gcr.io/library/golang
   env: ['GO111MODULE=on']
   args: ['go', 'build', './...']
 ```
 
 See [`examples/module`](https://github.com/GoogleCloudPlatform/cloud-builders/tree/master/go/examples/module)
 for a working example.
+
+## Note #1 `/workspace` and `/go`
+The `Golang` image defaults to a working directory of `/go` whereas Cloud Build mounts your sources under `/workspace`. This reflects the recommend best practice when using Modules of placing your sources *outside* of `GOPATH`. When you `go build ./...` you will run this in the working directory of `/workspace` *but* the packages will be pulled into `/go/pkg`.
+
+Because `/go` is outside of `/workspace`, the `/go` directory is not persisted across Cloud Build steps. See next note.
+
+## Note #2 Sharing packages across steps
+
+One advantage with Go Modules is that packages are now semantically versioned and immutable; one a package has been pulled once, it should not need to be pulled again. Because the `golang` image uses `/go` as its working directory and this is outside of Cloud Build's `/workspace` directory, `/go` is recreated in each `Golang` step. To avoid this and share packages across steps, you may use Cloud Build `volumes`. An example to prove the point:
+
+```YAML
+- name: mirror.gcr.io/golang
+  env:
+  - GO111MODULE=on
+  args: ['go','get','-u','github.com/golang/glog']
+  volumes:
+  - name: go-modules
+    path: /go
+
+- name: golang
+  env:
+  - GO111MODULE=on
+  args: ['go','list','-f','{{ .Dir }}','-m','github.com/golang/glog']
+  volumes:
+  - name: go-modules
+    path: /go
+```
+In the above, if the `volumes` section were omitted, the second step would fail. This is because `/go` would be created anew for the step and `github.com/golang/glob` would not be present in it.
+
+**NB** Cloud Build supports using build-wide settings for `env` and `volumes` using `options` (see [link](https://cloud.google.com/cloud-build/docs/build-config#options)). I've duplicated here to aid clarity.
+
+See [`examples/multi_step`](https://github.com/GoogleCloudPlatform/cloud-builders/tree/master/go/examples/multi_step/README.md)
+for a working example.
+
+## Note #3 Golang Module Mirror
+
+The Go team provides a Golang Module Mirror ([https://proxy.golang.org/](https://proxy.golang.org/)). You may utilize the Mirror by including `GOPROXY=https://proxy.golang.org` in your build steps, e.g.:
+```YAML
+- name: mirror.gcr.io/golang
+  env:
+  - GO111MODULE=on
+  - GOPROXY=https://proxy.golang.org
+  args: ['go','get','-u','github.com/golang/glog']
+  volumes:
+  - name: go-modules
+    path: /go
+
+```
 
 ## Using `gcr.io/cloud-builders/go`
 

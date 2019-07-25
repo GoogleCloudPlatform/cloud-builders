@@ -1,0 +1,51 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"DaemonSet","metadata":{"annotations":{},"labels":{"app":"test-app"},"name":"test-app-daemonset","namespace":"default"},"spec":{"selector":{"matchLabels":{"app":"test-app"}},"template":{"metadata":{"labels":{"app":"test-app"}},"spec":{"containers":[{"image":"gcr.io/cbd-test/test-app:latest","name":"test-app"}]}}}}
+  creationTimestamp: 2019-06-10T15:32:41Z
+  generation: 1
+  labels:
+    app: test-app
+  name: test-app-daemonset
+  namespace: default
+  resourceVersion: "5168290"
+  selfLink: /apis/extensions/v1beta1/namespaces/default/daemonsets/test-app-daemonset
+  uid: fc5c2e1f-8b94-11e9-8840-42010a8e00dc
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: test-app
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: test-app
+    spec:
+      containers:
+      - image: gcr.io/cbd-test/test-app:latest
+        imagePullPolicy: Always
+        name: test-app
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  templateGeneration: 1
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
+status:
+  currentNumberScheduled: 1
+  desiredNumberScheduled: 1
+  numberAvailable: 1
+  numberMisscheduled: 0
+  numberReady: 0
+  observedGeneration: 1
+  updatedNumberScheduled: 1

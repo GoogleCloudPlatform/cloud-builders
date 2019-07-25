@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: test-replicaset
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-rs
+  template:
+    metadata:
+      labels:
+        app: test-rs
+    spec:
+      containers:
+      - name: nginx
+        image: gcr.io/google-containers/nginx:latest

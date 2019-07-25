@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"ReplicaSet","metadata":{"annotations":{},"labels":{"app":"test-app-rs"},"name":"test-app-replicaset","namespace":"default"},"spec":{"replicas":2,"selector":{"matchLabels":{"app":"test-app-rs"}},"template":{"metadata":{"labels":{"app":"test-app-rs"}},"spec":{"containers":[{"image":"gcr.io/cbd-test/test-app:latest","name":"test-app"}]}}}}
+  creationTimestamp: 2019-06-10T19:55:11Z
+  generation: 1
+  labels:
+    app: test-app-rs
+  name: test-app-replicaset
+  namespace: default
+  resourceVersion: "5216058"
+  selfLink: /apis/apps/v1/namespaces/default/replicasets/test-app-replicaset
+  uid: a801d31f-8bb9-11e9-8840-42010a8e00dc
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: test-app-rs
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: test-app-rs
+    spec:
+      containers:
+      - image: gcr.io/cbd-test/test-app:latest
+        imagePullPolicy: Always
+        name: test-app
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  observedGeneration: 1
+  replicas: 0

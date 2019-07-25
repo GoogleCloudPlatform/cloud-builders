@@ -11,7 +11,7 @@ will need IAM permissions sufficient for the operations you want to perform. For
 typical read-only usage, the "Kubernetes Engine Viewer" role is sufficient. To
 deploy container images on a GKE cluster, the "Kubernetes Engine Developer" role
 is sufficient. Check the
-[GKE IAM page](https://cloud.google.com/kubernetes-engine/docs/iam-integration)
+[GKE IAM page](https://cloud.google.com/kubernetes-engine/docs/how-to/iam#roles)
 for details.
 
 Running the following command will give Cloud Build Service Account
@@ -36,6 +36,9 @@ cluster. You can configure the cluster by setting environment variables.
 
     # Name of GKE cluster
     CLOUDSDK_CONTAINER_CLUSTER=<your cluster's name>
+
+**You must set these environment variables on every step that uses the `kubectl`
+builder; this context is not persisted across steps.**
 
 
 If your GKE cluster is in a different project than Cloud Build, also set:
