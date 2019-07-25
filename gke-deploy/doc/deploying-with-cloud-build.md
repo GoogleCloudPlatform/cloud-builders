@@ -5,7 +5,7 @@ Build.
 
 ## Setup
 
-These examples work with the following Google Cloud Platform APIs, which may
+These examples work with the following Google Cloud Platform APIs, which can
 target different projects. **These examples assume a single project for all
 APIs:**
 
@@ -20,7 +20,7 @@ APIs:**
 # Your project to run examples in.
 PROJECT=my-project
 
-# Created a cluster, if you have not done so.
+# Create a cluster, if you have not done so.
 CLUSTER=my-cluster
 LOCATION=us-east1-b
 gcloud container clusters create $CLUSTER --num-nodes=3 --zone=$LOCATION --project=$PROJECT
@@ -43,7 +43,7 @@ gsutil mb -p $PROJECT gs://$BUCKET
 ### Build, push, and deploy application with no Kubernetes configs
 
 This build calls the `docker` build step to create a Docker image and push it to
-Container registry. Then, the build calls the `gke-deploy` build step to create
+Container Registry. Then, the build calls the `gke-deploy` build step to create
 and deploy Deployment, Horizontal Pod Autoscaler, and Service configs to your
 GKE cluster. Finally, the build calls the `gsutil` build step to copy any base
 configs created by `gke-deploy` to your bucket. The configs hydrated by
@@ -64,16 +64,12 @@ NAMESPACE=my-namespace
 
 # Run build, replacing substitution variables accordingly.
 gcloud builds submit . --project=$PROJECT --config cloudbuild-no-configs.yaml --substitutions=_IMAGE_NAME=$IMAGE_NAME,_IMAGE_VERSION=$VERSION,_GKE_CLUSTER=$CLUSTER,_GKE_LOCATION=$LOCATION,_K8S_APP_NAME=$APP,_K8S_NAMESPACE=$NAMESPACE,_OUTPUT_BUCKET=$BUCKET
-
-# After the build finishes, you should be able to visit the IP Address printed
-# in the > Deployed Resources table in the Service row.
-# e.g., Service                    test-app        Yes      104.154.67.125
 ```
 
 ### Build, push, and deploy application with Kubernetes configs
 
 This build calls the `docker` build step to create a Docker image and push it to
-Container registry. Then, the build calls the `gke-deploy` build step to deploy
+Container Registry. Then, the build calls the `gke-deploy` build step to deploy
 your configs to your GKE cluster. The configs hydrated by `gke-deploy` are
 copied to your bucket via the `artifacts` field.
 
@@ -98,10 +94,6 @@ sed -i "s#@NAMESPACE@#$NAMESPACE#g" config/namespace.yaml
 
 # Run build, replacing substitution variables accordingly.
 gcloud builds submit . --project=$PROJECT --config cloudbuild-with-configs.yaml --substitutions=_IMAGE_NAME=$IMAGE_NAME,_IMAGE_VERSION=$VERSION,_GKE_CLUSTER=$CLUSTER,_GKE_LOCATION=$LOCATION,_K8S_YAML_PATH=config,_K8S_APP_NAME=$APP,_K8S_NAMESPACE=$NAMESPACE,_OUTPUT_BUCKET=$BUCKET
-
-# After the build finishes, you should be able to visit the IP Address printed
-# in the > Deployed Resources table in the Service row.
-# e.g., Service                    test-app        Yes      104.154.67.125
 ```
 
 You can remove the `artifacts` field in your Cloud Build config if you do not
