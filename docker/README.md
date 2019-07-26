@@ -6,8 +6,6 @@ Arguments passed to this builder will be passed to `docker` directly, allowing
 callers to run
 [any Docker command](https://docs.docker.com/engine/reference/commandline/).
 
-By default, the version of Docker that is used by this builder is `19.03.0`.
-
 You should consider instead using an [official `docker`
 image](https://hub.docker.com/_/docker/):
 
