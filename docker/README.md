@@ -60,4 +60,5 @@ of this builder remain available for several previously-supported versions:
 
 *   `gcr.io/cloud-builders/docker:18.06.1`
 *   `gcr.io/cloud-builders/docker:18.09.0`
-*   `gcr.io/cloud-builders/docker:18.09.6` (`:latest`)
+*   `gcr.io/cloud-builders/docker:18.09.6`
+*   `gcr.io/cloud-builders/docker:19.03.1` (`:latest`)
