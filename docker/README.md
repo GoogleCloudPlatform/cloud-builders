@@ -6,6 +6,17 @@ Arguments passed to this builder will be passed to `docker` directly, allowing
 callers to run
 [any Docker command](https://docs.docker.com/engine/reference/commandline/).
 
+You should consider instead using an [official `docker`
+image](https://hub.docker.com/_/docker/):
+
+```yaml
+steps:
+- name: docker
+  args: ['build', '-t', '...']
+```
+
+This allows you to use any supported version of Docker (e.g., `docker:19.03.1`)
+
 ## GCR Credentials
 
 The Docker build step is automatically set up with credentials for your
