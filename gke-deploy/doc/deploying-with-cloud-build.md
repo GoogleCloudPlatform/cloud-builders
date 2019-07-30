@@ -52,7 +52,7 @@ bucket. The files hydrated by `gke-deploy` are copied to your bucket via the
 
 ```bash
 # Go to directory containing test app.
-clone https://github.com/GoogleCloudPlatform/cloud-builders.git && cd gke-deploy/docs/app
+clone https://github.com/GoogleCloudPlatform/cloud-builders.git && cd gke-deploy/doc/app
 
 PROJECT=my-project
 BUCKET=my-bucket
@@ -76,7 +76,7 @@ your Kubernetes configuration files to your GKE cluster. The files hydrated by
 
 ```bash
 # Go to directory containing test app.
-clone https://github.com/GoogleCloudPlatform/cloud-builders.git && cd gke-deploy/docs/app
+clone https://github.com/GoogleCloudPlatform/cloud-builders.git && cd gke-deploy/doc/app
 
 PROJECT=my-project
 BUCKET=my-bucket
