@@ -37,7 +37,7 @@ curl -H "Authorization: Bearer $(gcloud auth print-access-token --project=$PROJE
         ]
       },
       {
-        "name": "gcr.io/cloud-builders/gke-deploy",
+        "name": "gcr.io/cloud-builders/gke-deploy:stable",
         "id": "Deploy",
         "args": [
           "run",

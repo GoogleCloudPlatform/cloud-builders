@@ -5,7 +5,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   id: 'Push'
   args: ["push", "$_IMAGE_NAME:$_IMAGE_VERSION"]
-- name: 'gcr.io/cloud-builders/gke-deploy'
+- name: 'gcr.io/cloud-builders/gke-deploy:stable'
   id: 'Deploy'
   args:
   - 'run'
