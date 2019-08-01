@@ -28,7 +28,7 @@ be used locally.
     gke-deploy run -i nginx -x 80
     ```
 
-4.  After the command finishes successfully, gke-deploy will print a table
+4.  After the command finishes successfully, `gke-deploy` will print a table
     displaying deployed resources. You can visit the IP address printed in the
     Service row.
 
