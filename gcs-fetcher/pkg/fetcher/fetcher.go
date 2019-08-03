@@ -16,13 +16,16 @@ limitations under the License.
 package fetcher
 
 import (
+	"archive/tar"
 	"archive/zip"
+	"compress/gzip"
 	"context"
 	"crypto/sha1"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"math"
 	"math/rand"
@@ -651,23 +654,19 @@ func (gf *Fetcher) fetchFromManifest(ctx context.Context) (err error) {
 	return nil
 }
 
-func (gf *Fetcher) copyFileFromZip(file *zip.File) (err error) {
-	sourceReader, err := file.Open()
-	if err != nil {
-		return fmt.Errorf("failed to open source file %q: %v", file.Name, err)
-	}
+func (gf *Fetcher) copyFile(name string, mode os.FileMode, rc io.ReadCloser) (err error) {
 	defer func() {
-		if cerr := sourceReader.Close(); cerr != nil {
-			err = fmt.Errorf("Failed to close file %q: %v", file.Name, cerr)
+		if cerr := rc.Close(); cerr != nil {
+			err = fmt.Errorf("Failed to close file %q: %v", name, cerr)
 		}
 	}()
 
-	targetFile := filepath.Join(gf.DestDir, file.Name)
+	targetFile := filepath.Join(gf.DestDir, name)
 	if err := gf.ensureFolders(targetFile); err != nil {
 		return fmt.Errorf("failed to create folders for file %q: %v", targetFile, err)
 	}
 
-	targetWriter, err := os.OpenFile(targetFile, os.O_WRONLY|os.O_CREATE, file.Mode())
+	targetWriter, err := os.OpenFile(targetFile, os.O_WRONLY|os.O_CREATE, mode)
 	if err != nil {
 		return fmt.Errorf("failed to open target file %q: %v", targetFile, err)
 	}
@@ -677,8 +676,8 @@ func (gf *Fetcher) copyFileFromZip(file *zip.File) (err error) {
 		}
 	}()
 
-	if _, err := io.Copy(targetWriter, sourceReader); err != nil {
-		return fmt.Errorf("failed to copy %q to %q: %v", file.Name, targetFile, err)
+	if _, err := io.Copy(targetWriter, rc); err != nil {
+		return fmt.Errorf("failed to copy %q to %q: %v", name, targetFile, err)
 	}
 	return nil
 }
@@ -723,7 +722,11 @@ func (gf *Fetcher) fetchFromZip(ctx context.Context) (err error) {
 		}
 
 		numFiles++
-		if err := gf.copyFileFromZip(file); err != nil {
+		zf, err := file.Open()
+		if err != nil {
+			return err
+		}
+		if err := gf.copyFile(file.Name, file.Mode(), zf); err != nil {
 			return err
 		}
 	}
@@ -760,20 +763,107 @@ func (gf *Fetcher) fetchFromZip(ctx context.Context) (err error) {
 	return nil
 }
 
+// fetchFromTarGz is used when downloading a single .tar.gz of source files. It
+// is responsible to fetch the .tar.gz file and unzip it into the destination
+// folder.
+func (gf *Fetcher) fetchFromTarGz(ctx context.Context) (err error) {
+	started := time.Now()
+	gf.log("Fetching archive %s.", formatGCSName(gf.Bucket, gf.Object, gf.Generation))
+
+	// Download the archive from GCS.
+	tgzDir := gf.StagingDir
+	j := job{
+		filename:        gf.Object,
+		bucket:          gf.Bucket,
+		object:          gf.Object,
+		generation:      gf.Generation,
+		destDirOverride: tgzDir,
+	}
+	report := gf.fetchObject(ctx, j)
+	if !report.success {
+		return fmt.Errorf("failed to download archive %s: %v", formatGCSName(gf.Bucket, gf.Object, gf.Generation), report.err)
+	}
+
+	// Untgz into the destination directory
+	untgzStart := time.Now()
+	tgzfile := filepath.Join(tgzDir, gf.Object)
+	f, err := os.Open(tgzfile)
+	if err != nil {
+		return err
+	}
+	gzr, err := gzip.NewReader(f)
+	if err != nil {
+		return err
+	}
+	tr := tar.NewReader(gzr)
+
+	defer func() {
+		if cerr := f.Close(); cerr != nil {
+			err = fmt.Errorf("Failed to close file %q: %v", tgzfile, cerr)
+		}
+	}()
+
+	numFiles := 0
+	for {
+		h, err := tr.Next()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		if err := gf.copyFile(h.Name, h.FileInfo().Mode(), ioutil.NopCloser(tr)); err != nil {
+			return err
+		}
+	}
+	untgzDuration := time.Since(untgzStart)
+
+	// Remove the tgz file (best effort only, no harm if this fails).
+	if err := os.RemoveAll(tgzfile); err != nil {
+		gf.log("Failed to remove tgzfile %s, continuing: %v", tgzfile, err)
+	}
+
+	// Final cleanup of staging directory, which is only a temporary staging
+	// location for downloading the tgzfile in this case.
+	if err := gf.OS.RemoveAll(gf.StagingDir); err != nil {
+		gf.log("Failed to remove staging dir %q, continuing: %v", gf.StagingDir, err)
+	}
+
+	mib := float64(report.size) / 1024 / 1024
+	var mibps float64
+	tgzfileDuration := report.attempts[len(report.attempts)-1].duration
+	if tgzfileDuration > 0 {
+		mibps = mib / tgzfileDuration.Seconds()
+	}
+	gf.log("******************************************************")
+	gf.log("Status:                      SUCCESS")
+	gf.log("Started:                     %s", started.Format(time.RFC3339))
+	gf.log("Completed:                   %s", time.Now().Format(time.RFC3339))
+	gf.log("Total files:       %6d", numFiles)
+	gf.log("MiB downloaded:    %9.2f MiB", mib)
+	gf.log("MiB/s throughput:  %9.2f MiB/s", mibps)
+	gf.log("Time for tgzfile:  %9.2f s", tgzfileDuration.Seconds())
+	gf.log("Time to untgz:     %9.2f s", untgzDuration.Seconds())
+	gf.log("Total time:        %9.2f s", time.Since(started).Seconds())
+	gf.log("******************************************************")
+	return nil
+}
+
 // Fetch is the main entry point into Fetcher. Based on configuration,
 // it pulls source from GCS into the destination directory.
 func (gf *Fetcher) Fetch(ctx context.Context) error {
 	switch gf.SourceType {
 	case "Manifest":
-		if err := gf.fetchFromManifest(ctx); err != nil {
-			return err
-		}
+		return gf.fetchFromManifest(ctx)
 	case "Archive":
-		if err := gf.fetchFromZip(ctx); err != nil {
-			return err
-		}
+		fmt.Println("WARNING: -type=Archive is deprecated; use -type=ZipArchive")
+		fallthrough
+	case "ZipArchive":
+		return gf.fetchFromZip(ctx)
+	case "TarGzArchive":
+		return gf.fetchFromTarGz(ctx)
 	default:
-		return fmt.Errorf("misconfigured GCSFetcher, must have either -type as either Manifest or Archive: %v", gf.SourceType)
+		return fmt.Errorf("misconfigured GCSFetcher, unsupported -type %q", gf.SourceType)
 	}
 	return nil
 }
