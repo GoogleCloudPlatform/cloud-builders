@@ -37,7 +37,7 @@ be used locally.
     ![deployed-resources](doc/deployed-resources.png)
 
     ```bash
-    curl 35.231.198.229
+    curl 35.196.67.253
     ```
 
 ## `gke-deploy` vs `kubectl`
