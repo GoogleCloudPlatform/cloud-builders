@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Server that returns a declaration to the world."""
 from flask import Flask
 app = Flask('test-app')
 
+
 @app.route('/')
 def hello():
-  return "Hello, World!!\n"
+  return 'Hello, World!\n'
 
 if __name__ == '__main__':
-  app.run(host = '0.0.0.0', port = 80)
+  app.run(host='0.0.0.0', port=80)
