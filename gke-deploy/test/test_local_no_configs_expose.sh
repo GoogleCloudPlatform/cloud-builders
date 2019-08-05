@@ -48,13 +48,13 @@ cd "${OUTPUT}"/suggested
 
 mkdir "${OUTPUT}"/check && cd "${OUTPUT}"/check
 gcloud container clusters get-credentials "${GKE_DEPLOY_CLUSTER}" --zone "${GKE_DEPLOY_LOCATION}" --project "${GKE_DEPLOY_PROJECT}"
-kubectl get deployment test-deployment -n "${NAMESPACE}" -o yaml > deployment.yaml
+kubectl get deployment nginx -n "${NAMESPACE}" -o yaml > deployment.yaml
 grep -Fq "app.kubernetes.io/managed-by: gcp-cloud-build-deploy" deployment.yaml || fail "\"app.kubernetes.io/managed-by: gcp-cloud-build-deploy\" does not exist"
 grep -Fq "app.kubernetes.io/name: test-name" deployment.yaml || fail "\"app.kubernetes.io/name: test-name\" label does not exist"
 grep -Fq "app.kubernetes.io/version: test-version" deployment.yaml || fail "\"app.kubernetes.io/version: test-version\" label does note exist"
 grep -Fq "foo: bar" deployment.yaml || fail "\"foo: bar\" label does not exist"
 grep -Fq "gcr.io/google-containers/nginx@sha256" deployment.yaml || fail "\"gcr.io/google-containers/nginx@sha256\" container not found" # Can't guarantee digest won't change, but can check that a digest was added.
-kubectl get service test-service -n "${NAMESPACE}" -o yaml > service.yaml
+kubectl get service nginx-service -n "${NAMESPACE}" -o yaml > service.yaml
 SERVICE_IP="$(grep -F "ip:" service.yaml | awk '{print $NF}')" || fail "No IP in service"
 curl "${SERVICE_IP}" || fail "Failed to curl service IP"
 

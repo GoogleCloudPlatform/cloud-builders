@@ -31,6 +31,9 @@ gke-deploy run \
 -a "test-name" \
 -v "test-version" \
 -L "foo=bar" \
+-p "${GKE_DEPLOY_PROJECT}" \
+-c "${GKE_DEPLOY_CLUSTER}" \
+-l "${GKE_DEPLOY_LOCATION}" \
 -n "${NAMESPACE}" \
 -o "${OUTPUT}" \
 || fail "gke-deploy run failed"
