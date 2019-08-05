@@ -25,7 +25,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"math"
 	"math/rand"
@@ -662,8 +661,8 @@ func (gf *Fetcher) copyFile(name string, mode os.FileMode, rc io.ReadCloser) (er
 	}()
 
 	targetFile := filepath.Join(gf.DestDir, name)
-	if err := gf.ensureFolders(targetFile); err != nil {
-		return fmt.Errorf("failed to create folders for file %q: %v", targetFile, err)
+	if err := gf.OS.MkdirAll(filepath.Base(targetFile), mode); err != nil {
+		return err
 	}
 
 	targetWriter, err := os.OpenFile(targetFile, os.O_WRONLY|os.O_CREATE, mode)
@@ -812,14 +811,30 @@ func (gf *Fetcher) fetchFromTarGz(ctx context.Context) (err error) {
 		if err != nil {
 			return err
 		}
-		if err := gf.copyFile(h.Name, h.FileInfo().Mode(), ioutil.NopCloser(tr)); err != nil {
-			return err
+		n := filepath.Join(gf.DestDir, h.Name)
+		switch h.Typeflag {
+		case tar.TypeDir:
+			if err := gf.OS.MkdirAll(n, h.FileInfo().Mode()); err != nil {
+				return err
+			}
+		case tar.TypeReg:
+			if err := func() error {
+				f, err := os.OpenFile(n, os.O_WRONLY|os.O_CREATE, h.FileInfo().Mode())
+				if err != nil {
+					return err
+				}
+				defer f.Close()
+				_, err = io.Copy(f, tr)
+				return err
+			}(); err != nil {
+				return err
+			}
 		}
 	}
 	untgzDuration := time.Since(untgzStart)
 
 	// Remove the tgz file (best effort only, no harm if this fails).
-	if err := os.RemoveAll(tgzfile); err != nil {
+	if err := gf.OS.RemoveAll(tgzfile); err != nil {
 		gf.log("Failed to remove tgzfile %s, continuing: %v", tgzfile, err)
 	}
 
