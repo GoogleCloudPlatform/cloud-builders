@@ -26,22 +26,22 @@ const (
 	long  = `Deploy to GKE in two phases, which will do the following:
 
 Prepare Phase:
-  - Expand Kubernetes config YAMLs:
+  - Expand Kubernetes configuration files:
     - Set the digest of images that match the [--image|-i] flag, if provided.
     - Add app.kubernetes.io/name=[--app|-a] label, if provided.
     - Add app.kubernetes.io/version=[--version|-v] label, if provided.
 
 Apply Phase:
-  - Apply Kubernetes config YAMLs to the target cluster with the provided namespace.
-  - Wait for deployed resources to be ready before exiting.
+  - Apply Kubernetes configuration files to the target cluster with the provided namespace.
+  - Wait for deployed Kubernetes configuration files to be ready before exiting.
 `
-	example = `  # Expand configs and deploy to GKE cluster.
+	example = `  # Expand Kubernetes configuration files and deploy to GKE cluster.
   gke-deploy run -f configs -i gcr.io/my-project/my-app:1.0.0 -a my-app -v 1.0.0 -o expanded -n my-namespace -c my-cluster -l us-east1-b
 
   # Deploy to GKE cluster that kubectl is currently targeting.
   gke-deploy run -f configs
 
-  # Deploy to GKE cluster that kubectl is currently targeting without supplying any configs. Have gke-deploy generate base configs for your application using an image, app name, and service port.
+  # Deploy to GKE cluster that kubectl is currently targeting without supplying any Kubernetes configuration files. Have gke-deploy generate suggested Kubernetes configuration files for your application using an image, app name, and service port.
   gke-deploy run -i nginx -a nginx -x 80
 
   # Prepare only.

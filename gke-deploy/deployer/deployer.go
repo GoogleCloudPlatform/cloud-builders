@@ -54,13 +54,13 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 	if config != "" {
 		parsed, err := resource.ParseConfigs(ctx, config, d.Clients.OS)
 		if err != nil {
-			return fmt.Errorf("failed to parse configs %q: %v", config, err)
+			return fmt.Errorf("failed to parse configuration files %q: %v", config, err)
 		}
 		objs = parsed
-		fmt.Printf("Configs to prepare: %v\n", objs)
+		fmt.Printf("Configuration files to be used: %v\n", objs)
 	} else {
 		objs = resource.Objects{}
-		fmt.Println("Starting with no configs")
+		fmt.Println("Starting with no configuration files")
 	}
 
 	if im != nil {
@@ -69,7 +69,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 		imageNameSuffix := imageNameSplit[len(imageNameSplit)-1]
 
 		if config == "" {
-			fmt.Printf("Creating Deployment resource %q\n", imageNameSuffix)
+			fmt.Printf("Creating Deployment object %q\n", imageNameSuffix)
 			dObj, err := resource.CreateDeploymentObject(ctx, imageNameSuffix, imageNameSuffix, image.Name(im))
 			if err != nil {
 				return fmt.Errorf("failed to create Deployment object: %v", err)
@@ -79,7 +79,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 			}
 
 			hpaName := fmt.Sprintf("%s-hpa", imageNameSuffix)
-			fmt.Printf("Creating HorizontalPodAutoscaler resource %q\n", hpaName)
+			fmt.Printf("Creating HorizontalPodAutoscaler object %q\n", hpaName)
 			hpaObj, err := resource.CreateHorizontalPodAutoscalerObject(ctx, hpaName, imageNameSuffix)
 			if err != nil {
 				return fmt.Errorf("failed to create HorizontalPodAutoscaler object: %v", err)
@@ -96,7 +96,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 				return fmt.Errorf("failed to check if Service %q exists: %v", service, err)
 			}
 			if !ok {
-				fmt.Printf("Creating Service resource %q\n", service)
+				fmt.Printf("Creating Service object %q\n", service)
 				svcObj, err := resource.CreateServiceObject(ctx, service, "app", imageNameSuffix, exposePort)
 				if err != nil {
 					return fmt.Errorf("failed to create Service object: %v", err)
@@ -105,7 +105,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 					return fmt.Errorf("failed to add new suggested Service object: %v", err)
 				}
 			} else {
-				fmt.Fprintf(os.Stderr, "\nWARNING: Service %q already exists in provided configs. Not generating new Service.\n\n", service)
+				fmt.Fprintf(os.Stderr, "\nWARNING: Service %q already exists in provided configuration files. Not generating new Service.\n\n", service)
 			}
 		}
 	}
@@ -116,7 +116,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 			return fmt.Errorf("failed to check if Namespace %q exists: %v", namespace, err)
 		}
 		if !ok {
-			fmt.Printf("Creating Namespace resource %q\n", namespace)
+			fmt.Printf("Creating Namespace object %q\n", namespace)
 			nsObj, err := resource.CreateNamespaceObject(ctx, namespace)
 			if err != nil {
 				return fmt.Errorf("failed to create Namespace object: %v", err)
@@ -128,13 +128,13 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 	}
 
 	if len(objs) > 0 {
-		fmt.Printf("Saving suggested resource configs to %q\n", suggestedOutput)
+		fmt.Printf("Saving suggested configuration files to %q\n", suggestedOutput)
 		if err := resource.SaveAsConfigs(ctx, objs, suggestedOutput, d.Clients.OS); err != nil {
-			return fmt.Errorf("failed to save suggested configs to %q: %v", suggestedOutput, err)
+			return fmt.Errorf("failed to save suggested configuration files to %q: %v", suggestedOutput, err)
 		}
 	}
 
-	fmt.Printf("\nExpanding resources.\n")
+	fmt.Printf("\nExpanding configuration files.\n")
 
 	if im != nil {
 		imageName := image.Name(im)
@@ -145,7 +145,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 		imageWithDigest := fmt.Sprintf("%s@%s", image.Name(im), imageDigest)
 		fmt.Printf("Got digest for image: %s --> %s\n", im, imageWithDigest)
 
-		fmt.Printf("Updating resource containers that have image name %q to use image with digest %q\n", imageName, imageWithDigest)
+		fmt.Printf("Updating containers in configuration files that have image name %q to use image with digest %q\n", imageName, imageWithDigest)
 		if err := resource.UpdateMatchingContainerImage(ctx, objs, imageName, imageWithDigest); err != nil {
 			return fmt.Errorf("failed to update container of objects: %v", err)
 		}
@@ -190,9 +190,9 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 		}
 	}
 
-	fmt.Printf("Saving expanded resource configs to %q\n", expandedOutput)
+	fmt.Printf("Saving expanded configuration files to %q\n", expandedOutput)
 	if err := resource.SaveAsConfigs(ctx, objs, expandedOutput, d.Clients.OS); err != nil {
-		return fmt.Errorf("failed to save expanded configs to %q: %v", expandedOutput, err)
+		return fmt.Errorf("failed to save expanded configuration files to %q: %v", expandedOutput, err)
 	}
 
 	fmt.Printf("Finished preparing deployment.\n\n")
@@ -238,9 +238,9 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 
 	objs, err := resource.ParseConfigs(ctx, config, d.Clients.OS)
 	if err != nil {
-		return fmt.Errorf("failed to parse configs: %v", err)
+		return fmt.Errorf("failed to parse configuration files: %v", err)
 	}
-	fmt.Printf("Configs to apply: %v\n", objs)
+	fmt.Printf("Configuration files to be used: %v\n", objs)
 
 	exists := make(map[string]bool)
 	var dups []string
@@ -253,28 +253,28 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 		exists[key] = true
 	}
 	if len(dups) > 0 {
-		fmt.Fprintf(os.Stderr, "\nWARNING: Deploying multiple resources share the same kind and name. Duplicate resources will be overridden:\n")
+		fmt.Fprintf(os.Stderr, "\nWARNING: Deploying multiple objects share the same kind and name. Duplicate objects will be overridden:\n")
 		for _, obj := range dups {
 			fmt.Fprintf(os.Stderr, "%v\n", obj)
 		}
 		fmt.Fprintln(os.Stderr)
 	}
 
-	fmt.Printf("Applying resource configs to cluster.\n")
+	fmt.Printf("Applying configuration files to cluster.\n")
 
 	// Apply all namespace objects first, if they exists
 	for baseName, obj := range objs {
 		if resource.ResourceKind(obj) == "Namespace" {
 			nsFile := filepath.Join(config, baseName)
 			if err := cluster.ApplyConfigs(ctx, nsFile, "", d.Clients.Kubectl); err != nil {
-				return fmt.Errorf("failed to apply Namespace config to cluster: %v", err)
+				return fmt.Errorf("failed to apply Namespace configuration file to cluster: %v", err)
 			}
 			// TODO(joonlim): Wait for deployed namespace to be ready before applying other objects
 		}
 	}
 
 	if err := cluster.ApplyConfigs(ctx, config, namespace, d.Clients.Kubectl); err != nil {
-		return fmt.Errorf("failed to apply configs to cluster: %v", err)
+		return fmt.Errorf("failed to apply configuration files to cluster: %v", err)
 	}
 
 	deployedObjs := resource.Objects{}
@@ -291,11 +291,11 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 			kind := resource.ResourceKind(obj)
 			name, err := resource.ResourceName(obj)
 			if err != nil {
-				return fmt.Errorf("failed to get name of resource: %v", err)
+				return fmt.Errorf("failed to get name of object: %v", err)
 			}
 			deployedObj, err := cluster.GetDeployedObject(ctx, kind, name, namespace, d.Clients.Kubectl)
 			if err != nil {
-				return fmt.Errorf("failed to get config of deployed object with kind %q and name %q: %v", kind, name, err)
+				return fmt.Errorf("failed to get configuration of deployed object with kind %q and name %q: %v", kind, name, err)
 			}
 			deployedObjs[key] = deployedObj
 			ok, err := resource.IsReady(ctx, deployedObj)
@@ -329,11 +329,11 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 
 	summary, err := resource.DeploySummary(ctx, deployedObjs)
 	if err != nil {
-		return fmt.Errorf("failed to get summary of deployed resources: %v", err)
+		return fmt.Errorf("failed to get summary of deployed objects: %v", err)
 	}
 
 	fmt.Printf("################################################################################\n")
-	fmt.Printf("> Deployed Resources\n\n")
+	fmt.Printf("> Deployed Objects\n\n")
 	fmt.Printf("%s\n", summary)
 
 	fmt.Printf("################################################################################\n")

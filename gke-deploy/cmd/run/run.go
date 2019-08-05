@@ -29,22 +29,22 @@ const (
 	long  = `Deploy to GKE in two phases, which will do the following:
 
 Prepare Phase:
-  - Expand Kubernetes config YAMLs:
+  - Expand Kubernetes configuration files:
     - Set the digest of images that match the [--image|-i] flag, if provided.
     - Add app.kubernetes.io/name=[--app|-a] label, if provided.
     - Add app.kubernetes.io/version=[--version|-v] label, if provided.
 
 Apply Phase:
-  - Apply Kubernetes config YAMLs to the target cluster with the provided namespace.
-  - Wait for deployed resources to be ready before exiting.
+  - Apply Kubernetes configuration files to the target cluster with the provided namespace.
+  - Wait for deployed Kubernetes configuration files to be ready before exiting.
 `
-	example = `  # Expand configs and deploy to GKE cluster.
+	example = `  # Expand Kubernetes configuration files and deploy to GKE cluster.
   gke-deploy run -f configs -i gcr.io/my-project/my-app:1.0.0 -a my-app -v 1.0.0 -o expanded -n my-namespace -c my-cluster -l us-east1-b
 
   # Deploy to GKE cluster that kubectl is currently targeting.
   gke-deploy run -f configs
 
-  # Deploy to GKE cluster that kubectl is currently targeting without supplying any configs. Have gke-deploy generate base configs for your application using an image, app name, and service port.
+  # Deploy to GKE cluster that kubectl is currently targeting without supplying any Kubernetes configuration files. Have gke-deploy generate suggested Kubernetes configuration files for your application using an image, app name, and service port.
   gke-deploy run -i nginx -a nginx -x 80`
 )
 
@@ -82,17 +82,17 @@ func NewRunCommand() *cobra.Command {
 
 	cmd.Flags().StringVarP(&options.appName, "app", "a", "", "Application name of the Kubernetes deployment.")
 	cmd.Flags().StringVarP(&options.appVersion, "version", "v", "", "Version of the Kubernetes deployment.")
-	cmd.Flags().StringVarP(&options.filename, "filename", "f", "", "Config file or directory of config files to use to create the Kubernetes resources (file or files in directory must end with \".yml\" or \".yaml\"). If this field is not provided, suggested base configs will be created: Deployment with image provided by --image and HorizontalPodAutoscaler. The application's name will be inferred by the image name's suffix.")
+	cmd.Flags().StringVarP(&options.filename, "filename", "f", "", "Configuration file or directory of configuration files to use to create Kubernetes objects (file or files in directory must end with \".yml\" or \".yaml\"). If this field is not provided, suggested base configs will be created: Deployment with image provided by --image and HorizontalPodAutoscaler. The application's name will be inferred by the image name's suffix.")
 	cmd.Flags().StringVarP(&options.clusterLocation, "location", "l", "", "Region/zone of GKE cluster to deploy to.")
 	cmd.Flags().StringVarP(&options.clusterName, "cluster", "c", "", "Name of GKE cluster to deploy to.")
 	cmd.Flags().StringVarP(&options.clusterProject, "project", "p", "", "Project of GKE cluster to deploy to. If this field is not provided, the current set GCP project is used.")
 	cmd.Flags().StringVarP(&options.image, "image", "i", "", "Image to be deployed.")
-	cmd.Flags().StringSliceVarP(&options.labels, "label", "L", nil, "Label(s) to add to Kubernetes resources (k1=v1). Labels can be set comma-delimited or as separate flags. If two or more labels with the same key are listed, the last one is used.")
+	cmd.Flags().StringSliceVarP(&options.labels, "label", "L", nil, "Label(s) to add to Kubernetes configuration files (k1=v1). Labels can be set comma-delimited or as separate flags. If two or more labels with the same key are listed, the last one is used.")
 	cmd.Flags().StringVarP(&options.namespace, "namespace", "n", "default", "Namespace of GKE cluster to deploy to.")
-	cmd.Flags().StringVarP(&options.output, "output", "o", "./output", "Target directory to store suggested and expanded Kubernetes resource configs. Suggested configs will be stored in \"<output>/suggested\" and expanded configs will be stored in \"<output>/expanded\".")
-	cmd.Flags().IntVarP(&options.exposePort, "expose", "x", 0, "Creates a Service resource that connects to a deployed resource using a selector that matches the label with key as 'app' and value of the image name's suffix specified by --image. The port provided will be used to expose the deployed resource (i.e., port and targetPort will be set to the value provided in this flag).")
+	cmd.Flags().StringVarP(&options.output, "output", "o", "./output", "Target directory to store suggested and expanded Kubernetes configuration files. Suggested files will be stored in \"<output>/suggested\" and expanded files will be stored in \"<output>/expanded\".")
+	cmd.Flags().IntVarP(&options.exposePort, "expose", "x", 0, "Creates a Service object that connects to a deployed workload object using a selector that matches the label with key as 'app' and value of the image name's suffix specified by --image. The port provided will be used to expose the deployed workload object (i.e., port and targetPort will be set to the value provided in this flag).")
 	cmd.Flags().BoolVarP(&options.verbose, "verbose", "V", false, "Prints underlying commands being called to stdout.")
-	cmd.Flags().DurationVarP(&options.waitTimeout, "timeout", "t", 5*time.Minute, "Timeout limit for waiting for resources to finish applying.")
+	cmd.Flags().DurationVarP(&options.waitTimeout, "timeout", "t", 5*time.Minute, "Timeout limit for waiting for Kubernetes objects to finish applying.")
 
 	return cmd
 }
@@ -134,7 +134,7 @@ func run(_ *cobra.Command, options *options) error {
 		return fmt.Errorf("value of -x|--expose must be > 0")
 	}
 	if options.exposePort > 0 && options.image == "" {
-		return fmt.Errorf("exposing a deployed resource requires -i|--image to be set")
+		return fmt.Errorf("exposing a deployed workload object requires -i|--image to be set")
 	}
 
 	labelsMap, err := common.CreateLabelsMap(options.labels)
