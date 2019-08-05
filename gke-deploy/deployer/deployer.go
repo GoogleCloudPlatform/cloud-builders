@@ -69,23 +69,23 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 		imageNameSuffix := imageNameSplit[len(imageNameSplit)-1]
 
 		if config == "" {
-			fmt.Printf("Creating Deployment object %q\n", imageNameSuffix)
+			fmt.Printf("Creating suggested Deployment configuration file %q\n", imageNameSuffix)
 			dObj, err := resource.CreateDeploymentObject(ctx, imageNameSuffix, imageNameSuffix, image.Name(im))
 			if err != nil {
 				return fmt.Errorf("failed to create Deployment object: %v", err)
 			}
 			if err = resource.AddObject(ctx, objs, dObj); err != nil {
-				return fmt.Errorf("failed to add new suggested Deployment object: %v", err)
+				return fmt.Errorf("failed to add Deployment object: %v", err)
 			}
 
 			hpaName := fmt.Sprintf("%s-hpa", imageNameSuffix)
-			fmt.Printf("Creating HorizontalPodAutoscaler object %q\n", hpaName)
+			fmt.Printf("Creating suggested HorizontalPodAutoscaler configuration file %q\n", hpaName)
 			hpaObj, err := resource.CreateHorizontalPodAutoscalerObject(ctx, hpaName, imageNameSuffix)
 			if err != nil {
 				return fmt.Errorf("failed to create HorizontalPodAutoscaler object: %v", err)
 			}
 			if err = resource.AddObject(ctx, objs, hpaObj); err != nil {
-				return fmt.Errorf("failed to add new suggested HorizontalPodAutoscaler object: %v", err)
+				return fmt.Errorf("failed to add HorizontalPodAutoscaler object: %v", err)
 			}
 		}
 
@@ -96,13 +96,13 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 				return fmt.Errorf("failed to check if Service %q exists: %v", service, err)
 			}
 			if !ok {
-				fmt.Printf("Creating Service object %q\n", service)
+				fmt.Printf("Creating suggested Service configuration file %q\n", service)
 				svcObj, err := resource.CreateServiceObject(ctx, service, "app", imageNameSuffix, exposePort)
 				if err != nil {
 					return fmt.Errorf("failed to create Service object: %v", err)
 				}
 				if err = resource.AddObject(ctx, objs, svcObj); err != nil {
-					return fmt.Errorf("failed to add new suggested Service object: %v", err)
+					return fmt.Errorf("failed to add Service object: %v", err)
 				}
 			} else {
 				fmt.Fprintf(os.Stderr, "\nWARNING: Service %q already exists in provided configuration files. Not generating new Service.\n\n", service)
@@ -116,13 +116,13 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 			return fmt.Errorf("failed to check if Namespace %q exists: %v", namespace, err)
 		}
 		if !ok {
-			fmt.Printf("Creating Namespace object %q\n", namespace)
+			fmt.Printf("Creating suggested Namespace configuration file %q\n", namespace)
 			nsObj, err := resource.CreateNamespaceObject(ctx, namespace)
 			if err != nil {
 				return fmt.Errorf("failed to create Namespace object: %v", err)
 			}
 			if err = resource.AddObject(ctx, objs, nsObj); err != nil {
-				return fmt.Errorf("failed to add new suggested Namespace object: %v", err)
+				return fmt.Errorf("failed to add Namespace object: %v", err)
 			}
 		}
 	}
@@ -152,7 +152,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 	}
 
 	if err := resource.UpdateNamespace(ctx, objs, namespace); err != nil {
-		return fmt.Errorf("failed to update namespace: %v", err)
+		return fmt.Errorf("failed to update namespace of objects: %v", err)
 	}
 
 	for _, obj := range objs {
