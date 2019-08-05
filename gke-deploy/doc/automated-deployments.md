@@ -57,8 +57,8 @@ curl -H "Authorization: Bearer $(gcloud auth print-access-token --project=$PROJE
     ],
     "artifacts": {
       "objects": {
-        "location": "gs://$_OUTPUT_BUCKET/$BUILD_ID/hydrated",
-        "paths": ["output/hydrated/*"]
+        "location": "gs://$_OUTPUT_BUCKET/$BUILD_ID/expanded",
+        "paths": ["output/expanded/*"]
       }
     },
     "substitutions": {

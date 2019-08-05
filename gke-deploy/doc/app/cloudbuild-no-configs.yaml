@@ -23,14 +23,14 @@ steps:
   args:
   - '-c'
   - |
-    gsutil cp -r output/created gs://$_OUTPUT_BUCKET/$BUILD_ID/created
-    echo "Copied created base configs to gs://$_OUTPUT_BUCKET/$BUILD_ID/created"
+    gsutil cp -r output/suggested gs://$_OUTPUT_BUCKET/$BUILD_ID/suggested
+    echo "Copied suggested base configs to gs://$_OUTPUT_BUCKET/$BUILD_ID/suggested"
 images:
 - '$_IMAGE_NAME:$_IMAGE_VERSION'
 artifacts:
   objects:
-    location: 'gs://$_OUTPUT_BUCKET/$BUILD_ID/hydrated'
-    paths: ['output/hydrated/*']
+    location: 'gs://$_OUTPUT_BUCKET/$BUILD_ID/expanded'
+    paths: ['output/expanded/*']
 substitutions:
   _DOCKERFILE_PATH: Dockerfile
   _IMAGE_NAME:

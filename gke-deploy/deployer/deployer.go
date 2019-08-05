@@ -47,7 +47,7 @@ type Deployer struct {
 }
 
 // Prepare handles preparing deployment.
-func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appVersion, config, createdOutput, hydratedOutput, namespace string, labels map[string]string, exposePort int) error {
+func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appVersion, config, suggestedOutput, expandedOutput, namespace string, labels map[string]string, exposePort int) error {
 	fmt.Printf("Preparing deployment.\n")
 
 	var objs resource.Objects
@@ -63,7 +63,6 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 		fmt.Println("Starting with no configs")
 	}
 
-	createdObjs := resource.Objects{}
 	if im != nil {
 		// e.g., Resolve "gcr.io/my-project/my-app:1.0.0" to name suffix "my-app".
 		imageNameSplit := strings.Split(image.Name(im), "/")
@@ -76,10 +75,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 				return fmt.Errorf("failed to create Deployment object: %v", err)
 			}
 			if err = resource.AddObject(ctx, objs, dObj); err != nil {
-				return fmt.Errorf("failed to add Deployment object to objects to hydrate: %v", err)
-			}
-			if err = resource.AddObject(ctx, createdObjs, dObj); err != nil {
-				return fmt.Errorf("failed to add Deployment object to created objects: %v", err)
+				return fmt.Errorf("failed to add new suggested Deployment object: %v", err)
 			}
 
 			hpaName := fmt.Sprintf("%s-hpa", imageNameSuffix)
@@ -89,10 +85,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 				return fmt.Errorf("failed to create HorizontalPodAutoscaler object: %v", err)
 			}
 			if err = resource.AddObject(ctx, objs, hpaObj); err != nil {
-				return fmt.Errorf("failed to add HorizontalPodAutoscaler object to objects to hydrate: %v", err)
-			}
-			if err = resource.AddObject(ctx, createdObjs, hpaObj); err != nil {
-				return fmt.Errorf("failed to add HorizontalPodAutoscaler object to created objects: %v", err)
+				return fmt.Errorf("failed to add new suggested HorizontalPodAutoscaler object: %v", err)
 			}
 		}
 
@@ -109,10 +102,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 					return fmt.Errorf("failed to create Service object: %v", err)
 				}
 				if err = resource.AddObject(ctx, objs, svcObj); err != nil {
-					return fmt.Errorf("failed to add Service object to objects to hydrate: %v", err)
-				}
-				if err = resource.AddObject(ctx, createdObjs, svcObj); err != nil {
-					return fmt.Errorf("failed to add Service object to created objects: %v", err)
+					return fmt.Errorf("failed to add new suggested Service object: %v", err)
 				}
 			} else {
 				fmt.Fprintf(os.Stderr, "\nWARNING: Service %q already exists in provided configs. Not generating new Service.\n\n", service)
@@ -132,22 +122,19 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 				return fmt.Errorf("failed to create Namespace object: %v", err)
 			}
 			if err = resource.AddObject(ctx, objs, nsObj); err != nil {
-				return fmt.Errorf("failed to add Namespace object to objects to hydrate: %v", err)
-			}
-			if err = resource.AddObject(ctx, createdObjs, nsObj); err != nil {
-				return fmt.Errorf("failed to add Namespace object to created objects: %v", err)
+				return fmt.Errorf("failed to add new suggested Namespace object: %v", err)
 			}
 		}
 	}
 
-	if len(createdObjs) > 0 {
-		fmt.Printf("Saving created resource configs to %q\n", createdOutput)
-		if err := resource.SaveAsConfigs(ctx, createdObjs, createdOutput, d.Clients.OS); err != nil {
-			return fmt.Errorf("failed to save created configs to %q: %v", createdOutput, err)
+	if len(objs) > 0 {
+		fmt.Printf("Saving suggested resource configs to %q\n", suggestedOutput)
+		if err := resource.SaveAsConfigs(ctx, objs, suggestedOutput, d.Clients.OS); err != nil {
+			return fmt.Errorf("failed to save suggested configs to %q: %v", suggestedOutput, err)
 		}
 	}
 
-	fmt.Printf("\nHydrating resources.\n")
+	fmt.Printf("\nExpanding resources.\n")
 
 	if im != nil {
 		imageName := image.Name(im)
@@ -203,9 +190,9 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 		}
 	}
 
-	fmt.Printf("Saving hydrated resource configs to %q\n", hydratedOutput)
-	if err := resource.SaveAsConfigs(ctx, objs, hydratedOutput, d.Clients.OS); err != nil {
-		return fmt.Errorf("failed to save hydrated configs to %q: %v", hydratedOutput, err)
+	fmt.Printf("Saving expanded resource configs to %q\n", expandedOutput)
+	if err := resource.SaveAsConfigs(ctx, objs, expandedOutput, d.Clients.OS); err != nil {
+		return fmt.Errorf("failed to save expanded configs to %q: %v", expandedOutput, err)
 	}
 
 	fmt.Printf("Finished preparing deployment.\n\n")

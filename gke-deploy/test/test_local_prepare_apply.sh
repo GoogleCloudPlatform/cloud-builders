@@ -40,8 +40,8 @@ gke-deploy run \
 
 # Verify
 
-cd "${OUTPUT}"/created
-[ -e namespace.yaml ] || fail "${OUTPUT}/created/namespace.yaml does not exist"
+cd "${OUTPUT}"/suggested
+[ -e namespace.yaml ] || fail "${OUTPUT}/suggested/namespace.yaml does not exist"
 
 mkdir "${OUTPUT}"/check && cd "${OUTPUT}"/check
 gcloud container clusters get-credentials "${GKE_DEPLOY_CLUSTER}" --zone "${GKE_DEPLOY_LOCATION}" --project "${GKE_DEPLOY_PROJECT}"

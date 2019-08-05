@@ -25,20 +25,20 @@ import (
 
 const (
 	short = "Execute prepare phase and skip apply phase"
-	long  = `Prepare to deploy to GKE by generating modified Kubernetes resource configs. Skip apply.
+	long  = `Prepare to deploy to GKE by generating expanded Kubernetes resource configs. Skip apply.
 
-- Modify Kubernetes config YAMLs to:
+- Expand Kubernetes config YAMLs to:
   - Set the digest of images that match the [--image|-i] flag, if provided.
   - Add app.kubernetes.io/name=[--app|-a] label, if provided.
   - Add app.kubernetes.io/version=[--version|-v] label, if provided.
 `
 	example = `  # Prepare only.
-  gke-deploy prepare -f configs -i gcr.io/my-project/my-app:1.0.0 -a my-app -v 1.0.0 -o modified -n my-namespace
+  gke-deploy prepare -f configs -i gcr.io/my-project/my-app:1.0.0 -a my-app -v 1.0.0 -o expanded -n my-namespace
 
-  # Execute prepare and apply, with an intermediary step in between (e.g., manually check modified YAMLs)
-  gke-deploy prepare -f configs -i gcr.io/my-project/my-app:1.0.0 -a my-app -v 1.0.0 -o modified -n my-namespace
-  cat modified/*
-  gke-deploy apply -f modified -c my-cluster -n my-namespace -c my-cluster -l us-east1-b  # Pass modified directory to -f`
+  # Execute prepare and apply, with an intermediary step in between (e.g., manually check expanded YAMLs)
+  gke-deploy prepare -f configs -i gcr.io/my-project/my-app:1.0.0 -a my-app -v 1.0.0 -o expanded -n my-namespace
+  cat expanded/*
+  gke-deploy apply -f expanded -c my-cluster -n my-namespace -c my-cluster -l us-east1-b  # Pass expanded directory to -f`
 )
 
 type options struct {
@@ -71,11 +71,11 @@ func NewPrepareCommand() *cobra.Command {
 
 	cmd.Flags().StringVarP(&options.appName, "app", "a", "", "Application name of the Kubernetes deployment.")
 	cmd.Flags().StringVarP(&options.appVersion, "version", "v", "", "Version of the Kubernetes deployment.")
-	cmd.Flags().StringVarP(&options.filename, "filename", "f", "", "Config file or directory of config files to use to create the Kubernetes resources (file or files in directory must end with \".yml\" or \".yaml\"). If this field is not provided, base configs will be created: Deployment with image provided by --image and HorizontalPodAutoscaler. The application's name will be inferred by the image name's suffix.")
+	cmd.Flags().StringVarP(&options.filename, "filename", "f", "", "Config file or directory of config files to use to create the Kubernetes resources (file or files in directory must end with \".yml\" or \".yaml\"). If this field is not provided, suggested base configs will be created: Deployment with image provided by --image and HorizontalPodAutoscaler. The application's name will be inferred by the image name's suffix.")
 	cmd.Flags().StringVarP(&options.image, "image", "i", "", "Image to be deployed.")
 	cmd.Flags().StringSliceVarP(&options.labels, "label", "L", nil, "Label(s) to add to Kubernetes resources (k1=v1). Labels can be set comma-delimited or as separate flags. If two or more labels with the same key are listed, the last one is used.")
 	cmd.Flags().StringVarP(&options.namespace, "namespace", "n", "default", "Namespace of GKE cluster to deploy to.")
-	cmd.Flags().StringVarP(&options.output, "output", "o", "./output", "Target directory to store created and hydrated Kubernetes resource configs. Created configs will be stored in \"<output>/created\" and hydrated configs will be stored in \"<output>/hydrated\".")
+	cmd.Flags().StringVarP(&options.output, "output", "o", "./output", "Target directory to store suggested and expanded Kubernetes resource configs. Suggested configs will be stored in \"<output>/suggested\" and expanded configs will be stored in \"<output>/expanded\".")
 	cmd.Flags().IntVarP(&options.exposePort, "expose", "x", 0, "Creates a Service resource that connects to a deployed resource using a selector that matches the label with key as 'app' and value of the image name's suffix specified by --image. The port provided will be used to expose the deployed resource (i.e., port and targetPort will be set to the value provided in this flag).")
 	cmd.Flags().BoolVarP(&options.verbose, "verbose", "V", false, "Prints underlying commands being called to stdout.")
 
@@ -120,7 +120,7 @@ func prepare(_ *cobra.Command, options *options) error {
 		return err
 	}
 
-	if err := d.Prepare(ctx, im, options.appName, options.appVersion, options.filename, common.CreatedOutputPath(options.output), common.HydratedOutputPath(options.output), options.namespace, labelsMap, options.exposePort); err != nil {
+	if err := d.Prepare(ctx, im, options.appName, options.appVersion, options.filename, common.SuggestedOutputPath(options.output), common.ExpandedOutputPath(options.output), options.namespace, labelsMap, options.exposePort); err != nil {
 		return fmt.Errorf("failed to prepare deployment: %v", err)
 	}
 

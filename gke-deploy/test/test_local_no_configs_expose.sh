@@ -40,11 +40,11 @@ gke-deploy run \
 
 # Verify
 
-cd "${OUTPUT}"/created
-[ -e deployment.yaml ] || fail "${OUTPUT}/created/deployment.yaml does not exist"
-[ -e horizontalpodautoscaler.yaml ] || fail "${OUTPUT}/created/horizontalpodautoscaler.yaml does not exist"
-[ -e service.yaml ] || fail "${OUTPUT}/created/service.yaml does not exist"
-[ -e namespace.yaml ] || fail "${OUTPUT}/created/namespace.yaml does not exist"
+cd "${OUTPUT}"/suggested
+[ -e deployment.yaml ] || fail "${OUTPUT}/suggested/deployment.yaml does not exist"
+[ -e horizontalpodautoscaler.yaml ] || fail "${OUTPUT}/suggested/horizontalpodautoscaler.yaml does not exist"
+[ -e service.yaml ] || fail "${OUTPUT}/suggested/service.yaml does not exist"
+[ -e namespace.yaml ] || fail "${OUTPUT}/suggested/namespace.yaml does not exist"
 
 mkdir "${OUTPUT}"/check && cd "${OUTPUT}"/check
 gcloud container clusters get-credentials "${GKE_DEPLOY_CLUSTER}" --zone "${GKE_DEPLOY_LOCATION}" --project "${GKE_DEPLOY_PROJECT}"

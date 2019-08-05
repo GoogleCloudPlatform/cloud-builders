@@ -63,16 +63,16 @@ func CreateDeployer(ctx context.Context, useGcloud, verbose bool) (*deployer.Dep
 	return d, nil
 }
 
-// CreatedOutputPath takes a root output directory and returns the path where
-// created configs should be stored.
-func CreatedOutputPath(root string) string {
-	return filepath.Join(root, "created")
+// SuggestedOutputPath takes a root output directory and returns the path where
+// suggested configs should be stored.
+func SuggestedOutputPath(root string) string {
+	return filepath.Join(root, "suggested")
 }
 
-// HydratedOutputPath takes a root output directory and returns the path where
-// hydrated configs should be stored.
-func HydratedOutputPath(root string) string {
-	return filepath.Join(root, "hydrated")
+// ExpandedOutputPath takes a root output directory and returns the path where
+// expanded configs should be stored.
+func ExpandedOutputPath(root string) string {
+	return filepath.Join(root, "expanded")
 }
 
 // GcloudInPath returns true if the `gcloud` command is in this machine's PATH.
