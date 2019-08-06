@@ -31,14 +31,17 @@ gke-deploy run \
 -a "test-name" \
 -v "test-version" \
 -L "foo=bar" \
+-p "${GKE_DEPLOY_PROJECT}" \
+-c "${GKE_DEPLOY_CLUSTER}" \
+-l "${GKE_DEPLOY_LOCATION}" \
 -n "${NAMESPACE}" \
 -o "${OUTPUT}" \
 || fail "gke-deploy run failed"
 
 # Verify
 
-cd "${OUTPUT}"/created
-[ -e namespace.yaml ] || fail "${OUTPUT}/created/namespace.yaml does not exist"
+cd "${OUTPUT}"/expanded
+[ -e namespace.yaml ] || fail "${OUTPUT}/expanded/namespace.yaml does not exist"
 
 mkdir "${OUTPUT}"/check && cd "${OUTPUT}"/check
 gcloud container clusters get-credentials "${GKE_DEPLOY_CLUSTER}" --zone "${GKE_DEPLOY_LOCATION}" --project "${GKE_DEPLOY_PROJECT}"

@@ -16,7 +16,7 @@ steps:
   - |
     set -x  # Print commands
     set -e  # Fail if any command below fails
-    cd output/created
+    cd output/suggested
     [ -e deployment.yaml ]
     [ -e horizontalpodautoscaler.yaml ]
     [ -e service.yaml ]
@@ -24,7 +24,7 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/gke-deploy'
   args:
   - 'apply'
-  - '--filename=output/hydrated'
+  - '--filename=output/expanded'
   - '--namespace=$_NAMESPACE'
   - '--cluster=$_CLUSTER'
   - '--location=$_LOCATION'
@@ -53,8 +53,8 @@ steps:
   - '-c'
   - |
     set -e  # Fail if any command below fails
-    tail -n +1 output/created/*
-    tail -n +1 output/hydrated/*
+    tail -n +1 output/suggested/*
+    tail -n +1 output/expanded/*
 
 substitutions:
   _CLUSTER:

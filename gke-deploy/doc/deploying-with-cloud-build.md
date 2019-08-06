@@ -33,7 +33,7 @@ PROJECT_NUM=$(gcloud projects list --filter="$PROJECT" --format="value(PROJECT_N
 SERVICE_ACCOUNT=${PROJECT_NUM}@cloudbuild.gserviceaccount.com
 gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$SERVICE_ACCOUNT --role=roles/container.developer --project=$PROJECT
 
-# Create a bucket that will be used to store configs created and hydrated by gke-deploy.
+# Create a bucket that will be used to store configs suggested and expanded by gke-deploy.
 BUCKET=my-bucket
 gsutil mb -p $PROJECT gs://$BUCKET
 ```
@@ -46,8 +46,8 @@ This build calls the `docker` build step to create a Docker image and push it to
 Container Registry. Then, the build calls the `gke-deploy` build step to create
 and deploy Deployment, Horizontal Pod Autoscaler, and Service configuration
 files to your GKE cluster. Finally, the build calls the `gsutil` build step to
-copy any base Kubernetes configuration files created by `gke-deploy` to your
-bucket. The files hydrated by `gke-deploy` are copied to your bucket via the
+copy suggested base Kubernetes configuration files created by `gke-deploy` to your
+bucket. The files expanded by `gke-deploy` are copied to your bucket via the
 `artifacts` field.
 
 ```bash
@@ -73,7 +73,7 @@ gcloud builds submit . --project=$PROJECT --config cloudbuild-no-configs.yaml --
 
 This build calls the `docker` build step to create a Docker image and push it to
 Container Registry. Then, the build calls the `gke-deploy` build step to deploy
-your Kubernetes configuration files to your GKE cluster. The files hydrated by
+your Kubernetes configuration files to your GKE cluster. The files expanded by
 `gke-deploy` are copied to your bucket via the `artifacts` field.
 
 ```bash

@@ -25,18 +25,18 @@ import (
 
 const (
 	short = "Skip prepare phase and execute apply phase"
-	long  = `Apply unmodified Kubernetes resource configs. Skip prepare.
+	long  = `Apply Kubernetes configuration files. Skip prepare.
 
-- Apply Kubernetes config YAMLs to the target cluster with the provided namespace.
-- Wait for deployed resources to be ready before exiting.
+- Apply Kubernetes configuration files to the target cluster with the provided namespace.
+- Wait for deployed Kubernetes configuration files to be ready before exiting.
 `
 	example = `  # Apply only.
   gke-deploy apply -f configs -c my-cluster -n my-namespace -c my-cluster -l us-east1-b
 
-  # Execute prepare and apply, with an intermediary step in between (e.g., manually check modified YAMLs)
-  gke-deploy prepare -f configs -i gcr.io/my-project/my-app:1.0.0 -a my-app -v 1.0.0 -o modified -n my-namespace
-  cat modified/*
-  gke-deploy apply -f modified -c my-cluster -n my-namespace -c my-cluster -l us-east1-b  # Pass modified directory to -f`
+  # Execute prepare and apply, with an intermediary step in between (e.g., manually check expanded YAMLs)
+  gke-deploy prepare -f configs -i gcr.io/my-project/my-app:1.0.0 -a my-app -v 1.0.0 -o expanded -n my-namespace
+  cat expanded/*
+  gke-deploy apply -f expanded -c my-cluster -n my-namespace -c my-cluster -l us-east1-b  # Pass expanded directory to -f`
 )
 
 type options struct {
@@ -65,13 +65,13 @@ func NewApplyCommand() *cobra.Command {
 		SilenceUsage: true,
 	}
 
-	cmd.Flags().StringVarP(&options.filename, "filename", "f", "", "Config file or directory of config files to use to create the Kubernetes resources (file or files in directory must end with \".yml\" or \".yaml\").")
+	cmd.Flags().StringVarP(&options.filename, "filename", "f", "", "Configuration file or directory of configuration files to use to create Kubernetes objects (file or files in directory must end with \".yml\" or \".yaml\").")
 	cmd.Flags().StringVarP(&options.clusterLocation, "location", "l", "", "Region/zone of GKE cluster to deploy to.")
 	cmd.Flags().StringVarP(&options.clusterName, "cluster", "c", "", "Name of GKE cluster to deploy to.")
 	cmd.Flags().StringVarP(&options.clusterProject, "project", "p", "", "Project of GKE cluster to deploy to. If this field is not provided, the current set GCP project is used.")
 	cmd.Flags().StringVarP(&options.namespace, "namespace", "n", "default", "Name of GKE cluster to deploy to.")
 	cmd.Flags().BoolVarP(&options.verbose, "verbose", "V", false, "Prints underlying commands being called to stdout.")
-	cmd.Flags().DurationVarP(&options.waitTimeout, "timeout", "t", 5*time.Minute, "Timeout limit for waiting for resources to finish applying.")
+	cmd.Flags().DurationVarP(&options.waitTimeout, "timeout", "t", 5*time.Minute, "Timeout limit for waiting for Kubernetes objects to finish applying.")
 
 	return cmd
 }

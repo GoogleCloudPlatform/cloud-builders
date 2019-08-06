@@ -21,8 +21,8 @@ images:
 - '$_IMAGE_NAME:$_IMAGE_VERSION'
 artifacts:
   objects:
-    location: 'gs://$_OUTPUT_BUCKET/$BUILD_ID/hydrated'
-    paths: ['output/hydrated/*']
+    location: 'gs://$_OUTPUT_BUCKET/$BUILD_ID/expanded'
+    paths: ['output/expanded/*']
 substitutions:
   _DOCKERFILE_PATH: Dockerfile
   _IMAGE_NAME:
