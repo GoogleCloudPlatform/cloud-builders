@@ -3,43 +3,6 @@
 This tool deploys an application to a Kubernetes Engine cluster, following
 Google's recommended best practices.
 
-## Install Locally
-
-Although `gke-deploy` is meant to be used as a build step with [Cloud
-Build](https://cloud.google.com/cloud-build/), that doesn't mean that it can't
-be used locally.
-
-1.  First, install
-    [`kubectl`](https://kubernetes.io/docs/tasks/tools/install-kubectl/) as a
-    dependency.
-
-2.  Next, install `gke-deploy`:
-
-    ```bash
-    go install github.com/GoogleCloudPlatform/cloud-builders/gke-deploy
-    gke-deploy -h
-    ```
-
-3.  If your `kubectl` is pointing to a cluster, you can test out a deployment by
-    deploying an application with one simple command:
-
-    ```bash
-    # Deploy an nginx Deployment with a load balancer exposing port 80.
-    gke-deploy run -i nginx -x 80
-    ```
-
-4.  After the command finishes successfully, `gke-deploy` will print a table
-    displaying deployed resources. You can visit the IP address printed in the
-    Service row.
-
-    e.g.,
-
-    ![deployed-resources](doc/deployed-resources.png)
-
-    ```bash
-    curl 35.196.67.253
-    ```
-
 ## `gke-deploy` vs `kubectl`
 
 Using `gke-deploy` to deploy an application to Kubernetes Engine differs from
@@ -88,3 +51,39 @@ View [this page](doc/deploying-with-cloud-build.md) for examples on how to use
 
 Follow [these instructions](doc/automated-deployments.md) to set up continuous
 deployment.
+
+## Testing Locally
+
+Although `gke-deploy` is meant to be used as a build step with [Cloud
+Build](https://cloud.google.com/cloud-build/), you can run it locally for testing.
+
+1.  First, install
+    [`kubectl`](https://kubernetes.io/docs/tasks/tools/install-kubectl/) as a
+    dependency.
+
+2.  Next, install `gke-deploy`:
+
+    ```bash
+    go install github.com/GoogleCloudPlatform/cloud-builders/gke-deploy
+    gke-deploy -h
+    ```
+
+3.  If your `kubectl` is pointing to a cluster, you can test out a deployment by
+    deploying an application with one simple command:
+
+    ```bash
+    # Deploy an nginx Deployment with a load balancer exposing port 80.
+    gke-deploy run -i nginx -x 80
+    ```
+
+4.  After the command finishes successfully, `gke-deploy` will print a table
+    displaying deployed resources. You can visit the IP address printed in the
+    Service row.
+
+    e.g.,
+
+    ![deployed-resources](doc/deployed-resources.png)
+
+    ```bash
+    curl 35.196.67.253
+    ```
