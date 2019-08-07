@@ -2,7 +2,7 @@ steps:
 # Run tests.
 - name: 'golang:stretch'
   entrypoint: 'go'
-  args: ['build', './...']
+  args: ['test', './...']
 
 # Build the gcs-fetcher binary and put into the builder image.
 - name: 'gcr.io/cloud-builders/docker'
@@ -32,6 +32,43 @@ steps:
 # Check that files were downloaded.
 - name: 'ubuntu'
   args: ['cat', 'fetched/cloudbuild.yaml']
+
+# Tar.gz and upload the current directory, then fetch and check contents.
+- name: google/cloud-sdk
+  entrypoint: 'bash'
+  args:
+  - -c
+  - |
+    tar czvf /tmp/out.tar.gz .
+    gsutil cp /tmp/out.tar.gz gs://${PROJECT_ID}_cloudbuild/
+- name: gcr.io/$PROJECT_ID/gcs-fetcher
+  args:
+  - --type=TarGzArchive
+  - --location=gs://${PROJECT_ID}_cloudbuild/out.tar.gz
+  - --dest_dir=targz
+- name: ubuntu
+  args:
+  - cat
+  - targz/cloudbuild.yaml
+
+# Zip and upload the current directory, then fetch and check contents.
+- name: google/cloud-sdk
+  entrypoint: 'bash'
+  args:
+  - -c
+  - |
+    apt-get install -y zip
+    zip -r /tmp/out.zip .
+    gsutil cp /tmp/out.zip gs://${PROJECT_ID}_cloudbuild/
+- name: gcr.io/$PROJECT_ID/gcs-fetcher
+  args:
+  - --type=ZipArchive
+  - --location=gs://${PROJECT_ID}_cloudbuild/out.zip
+  - --dest_dir=zip
+- name: ubuntu
+  args:
+  - cat
+  - zip/cloudbuild.yaml
 
 # Push the images.
 images:

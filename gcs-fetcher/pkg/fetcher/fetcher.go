@@ -661,7 +661,7 @@ func (gf *Fetcher) copyFile(name string, mode os.FileMode, rc io.ReadCloser) (er
 	}()
 
 	targetFile := filepath.Join(gf.DestDir, name)
-	if err := gf.OS.MkdirAll(filepath.Base(targetFile), mode); err != nil {
+	if err := gf.OS.MkdirAll(filepath.Dir(targetFile), mode); err != nil {
 		return err
 	}
 
