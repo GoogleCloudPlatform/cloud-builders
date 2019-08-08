@@ -1,4 +1,4 @@
-# cloud.google.com/go v0.30.0
+# cloud.google.com/go v0.43.0
 cloud.google.com/go/storage
 cloud.google.com/go/iam
 cloud.google.com/go/internal
@@ -6,16 +6,18 @@ cloud.google.com/go/internal/optional
 cloud.google.com/go/internal/trace
 cloud.google.com/go/internal/version
 cloud.google.com/go/compute/metadata
-# github.com/golang/protobuf v1.2.0
+# github.com/golang/protobuf v1.3.2
 github.com/golang/protobuf/proto
 github.com/golang/protobuf/ptypes
 github.com/golang/protobuf/protoc-gen-go/descriptor
 github.com/golang/protobuf/ptypes/any
 github.com/golang/protobuf/ptypes/duration
 github.com/golang/protobuf/ptypes/timestamp
-# github.com/googleapis/gax-go v2.0.0+incompatible
-github.com/googleapis/gax-go
-# go.opencensus.io v0.17.0
+# github.com/googleapis/gax-go/v2 v2.0.5
+github.com/googleapis/gax-go/v2
+# github.com/hashicorp/golang-lru v0.5.3
+github.com/hashicorp/golang-lru/simplelru
+# go.opencensus.io v0.22.0
 go.opencensus.io/trace
 go.opencensus.io/plugin/ochttp
 go.opencensus.io/internal
@@ -27,31 +29,34 @@ go.opencensus.io/stats/view
 go.opencensus.io/tag
 go.opencensus.io/trace/propagation
 go.opencensus.io
+go.opencensus.io/metric/metricdata
 go.opencensus.io/stats/internal
 go.opencensus.io/internal/tagencoding
-# golang.org/x/net v0.0.0-20181011144130-49bb7cea24b1
+go.opencensus.io/metric/metricproducer
+go.opencensus.io/resource
+# golang.org/x/net v0.0.0-20190724013045-ca1201d0de80
+golang.org/x/net/trace
 golang.org/x/net/context
 golang.org/x/net/context/ctxhttp
-golang.org/x/net/trace
 golang.org/x/net/internal/timeseries
 golang.org/x/net/http2
 golang.org/x/net/http2/hpack
 golang.org/x/net/http/httpguts
 golang.org/x/net/idna
-# golang.org/x/oauth2 v0.0.0-20181003184128-c57b0facaced
+# golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 golang.org/x/oauth2
 golang.org/x/oauth2/google
 golang.org/x/oauth2/internal
 golang.org/x/oauth2/jws
 golang.org/x/oauth2/jwt
-# golang.org/x/sys v0.0.0-20181011152604-fa43e7bc11ba
+# golang.org/x/sys v0.0.0-20190804053845-51ab0e2deafa
 golang.org/x/sys/unix
-# golang.org/x/text v0.3.0
+# golang.org/x/text v0.3.2
 golang.org/x/text/secure/bidirule
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 golang.org/x/text/transform
-# google.golang.org/api v0.0.0-20181017004218-3f6e8463aa1d
+# google.golang.org/api v0.7.0
 google.golang.org/api/option
 google.golang.org/api/googleapi
 google.golang.org/api/iterator
@@ -62,7 +67,7 @@ google.golang.org/api/googleapi/internal/uritemplates
 google.golang.org/api/gensupport
 google.golang.org/api/googleapi/transport
 google.golang.org/api/transport/http/internal/propagation
-# google.golang.org/appengine v1.2.0
+# google.golang.org/appengine v1.6.1
 google.golang.org/appengine/urlfetch
 google.golang.org/appengine
 google.golang.org/appengine/internal
@@ -73,14 +78,16 @@ google.golang.org/appengine/internal/base
 google.golang.org/appengine/internal/datastore
 google.golang.org/appengine/internal/log
 google.golang.org/appengine/internal/remote_api
-# google.golang.org/genproto v0.0.0-20181016170114-94acd270e44e
+# google.golang.org/genproto v0.0.0-20190801165951-fa694d86fc64
 google.golang.org/genproto/googleapis/iam/v1
 google.golang.org/genproto/googleapis/rpc/code
 google.golang.org/genproto/googleapis/api/annotations
+google.golang.org/genproto/googleapis/type/expr
 google.golang.org/genproto/googleapis/rpc/status
-# google.golang.org/grpc v1.15.0
+# google.golang.org/grpc v1.22.1
 google.golang.org/grpc
 google.golang.org/grpc/codes
+google.golang.org/grpc/metadata
 google.golang.org/grpc/status
 google.golang.org/grpc/naming
 google.golang.org/grpc/balancer
@@ -92,16 +99,22 @@ google.golang.org/grpc/encoding/proto
 google.golang.org/grpc/grpclog
 google.golang.org/grpc/internal
 google.golang.org/grpc/internal/backoff
+google.golang.org/grpc/internal/balancerload
+google.golang.org/grpc/internal/binarylog
 google.golang.org/grpc/internal/channelz
 google.golang.org/grpc/internal/envconfig
 google.golang.org/grpc/internal/grpcrand
+google.golang.org/grpc/internal/grpcsync
 google.golang.org/grpc/internal/transport
 google.golang.org/grpc/keepalive
-google.golang.org/grpc/metadata
 google.golang.org/grpc/peer
 google.golang.org/grpc/resolver
 google.golang.org/grpc/resolver/dns
 google.golang.org/grpc/resolver/passthrough
+google.golang.org/grpc/serviceconfig
 google.golang.org/grpc/stats
 google.golang.org/grpc/tap
 google.golang.org/grpc/balancer/base
+google.golang.org/grpc/credentials/internal
+google.golang.org/grpc/binarylog/grpc_binarylog_v1
+google.golang.org/grpc/internal/syscall
