@@ -38,7 +38,7 @@ const (
 )
 
 var (
-	sourceType = flag.String("type", "", "Type of source to fetch; one of Archive or Manifest")
+	sourceType = flag.String("type", "", "Type of source to fetch; one of Manifest, ZipArchive or TarGzArchive")
 	location   = flag.String("location", "", "Location of source to fetch; in the form gs://bucket/path/to/object#generation")
 
 	destDir     = flag.String("dest_dir", "", "The root where to write the files.")
