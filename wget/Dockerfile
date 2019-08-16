@@ -1,6 +1,5 @@
-FROM launcher.gcr.io/google/ubuntu16_04
+FROM alpine:3.9
 
-RUN apt-get update && \
-  apt-get -y install wget ca-certificates
+RUN apk --no-cache add wget
 
 ENTRYPOINT ["wget"]
