@@ -8,7 +8,7 @@ needing an explicit `cloudbuild.yaml` file in your repository.
 
 ```bash
 PROJECT=my-project  # Set project here
-curl -H "Authorization: Bearer $(gcloud auth print-access-token --project=$PROJECT)" -H "Content-Type: application/json" -H "Accept: application/json" -H "X-Goog-User-Project: $PROJECT" https://cloudbuild.googleapis.com/v1/projects/$PROJECT/triggers -d '{
+curl -X POST -H "Authorization: Bearer $(gcloud auth print-access-token --project=$PROJECT)" -H "Content-Type: application/json" -H "Accept: application/json" -H "X-Goog-User-Project: $PROJECT" https://cloudbuild.googleapis.com/v1/projects/$PROJECT/triggers -d '{
   "description": "Push to any branch",
   "triggerTemplate": {
     "repoName": "test-app",
