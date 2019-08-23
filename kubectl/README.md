@@ -17,7 +17,7 @@ role:
 
 - Open the [Cloud Build settings page](https://console.cloud.google.com/cloud-build/settings).
 - You'll see the *Service account permissions* page.
-- Set the status of the "Kubernetes Engine Developer role to *Enable*.
+- Set the status of the "Kubernetes Engine Developer" role to *Enable*.
 
 For most use, kubectl will need to be configured to point to a specific GKE
 cluster. You can configure the cluster by setting environment variables.
