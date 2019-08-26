@@ -5,26 +5,19 @@ This Cloud Build build step runs
 
 ## Using this builder with Google Kubernetes Engine
 
-To use this builder, your
-[builder service account](https://cloud.google.com/cloud-build/docs/how-to/service-account-permissions)
-will need IAM permissions sufficient for the operations you want to perform. For
-typical read-only usage, the "Kubernetes Engine Viewer" role is sufficient. To
-deploy container images on a GKE cluster, the "Kubernetes Engine Developer" role
-is sufficient. Check the
-[GKE IAM page](https://cloud.google.com/kubernetes-engine/docs/how-to/iam#roles)
-for details.
+To use the builder, your [builder service account](https://cloud.google.com/cloud-build/docs/how-to/service-account-permissions) will need IAM permissions sufficient for the operations you
+want to perform. 
 
-Running the following command will give Cloud Build Service Account
-`container.developer` role access to your Kubernetes Engine clusters:
+For typical read-only usage, enable the "Kubernetes Engine Viewer" role. Check the
+[GKE IAM page](https://cloud.google.com/kubernetes-engine/docs/how-to/iam#roles) for
+details.
 
-```sh
-PROJECT="$(gcloud projects describe \
-    $(gcloud config get-value core/project -q) --format='get(projectNumber)')"
+To deploy container images on a GKE cluster, enable the "Kubernetes Engine Developer"
+role:
 
-gcloud projects add-iam-policy-binding $PROJECT \
-    --member=serviceAccount:$PROJECT@cloudbuild.gserviceaccount.com \
-    --role=roles/container.developer
-```
+- Open the [Cloud Build settings page](https://console.cloud.google.com/cloud-build/settings).
+- You'll see the **Service account permissions** page.
+- Set the status of the "Kubernetes Engine Developer" role to **Enable**.
 
 For most use, kubectl will need to be configured to point to a specific GKE
 cluster. You can configure the cluster by setting environment variables.
