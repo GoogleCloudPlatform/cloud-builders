@@ -1,4 +1,4 @@
-FROM golang:stretch AS build-env
+FROM golang:buster AS build-env
 ADD . /go-src
 WORKDIR /go-src
 ARG cmd
