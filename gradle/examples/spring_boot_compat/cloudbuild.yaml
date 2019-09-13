@@ -1,5 +1,5 @@
 steps:
-- name: 'gcr.io/cloud-builders/gradle:4.6-jdk8'
+- name: 'gcr.io/cloud-builders/gradle:4.6-jdk-8'
   args: ['build']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--tag=gcr.io/$PROJECT_ID/spring-boot', '.']
