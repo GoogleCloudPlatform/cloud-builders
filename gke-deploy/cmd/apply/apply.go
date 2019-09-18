@@ -69,7 +69,7 @@ func NewApplyCommand() *cobra.Command {
 	cmd.Flags().StringVarP(&options.clusterLocation, "location", "l", "", "Region/zone of GKE cluster to deploy to.")
 	cmd.Flags().StringVarP(&options.clusterName, "cluster", "c", "", "Name of GKE cluster to deploy to.")
 	cmd.Flags().StringVarP(&options.clusterProject, "project", "p", "", "Project of GKE cluster to deploy to. If this field is not provided, the current set GCP project is used.")
-	cmd.Flags().StringVarP(&options.namespace, "namespace", "n", "default", "Name of GKE cluster to deploy to.")
+	cmd.Flags().StringVarP(&options.namespace, "namespace", "n", "", "Namespace of GKE cluster to deploy to. If omitted, the namespace(s) specified in each Kubernetes configuration file is used.")
 	cmd.Flags().BoolVarP(&options.verbose, "verbose", "V", false, "Prints underlying commands being called to stdout.")
 	cmd.Flags().DurationVarP(&options.waitTimeout, "timeout", "t", 5*time.Minute, "Timeout limit for waiting for Kubernetes objects to finish applying.")
 
@@ -81,9 +81,6 @@ func apply(_ *cobra.Command, options *options) error {
 
 	if options.filename == "" {
 		return fmt.Errorf("required -f|--filename flag is not set")
-	}
-	if options.namespace == "" {
-		return fmt.Errorf("value of -n|--namespace cannot be empty")
 	}
 	if options.clusterName != "" && options.clusterLocation == "" {
 		return fmt.Errorf("you must set -c|--cluster flag because -l|--location flag is set")

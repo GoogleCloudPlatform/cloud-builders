@@ -18,7 +18,7 @@ import (
 	"testing"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/testservices"
-	"github.com/google/go-containerregistry/pkg/v1"
+	v1 "github.com/google/go-containerregistry/pkg/v1"
 
 	"github.com/google/go-containerregistry/pkg/name"
 )

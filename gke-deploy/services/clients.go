@@ -46,8 +46,8 @@ type GcloudService interface {
 
 // KubectlService is an interface for kubectl operations.
 type KubectlService interface {
-	Apply(ctx context.Context, configs, namespace string) error
-	Get(ctx context.Context, kind, name, namespace, format string) (string, error)
+	ApplyFromString(configString, namespace string) error
+	Get(ctx context.Context, kind, name, namespace, format string, ignoreNotFound bool) (string, error)
 }
 
 // RemoteService is an interface for github.com/google/go-containerregistry/pkg/v1/remote.

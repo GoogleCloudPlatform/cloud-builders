@@ -21,6 +21,10 @@ gcloud container clusters create $GKE_DEPLOY_CLUSTER --num-nodes 3 --zone $GKE_D
 
 ## Tests
 
+### test_gcb_run_usage.sh
+
+Tests `gke-deploy run --help` on GCB. This can be used to check that the test container has the "latest" changes.
+
 ### test_gcb_run.sh
 
 Tests `gke-deploy run` on GCB.
@@ -44,3 +48,7 @@ Tests `gke-deploy prepare` and `gke-deploy apply` locally.
 ### test_local_configs_expose.sh
 
 Tests `gke-deploy run` locally with no -f flag and with -x flag.
+
+### test_local_run_diff_namespaces.sh
+
+Tests `gke-deploy run` locally with no -n flag where each config has its own namespace.

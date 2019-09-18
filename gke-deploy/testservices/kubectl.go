@@ -19,8 +19,8 @@ import (
 
 // TestKubectl implements the KubectlService interface.
 type TestKubectl struct {
-	ApplyResponse map[string]error
-	GetResponse   map[string]map[string]*GetResponse
+	ApplyFromStringResponse map[string]error
+	GetResponse             map[string]map[string]*GetResponse
 }
 
 // StatResponse represents a response tuple for a Stat function call.
@@ -31,16 +31,16 @@ type GetResponse struct {
 }
 
 // Apply calls `kubectl apply -f <configs> -n <namespace>`.
-func (k *TestKubectl) Apply(ctx context.Context, configs, namespace string) error {
-	err, ok := k.ApplyResponse[configs]
+func (k *TestKubectl) ApplyFromString(configString, namespace string) error {
+	err, ok := k.ApplyFromStringResponse[configString]
 	if !ok {
-		panic(fmt.Sprintf("ApplyResponse has no response for configs %q", configs))
+		panic(fmt.Sprintf("ApplyFromStringResponse has no response for configs %q", configString))
 	}
 	return err
 }
 
 // Get calls `kubectl get <kind> <name> -n <namespace> --output=<format>`.
-func (k *TestKubectl) Get(ctx context.Context, kind, name, namespace, format string) (string, error) {
+func (k *TestKubectl) Get(ctx context.Context, kind, name, namespace, format string, ignoreNotFound bool) (string, error) {
 	resp, ok := k.GetResponse[kind][name]
 	if !ok {
 		panic(fmt.Sprintf("GetResponse has no response for kind %q and name %q", kind, name))

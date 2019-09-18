@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 	"text/tabwriter"
 	"time"
@@ -110,7 +109,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 		}
 	}
 
-	if namespace != "default" {
+	if namespace != "" && namespace != "default" {
 		ok, err := resource.HasObject(ctx, objs, "Namespace", namespace)
 		if err != nil {
 			return fmt.Errorf("failed to check if Namespace %q exists: %v", namespace, err)
@@ -151,8 +150,10 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 		}
 	}
 
-	if err := resource.UpdateNamespace(ctx, objs, namespace); err != nil {
-		return fmt.Errorf("failed to update namespace of objects: %v", err)
+	if namespace != "" {
+		if err := resource.UpdateNamespace(ctx, objs, namespace); err != nil {
+			return fmt.Errorf("failed to update namespace of objects: %v", err)
+		}
 	}
 
 	for _, obj := range objs {
@@ -262,19 +263,47 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 
 	fmt.Printf("Applying configuration files to cluster.\n")
 
-	// Apply all namespace objects first, if they exists
+	// Apply all namespace objects first, if they exist
 	for baseName, obj := range objs {
 		if resource.ResourceKind(obj) == "Namespace" {
-			nsFile := filepath.Join(config, baseName)
-			if err := cluster.ApplyConfigs(ctx, nsFile, "", d.Clients.Kubectl); err != nil {
-				return fmt.Errorf("failed to apply Namespace configuration file to cluster: %v", err)
+			nsName, err := resource.ResourceName(obj)
+			if err != nil {
+				return fmt.Errorf("failed to get name of object: %v", err)
 			}
-			// TODO(joonlim): Wait for deployed namespace to be ready before applying other objects
+			exists, err := cluster.DeployedObjectExists(ctx, "Namespace", nsName, "", d.Clients.Kubectl)
+			if err != nil {
+				return fmt.Errorf("failed to check if deployed object with kind \"Namespace\" and name %q exists: %v", nsName, err)
+			}
+			if !exists {
+				fmt.Fprintf(os.Stderr, "\nWARNING: It is recommended that namespaces be created by an administrator. Creating namespace %q because it does not exist.\n\n", nsName)
+				objString, err := resource.EncodeToYAMLString(obj)
+				if err != nil {
+					return fmt.Errorf("failed to encode obj to string")
+				}
+				if err := cluster.ApplyConfigFromString(objString, "", d.Clients.Kubectl); err != nil {
+					return fmt.Errorf("failed to apply Namespace configuration file with name %q to cluster: %v", nsName, err)
+				}
+			}
+			// Delete namespace from list of objects to be deployed because it has already been deployed we do not want it to show up in the deployment summary.
+			delete(objs, baseName)
 		}
 	}
 
-	if err := cluster.ApplyConfigs(ctx, config, namespace, d.Clients.Kubectl); err != nil {
-		return fmt.Errorf("failed to apply configuration files to cluster: %v", err)
+	// Apply each config file individually vs applying the directory to avoid applying namespaces.
+	// Namespace objects are removed from objs at this point.
+	for _, obj := range objs {
+		objName, err := resource.ResourceName(obj)
+		if err != nil {
+			return fmt.Errorf("failed to get name of object: %v", err)
+		}
+		objString, err := resource.EncodeToYAMLString(obj)
+		if err != nil {
+			return fmt.Errorf("failed to encode obj to string")
+		}
+		// If namespace == "", uses the namespace defined in each config.
+		if err := cluster.ApplyConfigFromString(objString, namespace, d.Clients.Kubectl); err != nil {
+			return fmt.Errorf("failed to apply %s configuration file with name %q to cluster: %v", resource.ResourceKind(obj), objName, err)
+		}
 	}
 
 	deployedObjs := resource.Objects{}
@@ -293,7 +322,17 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 			if err != nil {
 				return fmt.Errorf("failed to get name of object: %v", err)
 			}
-			deployedObj, err := cluster.GetDeployedObject(ctx, kind, name, namespace, d.Clients.Kubectl)
+			objNamespace := ""
+			if namespace == "" {
+				ns, err := resource.ResourceNamespace(obj)
+				if err != nil {
+					return fmt.Errorf("failed to get namespace of object: %v", err)
+				}
+				objNamespace = ns
+			} else {
+				objNamespace = namespace
+			}
+			deployedObj, err := cluster.GetDeployedObject(ctx, kind, name, objNamespace, d.Clients.Kubectl)
 			if err != nil {
 				return fmt.Errorf("failed to get configuration of deployed object with kind %q and name %q: %v", kind, name, err)
 			}
