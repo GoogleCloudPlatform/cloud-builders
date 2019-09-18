@@ -59,6 +59,15 @@ type Object struct {
 	*unstructured.Unstructured
 }
 
+// EncodeToYAMLString encodes an object from *Object to a string.
+func EncodeToYAMLString(obj *Object) (string, error) {
+	out, err := runtime.Encode(encoder, obj)
+	if err != nil {
+		return "", fmt.Errorf("failed to encode resource: %v", err)
+	}
+	return string(out), nil
+}
+
 // DecodeFromYAML decodes an object from a YAML string as bytes.
 func DecodeFromYAML(ctx context.Context, yaml []byte) (*Object, error) {
 	obj, err := runtime.Decode(decoder, yaml)

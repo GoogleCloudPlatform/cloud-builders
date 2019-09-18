@@ -1213,8 +1213,9 @@ func TestApply(t *testing.T) {
 					ContainerClustersGetCredentialsErr: nil,
 				},
 				Kubectl: &testservices.TestKubectl{
-					ApplyResponse: map[string]error{
-						configDir: nil,
+					ApplyFromStringResponse: map[string]error{
+						string(fileContents(t, testDeploymentFile)): nil,
+						string(fileContents(t, testServiceFile)):    nil,
 					},
 					GetResponse: map[string]map[string]*testservices.GetResponse{
 						"Deployment": {
@@ -1276,8 +1277,9 @@ func TestApply(t *testing.T) {
 					ContainerClustersGetCredentialsErr: nil,
 				},
 				Kubectl: &testservices.TestKubectl{
-					ApplyResponse: map[string]error{
-						multiResourceYaml: nil,
+					ApplyFromStringResponse: map[string]error{
+						string(fileContents(t, testDeploymentFile)): nil,
+						string(fileContents(t, testServiceFile)):    nil,
 					},
 					GetResponse: map[string]map[string]*testservices.GetResponse{
 						"Deployment": {
@@ -1354,9 +1356,9 @@ func TestApply(t *testing.T) {
 					ContainerClustersGetCredentialsErr: nil,
 				},
 				Kubectl: &testservices.TestKubectl{
-					ApplyResponse: map[string]error{
-						filepath.Join(configDir, namespaceYaml): nil,
-						configDir:                               nil,
+					ApplyFromStringResponse: map[string]error{
+						string(fileContents(t, testNamespaceFile)):  nil,
+						string(fileContents(t, testDeploymentFile)): nil,
 					},
 					GetResponse: map[string]map[string]*testservices.GetResponse{
 						"Deployment": {
@@ -1425,8 +1427,8 @@ func TestApply(t *testing.T) {
 					ContainerClustersGetCredentialsErr: nil,
 				},
 				Kubectl: &testservices.TestKubectl{
-					ApplyResponse: map[string]error{
-						configDir: nil,
+					ApplyFromStringResponse: map[string]error{
+						string(fileContents(t, testServiceFile)): nil,
 					},
 					GetResponse: map[string]map[string]*testservices.GetResponse{
 						"Service": {
@@ -1503,10 +1505,10 @@ func TestApply(t *testing.T) {
 					ContainerClustersGetCredentialsErr: nil,
 				},
 				Kubectl: &testservices.TestKubectl{
-					ApplyResponse: map[string]error{
-						filepath.Join(configDir, namespaceYaml):  nil,
-						filepath.Join(configDir, namespace2Yaml): nil,
-						configDir:                                nil,
+					ApplyFromStringResponse: map[string]error{
+						string(fileContents(t, testNamespaceFile)):  nil,
+						string(fileContents(t, testNamespace2File)): nil,
+						string(fileContents(t, testDeploymentFile)): nil,
 					},
 					GetResponse: map[string]map[string]*testservices.GetResponse{
 						"Deployment": {
@@ -1569,8 +1571,9 @@ func TestApply(t *testing.T) {
 					},
 				},
 				Kubectl: &testservices.TestKubectl{
-					ApplyResponse: map[string]error{
-						multiResourceYaml: nil,
+					ApplyFromStringResponse: map[string]error{
+						string(fileContents(t, testDeploymentFile)): nil,
+						string(fileContents(t, testServiceFile)):    nil,
 					},
 					GetResponse: map[string]map[string]*testservices.GetResponse{
 						"Deployment": {
@@ -1647,9 +1650,9 @@ func TestApply(t *testing.T) {
 					ContainerClustersGetCredentialsErr: nil,
 				},
 				Kubectl: &testservices.TestKubectl{
-					ApplyResponse: map[string]error{
-						filepath.Join(configDir, namespaceYaml): nil,
-						configDir:                               nil,
+					ApplyFromStringResponse: map[string]error{
+						string(fileContents(t, testNamespaceFile)):  nil,
+						string(fileContents(t, testDeploymentFile)): nil,
 					},
 					GetResponse: map[string]map[string]*testservices.GetResponse{
 						"Deployment": {
@@ -1798,8 +1801,8 @@ func TestApplyErrors(t *testing.T) {
 					ContainerClustersGetCredentialsErr: nil,
 				},
 				Kubectl: &testservices.TestKubectl{
-					ApplyResponse: map[string]error{
-						filepath.Join(configDir, namespaceYaml): fmt.Errorf("failed to apply namespace manifest to cluster"),
+					ApplyFromStringResponse: map[string]error{
+						string(fileContents(t, testNamespaceFile)): fmt.Errorf("failed to apply kubernetes manifests to cluster"),
 					},
 					GetResponse: map[string]map[string]*testservices.GetResponse{
 						"Namespace": {
@@ -1858,8 +1861,8 @@ func TestApplyErrors(t *testing.T) {
 					ContainerClustersGetCredentialsErr: nil,
 				},
 				Kubectl: &testservices.TestKubectl{
-					ApplyResponse: map[string]error{
-						configDir: fmt.Errorf("failed to apply kubernetes manifests to cluster"),
+					ApplyFromStringResponse: map[string]error{
+						string(fileContents(t, testDeploymentFile)): fmt.Errorf("failed to apply kubernetes manifests to cluster"),
 					},
 				},
 			},
@@ -1906,8 +1909,8 @@ func TestApplyErrors(t *testing.T) {
 					ContainerClustersGetCredentialsErr: nil,
 				},
 				Kubectl: &testservices.TestKubectl{
-					ApplyResponse: map[string]error{
-						configDir: nil,
+					ApplyFromStringResponse: map[string]error{
+						string(fileContents(t, testServiceFile)): nil,
 					},
 					GetResponse: map[string]map[string]*testservices.GetResponse{
 						"Service": {

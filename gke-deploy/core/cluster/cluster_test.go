@@ -54,33 +54,31 @@ func TestAuthorizeAccessErrors(t *testing.T) {
 	}
 }
 
-func TestApplyConfigs(t *testing.T) {
-	ctx := context.Background()
-	configs := "manifests"
+func TestApplyConfigFromString(t *testing.T) {
+	configString := string(fileContents(t, "testing/deployment.yaml"))
 	namespace := "default"
 	ks := &testservices.TestKubectl{
-		ApplyResponse: map[string]error{
-			configs: nil,
+		ApplyFromStringResponse: map[string]error{
+			configString: nil,
 		},
 	}
 
-	if err := ApplyConfigs(ctx, configs, namespace, ks); err != nil {
-		t.Errorf("ApplyConfigs(ctx, %s, %s, ks) = %v; want <nil>", configs, namespace, err)
+	if err := ApplyConfigFromString(configString, namespace, ks); err != nil {
+		t.Errorf("ApplyConfigFromString(%s, %s, ks) = %v; want <nil>", configString, namespace, err)
 	}
 }
 
-func TestApplyConfigsErrors(t *testing.T) {
-	ctx := context.Background()
-	configs := "manifests"
+func TestApplyConfigFromStringErrors(t *testing.T) {
+	configString := string(fileContents(t, "testing/deployment.yaml"))
 	namespace := "default"
 	ks := &testservices.TestKubectl{
-		ApplyResponse: map[string]error{
-			configs: fmt.Errorf("failed to apply kubernetes manifests to cluster"),
+		ApplyFromStringResponse: map[string]error{
+			configString: fmt.Errorf("failed to apply kubernetes manifests to cluster"),
 		},
 	}
 
-	if err := ApplyConfigs(ctx, configs, namespace, ks); err == nil {
-		t.Errorf("ApplyConfigs(ctx, %s, %s, ks) = <nil>; want error", configs, namespace)
+	if err := ApplyConfigFromString(configString, namespace, ks); err == nil {
+		t.Errorf("ApplyConfigs(%s, %s, ks) = <nil>; want error", configString, namespace)
 	}
 }
 

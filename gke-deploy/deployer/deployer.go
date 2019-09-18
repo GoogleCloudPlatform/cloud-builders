@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 	"text/tabwriter"
 	"time"
@@ -277,8 +276,11 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 			}
 			if !exists {
 				fmt.Fprintf(os.Stderr, "\nWARNING: It is recommended that namespaces be created by an administrator. Creating namespace %q because it does not exist.\n\n", nsName)
-				nsFile := filepath.Join(config, baseName)
-				if err := cluster.ApplyConfigs(ctx, nsFile, "", d.Clients.Kubectl); err != nil {
+				objString, err := resource.EncodeToYAMLString(obj)
+				if err != nil {
+					return fmt.Errorf("failed to encode obj to string")
+				}
+				if err := cluster.ApplyConfigFromString(objString, "", d.Clients.Kubectl); err != nil {
 					return fmt.Errorf("failed to apply Namespace configuration file with name %q to cluster: %v", nsName, err)
 				}
 			}
@@ -289,14 +291,17 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 
 	// Apply each config file individually vs applying the directory to avoid applying namespaces.
 	// Namespace objects are removed from objs at this point.
-	for baseName, obj := range objs {
+	for _, obj := range objs {
 		objName, err := resource.ResourceName(obj)
 		if err != nil {
 			return fmt.Errorf("failed to get name of object: %v", err)
 		}
-		objFile := filepath.Join(config, baseName)
+		objString, err := resource.EncodeToYAMLString(obj)
+		if err != nil {
+			return fmt.Errorf("failed to encode obj to string")
+		}
 		// If namespace == "", uses the namespace defined in each config.
-		if err := cluster.ApplyConfigs(ctx, objFile, namespace, d.Clients.Kubectl); err != nil {
+		if err := cluster.ApplyConfigFromString(objString, namespace, d.Clients.Kubectl); err != nil {
 			return fmt.Errorf("failed to apply %s configuration file with name %q to cluster: %v", resource.ResourceKind(obj), objName, err)
 		}
 	}

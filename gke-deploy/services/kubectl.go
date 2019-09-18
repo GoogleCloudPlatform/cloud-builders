@@ -35,14 +35,14 @@ func NewKubectl(ctx context.Context, printCommands bool) (*Kubectl, error) {
 	}, nil
 }
 
-// Apply calls `kubectl apply -f <configs> -n <namespace>`.
-func (k *Kubectl) Apply(ctx context.Context, configs, namespace string) error {
-	args := []string{"apply", "-f", configs}
+// Apply calls `kubectl apply -f - -n <namespace> < ${configString}`.
+func (k *Kubectl) ApplyFromString(configString, namespace string) error {
+	args := []string{"apply", "-f", "-"}
 	if namespace != "" {
 		args = append(args, "-n", namespace)
 	}
-	if _, err := runCommand(k.printCommands, "kubectl", args...); err != nil {
-		return fmt.Errorf("command to apply kubernetes configs to cluster failed: %v", err)
+	if _, err := runCommandWithStdinRedirection(k.printCommands, "kubectl", configString, args...); err != nil {
+		return fmt.Errorf("command to apply kubernetes config from string to cluster failed: %v", err)
 	}
 	return nil
 }

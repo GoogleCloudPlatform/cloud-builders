@@ -30,10 +30,10 @@ func AuthorizeAccess(ctx context.Context, clusterName, clusterLocation, clusterP
 	return nil
 }
 
-// ApplyConfigs applies a file or directory of files to the current context's cluster.
-func ApplyConfigs(ctx context.Context, configs, namespace string, ks services.KubectlService) error {
-	if err := ks.Apply(ctx, configs, namespace); err != nil {
-		return fmt.Errorf("failed to apply configs: %v", err)
+// ApplyConfigs applies aa config string to the current context's cluster.
+func ApplyConfigFromString(configString, namespace string, ks services.KubectlService) error {
+	if err := ks.ApplyFromString(configString, namespace); err != nil {
+		return fmt.Errorf("failed to apply config from string: %v", err)
 	}
 	return nil
 }
