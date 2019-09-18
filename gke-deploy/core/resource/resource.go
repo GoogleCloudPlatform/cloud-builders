@@ -229,7 +229,7 @@ func UpdateMatchingContainerImage(ctx context.Context, objs Objects, imageName, 
 func UpdateNamespace(ctx context.Context, objs Objects, replace string) error {
 	var hasNS []*Object
 	for _, obj := range objs {
-		ns, err := resourceNamespace(obj)
+		ns, err := ResourceNamespace(obj)
 		if err != nil {
 			return fmt.Errorf("failed to get namespace field: %v", err)
 		}
@@ -352,7 +352,7 @@ func DeploySummary(ctx context.Context, objs Objects) (string, error) {
 	buf := new(bytes.Buffer)
 	w := tabwriter.NewWriter(buf, 0, 0, padding, ' ', 0)
 
-	if _, err := fmt.Fprintln(w, "KIND\tNAME\tREADY\t"); err != nil {
+	if _, err := fmt.Fprintln(w, "NAMESPACE\tKIND\tNAME\tREADY\t"); err != nil {
 		return "", fmt.Errorf("failed to write to writer: %v", err)
 	}
 
@@ -361,6 +361,13 @@ func DeploySummary(ctx context.Context, objs Objects) (string, error) {
 		name, err := ResourceName(obj)
 		if err != nil {
 			return "", fmt.Errorf("failed to get resource name: %v", err)
+		}
+		namespace, err := ResourceNamespace(obj)
+		if err != nil {
+			return "", fmt.Errorf("failed to get namespace of object: %v", err)
+		}
+		if namespace == "" {
+			namespace = "default"
 		}
 
 		extraInfo, err := deploySummaryExtraInfo(obj)
@@ -378,7 +385,7 @@ func DeploySummary(ctx context.Context, objs Objects) (string, error) {
 			ready = "No"
 		}
 
-		if _, err := fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", kind, name, ready, extraInfo); err != nil {
+		if _, err := fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", namespace, kind, name, ready, extraInfo); err != nil {
 			return "", fmt.Errorf("failed to write to writer: %v", err)
 		}
 	}
@@ -629,16 +636,7 @@ func ResourceName(obj *Object) (string, error) {
 	return accessor.GetName(), nil
 }
 
-func setResourceName(obj *Object, name string) error {
-	accessor, err := meta.Accessor(obj)
-	if err != nil {
-		return fmt.Errorf("failed to get metadata accessor from object: %v", err)
-	}
-	accessor.SetName(name)
-	return nil
-}
-
-func resourceNamespace(obj *Object) (string, error) {
+func ResourceNamespace(obj *Object) (string, error) {
 	accessor, err := meta.Accessor(obj)
 	if err != nil {
 		return "", fmt.Errorf("failed to get metadata accessor from object: %v", err)

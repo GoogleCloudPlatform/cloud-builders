@@ -1555,15 +1555,15 @@ func TestDeploySummary(t *testing.T) {
 			"h": newObjectFromFile(t, testStatefulsetUnreadyFile),
 		},
 
-		want: `KIND                     NAME                              READY    
-CronJob                  test-cron-job                     Yes      
-DaemonSet                test-app-daemonset                Yes      
-Deployment               test-app                          Yes      
-Namespace                foobar                            Yes      
-ReplicationController    test-app-replicationcontroller    Yes      
-Service                  test-app                          Yes      34.74.85.152
-Service                  test-app-service-externalname     Yes      test-app.example.com
-StatefulSet              test-app-statefulset              No       
+		want: `NAMESPACE                KIND                     NAME                              READY    
+default                  CronJob                  test-cron-job                     Yes      
+default                  DaemonSet                test-app-daemonset                Yes      
+foobar                   Deployment               test-app                          Yes      
+default                  Namespace                foobar                            Yes      
+test-local-deploy-all    ReplicationController    test-app-replicationcontroller    Yes      
+foobar                   Service                  test-app                          Yes      34.74.85.152
+foobar                   Service                  test-app-service-externalname     Yes      test-app.example.com
+default                  StatefulSet              test-app-statefulset              No       
 `,
 	}, {
 		name: "LoadBalancer Service not ready",
@@ -1579,15 +1579,15 @@ StatefulSet              test-app-statefulset              No
 			"h": newObjectFromFile(t, testStatefulsetUnreadyFile),
 		},
 
-		want: `KIND                     NAME                              READY    
-CronJob                  test-cron-job                     Yes      
-DaemonSet                test-app-daemonset                Yes      
-Deployment               test-app                          Yes      
-Namespace                foobar                            Yes      
-ReplicationController    test-app-replicationcontroller    Yes      
-Service                  test-app                          No       
-Service                  test-app-service-externalname     Yes      test-app.example.com
-StatefulSet              test-app-statefulset              No       
+		want: `NAMESPACE                KIND                     NAME                              READY    
+default                  CronJob                  test-cron-job                     Yes      
+default                  DaemonSet                test-app-daemonset                Yes      
+foobar                   Deployment               test-app                          Yes      
+default                  Namespace                foobar                            Yes      
+test-local-deploy-all    ReplicationController    test-app-replicationcontroller    Yes      
+foobar                   Service                  test-app                          No       
+foobar                   Service                  test-app-service-externalname     Yes      test-app.example.com
+default                  StatefulSet              test-app-statefulset              No       
 `,
 	}}
 

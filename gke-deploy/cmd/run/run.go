@@ -88,7 +88,7 @@ func NewRunCommand() *cobra.Command {
 	cmd.Flags().StringVarP(&options.clusterProject, "project", "p", "", "Project of GKE cluster to deploy to. If this field is not provided, the current set GCP project is used.")
 	cmd.Flags().StringVarP(&options.image, "image", "i", "", "Image to be deployed.")
 	cmd.Flags().StringSliceVarP(&options.labels, "label", "L", nil, "Label(s) to add to Kubernetes configuration files (k1=v1). Labels can be set comma-delimited or as separate flags. If two or more labels with the same key are listed, the last one is used.")
-	cmd.Flags().StringVarP(&options.namespace, "namespace", "n", "default", "Namespace of GKE cluster to deploy to.")
+	cmd.Flags().StringVarP(&options.namespace, "namespace", "n", "", "Namespace of GKE cluster to deploy to. If omitted, the namespace(s) specified in each Kubernetes configuration file is used.")
 	cmd.Flags().StringVarP(&options.output, "output", "o", "./output", "Target directory to store suggested and expanded Kubernetes configuration files. Suggested files will be stored in \"<output>/suggested\" and expanded files will be stored in \"<output>/expanded\".")
 	cmd.Flags().IntVarP(&options.exposePort, "expose", "x", 0, "Creates a Service object that connects to a deployed workload object using a selector that matches the label with key as 'app' and value of the image name's suffix specified by --image. The port provided will be used to expose the deployed workload object (i.e., port and targetPort will be set to the value provided in this flag).")
 	cmd.Flags().BoolVarP(&options.verbose, "verbose", "V", false, "Prints underlying commands being called to stdout.")
@@ -111,9 +111,6 @@ func run(_ *cobra.Command, options *options) error {
 
 	if options.filename == "" && options.image == "" {
 		return fmt.Errorf("omitting -f|--filename requires -i|--image to be set")
-	}
-	if options.namespace == "" {
-		return fmt.Errorf("value of -n|--namespace cannot be empty")
 	}
 	if options.output == "" {
 		return fmt.Errorf("value of -o|--output cannot be empty")

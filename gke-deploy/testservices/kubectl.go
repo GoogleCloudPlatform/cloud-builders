@@ -40,7 +40,7 @@ func (k *TestKubectl) Apply(ctx context.Context, configs, namespace string) erro
 }
 
 // Get calls `kubectl get <kind> <name> -n <namespace> --output=<format>`.
-func (k *TestKubectl) Get(ctx context.Context, kind, name, namespace, format string) (string, error) {
+func (k *TestKubectl) Get(ctx context.Context, kind, name, namespace, format string, ignoreNotFound bool) (string, error) {
 	resp, ok := k.GetResponse[kind][name]
 	if !ok {
 		panic(fmt.Sprintf("GetResponse has no response for kind %q and name %q", kind, name))

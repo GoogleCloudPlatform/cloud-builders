@@ -40,9 +40,22 @@ func ApplyConfigs(ctx context.Context, configs, namespace string, ks services.Ku
 
 // GetDeployedObject gets an object deployed to the current context's cluster.
 func GetDeployedObject(ctx context.Context, kind, name, namespace string, ks services.KubectlService) (*resource.Object, error) {
-	objYaml, err := ks.Get(ctx, kind, name, namespace, "yaml")
+	objYaml, err := ks.Get(ctx, kind, name, namespace, "yaml", false)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get config of deployed object: %v", err)
 	}
 	return resource.DecodeFromYAML(ctx, []byte(objYaml))
+}
+
+// DeployedObjectExists returns true if a deployed object exists in the current context's cluster,
+// else false.
+func DeployedObjectExists(ctx context.Context, kind, name, namespace string, ks services.KubectlService) (bool, error) {
+	objYaml, err := ks.Get(ctx, kind, name, namespace, "yaml", true)
+	if err != nil {
+		return false, fmt.Errorf("failed to get config of deployed object: %v", err)
+	}
+	if objYaml == "" {
+		return false, nil
+	}
+	return true, nil
 }

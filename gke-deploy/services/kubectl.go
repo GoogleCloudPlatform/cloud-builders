@@ -48,10 +48,16 @@ func (k *Kubectl) Apply(ctx context.Context, configs, namespace string) error {
 }
 
 // Get calls `kubectl get <kind> <name> -n <namespace> --output=<format>`.
-func (k *Kubectl) Get(ctx context.Context, kind, name, namespace, format string) (string, error) {
-	args := []string{"get", kind, name, "-n", namespace}
+func (k *Kubectl) Get(ctx context.Context, kind, name, namespace, format string, ignoreNotFound bool) (string, error) {
+	args := []string{"get", kind, name}
+	if namespace != "" {
+		args = append(args, "-n", namespace)
+	}
 	if format != "" {
 		args = append(args, fmt.Sprintf("--output=%s", format))
+	}
+	if ignoreNotFound {
+		args = append(args, "--ignore-not-found=true")
 	}
 	out, err := runCommand(k.printCommands, "kubectl", args...)
 	if err != nil {

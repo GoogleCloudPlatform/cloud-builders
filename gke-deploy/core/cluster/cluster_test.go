@@ -84,7 +84,7 @@ func TestApplyConfigsErrors(t *testing.T) {
 	}
 }
 
-func TestGetDeployedObjects(t *testing.T) {
+func TestGetDeployedObject(t *testing.T) {
 	ctx := context.Background()
 
 	testDeploymentFile := "testing/deployment.yaml"
@@ -149,6 +149,116 @@ func TestGetDeployedObjects(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			if got, err := GetDeployedObject(ctx, tc.kind, tc.objName, tc.namespace, tc.ks); !reflect.DeepEqual(got, tc.want) || err != nil {
 				t.Errorf("GetDeployedObject(ctx, %s, %s, %s, ks,) = %v, %v; want %v, <nil>", tc.kind, tc.objName, tc.namespace, got, err, tc.want)
+			}
+		})
+	}
+}
+
+func TestDeployedObjectExists(t *testing.T) {
+	ctx := context.Background()
+
+	testDeploymentFile := "testing/deployment.yaml"
+
+	tests := []struct {
+		name string
+
+		kind      string
+		objName   string
+		namespace string
+		ks        services.KubectlService
+
+		want bool
+	}{{
+		name: "Deployed deployment exists",
+
+		kind:      "Deployment",
+		objName:   "test-app",
+		namespace: "default",
+		ks: &testservices.TestKubectl{
+			GetResponse: map[string]map[string]*testservices.GetResponse{
+				"Deployment": {
+					"test-app": {
+						Res: []string{
+							string(fileContents(t, testDeploymentFile)),
+						},
+						Err: []error{
+							nil,
+						},
+					},
+				},
+			},
+		},
+
+		want: true,
+	}, {
+		name: "Deployed service does not exist",
+
+		kind:      "Service",
+		objName:   "test-app",
+		namespace: "default",
+		ks: &testservices.TestKubectl{
+			GetResponse: map[string]map[string]*testservices.GetResponse{
+				"Service": {
+					"test-app": {
+						Res: []string{
+							"",
+						},
+						Err: []error{
+							nil,
+						},
+					},
+				},
+			},
+		},
+
+		want: false,
+	}}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if got, err := DeployedObjectExists(ctx, tc.kind, tc.objName, tc.namespace, tc.ks); got != tc.want || err != nil {
+				t.Errorf("DeployedObjectExists(ctx, %s, %s, %s, ks,) = %t, %v; want %t, <nil>", tc.kind, tc.objName, tc.namespace, got, err, tc.want)
+			}
+		})
+	}
+}
+
+func TestDeployedObjectExistsErrors(t *testing.T) {
+	ctx := context.Background()
+
+	tests := []struct {
+		name string
+
+		kind      string
+		objName   string
+		namespace string
+		ks        services.KubectlService
+	}{{
+		name: "Failed to check if object exists",
+
+		kind:      "Service",
+		objName:   "test-app",
+		namespace: "default",
+		ks: &testservices.TestKubectl{
+			GetResponse: map[string]map[string]*testservices.GetResponse{
+				"Service": {
+					"test-app": {
+						Res: []string{
+							"",
+						},
+						Err: []error{
+							fmt.Errorf("failed to get service"),
+						},
+					},
+				},
+			},
+		},
+	}}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if got, err := DeployedObjectExists(ctx, tc.kind, tc.objName, tc.namespace, tc.ks); err == nil {
+				t.Errorf("DeployedObjectExists(ctx, %s, %s, %s, ks,) = %t, <nil>; want false, error", tc.kind, tc.objName, tc.namespace, got)
 			}
 		})
 	}
