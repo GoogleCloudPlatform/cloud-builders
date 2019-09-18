@@ -279,7 +279,7 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 				fmt.Fprintf(os.Stderr, "\nWARNING: It is recommended that namespaces be created by an administrator. Creating namespace %q because it does not exist.\n\n", nsName)
 				nsFile := filepath.Join(config, baseName)
 				if err := cluster.ApplyConfigs(ctx, nsFile, "", d.Clients.Kubectl); err != nil {
-					return fmt.Errorf("failed to apply Namespace configuration file to cluster: %v", err)
+					return fmt.Errorf("failed to apply Namespace configuration file with name %q to cluster: %v", nsName, err)
 				}
 			}
 			// Delete namespace from list of objects to be deployed because it has already been deployed we do not want it to show up in the deployment summary.
@@ -287,9 +287,18 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 		}
 	}
 
-	// If namespace == "", use the namespace defined in each config.
-	if err := cluster.ApplyConfigs(ctx, config, namespace, d.Clients.Kubectl); err != nil {
-		return fmt.Errorf("failed to apply configuration files to cluster: %v", err)
+	// Apply each config file individually vs applying the directory to avoid applying namespaces.
+	// Namespace objects are removed from objs at this point.
+	for baseName, obj := range objs {
+		objName, err := resource.ResourceName(obj)
+		if err != nil {
+			return fmt.Errorf("failed to get name of object: %v", err)
+		}
+		objFile := filepath.Join(config, baseName)
+		// If namespace == "", uses the namespace defined in each config.
+		if err := cluster.ApplyConfigs(ctx, objFile, namespace, d.Clients.Kubectl); err != nil {
+			return fmt.Errorf("failed to apply %s configuration file with name %q to cluster: %v", resource.ResourceKind(obj), objName, err)
+		}
 	}
 
 	deployedObjs := resource.Objects{}
