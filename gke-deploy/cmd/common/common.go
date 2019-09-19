@@ -24,8 +24,9 @@ import (
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
 )
 
-// CreateLabelsMap creates a map[string]string from a slice of "="-delimited strings.
-func CreateLabelsMap(labels []string) (map[string]string, error) {
+// CreateMapFromEqualDelimitedStrings creates a map[string]string from a slice
+// of "="-delimited strings.
+func CreateMapFromEqualDelimitedStrings(labels []string) (map[string]string, error) {
 	labelsMap := make(map[string]string)
 	for _, label := range labels {
 		p := strings.TrimSpace(label)
@@ -35,15 +36,15 @@ func CreateLabelsMap(labels []string) (map[string]string, error) {
 		}
 		kv := strings.Split(p, "=")
 		if len(kv) != 2 {
-			return nil, fmt.Errorf("invalid label: %q", p)
+			return nil, fmt.Errorf("invalid key value pair: %q", p)
 		}
 		k := strings.TrimSpace(kv[0])
 		if k == "" {
-			return nil, fmt.Errorf("invalid label: key must not be empty string")
+			return nil, fmt.Errorf("key must not be empty string")
 		}
 		v := strings.TrimSpace(kv[1])
 		if v == "" {
-			return nil, fmt.Errorf("invalid label: value must not be empty string")
+			return nil, fmt.Errorf("value must not be empty string")
 		}
 		labelsMap[k] = v
 	}

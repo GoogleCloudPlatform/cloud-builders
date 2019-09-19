@@ -37,6 +37,7 @@ gke-deploy run \
 -a "test-name" \
 -v "test-version" \
 -L "foo=bar" \
+-A "hi=bye" \
 -p "${GKE_DEPLOY_PROJECT}" \
 -c "${GKE_DEPLOY_CLUSTER}" \
 -l "${GKE_DEPLOY_LOCATION}" \
@@ -54,6 +55,7 @@ grep -Fq "app.kubernetes.io/managed-by: gcp-cloud-build-deploy" deployment.yaml 
 grep -Fq "app.kubernetes.io/name: test-name" deployment.yaml || fail "\"app.kubernetes.io/name: test-name\" label does not exist"
 grep -Fq "app.kubernetes.io/version: test-version" deployment.yaml || fail "\"app.kubernetes.io/version: test-version\" label does note exist"
 grep -Fq "foo: bar" deployment.yaml || fail "\"foo: bar\" label does not exist"
+grep -Fq "hi: bye" deployment.yaml || fail "\"hi: bye\" annotation does not exist"
 grep -Fq "gcr.io/google-containers/nginx@sha256" deployment.yaml || fail "\"gcr.io/google-containers/nginx@sha256\" container not found" # Can't guarantee digest won't change, but can check that a digest was added.
 kubectl get hpa test-hpa -n b -o yaml
 kubectl get service test-service -n c -o yaml

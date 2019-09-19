@@ -69,6 +69,7 @@ steps:
   - '--version=test-version'
   - '--namespace=$_NAMESPACE'
   - '--label=foo=bar'
+  - '--annotation=hi=bye'
   - '--output=output'
   - '--cluster=$_CLUSTER'
   - '--location=$_LOCATION'
@@ -87,6 +88,7 @@ steps:
     grep -Fq "app.kubernetes.io/name: test-name" deployment.yaml
     grep -Fq "app.kubernetes.io/version: test-version" deployment.yaml
     grep -Fq "foo: bar" deployment.yaml
+    grep -Fq "hi: bye" deployment.yaml
     grep -Fq "gcr.io/google-containers/nginx@sha256" deployment.yaml  # Can't guarantee digest won't change, but can check that a digest was added.
     kubectl get service nginx-service -n $_NAMESPACE -o yaml > service.yaml
     SERVICE_IP="$(grep -F "ip:" service.yaml | awk '{print $$NF}')"

@@ -46,7 +46,7 @@ type Deployer struct {
 }
 
 // Prepare handles preparing deployment.
-func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appVersion, config, suggestedOutput, expandedOutput, namespace string, labels map[string]string, exposePort int) error {
+func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appVersion, config, suggestedOutput, expandedOutput, namespace string, labels, annotations map[string]string, exposePort int) error {
 	fmt.Printf("Preparing deployment.\n")
 
 	var objs resource.Objects
@@ -187,6 +187,12 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 
 			if err := resource.AddLabel(ctx, obj, k, v, true); err != nil {
 				return fmt.Errorf("failed to add %s=%s custom label to object %v: %v", k, v, obj, err)
+			}
+		}
+
+		for k, v := range annotations {
+			if err := resource.AddAnnotation(obj, k, v); err != nil {
+				return fmt.Errorf("failed to add %s=%s custom annotation to object %v: %v", k, v, obj, err)
 			}
 		}
 	}

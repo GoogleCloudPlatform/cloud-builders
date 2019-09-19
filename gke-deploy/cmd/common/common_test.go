@@ -17,17 +17,17 @@ import (
 	"testing"
 )
 
-func TestCreateLabelsMap(t *testing.T) {
+func TestCreateMapFromEqualDelimitedStrings(t *testing.T) {
 	tests := []struct {
 		name string
 
-		labels []string
+		keyValues []string
 
 		want map[string]string
 	}{{
 		name: "Normal case",
 
-		labels: []string{
+		keyValues: []string{
 			"a=b",
 			"c=d",
 			"d=f",
@@ -39,15 +39,15 @@ func TestCreateLabelsMap(t *testing.T) {
 			"d": "f",
 		},
 	}, {
-		name: "No labels",
+		name: "No keyValues",
 
-		labels: []string{},
+		keyValues: []string{},
 
 		want: map[string]string{},
 	}, {
 		name: "Trailing comma",
 
-		labels: []string{
+		keyValues: []string{
 			"a=b",
 			"c=d",
 			"d=f,",
@@ -61,7 +61,7 @@ func TestCreateLabelsMap(t *testing.T) {
 	}, {
 		name: "Leading comma",
 
-		labels: []string{
+		keyValues: []string{
 			",a=b",
 			"c=d",
 			"d=f",
@@ -75,7 +75,7 @@ func TestCreateLabelsMap(t *testing.T) {
 	}, {
 		name: "Trailing whitespace",
 
-		labels: []string{
+		keyValues: []string{
 			"a=b",
 			"c=d",
 			"d=f    ",
@@ -89,7 +89,7 @@ func TestCreateLabelsMap(t *testing.T) {
 	}, {
 		name: "Leading whitespace",
 
-		labels: []string{
+		keyValues: []string{
 			"     a=b",
 			"c=d",
 			"d=f",
@@ -103,7 +103,7 @@ func TestCreateLabelsMap(t *testing.T) {
 	}, {
 		name: "Handles whitespace",
 
-		labels: []string{
+		keyValues: []string{
 			" \n a = b  \n\n",
 			"\t c = \nd ",
 			"d =  f\t",
@@ -118,48 +118,48 @@ func TestCreateLabelsMap(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if got, err := CreateLabelsMap(tc.labels); !reflect.DeepEqual(got, tc.want) || err != nil {
-				t.Errorf("CreateLabelsMap(%s) = %v, %v; want %v, <nil>", tc.labels, got, err, tc.want)
+			if got, err := CreateMapFromEqualDelimitedStrings(tc.keyValues); !reflect.DeepEqual(got, tc.want) || err != nil {
+				t.Errorf("CreateMapFromEqualDelimitedStrings(%s) = %v, %v; want %v, <nil>", tc.keyValues, got, err, tc.want)
 			}
 		})
 	}
 }
 
-func TestCreateLabelsMapErrors(t *testing.T) {
+func TestCreateMapFromEqualDelimitedStringsErrors(t *testing.T) {
 	tests := []struct {
 		name string
 
-		labels []string
+		keyValues []string
 	}{{
 		name: "No =",
 
-		labels: []string{
+		keyValues: []string{
 			"a",
 		},
 	}, {
 		name: "More than one =",
 
-		labels: []string{
+		keyValues: []string{
 			"a=b=",
 		},
 	}, {
 		name: "No key",
 
-		labels: []string{
+		keyValues: []string{
 			"=b",
 		},
 	}, {
 		name: "No value",
 
-		labels: []string{
+		keyValues: []string{
 			"a=",
 		},
 	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if got, err := CreateLabelsMap(tc.labels); got != nil || err == nil {
-				t.Errorf("CreateLabelsMap(%s) = %v, %v; want <nil>, err", tc.labels, got, err)
+			if got, err := CreateMapFromEqualDelimitedStrings(tc.keyValues); got != nil || err == nil {
+				t.Errorf("CreateMapFromEqualDelimitedStrings(%s) = %v, %v; want <nil>, err", tc.keyValues, got, err)
 			}
 		})
 	}

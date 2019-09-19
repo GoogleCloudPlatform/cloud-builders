@@ -587,7 +587,7 @@ func AddLabel(ctx context.Context, obj *Object, key, value string, override bool
 		return fmt.Errorf("key and value cannot be empty")
 	}
 
-	if err := addLabelToNestedField(obj, key, value, override, "metadata", "labels"); err != nil {
+	if err := addToNestedMap(obj, key, value, override, "metadata", "labels"); err != nil {
 		return err
 	}
 
@@ -600,31 +600,58 @@ func AddLabel(ctx context.Context, obj *Object, key, value string, override bool
 	default:
 		return nil
 	}
-	if err := addLabelToNestedField(obj, key, value, override, nestedFields...); err != nil {
+	if err := addToNestedMap(obj, key, value, override, nestedFields...); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func addLabelToNestedField(obj *Object, key, value string, override bool, nestedFields ...string) error {
-	labels, ok, err := unstructured.NestedMap(obj.Object, nestedFields...)
+// AddAnnotation updates an object to add an annotation with the key and value
+// provided.
+func AddAnnotation(obj *Object, key, value string) error {
+	if key == "" || value == "" {
+		return fmt.Errorf("key and value cannot be empty")
+	}
+
+	if err := addToNestedMap(obj, key, value, true, "metadata", "annotations"); err != nil {
+		return err
+	}
+
+	var nestedFields []string
+	switch kind := ResourceKind(obj); kind {
+	case "CronJob":
+		nestedFields = []string{"spec", "jobTemplate", "spec", "template", "metadata", "annotations"}
+	case "DaemonSet", "Deployment", "Job", "ReplicaSet", "ReplicationController", "StatefulSet":
+		nestedFields = []string{"spec", "template", "metadata", "annotations"}
+	default:
+		return nil
+	}
+	if err := addToNestedMap(obj, key, value, true, nestedFields...); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func addToNestedMap(obj *Object, key, value string, override bool, nestedFields ...string) error {
+	mapField, ok, err := unstructured.NestedMap(obj.Object, nestedFields...)
 	if err != nil {
-		return fmt.Errorf("failed to get labels field: %v", err)
+		return fmt.Errorf("failed to get map field: %v", err)
 	}
 
 	if !ok {
-		labels = make(map[string]interface{})
+		mapField = make(map[string]interface{})
 	}
 
-	if existing, ok := labels[key]; ok && !override {
+	if existing, ok := mapField[key]; ok && !override {
 		if existing != value {
-			fmt.Fprintf(os.Stderr, "\nWARNING: Label %q is already set as %q for object %v in %v field. Not overriding.\n", key, existing, obj, strings.Join(nestedFields, "."))
+			fmt.Fprintf(os.Stderr, "\nWARNING: Key %q is already set as %q for object %v in %v field. Not overriding.\n", key, existing, obj, strings.Join(nestedFields, "."))
 		}
 	} else {
-		labels[key] = value
-		if err := unstructured.SetNestedMap(obj.Object, labels, nestedFields...); err != nil {
-			return fmt.Errorf("failed to set labels field: %v", err)
+		mapField[key] = value
+		if err := unstructured.SetNestedMap(obj.Object, mapField, nestedFields...); err != nil {
+			return fmt.Errorf("failed to set map field: %v", err)
 		}
 	}
 

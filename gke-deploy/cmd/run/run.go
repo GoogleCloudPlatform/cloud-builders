@@ -57,6 +57,7 @@ type options struct {
 	clusterProject  string
 	image           string
 	labels          []string
+	annotations     []string
 	namespace       string
 	output          string
 	exposePort      int
@@ -89,6 +90,7 @@ func NewRunCommand() *cobra.Command {
 	cmd.Flags().StringVarP(&options.image, "image", "i", "", "Image to be deployed.")
 	cmd.Flags().StringSliceVarP(&options.labels, "label", "L", nil, "Label(s) to add to Kubernetes configuration files (k1=v1). Labels can be set comma-delimited or as separate flags. If two or more labels with the same key are listed, the last one is used.")
 	cmd.Flags().StringVarP(&options.namespace, "namespace", "n", "", "Namespace of GKE cluster to deploy to. If omitted, the namespace(s) specified in each Kubernetes configuration file is used.")
+	cmd.Flags().StringSliceVarP(&options.annotations, "annotation", "A", nil, "Annotation(s) to add to Kubernetes configuration files (k1=v1). Annotations can be set comma-delimited or as separate flags. If two or more annotations with the same key are listed, the last one is used.")
 	cmd.Flags().StringVarP(&options.output, "output", "o", "./output", "Target directory to store suggested and expanded Kubernetes configuration files. Suggested files will be stored in \"<output>/suggested\" and expanded files will be stored in \"<output>/expanded\".")
 	cmd.Flags().IntVarP(&options.exposePort, "expose", "x", 0, "Creates a Service object that connects to a deployed workload object using a selector that matches the label with key as 'app' and value of the image name's suffix specified by --image. The port provided will be used to expose the deployed workload object (i.e., port and targetPort will be set to the value provided in this flag).")
 	cmd.Flags().BoolVarP(&options.verbose, "verbose", "V", false, "Prints underlying commands being called to stdout.")
@@ -134,7 +136,11 @@ func run(_ *cobra.Command, options *options) error {
 		return fmt.Errorf("exposing a deployed workload object requires -i|--image to be set")
 	}
 
-	labelsMap, err := common.CreateLabelsMap(options.labels)
+	labelsMap, err := common.CreateMapFromEqualDelimitedStrings(options.labels)
+	if err != nil {
+		return err
+	}
+	annotationsMap, err := common.CreateMapFromEqualDelimitedStrings(options.annotations)
 	if err != nil {
 		return err
 	}
@@ -144,7 +150,7 @@ func run(_ *cobra.Command, options *options) error {
 	}
 
 	expandedOutput := common.ExpandedOutputPath(options.output)
-	if err := d.Prepare(ctx, im, options.appName, options.appVersion, options.filename, common.SuggestedOutputPath(options.output), expandedOutput, options.namespace, labelsMap, options.exposePort); err != nil {
+	if err := d.Prepare(ctx, im, options.appName, options.appVersion, options.filename, common.SuggestedOutputPath(options.output), expandedOutput, options.namespace, labelsMap, annotationsMap, options.exposePort); err != nil {
 		return fmt.Errorf("failed to prepare deployment: %v", err)
 	}
 	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, expandedOutput, options.namespace, options.waitTimeout); err != nil {

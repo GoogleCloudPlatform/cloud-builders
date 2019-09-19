@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  annotations:
+    foo: bar
+  name: test-replication-controller
+spec:
+  replicas: 3
+  template:
+    metadata:
+      annotations:
+        foo: bar
+      labels:
+        app: test-replication-controller
+    spec:
+      containers:
+        - image: gcr.io/cbd-test/test-app:latest
+          name: test-app
