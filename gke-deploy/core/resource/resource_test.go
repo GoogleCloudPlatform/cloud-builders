@@ -1261,6 +1261,137 @@ func TestAddLabelErrors(t *testing.T) {
 	}
 }
 
+func TestAddAnnotation(t *testing.T) {
+	testDeploymentFile := "testing/deployment.yaml"
+	testDeploymentUpdatedAnnotationFile := "testing/deployment-updated-annotation.yaml"
+	testCronjobFile := "testing/cronjob.yaml"
+	testCronjobUpdatedAnnotationFile := "testing/cronjob-updated-annotation.yaml"
+	testDaemonsetFile := "testing/daemonset.yaml"
+	testDaemonsetUpdatedAnnotationFile := "testing/daemonset-updated-annotation.yaml"
+	testJobFile := "testing/job.yaml"
+	testJobUpdatedAnnotationFile := "testing/job-updated-annotation.yaml"
+	testReplicasetFile := "testing/replicaset.yaml"
+	testReplicasetUpdatedAnnotationFile := "testing/replicaset-updated-annotation.yaml"
+	testReplicationcontrollerFile := "testing/replicationcontroller.yaml"
+	testReplicationcontrollerUpdatedAnnotationFile := "testing/replicationcontroller-updated-annotation.yaml"
+	testStatefulsetFile := "testing/statefulset.yaml"
+	testStatefulsetUpdatedAnnotationFile := "testing/statefulset-updated-annotation.yaml"
+
+	tests := []struct {
+		name string
+
+		obj   *Object
+		key   string
+		value string
+
+		beforeUpdate *Object
+		want         *Object
+	}{{
+		name: "Normal case",
+
+		obj:   newObjectFromFile(t, testDeploymentFile),
+		key:   "foo",
+		value: "bar",
+
+		beforeUpdate: newObjectFromFile(t, testDeploymentFile),
+		want:         newObjectFromFile(t, testDeploymentUpdatedAnnotationFile),
+	}, {
+		name: "No existing annotations field",
+
+		obj:   newObjectFromFile(t, testCronjobFile),
+		key:   "foo",
+		value: "bar",
+
+		beforeUpdate: newObjectFromFile(t, testCronjobFile),
+		want:         newObjectFromFile(t, testCronjobUpdatedAnnotationFile),
+	}, {
+		name: "DaemonSet nested template",
+
+		obj:   newObjectFromFile(t, testDaemonsetFile),
+		key:   "foo",
+		value: "bar",
+
+		beforeUpdate: newObjectFromFile(t, testDaemonsetFile),
+		want:         newObjectFromFile(t, testDaemonsetUpdatedAnnotationFile),
+	}, {
+		name: "Job nested template",
+
+		obj:   newObjectFromFile(t, testJobFile),
+		key:   "foo",
+		value: "bar",
+
+		beforeUpdate: newObjectFromFile(t, testJobFile),
+		want:         newObjectFromFile(t, testJobUpdatedAnnotationFile),
+	}, {
+		name: "ReplicaSet nested template",
+
+		obj:   newObjectFromFile(t, testReplicasetFile),
+		key:   "foo",
+		value: "bar",
+
+		beforeUpdate: newObjectFromFile(t, testReplicasetFile),
+		want:         newObjectFromFile(t, testReplicasetUpdatedAnnotationFile),
+	}, {
+		name: "ReplicationController nested template",
+
+		obj:   newObjectFromFile(t, testReplicationcontrollerFile),
+		key:   "foo",
+		value: "bar",
+
+		beforeUpdate: newObjectFromFile(t, testReplicationcontrollerFile),
+		want:         newObjectFromFile(t, testReplicationcontrollerUpdatedAnnotationFile),
+	}, {
+		name: "StatefulSet nested template",
+
+		obj:   newObjectFromFile(t, testStatefulsetFile),
+		key:   "foo",
+		value: "bar",
+
+		beforeUpdate: newObjectFromFile(t, testStatefulsetFile),
+		want:         newObjectFromFile(t, testStatefulsetUpdatedAnnotationFile),
+	}}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if err := AddAnnotation(tc.obj, tc.key, tc.value); !reflect.DeepEqual(tc.obj, tc.want) || err != nil {
+				t.Errorf("AddAnnotation(%v, %s, %s) = %v, %v; want <nil>, %v", tc.beforeUpdate, tc.key, tc.value, err, tc.obj, tc.want)
+			}
+		})
+	}
+}
+
+func TestAddAnnotationErrors(t *testing.T) {
+	testDeploymentFile := "testing/deployment.yaml"
+
+	tests := []struct {
+		name string
+
+		obj   *Object
+		key   string
+		value string
+	}{{
+		name: "Empty key",
+
+		obj:   newObjectFromFile(t, testDeploymentFile),
+		key:   "",
+		value: "bar",
+	}, {
+		name: "Empty value",
+
+		obj:   newObjectFromFile(t, testDeploymentFile),
+		key:   "foo",
+		value: "",
+	}}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if err := AddAnnotation(tc.obj, tc.key, tc.value); err == nil {
+				t.Errorf("AddAnnotation(%v, %s, %s) = <nil>; want error", tc.obj, tc.key, tc.value)
+			}
+		})
+	}
+}
+
 func TestUpdateNamespace(t *testing.T) {
 	ctx := context.Background()
 

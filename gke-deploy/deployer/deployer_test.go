@@ -42,6 +42,7 @@ func TestPrepare(t *testing.T) {
 	expandedDir := "path/to/outputDir/expanded"
 	namespace := "default"
 	labels := make(map[string]string)
+	annotations := make(map[string]string)
 
 	configDir := "path/to/config"
 	deploymentYaml := "deployment.yaml"
@@ -61,6 +62,7 @@ func TestPrepare(t *testing.T) {
 		expandedOutput  string
 		namespace       string
 		labels          map[string]string
+		annotations     map[string]string
 		exposePort      int
 
 		deployer *Deployer
@@ -74,6 +76,7 @@ func TestPrepare(t *testing.T) {
 		suggestedOutput: suggestedDir,
 		expandedOutput:  expandedDir,
 		labels:          labels,
+		annotations:     annotations,
 		namespace:       namespace,
 		exposePort:      0,
 
@@ -166,6 +169,7 @@ func TestPrepare(t *testing.T) {
 		suggestedOutput: suggestedDir,
 		expandedOutput:  expandedDir,
 		labels:          labels,
+		annotations:     annotations,
 		namespace:       namespace,
 		exposePort:      0,
 
@@ -227,6 +231,82 @@ func TestPrepare(t *testing.T) {
 		suggestedOutput: suggestedDir,
 		expandedOutput:  expandedDir,
 		labels: map[string]string{
+			"foo":         "bar",
+			"hi":          "bye",
+			"a/b/c.d.f.g": "h/i/j.k.l.m",
+		},
+		annotations: annotations,
+		namespace:   namespace,
+		exposePort:  0,
+
+		deployer: &Deployer{
+			Clients: &services.Clients{
+				OS: &testservices.TestOS{
+					StatResponse: map[string]testservices.StatResponse{
+						configDir: {
+							Res: &testservices.TestFileInfo{
+								IsDirectory: true,
+							},
+							Err: nil,
+						},
+						suggestedDir: {
+							Res: nil,
+							Err: os.ErrNotExist,
+						},
+						expandedDir: {
+							Res: nil,
+							Err: os.ErrNotExist,
+						},
+					},
+					ReadDirResponse: map[string]testservices.ReadDirResponse{
+						configDir: {
+							Res: []os.FileInfo{
+								&testservices.TestFileInfo{
+									BaseName:    deploymentYaml,
+									IsDirectory: false,
+								},
+							},
+							Err: nil,
+						},
+					},
+					ReadFileResponse: map[string]testservices.ReadFileResponse{
+						filepath.Join(configDir, deploymentYaml): {
+							Res: fileContents(t, testDeploymentFile),
+							Err: nil,
+						},
+					},
+					MkdirAllResponse: map[string]error{
+						suggestedDir: nil,
+						expandedDir:  nil,
+					},
+					WriteFileResponse: map[string]error{
+						filepath.Join(suggestedDir, deploymentYaml): nil,
+						filepath.Join(expandedDir, deploymentYaml):  nil,
+					},
+				},
+				Remote: &testservices.TestRemote{
+					ImageResp: &testservices.TestImage{
+						Hash: v1.Hash{
+							Algorithm: "sha256",
+							Hex:       "foobar",
+						},
+						Err: nil,
+					},
+					ImageErr: nil,
+				},
+			},
+		},
+	}, {
+		name: "Add custom annotations",
+
+		image:           image,
+		appName:         appName,
+		appVersion:      appVersion,
+		config:          configDir,
+		suggestedOutput: suggestedDir,
+		expandedOutput:  expandedDir,
+		labels:          labels,
+		annotations: map[string]string{
 			"foo":         "bar",
 			"hi":          "bye",
 			"a/b/c.d.f.g": "h/i/j.k.l.m",
@@ -301,6 +381,7 @@ func TestPrepare(t *testing.T) {
 		suggestedOutput: suggestedDir,
 		expandedOutput:  expandedDir,
 		labels:          labels,
+		annotations:     annotations,
 		namespace:       namespace,
 		exposePort:      0,
 
@@ -371,6 +452,7 @@ func TestPrepare(t *testing.T) {
 		suggestedOutput: suggestedDir,
 		expandedOutput:  expandedDir,
 		labels:          labels,
+		annotations:     annotations,
 		namespace:       "foobar",
 		exposePort:      0,
 
@@ -443,6 +525,7 @@ func TestPrepare(t *testing.T) {
 		suggestedOutput: suggestedDir,
 		expandedOutput:  expandedDir,
 		labels:          labels,
+		annotations:     annotations,
 		namespace:       namespace,
 		exposePort:      0,
 
@@ -513,6 +596,7 @@ func TestPrepare(t *testing.T) {
 		suggestedOutput: suggestedDir,
 		expandedOutput:  expandedDir,
 		labels:          labels,
+		annotations:     annotations,
 		namespace:       namespace,
 		exposePort:      0,
 
@@ -585,6 +669,7 @@ func TestPrepare(t *testing.T) {
 		suggestedOutput: suggestedDir,
 		expandedOutput:  expandedDir,
 		labels:          labels,
+		annotations:     annotations,
 		namespace:       namespace,
 		exposePort:      80,
 
@@ -657,6 +742,7 @@ func TestPrepare(t *testing.T) {
 		suggestedOutput: suggestedDir,
 		expandedOutput:  expandedDir,
 		labels:          labels,
+		annotations:     annotations,
 		namespace:       "",
 		exposePort:      0,
 
@@ -721,8 +807,8 @@ func TestPrepare(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if err := tc.deployer.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, tc.suggestedOutput, tc.expandedOutput, tc.namespace, tc.labels, tc.exposePort); err != nil {
-				t.Errorf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %v) = %v; want <nil>", tc.image, tc.appName, tc.appVersion, tc.config, tc.suggestedOutput, tc.expandedOutput, tc.namespace, tc.labels, err)
+			if err := tc.deployer.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, tc.suggestedOutput, tc.expandedOutput, tc.namespace, tc.labels, tc.annotations, tc.exposePort); err != nil {
+				t.Errorf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %s, %v) = %v; want <nil>", tc.image, tc.appName, tc.appVersion, tc.config, tc.suggestedOutput, tc.expandedOutput, tc.namespace, tc.labels, tc.annotations, err)
 			}
 		})
 	}
@@ -740,6 +826,7 @@ func TestPrepareErrors(t *testing.T) {
 	expandedDir := "path/to/expanded"
 	namespace := "default"
 	labels := make(map[string]string)
+	annotations := make(map[string]string)
 
 	configDir := "path/to/config"
 	deploymentYaml := "deployment.yaml"
@@ -755,6 +842,7 @@ func TestPrepareErrors(t *testing.T) {
 		expandedOutput  string
 		namespace       string
 		labels          map[string]string
+		annotations     map[string]string
 
 		deployer *Deployer
 	}{{
@@ -767,6 +855,7 @@ func TestPrepareErrors(t *testing.T) {
 		suggestedOutput: suggestedDir,
 		expandedOutput:  expandedDir,
 		labels:          labels,
+		annotations:     annotations,
 		namespace:       namespace,
 
 		deployer: &Deployer{
@@ -799,6 +888,7 @@ func TestPrepareErrors(t *testing.T) {
 		suggestedOutput: suggestedDir,
 		expandedOutput:  expandedDir,
 		labels:          labels,
+		annotations:     annotations,
 		namespace:       namespace,
 
 		deployer: &Deployer{
@@ -856,6 +946,7 @@ func TestPrepareErrors(t *testing.T) {
 		suggestedOutput: suggestedDir,
 		expandedOutput:  expandedDir,
 		labels:          labels,
+		annotations:     annotations,
 		namespace:       namespace,
 
 		deployer: &Deployer{
@@ -921,7 +1012,8 @@ func TestPrepareErrors(t *testing.T) {
 		labels: map[string]string{
 			"app.kubernetes.io/name": "foobar",
 		},
-		namespace: namespace,
+		annotations: annotations,
+		namespace:   namespace,
 
 		deployer: &Deployer{
 			Clients: &services.Clients{
@@ -988,7 +1080,8 @@ func TestPrepareErrors(t *testing.T) {
 		labels: map[string]string{
 			"app.kubernetes.io/version": "foobar",
 		},
-		namespace: namespace,
+		annotations: annotations,
+		namespace:   namespace,
 
 		deployer: &Deployer{
 			Clients: &services.Clients{
@@ -1053,7 +1146,8 @@ func TestPrepareErrors(t *testing.T) {
 		labels: map[string]string{
 			"app.kubernetes.io/managed-by": "foobar",
 		},
-		namespace: namespace,
+		annotations: annotations,
+		namespace:   namespace,
 
 		deployer: &Deployer{
 			Clients: &services.Clients{
@@ -1110,8 +1204,8 @@ func TestPrepareErrors(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if err := tc.deployer.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, tc.suggestedOutput, tc.expandedOutput, tc.namespace, tc.labels, 0); err == nil {
-				t.Errorf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %v) = <nil>; want error", tc.image, tc.appName, tc.appVersion, tc.config, tc.suggestedOutput, tc.expandedOutput, tc.namespace, tc.labels)
+			if err := tc.deployer.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, tc.suggestedOutput, tc.expandedOutput, tc.namespace, tc.labels, tc.annotations, 0); err == nil {
+				t.Errorf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %s, %v) = <nil>; want error", tc.image, tc.appName, tc.appVersion, tc.config, tc.suggestedOutput, tc.expandedOutput, tc.namespace, tc.labels, tc.annotations)
 			}
 		})
 	}
