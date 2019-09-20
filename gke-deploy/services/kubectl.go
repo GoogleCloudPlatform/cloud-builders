@@ -35,7 +35,7 @@ func NewKubectl(ctx context.Context, printCommands bool) (*Kubectl, error) {
 	}, nil
 }
 
-// Apply calls `kubectl apply -f - -n <namespace> < ${configString}`.
+// ApplyFromString calls `kubectl apply -f - -n <namespace> < ${configString}`.
 func (k *Kubectl) ApplyFromString(configString, namespace string) error {
 	args := []string{"apply", "-f", "-"}
 	if namespace != "" {

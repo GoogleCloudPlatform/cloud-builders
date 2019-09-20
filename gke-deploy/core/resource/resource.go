@@ -660,10 +660,12 @@ func addToNestedMap(obj *Object, key, value string, override bool, nestedFields 
 
 // TODO(joonlim): These should be member functions of Object.
 
+// ResourceKind returns the kind of an object.
 func ResourceKind(obj *Object) string {
 	return obj.GetObjectKind().GroupVersionKind().Kind
 }
 
+// ResourceName returns the name of an object.
 func ResourceName(obj *Object) (string, error) {
 	accessor, err := meta.Accessor(obj)
 	if err != nil {
@@ -672,6 +674,7 @@ func ResourceName(obj *Object) (string, error) {
 	return accessor.GetName(), nil
 }
 
+// ResourceNamespace returns the namespace of an object.
 func ResourceNamespace(obj *Object) (string, error) {
 	accessor, err := meta.Accessor(obj)
 	if err != nil {

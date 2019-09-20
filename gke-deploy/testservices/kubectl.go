@@ -30,7 +30,7 @@ type GetResponse struct {
 	count int
 }
 
-// Apply calls `kubectl apply -f <configs> -n <namespace>`.
+// ApplyFromString calls `kubectl apply -f - -n <namespace> < ${configString}`.
 func (k *TestKubectl) ApplyFromString(configString, namespace string) error {
 	err, ok := k.ApplyFromStringResponse[configString]
 	if !ok {
