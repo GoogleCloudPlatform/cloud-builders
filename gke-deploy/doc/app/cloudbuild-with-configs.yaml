@@ -3,7 +3,7 @@ steps:
   id: 'Build'
   args: ["build", "-t", "$_IMAGE_NAME:$_IMAGE_VERSION", ".", "-f", "$_DOCKERFILE_PATH"]
 - name: 'gcr.io/cloud-builders/docker'
-  id: 'Push'
+  id: 'Publish'
   args: ["push", "$_IMAGE_NAME:$_IMAGE_VERSION"]
 - name: 'gcr.io/cloud-builders/gke-deploy:stable'
   id: 'Prepare deploy'
@@ -14,18 +14,19 @@ steps:
   - '--app=$_K8S_APP_NAME'
   - '--version=$_IMAGE_VERSION'
   - '--namespace=$_K8S_NAMESPACE'
-  - '--label=$_K8S_LABELS,gcb-build-id=$BUILD_ID'
+  - '--output=output'
+  - '--annotation=gcb-build-id=$BUILD_ID'
 - name: 'gcr.io/cloud-builders/gsutil'
-  id: 'Save suggested base configs and expanded configs to bucket'
+  id: 'Save configs'
   entrypoint: 'sh'
   args:
   - '-c'
   - |
     set -e
-    gsutil cp -r output/suggested gs://$_OUTPUT_BUCKET/$BUILD_ID/suggested
-    echo "Copied suggested base configs to gs://$_OUTPUT_BUCKET/$BUILD_ID/suggested"
-    gsutil cp -r output/expanded gs://$_OUTPUT_BUCKET/$BUILD_ID/expanded
-    echo "Copied expanded configs to gs://$_OUTPUT_BUCKET/$BUILD_ID/expanded"
+    gsutil cp -r output/suggested gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/suggested
+    echo "Copied suggested base configs to gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/suggested"
+    gsutil cp -r output/expanded gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/expanded
+    echo "Copied expanded configs to gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/expanded"
 - name: 'gcr.io/cloud-builders/gke-deploy:stable'
   id: 'Apply deploy'
   args:
@@ -45,8 +46,7 @@ substitutions:
   _K8S_YAML_PATH:
   _K8S_APP_NAME:
   _K8S_NAMESPACE:
-  _K8S_LABELS:
-  _OUTPUT_BUCKET:
+  _OUTPUT_BUCKET_PATH:
 options:
   substitution_option: 'ALLOW_LOOSE'
 tags: ['gcp-cloud-build-deploy', '$_K8S_APP_NAME']

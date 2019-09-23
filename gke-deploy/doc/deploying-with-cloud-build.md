@@ -40,15 +40,15 @@ gsutil mb -p $PROJECT gs://$BUCKET
 
 ## Examples
 
-### Build, push, and deploy application with no Kubernetes configuration files
+### Build, publish, and deploy application with no Kubernetes configuration files
 
-This build calls the `docker` build step to create a Docker image and push it to
-Container Registry. Then, the build calls the `gke-deploy` build step to create
-and deploy Deployment, Horizontal Pod Autoscaler, and Service configuration
-files to your GKE cluster. Finally, the build calls the `gsutil` build step to
-copy suggested base Kubernetes configuration files created by `gke-deploy` to your
-bucket. The files expanded by `gke-deploy` are copied to your bucket via the
-`artifacts` field.
+This build calls the `docker` build step to create a Docker image and publish it to
+Container Registry. Then, the build calls the `gke-deploy` build step with the
+`prepare` arg to create and expand Deployment, Horizontal Pod Autoscaler, and Service
+configuration files to deploy. Next, the build calls the `gsutil` build step to
+copy suggested base and expanded Kubernetes configuration files to your bucket.
+Finally, the build calls the `gke-deploy` build step with the `apply` arg to
+deploy the expanded Kubernetes configuration files created by the `prepare` step.
 
 ```bash
 # Go to directory containing test app.
@@ -66,15 +66,18 @@ APP=my-app
 NAMESPACE=my-namespace
 
 # Run build, replacing substitution variables accordingly.
-gcloud builds submit . --project=$PROJECT --config cloudbuild-no-configs.yaml --substitutions=_IMAGE_NAME=gcr.io/$PROJECT/$APP,_IMAGE_VERSION=$VERSION,_GKE_CLUSTER=$CLUSTER,_GKE_LOCATION=$LOCATION,_K8S_APP_NAME=$APP,_K8S_NAMESPACE=$NAMESPACE,_OUTPUT_BUCKET=$BUCKET
+gcloud builds submit . --project=$PROJECT --config cloudbuild-no-configs.yaml --substitutions=_IMAGE_NAME=gcr.io/$PROJECT/$APP,_IMAGE_VERSION=$VERSION,_GKE_CLUSTER=$CLUSTER,_GKE_LOCATION=$LOCATION,_K8S_APP_NAME=$APP,_K8S_NAMESPACE=$NAMESPACE,_OUTPUT_BUCKET_PATH=$BUCKET
 ```
 
-### Build, push, and deploy application with Kubernetes configuration files
+### Build, publish, and deploy application with Kubernetes configuration files
 
-This build calls the `docker` build step to create a Docker image and push it to
-Container Registry. Then, the build calls the `gke-deploy` build step to deploy
-your Kubernetes configuration files to your GKE cluster. The files expanded by
-`gke-deploy` are copied to your bucket via the `artifacts` field.
+This build calls the `docker` build step to create a Docker image and publish it to
+Container Registry. Then, the build calls the `gke-deploy` build step with the
+`prepare` arg to expand the provided configuration files to deploy. Next, the
+build calls the `gsutil` build step to copy suggested base and expanded
+Kubernetes configuration files to your bucket. Finally, the build calls the
+`gke-deploy` build step with the `apply` arg to deploy the expanded Kubernetes
+configuration files created by the `prepare` step.
 
 ```bash
 # Go to directory containing test app.
@@ -98,11 +101,11 @@ sed -i "s#@IMAGE_NAME@#$IMAGE_NAME#g" config/deployment.yaml
 sed -i "s#@NAMESPACE@#$NAMESPACE#g" config/namespace.yaml
 
 # Run build, replacing substitution variables accordingly.
-gcloud builds submit . --project=$PROJECT --config cloudbuild-with-configs.yaml --substitutions=_IMAGE_NAME=gcr.io/$PROJECT/$APP,_IMAGE_VERSION=$VERSION,_GKE_CLUSTER=$CLUSTER,_GKE_LOCATION=$LOCATION,_K8S_YAML_PATH=config,_K8S_APP_NAME=$APP,_K8S_NAMESPACE=$NAMESPACE,_OUTPUT_BUCKET=$BUCKET
+gcloud builds submit . --project=$PROJECT --config cloudbuild-with-configs.yaml --substitutions=_IMAGE_NAME=gcr.io/$PROJECT/$APP,_IMAGE_VERSION=$VERSION,_GKE_CLUSTER=$CLUSTER,_GKE_LOCATION=$LOCATION,_K8S_YAML_PATH=config,_K8S_APP_NAME=$APP,_K8S_NAMESPACE=$NAMESPACE,_OUTPUT_BUCKET_PATH=$BUCKET
 ```
 
-You can remove the `artifacts` field in your Cloud Build config if you do not
-want to store the output to a bucket.
+You can remove the `Save configs` build step in your Cloud Build config if you do not
+want to store configs to a bucket.
 
 Builds can use `$SHORT_SHA` instead of an explicit `$_IMAGE_VERSION` for the
 image and app versions if executed via a trigger. Follow [these
