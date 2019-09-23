@@ -2,7 +2,7 @@
 
 You can set up automated deployments of a repository in
 [CSR](https://cloud.google.com/source-repositories/) using the following
-command, which will cause a build, push, and deploy to be triggered for every
+command, which will cause a build, publish, and deploy to be triggered for every
 push to any branch. This command allows setting up a build trigger without
 needing an explicit `cloudbuild.yaml` file in your repository.
 
@@ -30,7 +30,7 @@ curl -X POST -H "Authorization: Bearer $(gcloud auth print-access-token --projec
       },
       {
         "name": "gcr.io/cloud-builders/docker",
-        "id": "Push",
+        "id": "Publish",
         "args": [
           "push",
           "$_IMAGE_NAME:$SHORT_SHA",
@@ -38,7 +38,7 @@ curl -X POST -H "Authorization: Bearer $(gcloud auth print-access-token --projec
       },
       {
         "name": "gcr.io/cloud-builders/gke-deploy:stable",
-        "id": "Deploy",
+        "id": "Prepare deploy",
         "args": [
           "run",
           "--filename=$_K8S_YAML_PATH",
@@ -46,7 +46,32 @@ curl -X POST -H "Authorization: Bearer $(gcloud auth print-access-token --projec
           "--app=$_K8S_APP_NAME",
           "--version=$SHORT_SHA",
           "--namespace=$_K8S_NAMESPACE",
-          "--label=$_K8S_LABELS,gcb-build-id=$BUILD_ID",
+          "--output=output",
+          "--annotation=gcb-build-id=$BUILD_ID",
+        ]
+      },
+      {
+        "name": "gcr.io/cloud-builders/gsutil",
+        "id": "Save configs",
+        "entrypoint": "sh",
+        "args": [
+          "-c",
+          "
+set -e
+gsutil cp -r output/suggested gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/suggested
+echo \"Copied suggested base configs to gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/suggested\"
+gsutil cp -r output/expanded gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/expanded
+echo \"Copied expanded configs to gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/expanded\"
+          "
+        ]
+      },
+      {
+        "name": "gcr.io/cloud-builders/gke-deploy:stable",
+        "id": "Apply deploy",
+        "args": [
+          "run",
+          "--filename=output/expanded",
+          "--namespace=$_K8S_NAMESPACE",
           "--cluster=$_GKE_CLUSTER",
           "--location=$_GKE_LOCATION",
         ]
@@ -55,12 +80,6 @@ curl -X POST -H "Authorization: Bearer $(gcloud auth print-access-token --projec
     "images": [
       "$_IMAGE_NAME:$SHORT_SHA"
     ],
-    "artifacts": {
-      "objects": {
-        "location": "gs://$_OUTPUT_BUCKET/$BUILD_ID/expanded",
-        "paths": ["output/expanded/*"]
-      }
-    },
     "substitutions": {
       "_DOCKERFILE_PATH": "Dockerfile",
       "_IMAGE_NAME": "",
@@ -69,8 +88,7 @@ curl -X POST -H "Authorization: Bearer $(gcloud auth print-access-token --projec
       "_K8S_YAML_PATH": "",
       "_K8S_APP_NAME": "",
       "_K8S_NAMESPACE": "",
-      "_K8S_LABELS": "",
-      "_OUTPUT_BUCKET": ""
+      "_OUTPUT_BUCKET_PATH": ""
     },
     "options": {
       "substitution_option": "ALLOW_LOOSE"
@@ -87,7 +105,7 @@ curl -X POST -H "Authorization: Bearer $(gcloud auth print-access-token --projec
     "_K8S_APP_NAME": "NAME",
     "_K8S_NAMESPACE": "NAMESPACE",
     "_K8S_YAML_PATH": "CONFIG",
-    "_OUTPUT_BUCKET": "BUCKET"
+    "_OUTPUT_BUCKET_PATH": "BUCKET_PATH"
   }
 }'
 ```
