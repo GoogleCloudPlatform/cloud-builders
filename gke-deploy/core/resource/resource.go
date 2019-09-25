@@ -456,6 +456,25 @@ func deploySummaryExtraInfo(obj *Object) (string, error) {
 }
 
 func serviceIPs(obj *Object) (string, error) {
+	ports, ok, err := unstructured.NestedSlice(obj.Object, "spec", "ports")
+	if err != nil {
+		return "", fmt.Errorf("failed to get spec.ports field: %v", err)
+	}
+	if !ok || len(ports) == 0 {
+		return "", nil
+	}
+	portMap := ports[0].(map[string]interface{})
+	if !ok {
+		return "", fmt.Errorf("failed to convert port to map")
+	}
+	port, ok, err := unstructured.NestedInt64(portMap, "port")
+	if err != nil {
+		return "", fmt.Errorf("failed to get port field: %v", err)
+	}
+	if !ok {
+		return "", fmt.Errorf("port field is missing")
+	}
+
 	ingress, ok, err := unstructured.NestedSlice(obj.Object, "status", "loadBalancer", "ingress")
 	if err != nil {
 		return "", fmt.Errorf("failed to get status.loadBalancer.ingress field: %v", err)
@@ -477,6 +496,11 @@ func serviceIPs(obj *Object) (string, error) {
 		if !ok || ip == "" {
 			return "", fmt.Errorf("ip field is missing or is empty")
 		}
+
+		if port != 80 {
+			ip = fmt.Sprintf("%s:%d", ip, port)
+		}
+
 		ips = append(ips, ip)
 	}
 
