@@ -176,7 +176,7 @@ func UpdateMatchingContainerImage(ctx context.Context, objs Objects, imageName, 
 	for _, obj := range objs {
 		var nestedFields []string
 
-		switch kind := ResourceKind(obj); kind {
+		switch kind := ObjectKind(obj); kind {
 		case "CronJob":
 			nestedFields = []string{"spec", "jobTemplate", "spec", "template", "spec", "containers"}
 		case "Pod":
@@ -238,12 +238,12 @@ func UpdateMatchingContainerImage(ctx context.Context, objs Objects, imageName, 
 func UpdateNamespace(ctx context.Context, objs Objects, replace string) error {
 	var hasNS []*Object
 	for _, obj := range objs {
-		ns, err := ResourceNamespace(obj)
+		ns, err := ObjectNamespace(obj)
 		if err != nil {
 			return fmt.Errorf("failed to get namespace field: %v", err)
 		}
 		if ns != "" {
-			if err := setResourceNamespace(obj, replace); err != nil {
+			if err := setObjectNamespace(obj, replace); err != nil {
 				return fmt.Errorf("failed to set namespace field: %v", err)
 			}
 			hasNS = append(hasNS, obj)
@@ -263,8 +263,8 @@ func UpdateNamespace(ctx context.Context, objs Objects, replace string) error {
 // name.
 func HasObject(ctx context.Context, objs Objects, kind, name string) (bool, error) {
 	for _, obj := range objs {
-		objKind := ResourceKind(obj)
-		objName, err := ResourceName(obj)
+		objKind := ObjectKind(obj)
+		objName, err := ObjectName(obj)
 		if err != nil {
 			return false, fmt.Errorf("failed to get resource name: %v", err)
 		}
@@ -278,7 +278,7 @@ func HasObject(ctx context.Context, objs Objects, kind, name string) (bool, erro
 // AddObject adds the provided object to objs with a generated file base name as its key.
 func AddObject(ctx context.Context, objs Objects, obj *Object) error {
 	// Try <resource-kind>.yaml
-	objKind := strings.ToLower(ResourceKind(obj))
+	objKind := strings.ToLower(ObjectKind(obj))
 	baseName := fmt.Sprintf("%s.yaml", objKind)
 	if _, ok := objs[baseName]; !ok {
 		objs[baseName] = obj
@@ -286,7 +286,7 @@ func AddObject(ctx context.Context, objs Objects, obj *Object) error {
 	}
 
 	// Try <resource-kind>-<resource-name>.yaml
-	objName, err := ResourceName(obj)
+	objName, err := ObjectName(obj)
 	if err != nil {
 		return fmt.Errorf("failed to get resource name: %v", err)
 	}
@@ -366,12 +366,12 @@ func DeploySummary(ctx context.Context, objs Objects) (string, error) {
 	}
 
 	for _, obj := range sorted {
-		kind := ResourceKind(obj)
-		name, err := ResourceName(obj)
+		kind := ObjectKind(obj)
+		name, err := ObjectName(obj)
 		if err != nil {
 			return "", fmt.Errorf("failed to get resource name: %v", err)
 		}
-		namespace, err := ResourceNamespace(obj)
+		namespace, err := ObjectNamespace(obj)
 		if err != nil {
 			return "", fmt.Errorf("failed to get namespace of object: %v", err)
 		}
@@ -411,13 +411,13 @@ func sortObjectsByKindAndName(objs []*Object) []*Object {
 		a := objs[i]
 		b := objs[j]
 
-		aKind := ResourceKind(a)
-		bKind := ResourceKind(b)
-		aName, err := ResourceName(a)
+		aKind := ObjectKind(a)
+		bKind := ObjectKind(b)
+		aName, err := ObjectName(a)
 		if err != nil {
 			return false // Move a to end of slice
 		}
-		bName, err := ResourceName(b)
+		bName, err := ObjectName(b)
 		if err != nil {
 			return true // Move b to end of slice
 		}
@@ -433,7 +433,7 @@ func sortObjectsByKindAndName(objs []*Object) []*Object {
 func deploySummaryExtraInfo(obj *Object) (string, error) {
 	var extraInfo string
 
-	kind := ResourceKind(obj)
+	kind := ObjectKind(obj)
 	switch kind {
 	case "Service":
 		serviceType, ok, err := unstructured.NestedString(obj.Object, "spec", "type")
@@ -545,8 +545,8 @@ func parseResourcesFromFile(ctx context.Context, filename string, objs Objects, 
 			ix := strings.LastIndex(baseName, ".")
 			prefix := baseName[:ix]
 			suffix := baseName[ix+1:]
-			objKind := strings.ToLower(ResourceKind(obj))
-			objName, err := ResourceName(obj)
+			objKind := strings.ToLower(ObjectKind(obj))
+			objName, err := ObjectName(obj)
 			if err != nil {
 				return fmt.Errorf("failed to get resource name of item %d in file %q: %v", i+1, filename, err)
 			}
@@ -596,8 +596,8 @@ func (objs Objects) String() string {
 
 // String returns a string representation of an object.
 func (obj *Object) String() string {
-	kind := ResourceKind(obj)
-	name, err := ResourceName(obj)
+	kind := ObjectKind(obj)
+	name, err := ObjectName(obj)
 	if err != nil {
 		name = "UNKNOWN"
 	}
@@ -616,7 +616,7 @@ func AddLabel(ctx context.Context, obj *Object, key, value string, override bool
 	}
 
 	var nestedFields []string
-	switch kind := ResourceKind(obj); kind {
+	switch kind := ObjectKind(obj); kind {
 	case "CronJob":
 		nestedFields = []string{"spec", "jobTemplate", "spec", "template", "metadata", "labels"}
 	case "DaemonSet", "Deployment", "Job", "ReplicaSet", "ReplicationController", "StatefulSet":
@@ -643,7 +643,7 @@ func AddAnnotation(obj *Object, key, value string) error {
 	}
 
 	var nestedFields []string
-	switch kind := ResourceKind(obj); kind {
+	switch kind := ObjectKind(obj); kind {
 	case "CronJob":
 		nestedFields = []string{"spec", "jobTemplate", "spec", "template", "metadata", "annotations"}
 	case "DaemonSet", "Deployment", "Job", "ReplicaSet", "ReplicationController", "StatefulSet":
@@ -684,13 +684,13 @@ func addToNestedMap(obj *Object, key, value string, override bool, nestedFields 
 
 // TODO(joonlim): These should be member functions of Object.
 
-// ResourceKind returns the kind of an object.
-func ResourceKind(obj *Object) string {
+// ObjectKind returns the kind of an object.
+func ObjectKind(obj *Object) string {
 	return obj.GetObjectKind().GroupVersionKind().Kind
 }
 
-// ResourceName returns the name of an object.
-func ResourceName(obj *Object) (string, error) {
+// ObjectName returns the name of an object.
+func ObjectName(obj *Object) (string, error) {
 	accessor, err := meta.Accessor(obj)
 	if err != nil {
 		return "", fmt.Errorf("failed to get metadata accessor from object: %v", err)
@@ -698,8 +698,8 @@ func ResourceName(obj *Object) (string, error) {
 	return accessor.GetName(), nil
 }
 
-// ResourceNamespace returns the namespace of an object.
-func ResourceNamespace(obj *Object) (string, error) {
+// ObjectNamespace returns the namespace of an object.
+func ObjectNamespace(obj *Object) (string, error) {
 	accessor, err := meta.Accessor(obj)
 	if err != nil {
 		return "", fmt.Errorf("failed to get metadata accessor from object: %v", err)
@@ -707,7 +707,7 @@ func ResourceNamespace(obj *Object) (string, error) {
 	return accessor.GetNamespace(), nil
 }
 
-func setResourceNamespace(obj *Object, namespace string) error {
+func setObjectNamespace(obj *Object, namespace string) error {
 	accessor, err := meta.Accessor(obj)
 	if err != nil {
 		return fmt.Errorf("failed to get metadata accessor from object: %v", err)

@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/google/go-containerregistry/pkg/name"
-	"github.com/google/go-containerregistry/pkg/v1"
+	v1 "github.com/google/go-containerregistry/pkg/v1"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/testservices"
