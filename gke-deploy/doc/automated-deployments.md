@@ -9,6 +9,7 @@ needing an explicit `cloudbuild.yaml` file in your repository.
 # Go to directory containing this doc.
 git clone https://github.com/GoogleCloudPlatform/cloud-builders.git && cd cloud-builders/gke-deploy/doc
 
+PROJECT=my-project
 OWNER=user
 REPO=repo
 BRANCH_REGEX='.*'
@@ -33,5 +34,5 @@ sed -i "s#@APP_NAME@#$APP_NAME#g" my-trigger.yaml
 sed -i "s#@NAMESPACE@#$NAMESPACE#g" my-trigger.yaml
 sed -i "s#@OUTPUT_BUCKET_PATH@#$OUTPUT_BUCKET_PATH#g" my-trigger.yaml
 
-gcloud alpha builds trigger create github --trigger-config=my-trigger.yaml --project=cbd-test
+gcloud alpha builds trigger create github --trigger-config=my-trigger.yaml --project=$PROJECT
 ```
