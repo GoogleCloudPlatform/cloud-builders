@@ -157,7 +157,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 	}
 
 	for _, obj := range objs {
-		if resource.ResourceKind(obj) != "Namespace" {
+		if resource.ObjectKind(obj) != "Namespace" {
 			if appName != "" {
 				if err := resource.AddLabel(ctx, obj, appNameLabelKey, appName, false); err != nil {
 					return fmt.Errorf("failed to add %s=%s label to object %v: %v", appNameLabelKey, appName, obj, err)
@@ -271,8 +271,8 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 
 	// Apply all namespace objects first, if they exist
 	for baseName, obj := range objs {
-		if resource.ResourceKind(obj) == "Namespace" {
-			nsName, err := resource.ResourceName(obj)
+		if resource.ObjectKind(obj) == "Namespace" {
+			nsName, err := resource.ObjectName(obj)
 			if err != nil {
 				return fmt.Errorf("failed to get name of object: %v", err)
 			}
@@ -298,7 +298,7 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 	// Apply each config file individually vs applying the directory to avoid applying namespaces.
 	// Namespace objects are removed from objs at this point.
 	for _, obj := range objs {
-		objName, err := resource.ResourceName(obj)
+		objName, err := resource.ObjectName(obj)
 		if err != nil {
 			return fmt.Errorf("failed to get name of object: %v", err)
 		}
@@ -308,7 +308,7 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 		}
 		// If namespace == "", uses the namespace defined in each config.
 		if err := cluster.ApplyConfigFromString(objString, namespace, d.Clients.Kubectl); err != nil {
-			return fmt.Errorf("failed to apply %s configuration file with name %q to cluster: %v", resource.ResourceKind(obj), objName, err)
+			return fmt.Errorf("failed to apply %s configuration file with name %q to cluster: %v", resource.ObjectKind(obj), objName, err)
 		}
 	}
 
@@ -323,14 +323,14 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 	ticker := time.NewTicker(5 * time.Second)
 	for len(objs) > 0 {
 		for key, obj := range objs {
-			kind := resource.ResourceKind(obj)
-			name, err := resource.ResourceName(obj)
+			kind := resource.ObjectKind(obj)
+			name, err := resource.ObjectName(obj)
 			if err != nil {
 				return fmt.Errorf("failed to get name of object: %v", err)
 			}
 			objNamespace := ""
 			if namespace == "" {
-				ns, err := resource.ResourceNamespace(obj)
+				ns, err := resource.ObjectNamespace(obj)
 				if err != nil {
 					return fmt.Errorf("failed to get namespace of object: %v", err)
 				}

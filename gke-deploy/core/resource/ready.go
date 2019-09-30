@@ -22,7 +22,7 @@ import (
 // IsReady returns true if a deployed object is ready. Please check the comments of each kind's
 // implementation for a description of what is considered to be ready for that kind of object.
 func IsReady(ctx context.Context, obj *Object) (bool, error) {
-	kind := ResourceKind(obj)
+	kind := ObjectKind(obj)
 	switch kind {
 	case "DaemonSet":
 		return daemonSetIsReady(ctx, obj)

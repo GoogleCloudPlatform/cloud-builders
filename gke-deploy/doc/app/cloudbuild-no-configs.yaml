@@ -3,7 +3,7 @@ steps:
   id: 'Build'
   args: ["build", "-t", "$_IMAGE_NAME:$_IMAGE_VERSION", ".", "-f", "$_DOCKERFILE_PATH"]
 - name: 'gcr.io/cloud-builders/docker'
-  id: 'Publish'
+  id: 'Push'
   args: ["push", "$_IMAGE_NAME:$_IMAGE_VERSION"]
 - name: 'gcr.io/cloud-builders/gke-deploy:stable'
   id: 'Prepare deploy'
@@ -23,6 +23,7 @@ steps:
   - '-c'
   - |
     set -e
+
     gsutil cp -r output/suggested gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/suggested
     echo "Copied suggested base configs to gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/suggested"
     gsutil cp -r output/expanded gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/expanded
