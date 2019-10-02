@@ -11,10 +11,10 @@ EOF
   exit 1
 }
 
-cluster=$(gcloud config get-value container/cluster 2> /dev/null)
+cluster=${CLOUDSDK_CONTAINER_CLUSTER:-$(gcloud config get-value container/cluster 2> /dev/null)}
 region=${CLOUDSDK_COMPUTE_REGION:-$(gcloud config get-value compute/region 2> /dev/null)}
-zone=$(gcloud config get-value compute/zone 2> /dev/null)
-project=$(gcloud config get-value core/project 2> /dev/null)
+zone=${CLOUDSDK_COMPUTE_ZONE:-$(gcloud config get-value compute/zone 2> /dev/null)}
+project=${CLOUDSDK_CORE_PROJECT:-$(gcloud config get-value core/project 2> /dev/null)}
 
 [[ -z "$cluster" ]] && var_usage
 [ ! "$zone" -o "$region" ] && var_usage
