@@ -8,6 +8,17 @@ steps:
   args:
   - 'build'
   - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:8'
+  - '--build-arg=GRADLE_VERSION=5.6.2'
+  - '--build-arg=SHA=32fce6628848f799b0ad3205ae8db67d0d828c10ffe62b748a7c0d9f4a5d9ee0'
+  - '--tag=gcr.io/$PROJECT_ID/gradle:5.6.2-jdk-8'
+  - '--tag=gcr.io/$PROJECT_ID/java/gradle:5.6.2-jdk-8'
+  - '.'
+  waitFor: ['-']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=BASE_IMAGE=gcr.io/$PROJECT_ID/javac:8'
   - '--build-arg=GRADLE_VERSION=4.6'
   - '--build-arg=SHA=98bd5fd2b30e070517e03c51cbb32beee3e2ee1a84003a5a5d748996d4b1b915'
   - '--tag=gcr.io/$PROJECT_ID/gradle:4.6-jdk-8'
@@ -39,12 +50,12 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'tag'
-  - 'gcr.io/$PROJECT_ID/gradle:4.6-jdk-8'
+  - 'gcr.io/$PROJECT_ID/gradle:5.6.2-jdk-8'
   - 'gcr.io/$PROJECT_ID/java/gradle'
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'tag'
-  - 'gcr.io/$PROJECT_ID/gradle:4.6-jdk-8'
+  - 'gcr.io/$PROJECT_ID/gradle:5.6.2-jdk-8'
   - 'gcr.io/$PROJECT_ID/gradle'
 
 # Run examples
@@ -55,25 +66,35 @@ steps:
   args: ['build', '.']
   dir: 'examples/spring_boot'
 
-- name: 'gcr.io/$PROJECT_ID/gradle:4.0-jdk-8'
+- name: 'gcr.io/$PROJECT_ID/gradle:4.6-jdk-8'
   args: ['build']
-  dir: 'examples/spring_boot'
+  dir: 'examples/spring_boot_compat'
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '.']
-  dir: 'examples/spring_boot'
+  dir: 'examples/spring_boot_compat'
+
+- name: 'gcr.io/$PROJECT_ID/gradle:4.0-jdk-8'
+  args: ['build']
+  dir: 'examples/spring_boot_compat'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '.']
+  dir: 'examples/spring_boot_compat'
 
 - name: 'gcr.io/$PROJECT_ID/gradle:3.5-jdk-8'
   args: ['build']
-  dir: 'examples/spring_boot'
+  dir: 'examples/spring_boot_compat'
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '.']
-  dir: 'examples/spring_boot'
+  dir: 'examples/spring_boot_compat'
 
 images:
 - 'gcr.io/$PROJECT_ID/gradle'
+- 'gcr.io/$PROJECT_ID/gradle:5.6.2-jdk-8'
 - 'gcr.io/$PROJECT_ID/gradle:4.6-jdk-8'
 - 'gcr.io/$PROJECT_ID/gradle:4.0-jdk-8'
 - 'gcr.io/$PROJECT_ID/gradle:3.5-jdk-8'
 - 'gcr.io/$PROJECT_ID/java/gradle'
+- 'gcr.io/$PROJECT_ID/java/gradle:5.6.2-jdk-8'
+- 'gcr.io/$PROJECT_ID/java/gradle:4.6-jdk-8'
 - 'gcr.io/$PROJECT_ID/java/gradle:4.0-jdk-8'
 - 'gcr.io/$PROJECT_ID/java/gradle:3.5-jdk-8'
