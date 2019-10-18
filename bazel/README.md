@@ -3,7 +3,8 @@
 This is a tool builder to simply invoke [`bazel`](https://bazel.io) commands.
 
 You should consider instead using an [official `bazel`
-image](https://launcher.gcr.io/google/bazel):
+image](https://launcher.gcr.io/google/bazel), to which updates will become
+available more quickly:
 
 ```yaml
 steps:
