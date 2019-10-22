@@ -539,6 +539,19 @@ func parseResourcesFromFile(ctx context.Context, filename string, objs Objects, 
 	split := strings.Split(string(in), "\n---")
 
 	for i, r := range split {
+		lines := strings.Split(r, "\n")
+		onlyCommentsAndWhitespace := true
+		for _, line := range lines {
+			trimmedLine := strings.TrimSpace(line)
+			if trimmedLine != "" && !strings.HasPrefix(trimmedLine, "#") {
+				onlyCommentsAndWhitespace = false
+				break
+			}
+		}
+		if onlyCommentsAndWhitespace {
+			continue
+		}
+
 		obj, err := DecodeFromYAML(ctx, []byte(r))
 		if err != nil {
 			return fmt.Errorf("failed to decode resource from item %d in %s: %v", i+1, printFilename, err)

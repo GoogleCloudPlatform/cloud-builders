@@ -404,6 +404,7 @@ func TestParseConfigs(t *testing.T) {
 	testServiceFile := "testing/service.yaml"
 	testMultiResourceFile := "testing/multi-resource.yaml"
 	testMultiResourceWithWhitespaceFile := "testing/multi-resource-with-whitespace.yaml"
+	testWhitespaceAndCommentsFile := "testing/whitespace-and-comments.yaml"
 
 	configsDir := "path/to/configs"
 	deploymentYaml := "deployment.yaml"
@@ -823,6 +824,110 @@ func TestParseConfigs(t *testing.T) {
 			"multi-resource-deployment-test-app-2.yaml": newObjectFromFile(t, testDeploymentFile),
 			"multi-resource-service-test-app-2.yaml":    newObjectFromFile(t, testServiceFile),
 		},
+	},{
+		name: "Configs is stdin with single object",
+
+		configs: "-",
+		oss: &testservices.TestOS{
+			StatResponse: map[string]testservices.StatResponse{
+				"-": {
+					Res: &testservices.TestFileInfo{
+						IsDirectory: false,
+					},
+					Err: nil,
+				},
+			},
+			ReadFileResponse: map[string]testservices.ReadFileResponse{
+				"-": {
+					Res: fileContents(t, testDeploymentFile),
+					Err: nil,
+				},
+			},
+		},
+
+		want: Objects{
+			"k8s.yaml": newObjectFromFile(t, testDeploymentFile),
+		},
+	},{
+		name: "Configs is stdin with multiple objects",
+
+		configs: "-",
+		oss: &testservices.TestOS{
+			StatResponse: map[string]testservices.StatResponse{
+				"-": {
+					Res: &testservices.TestFileInfo{
+						IsDirectory: false,
+					},
+					Err: nil,
+				},
+			},
+			ReadFileResponse: map[string]testservices.ReadFileResponse{
+				"-": {
+					Res: fileContents(t, testMultiResourceFile),
+					Err: nil,
+				},
+			},
+		},
+
+		want: Objects{
+			"k8s-deployment-test-app.yaml": newObjectFromFile(t, testDeploymentFile),
+			"k8s-service-test-app.yaml":    newObjectFromFile(t, testServiceFile),
+		},
+	},{
+		name: "Do not parse file with only comments and whitespace",
+
+		configs: "file.yaml",
+		oss: &testservices.TestOS{
+			StatResponse: map[string]testservices.StatResponse{
+				"file.yaml": {
+					Res: &testservices.TestFileInfo{
+						IsDirectory: false,
+					},
+					Err: nil,
+				},
+			},
+			ReadFileResponse: map[string]testservices.ReadFileResponse{
+				filepath.Join("file.yaml"): {
+					Res: fileContents(t, testWhitespaceAndCommentsFile),
+					Err: nil,
+				},
+			},
+		},
+
+		want: Objects{},
+	},{
+		name: "Do not parse file in dir with only comments and whitespace",
+
+		configs: configsDir,
+		oss: &testservices.TestOS{
+			StatResponse: map[string]testservices.StatResponse{
+				configsDir: {
+					Res: &testservices.TestFileInfo{
+						IsDirectory: true,
+					},
+					Err: nil,
+				},
+			},
+			ReadDirResponse: map[string]testservices.ReadDirResponse{
+				configsDir: {
+					Res: []os.FileInfo{
+						&testservices.TestFileInfo{
+							BaseName:    "file.yaml",
+							IsDirectory: false,
+						},
+					},
+					Err: nil,
+				},
+			},
+			ReadFileResponse: map[string]testservices.ReadFileResponse{
+				filepath.Join(configsDir, "file.yaml"): {
+					Res: fileContents(t, testWhitespaceAndCommentsFile),
+					Err: nil,
+				},
+			},
+		},
+
+		want: Objects{},
 	}}
 
 	for _, tc := range tests {
