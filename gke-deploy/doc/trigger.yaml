@@ -21,7 +21,7 @@ build:
     - push
     - $_IMAGE_NAME:$SHORT_SHA
   - id: Prepare deploy
-    name: gcr.io/cloud-builders/gke-deploy:stable
+    name: gcr.io/cloud-builders/gke-deploy
     args:
     - prepare
     - --filename=$_K8S_YAML_PATH
@@ -46,7 +46,7 @@ build:
         echo "Copied expanded configs to gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/expanded"
       fi
   - id: Apply deploy
-    name: gcr.io/cloud-builders/gke-deploy:stable
+    name: gcr.io/cloud-builders/gke-deploy
     args:
     - apply
     - --filename=output/expanded
