@@ -40,7 +40,7 @@ const (
 
   # Pipe output from another templating engine to gke-deploy apply.
   kustomize build overlays/staging | gke-deploy apply -f - -c my-cluster -l us-east1-b
-  helm template charts/prometheus | gke-deploy apply -f - -c my-cluster -l us-east1-b`
+  helm template charts/prometheus | gke-deploy apply -f - -c my-cluster -l us-east1-b  # No need to run Tiller in cluster`
 )
 
 type options struct {

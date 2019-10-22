@@ -57,7 +57,7 @@ Apply Phase:
 
   # Pipe output from another templating engine to gke-deploy.
   kustomize build overlays/staging | gke-deploy run -f - -a my-app -c my-cluster -l us-east1-b
-  helm template charts/prometheus | gke-deploy apply -f - -c my-cluster -l us-east1-b`
+  helm template charts/prometheus | gke-deploy apply -f - -c my-cluster -l us-east1-b  # No need to run Tiller in cluster`
 	version = "" // TODO(joonlim): Create plan for versioning.
 )
 
