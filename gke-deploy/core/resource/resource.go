@@ -120,7 +120,7 @@ func ParseConfigs(ctx context.Context, configs string, oss services.OSService) (
 		}
 	} else {
 		filename := configs
-		if !hasYamlOrYmlSuffix(filename) {
+		if filename != "-" && !hasYamlOrYmlSuffix(filename) {
 			return nil, fmt.Errorf("file %q does not end in \".yaml\" or \".yml\"", filename)
 		}
 
@@ -520,9 +520,20 @@ func serviceExternalName(obj *Object) (string, error) {
 }
 
 func parseResourcesFromFile(ctx context.Context, filename string, objs Objects, oss services.OSService) error {
+	readStdin := filename == "-"
+	var printFilename string
+	if readStdin {
+		printFilename = "stdin"
+	} else {
+		printFilename = fmt.Sprintf("file %q", filename)
+	}
+
 	in, err := oss.ReadFile(ctx, filename)
 	if err != nil {
-		return fmt.Errorf("failed to read file %q: %v", filename, err)
+		return fmt.Errorf("failed to read %s: %v", printFilename, err)
+	}
+	if readStdin {
+		filename = "k8s.yaml" // Files parsed from stdin will have the prefix "k8s".
 	}
 
 	split := strings.Split(string(in), "\n---")
@@ -530,7 +541,7 @@ func parseResourcesFromFile(ctx context.Context, filename string, objs Objects, 
 	for i, r := range split {
 		obj, err := DecodeFromYAML(ctx, []byte(r))
 		if err != nil {
-			return fmt.Errorf("failed to decode resource from item %d in file %q: %v", i+1, filename, err)
+			return fmt.Errorf("failed to decode resource from item %d in %s: %v", i+1, printFilename, err)
 		}
 
 		// For configs containing one resource, just use the original file base name.
@@ -548,7 +559,7 @@ func parseResourcesFromFile(ctx context.Context, filename string, objs Objects, 
 			objKind := strings.ToLower(ObjectKind(obj))
 			objName, err := ObjectName(obj)
 			if err != nil {
-				return fmt.Errorf("failed to get resource name of item %d in file %q: %v", i+1, filename, err)
+				return fmt.Errorf("failed to get resource name of item %d in %s: %v", i+1, printFilename, err)
 			}
 			baseName = fmt.Sprintf("%s-%s-%s.%s", prefix, objKind, objName, suffix)
 		}
