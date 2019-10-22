@@ -45,7 +45,11 @@ Apply Phase:
   gke-deploy run -f configs
 
   # Deploy to GKE cluster that kubectl is currently targeting without supplying any Kubernetes configuration files. Have gke-deploy generate suggested Kubernetes configuration files for your application using an image, app name, and service port.
-  gke-deploy run -i nginx -a nginx -x 80`
+  gke-deploy run -i nginx -a nginx -x 80
+
+  # Pipe output from another templating engine to gke-deploy run.
+  kustomize build overlays/staging | gke-deploy run -f - -a my-app -c my-cluster -l us-east1-b
+  helm template charts/prometheus | gke-deploy run -f - -a prometheus -c my-cluster -l us-east1-b  # No need to run Tiller in cluster`
 )
 
 type options struct {

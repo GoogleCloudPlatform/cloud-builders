@@ -28,6 +28,9 @@ func NewOS(ctx context.Context) (*OS, error) {
 
 // Stat gets a file description for a file filename.
 func (o *OS) Stat(ctx context.Context, filename string) (os.FileInfo, error) {
+	if filename == "-" {
+		return os.Stdin.Stat()
+	}
 	return os.Stat(filename)
 }
 
@@ -38,6 +41,9 @@ func (o *OS) ReadDir(ctx context.Context, dirname string) ([]os.FileInfo, error)
 
 // ReadFile gets the entire contents of a file filename as bytes.
 func (o *OS) ReadFile(ctx context.Context, filename string) ([]byte, error) {
+	if filename == "-" {
+		return ioutil.ReadAll(os.Stdin)
+	}
 	return ioutil.ReadFile(filename)
 }
 

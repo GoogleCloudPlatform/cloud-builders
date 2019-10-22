@@ -55,6 +55,9 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 		if err != nil {
 			return fmt.Errorf("failed to parse configuration files %q: %v", config, err)
 		}
+		if len(parsed) == 0 {
+			return fmt.Errorf("no objects found")
+		}
 		objs = parsed
 		fmt.Printf("Configuration files to be used: %v\n", objs)
 	} else {
@@ -246,6 +249,9 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 	objs, err := resource.ParseConfigs(ctx, config, d.Clients.OS)
 	if err != nil {
 		return fmt.Errorf("failed to parse configuration files: %v", err)
+	}
+	if len(objs) == 0 {
+		return fmt.Errorf("no objects found")
 	}
 	fmt.Printf("Configuration files to be used: %v\n", objs)
 
