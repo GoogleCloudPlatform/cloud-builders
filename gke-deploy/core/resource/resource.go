@@ -133,7 +133,7 @@ func ParseConfigs(ctx context.Context, configs string, oss services.OSService) (
 }
 
 // SaveAsConfigs saves resource objects as config files to a target output directory.
-func SaveAsConfigs(ctx context.Context, objs Objects, outputDir string, oss services.OSService) error {
+func SaveAsConfigs(ctx context.Context, objs Objects, outputDir string, commentLines map[string]string, oss services.OSService) error {
 	fi, err := oss.Stat(ctx, outputDir)
 	if err != nil && !os.IsNotExist(err) {
 		return fmt.Errorf("failed to get file info for output directory %q: %v", outputDir, err)
@@ -162,6 +162,27 @@ func SaveAsConfigs(ctx context.Context, objs Objects, outputDir string, oss serv
 		if err != nil {
 			return fmt.Errorf("failed to encode resource: %v", err)
 		}
+
+		outString := string(out)
+		lines := strings.Split(outString, "\n")
+		lineIdx := 0
+		for _, line := range lines {
+			for stringToContain, comment := range commentLines {
+				if strings.Contains(stringToContain, "\n") {
+					return fmt.Errorf("line cannot contain a newline character")
+				}
+				if strings.Contains(comment, "\n") {
+					return fmt.Errorf("comment cannot contain a newline character")
+				}
+				if strings.Contains(line, stringToContain) {
+					lines[lineIdx] = fmt.Sprintf("%s  # %s", line, comment)
+				}
+			}
+			lineIdx += 1
+		}
+
+		out = []byte(strings.Join(lines, "\n"))
+
 		if err := oss.WriteFile(ctx, filename, out, 0644); err != nil {
 			return fmt.Errorf("failed to write file %q: %v", filename, err)
 		}

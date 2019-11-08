@@ -824,7 +824,7 @@ func TestParseConfigs(t *testing.T) {
 			"multi-resource-deployment-test-app-2.yaml": newObjectFromFile(t, testDeploymentFile),
 			"multi-resource-service-test-app-2.yaml":    newObjectFromFile(t, testServiceFile),
 		},
-	},{
+	}, {
 		name: "Configs is stdin with single object",
 
 		configs: "-",
@@ -848,7 +848,7 @@ func TestParseConfigs(t *testing.T) {
 		want: Objects{
 			"k8s.yaml": newObjectFromFile(t, testDeploymentFile),
 		},
-	},{
+	}, {
 		name: "Configs is stdin with multiple objects",
 
 		configs: "-",
@@ -873,7 +873,7 @@ func TestParseConfigs(t *testing.T) {
 			"k8s-deployment-test-app.yaml": newObjectFromFile(t, testDeploymentFile),
 			"k8s-service-test-app.yaml":    newObjectFromFile(t, testServiceFile),
 		},
-	},{
+	}, {
 		name: "Do not parse file with only comments and whitespace",
 
 		configs: "file.yaml",
@@ -895,7 +895,7 @@ func TestParseConfigs(t *testing.T) {
 		},
 
 		want: Objects{},
-	},{
+	}, {
 		name: "Do not parse file in dir with only comments and whitespace",
 
 		configs: configsDir,
