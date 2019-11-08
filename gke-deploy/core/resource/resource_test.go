@@ -173,6 +173,7 @@ func TestSaveAsConfigs(t *testing.T) {
 
 		objs      Objects
 		outputDir string
+		commentLines map[string]string
 		oss       services.OSService
 
 		want Objects
@@ -181,6 +182,7 @@ func TestSaveAsConfigs(t *testing.T) {
 
 		outputDir: outputDir,
 		objs:      Objects{},
+		commentLines: nil,
 		oss: &testservices.TestOS{
 			StatResponse: map[string]testservices.StatResponse{
 				outputDir: {
@@ -200,6 +202,7 @@ func TestSaveAsConfigs(t *testing.T) {
 			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
 			serviceYaml:    newObjectFromFile(t, testServiceFile),
 		},
+		commentLines: nil,
 		oss: &testservices.TestOS{
 			StatResponse: map[string]testservices.StatResponse{
 				outputDir: {
@@ -222,6 +225,7 @@ func TestSaveAsConfigs(t *testing.T) {
 			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
 			serviceYaml:    newObjectFromFile(t, testServiceFile),
 		},
+		commentLines: nil,
 		oss: &testservices.TestOS{
 			StatResponse: map[string]testservices.StatResponse{
 				outputDir: {
@@ -243,12 +247,38 @@ func TestSaveAsConfigs(t *testing.T) {
 				filepath.Join(outputDir, serviceYaml):    nil,
 			},
 		},
+	},  {
+		name: "Non-zero objects",
+
+		outputDir: outputDir,
+		objs: Objects{
+			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+		},
+		commentLines: map[string]string{
+			"unfound": "abc",
+			"image: gcr.io/cbd-test/test-app:latest" : "comment 123",
+
+		},
+		oss: &testservices.TestOS{
+			StatResponse: map[string]testservices.StatResponse{
+				outputDir: {
+					Res: nil,
+					Err: os.ErrNotExist,
+				},
+			},
+			MkdirAllResponse: map[string]error{
+				outputDir: nil,
+			},
+			WriteFileResponse: map[string]error{
+				filepath.Join(outputDir, deploymentYaml): nil,
+			},
+		},
 	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if err := SaveAsConfigs(ctx, tc.objs, tc.outputDir, tc.oss); err != nil {
-				t.Errorf("SaveAsConfigs(ctx, %v, %s, oss) = %v; want <nil>", tc.objs, tc.outputDir, err)
+			if err := SaveAsConfigs(ctx, tc.objs, tc.outputDir, tc.commentLines, tc.oss); err != nil {
+				t.Errorf("SaveAsConfigs(ctx, %v, %s, %v, oss) = %v; want <nil>", tc.objs, tc.outputDir, tc.commentLines, err)
 			}
 		})
 	}
@@ -267,6 +297,7 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 
 		objs      Objects
 		outputDir string
+		commentLines map[string]string
 		oss       services.OSService
 
 		want Objects
@@ -274,6 +305,7 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 		name: "Failed to make directory",
 
 		outputDir: outputDir,
+		commentLines: nil,
 		oss: &testservices.TestOS{
 			StatResponse: map[string]testservices.StatResponse{
 				outputDir: {
@@ -289,6 +321,7 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 		name: "Failed to write file",
 
 		outputDir: outputDir,
+		commentLines: nil,
 		objs: Objects{
 			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
 		},
@@ -310,6 +343,7 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 		name: "Failed to stat output directory",
 
 		outputDir: outputDir,
+		commentLines: nil,
 		objs: Objects{
 			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
 		},
@@ -324,6 +358,7 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 	}, {
 		name:      "Output directory exists and is not empty",
 		outputDir: outputDir,
+		commentLines: nil,
 		objs: Objects{
 			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
 		},
@@ -351,6 +386,7 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 	}, {
 		name:      "Failed to read output directory",
 		outputDir: outputDir,
+		commentLines: nil,
 		objs: Objects{
 			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
 		},
@@ -373,6 +409,7 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 	}, {
 		name:      "Output directory exists and is a file",
 		outputDir: outputDir,
+		commentLines: nil,
 		objs: Objects{
 			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
 		},
@@ -386,12 +423,56 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 				},
 			},
 		},
+	},  {
+		name: "Line to add comment to contains newline character",
+
+		outputDir: outputDir,
+		objs: Objects{
+			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+		},
+		commentLines: map[string]string{
+			"asdf\nasdf": "asdf",
+
+		},
+		oss: &testservices.TestOS{
+			StatResponse: map[string]testservices.StatResponse{
+				outputDir: {
+					Res: nil,
+					Err: os.ErrNotExist,
+				},
+			},
+			MkdirAllResponse: map[string]error{
+				outputDir: nil,
+			},
+		},
+	},  {
+		name: "Comment to add contains newline character",
+
+		outputDir: outputDir,
+		objs: Objects{
+			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+		},
+		commentLines: map[string]string{
+			"asdf": "asdf\nasdf",
+
+		},
+		oss: &testservices.TestOS{
+			StatResponse: map[string]testservices.StatResponse{
+				outputDir: {
+					Res: nil,
+					Err: os.ErrNotExist,
+				},
+			},
+			MkdirAllResponse: map[string]error{
+				outputDir: nil,
+			},
+		},
 	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if err := SaveAsConfigs(ctx, tc.objs, tc.outputDir, tc.oss); err == nil {
-				t.Errorf("SaveAsConfigs(ctx, %v, %s, oss) = <nil>; want error", tc.objs, tc.outputDir)
+			if err := SaveAsConfigs(ctx, tc.objs, tc.outputDir, tc.commentLines, tc.oss); err == nil {
+				t.Errorf("SaveAsConfigs(ctx, %v, %s, %v, oss) = <nil>; want error", tc.objs, tc.outputDir, tc.commentLines)
 			}
 		})
 	}
