@@ -15,6 +15,7 @@ RUN apt-get -y update && \
         bigtable \
         cbt \
         cloud-datastore-emulator \
+        cloud-firestore-emulator \
         cloud-build-local \
         datalab \
         docker-credential-gcr \
