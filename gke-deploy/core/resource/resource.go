@@ -133,10 +133,10 @@ func ParseConfigs(ctx context.Context, configs string, oss services.OSService) (
 }
 
 // SaveAsConfigs saves resource objects as config files to a target output directory.
-// If any lines in a resource object's string representation contains a key in
-// commentLines, the corresponding value will be added as a comment at the end of
+// If any lines in a resource object's string representation contain a key in
+// lineComments, the corresponding value will be added as a comment at the end of
 // the line.
-func SaveAsConfigs(ctx context.Context, objs Objects, outputDir string, commentLines map[string]string, oss services.OSService) error {
+func SaveAsConfigs(ctx context.Context, objs Objects, outputDir string, lineComments map[string]string, oss services.OSService) error {
 	fi, err := oss.Stat(ctx, outputDir)
 	if err != nil && !os.IsNotExist(err) {
 		return fmt.Errorf("failed to get file info for output directory %q: %v", outputDir, err)
@@ -166,31 +166,41 @@ func SaveAsConfigs(ctx context.Context, objs Objects, outputDir string, commentL
 			return fmt.Errorf("failed to encode resource: %v", err)
 		}
 
-		outString := string(out)
-		lines := strings.Split(outString, "\n")
-		lineIdx := 0
-		for _, line := range lines {
-			for stringToContain, comment := range commentLines {
-				if strings.Contains(stringToContain, "\n") {
-					return fmt.Errorf("line cannot contain a newline character")
-				}
-				if strings.Contains(comment, "\n") {
-					return fmt.Errorf("comment cannot contain a newline character")
-				}
-				if strings.Contains(line, stringToContain) {
-					lines[lineIdx] = fmt.Sprintf("%s  # %s", line, comment)
-				}
-			}
-			lineIdx += 1
+		outWithComments, err := addCommentsToLines(string(out), lineComments)
+		if err != nil {
+			return fmt.Errorf("failed to add comment to object file: %v", err)
 		}
 
-		out = []byte(strings.Join(lines, "\n"))
-
-		if err := oss.WriteFile(ctx, filename, out, 0644); err != nil {
+		if err := oss.WriteFile(ctx, filename, []byte(outWithComments), 0644); err != nil {
 			return fmt.Errorf("failed to write file %q: %v", filename, err)
 		}
 	}
 	return nil
+}
+
+// addCommentsToLines iterates through the lines of a string ('-n'-delimited)
+// and if any lines contain a key in lineComments, the corresponding value will
+// be added as a comment at the end of the line. This function returns the
+// modified string.
+func addCommentsToLines(s string, lineComments map[string]string) (string, error) {
+	lines := strings.Split(s, "\n")
+	lineIdx := 0
+	for _, line := range lines {
+		for stringToContain, comment := range lineComments {
+			if strings.Contains(stringToContain, "\n") {
+				return "", fmt.Errorf("line cannot contain a newline character")
+			}
+			if strings.Contains(comment, "\n") {
+				return "", fmt.Errorf("comment cannot contain a newline character")
+			}
+			if strings.Contains(line, stringToContain) {
+				lines[lineIdx] = fmt.Sprintf("%s  # %s", line, comment)
+			}
+		}
+		lineIdx += 1
+	}
+
+	return strings.Join(lines, "\n"), nil
 }
 
 // UpdateMatchingContainerImage updates all objects that have container images matching the provided image
