@@ -234,27 +234,21 @@ func UpdateMatchingContainerImage(ctx context.Context, objs Objects, imageName, 
 }
 
 // UpdateNamespace updates all objects to change its namespace to the provided namespace. Objects
-// that do not have a namespace field will not be updated.
-func UpdateNamespace(ctx context.Context, objs Objects, replace string) error {
-	var hasNS []*Object
+// that do not have a namespace field will be updated to have a namespace field. If onlyAddIfEmpty
+// is true, the namespace will only be added to to objects that do not already have a namespace
+// field.
+func UpdateNamespace(ctx context.Context, objs Objects, replace string, onlyAddIfEmpty bool) error {
 	for _, obj := range objs {
 		ns, err := ObjectNamespace(obj)
 		if err != nil {
 			return fmt.Errorf("failed to get namespace field: %v", err)
 		}
-		if ns != "" {
-			if err := setObjectNamespace(obj, replace); err != nil {
-				return fmt.Errorf("failed to set namespace field: %v", err)
-			}
-			hasNS = append(hasNS, obj)
+		if onlyAddIfEmpty && ns != "" {
+			continue
 		}
-	}
-	if len(hasNS) > 0 {
-		fmt.Fprintf(os.Stderr, "\nWARNING: It is recommended to set a resource's namespace at deploy time, rather than in its config. The following resources have embedded namespaces:\n")
-		for _, obj := range hasNS {
-			fmt.Fprintf(os.Stderr, "%v\n", obj)
+		if err := setObjectNamespace(obj, replace); err != nil {
+			return fmt.Errorf("failed to set namespace field: %v", err)
 		}
-		fmt.Fprintln(os.Stderr)
 	}
 	return nil
 }

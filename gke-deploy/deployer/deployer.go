@@ -154,8 +154,12 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 	}
 
 	if namespace != "" {
-		if err := resource.UpdateNamespace(ctx, objs, namespace); err != nil {
+		if err := resource.UpdateNamespace(ctx, objs, namespace, false); err != nil {
 			return fmt.Errorf("failed to update namespace of objects: %v", err)
+		}
+	} else {
+		if err := resource.UpdateNamespace(ctx, objs, "default", true); err != nil {
+			return fmt.Errorf("failed to update namespace of objects to default: %v", err)
 		}
 	}
 
