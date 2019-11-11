@@ -49,6 +49,8 @@ RUN \
 
 # Store the Bazel outputs under /workspace so that the symlinks under bazel-bin (et al) are accessible
 # to downstream build steps.
+ENV HOME /builder/home
+RUN mkdir -p $HOME
 RUN mkdir -p /workspace
 RUN echo 'startup --output_base=/workspace/.bazel' > ~/.bazelrc
 
