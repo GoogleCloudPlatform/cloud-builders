@@ -171,16 +171,18 @@ func TestSaveAsConfigs(t *testing.T) {
 	tests := []struct {
 		name string
 
-		objs      Objects
-		outputDir string
-		oss       services.OSService
+		objs         Objects
+		outputDir    string
+		lineComments map[string]string
+		oss          services.OSService
 
 		want Objects
 	}{{
 		name: "Zero objects",
 
-		outputDir: outputDir,
-		objs:      Objects{},
+		outputDir:    outputDir,
+		objs:         Objects{},
+		lineComments: nil,
 		oss: &testservices.TestOS{
 			StatResponse: map[string]testservices.StatResponse{
 				outputDir: {
@@ -200,6 +202,7 @@ func TestSaveAsConfigs(t *testing.T) {
 			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
 			serviceYaml:    newObjectFromFile(t, testServiceFile),
 		},
+		lineComments: nil,
 		oss: &testservices.TestOS{
 			StatResponse: map[string]testservices.StatResponse{
 				outputDir: {
@@ -222,6 +225,7 @@ func TestSaveAsConfigs(t *testing.T) {
 			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
 			serviceYaml:    newObjectFromFile(t, testServiceFile),
 		},
+		lineComments: nil,
 		oss: &testservices.TestOS{
 			StatResponse: map[string]testservices.StatResponse{
 				outputDir: {
@@ -243,12 +247,37 @@ func TestSaveAsConfigs(t *testing.T) {
 				filepath.Join(outputDir, serviceYaml):    nil,
 			},
 		},
+	}, {
+		name: "Non-zero objects",
+
+		outputDir: outputDir,
+		objs: Objects{
+			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+		},
+		lineComments: map[string]string{
+			"unfound":                                "abc",
+			"image: gcr.io/cbd-test/test-app:latest": "comment 123",
+		},
+		oss: &testservices.TestOS{
+			StatResponse: map[string]testservices.StatResponse{
+				outputDir: {
+					Res: nil,
+					Err: os.ErrNotExist,
+				},
+			},
+			MkdirAllResponse: map[string]error{
+				outputDir: nil,
+			},
+			WriteFileResponse: map[string]error{
+				filepath.Join(outputDir, deploymentYaml): nil,
+			},
+		},
 	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if err := SaveAsConfigs(ctx, tc.objs, tc.outputDir, tc.oss); err != nil {
-				t.Errorf("SaveAsConfigs(ctx, %v, %s, oss) = %v; want <nil>", tc.objs, tc.outputDir, err)
+			if err := SaveAsConfigs(ctx, tc.objs, tc.outputDir, tc.lineComments, tc.oss); err != nil {
+				t.Errorf("SaveAsConfigs(ctx, %v, %s, %v, oss) = %v; want <nil>", tc.objs, tc.outputDir, tc.lineComments, err)
 			}
 		})
 	}
@@ -265,15 +294,17 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 	tests := []struct {
 		name string
 
-		objs      Objects
-		outputDir string
-		oss       services.OSService
+		objs         Objects
+		outputDir    string
+		lineComments map[string]string
+		oss          services.OSService
 
 		want Objects
 	}{{
 		name: "Failed to make directory",
 
-		outputDir: outputDir,
+		outputDir:    outputDir,
+		lineComments: nil,
 		oss: &testservices.TestOS{
 			StatResponse: map[string]testservices.StatResponse{
 				outputDir: {
@@ -288,7 +319,8 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 	}, {
 		name: "Failed to write file",
 
-		outputDir: outputDir,
+		outputDir:    outputDir,
+		lineComments: nil,
 		objs: Objects{
 			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
 		},
@@ -309,7 +341,8 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 	}, {
 		name: "Failed to stat output directory",
 
-		outputDir: outputDir,
+		outputDir:    outputDir,
+		lineComments: nil,
 		objs: Objects{
 			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
 		},
@@ -322,8 +355,9 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 			},
 		},
 	}, {
-		name:      "Output directory exists and is not empty",
-		outputDir: outputDir,
+		name:         "Output directory exists and is not empty",
+		outputDir:    outputDir,
+		lineComments: nil,
 		objs: Objects{
 			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
 		},
@@ -349,8 +383,9 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 			},
 		},
 	}, {
-		name:      "Failed to read output directory",
-		outputDir: outputDir,
+		name:         "Failed to read output directory",
+		outputDir:    outputDir,
+		lineComments: nil,
 		objs: Objects{
 			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
 		},
@@ -371,8 +406,9 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 			},
 		},
 	}, {
-		name:      "Output directory exists and is a file",
-		outputDir: outputDir,
+		name:         "Output directory exists and is a file",
+		outputDir:    outputDir,
+		lineComments: nil,
 		objs: Objects{
 			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
 		},
@@ -386,12 +422,54 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 				},
 			},
 		},
+	}, {
+		name: "Line to add comment to contains newline character",
+
+		outputDir: outputDir,
+		objs: Objects{
+			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+		},
+		lineComments: map[string]string{
+			"asdf\nasdf": "asdf",
+		},
+		oss: &testservices.TestOS{
+			StatResponse: map[string]testservices.StatResponse{
+				outputDir: {
+					Res: nil,
+					Err: os.ErrNotExist,
+				},
+			},
+			MkdirAllResponse: map[string]error{
+				outputDir: nil,
+			},
+		},
+	}, {
+		name: "Comment to add contains newline character",
+
+		outputDir: outputDir,
+		objs: Objects{
+			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+		},
+		lineComments: map[string]string{
+			"asdf": "asdf\nasdf",
+		},
+		oss: &testservices.TestOS{
+			StatResponse: map[string]testservices.StatResponse{
+				outputDir: {
+					Res: nil,
+					Err: os.ErrNotExist,
+				},
+			},
+			MkdirAllResponse: map[string]error{
+				outputDir: nil,
+			},
+		},
 	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if err := SaveAsConfigs(ctx, tc.objs, tc.outputDir, tc.oss); err == nil {
-				t.Errorf("SaveAsConfigs(ctx, %v, %s, oss) = <nil>; want error", tc.objs, tc.outputDir)
+			if err := SaveAsConfigs(ctx, tc.objs, tc.outputDir, tc.lineComments, tc.oss); err == nil {
+				t.Errorf("SaveAsConfigs(ctx, %v, %s, %v, oss) = <nil>; want error", tc.objs, tc.outputDir, tc.lineComments)
 			}
 		})
 	}
@@ -824,7 +902,7 @@ func TestParseConfigs(t *testing.T) {
 			"multi-resource-deployment-test-app-2.yaml": newObjectFromFile(t, testDeploymentFile),
 			"multi-resource-service-test-app-2.yaml":    newObjectFromFile(t, testServiceFile),
 		},
-	},{
+	}, {
 		name: "Configs is stdin with single object",
 
 		configs: "-",
@@ -848,7 +926,7 @@ func TestParseConfigs(t *testing.T) {
 		want: Objects{
 			"k8s.yaml": newObjectFromFile(t, testDeploymentFile),
 		},
-	},{
+	}, {
 		name: "Configs is stdin with multiple objects",
 
 		configs: "-",
@@ -873,7 +951,7 @@ func TestParseConfigs(t *testing.T) {
 			"k8s-deployment-test-app.yaml": newObjectFromFile(t, testDeploymentFile),
 			"k8s-service-test-app.yaml":    newObjectFromFile(t, testServiceFile),
 		},
-	},{
+	}, {
 		name: "Do not parse file with only comments and whitespace",
 
 		configs: "file.yaml",
@@ -895,7 +973,7 @@ func TestParseConfigs(t *testing.T) {
 		},
 
 		want: Objects{},
-	},{
+	}, {
 		name: "Do not parse file in dir with only comments and whitespace",
 
 		configs: configsDir,
@@ -1888,6 +1966,60 @@ func TestSortObjectsByKindAndName(t *testing.T) {
 
 	if sortObjectsByKindAndName(objs); !reflect.DeepEqual(objs, want) {
 		t.Errorf("sortObjectsByKindAndName(%v) = %v; want %v", beforeUpdate, objs, want)
+	}
+}
+
+func TestAddCommentsToLines(t *testing.T) {
+	tests := []struct {
+		name string
+
+		s            string
+		lineComments map[string]string
+
+		want string
+	}{{
+		name: "Add comments to lines",
+
+		s: "abc\n123\nhithere\nbyehere",
+		lineComments: map[string]string{
+			"12":   "first comment",
+			"here": "multiple comments",
+		},
+
+		want: "abc\n123  # first comment\nhithere  # multiple comments\nbyehere  # multiple comments",
+	}, {
+		name: "No comments to add",
+
+		s:            "abc\n123\nhithere\nbyehere",
+		lineComments: nil,
+
+		want: "abc\n123\nhithere\nbyehere",
+	}, {
+		name: "No matching lines",
+
+		s: "red\nfish\nblue\nfish",
+		lineComments: map[string]string{
+			"12":   "first comment",
+			"here": "multiple comments",
+		},
+		want: "red\nfish\nblue\nfish",
+	}, {
+		name: "Empty string",
+
+		s: "",
+		lineComments: map[string]string{
+			"12":   "first comment",
+			"here": "multiple comments",
+		},
+		want: "",
+	}}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if got, err := addCommentsToLines(tc.s, tc.lineComments); got != tc.want || err != nil {
+				t.Errorf("addCommentsToLines(%s, %v) = %s, %v; want %s, <nil>", tc.s, tc.lineComments, got, err, tc.want)
+			}
+		})
 	}
 }
 

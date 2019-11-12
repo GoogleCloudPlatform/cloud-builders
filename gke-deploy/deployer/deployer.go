@@ -69,10 +69,11 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 		// e.g., Resolve "gcr.io/my-project/my-app:1.0.0" to name suffix "my-app".
 		imageNameSplit := strings.Split(image.Name(im), "/")
 		imageNameSuffix := imageNameSplit[len(imageNameSplit)-1]
+		imageName := image.Name(im)
 
 		if config == "" {
 			fmt.Printf("Creating suggested Deployment configuration file %q\n", imageNameSuffix)
-			dObj, err := resource.CreateDeploymentObject(ctx, imageNameSuffix, imageNameSuffix, image.Name(im))
+			dObj, err := resource.CreateDeploymentObject(ctx, imageNameSuffix, imageNameSuffix, imageName)
 			if err != nil {
 				return fmt.Errorf("failed to create Deployment object: %v", err)
 			}
@@ -110,6 +111,11 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 				fmt.Fprintf(os.Stderr, "\nWARNING: Service %q already exists in provided configuration files. Not generating new Service.\n\n", service)
 			}
 		}
+
+		// Remove tag/digest from image references.
+		if err := resource.UpdateMatchingContainerImage(ctx, objs, imageName, imageName); err != nil {
+			return fmt.Errorf("failed to update container of objects: %v", err)
+		}
 	}
 
 	if namespace != "" && namespace != "default" {
@@ -131,7 +137,9 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 
 	if len(objs) > 0 {
 		fmt.Printf("Saving suggested configuration files to %q\n", suggestedOutput)
-		if err := resource.SaveAsConfigs(ctx, objs, suggestedOutput, d.Clients.OS); err != nil {
+		if err := resource.SaveAsConfigs(ctx, objs, suggestedOutput, map[string]string{
+			fmt.Sprintf("image: %s", image.Name(im)): "Will be set to actual image before deployment",
+		}, d.Clients.OS); err != nil {
 			return fmt.Errorf("failed to save suggested configuration files to %q: %v", suggestedOutput, err)
 		}
 	}
@@ -201,7 +209,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 	}
 
 	fmt.Printf("Saving expanded configuration files to %q\n", expandedOutput)
-	if err := resource.SaveAsConfigs(ctx, objs, expandedOutput, d.Clients.OS); err != nil {
+	if err := resource.SaveAsConfigs(ctx, objs, expandedOutput, nil, d.Clients.OS); err != nil {
 		return fmt.Errorf("failed to save expanded configuration files to %q: %v", expandedOutput, err)
 	}
 
