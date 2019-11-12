@@ -1581,6 +1581,7 @@ func TestUpdateNamespace(t *testing.T) {
 	testHpaFile := "testing/hpa.yaml"
 	testHpaUpdatedNamespacefile := "testing/hpa-updated-namespace.yaml"
 	testDeploymentFile := "testing/deployment.yaml"
+	testDeploymentUpdatedNamespacefile := "testing/deployment-updated-namespace.yaml"
 
 	hpaYaml := "hpa.yaml"
 	deploymentYaml := "deployment.yaml"
@@ -1619,7 +1620,7 @@ func TestUpdateNamespace(t *testing.T) {
 			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
 		},
 		want: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+			deploymentYaml: newObjectFromFile(t, testDeploymentUpdatedNamespacefile),
 		},
 	}, {
 		name: "Same namespace",
@@ -1649,6 +1650,69 @@ func TestUpdateNamespace(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			if err := UpdateNamespace(ctx, tc.objs, tc.replace); !reflect.DeepEqual(tc.objs, tc.want) || err != nil {
 				t.Errorf("UpdateNamespace(ctx, %v, %s) = %v, %v; want <nil>, %v", tc.beforeUpdate, tc.replace, err, tc.objs, tc.want)
+			}
+		})
+	}
+}
+
+func TestAddNamespaceIfMissing(t *testing.T) {
+	testDeploymentFile := "testing/deployment.yaml"
+	testDeploymentUpdatedNamespacefile := "testing/deployment-updated-namespace.yaml"
+	testHpaFile := "testing/hpa.yaml"
+
+	deploymentYaml := "deployment.yaml"
+	hpaYaml := "hpa.yaml"
+
+	tests := []struct {
+		name string
+
+		objs    Objects
+		replace string
+
+		beforeUpdate Objects
+		want         Objects
+	}{{
+		name: "No namespace field, adds namespace",
+
+		objs: Objects{
+			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+		},
+		replace: "REPLACED",
+
+		beforeUpdate: Objects{
+			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+		},
+		want: Objects{
+			deploymentYaml: newObjectFromFile(t, testDeploymentUpdatedNamespacefile),
+		},
+	}, {
+		name: "Does not update namespace",
+
+		objs: Objects{
+			hpaYaml: newObjectFromFile(t, testHpaFile),
+		},
+		replace: "REPLACED",
+
+		beforeUpdate: Objects{
+			hpaYaml: newObjectFromFile(t, testHpaFile),
+		},
+		want: Objects{
+			hpaYaml: newObjectFromFile(t, testHpaFile),
+		},
+	}, {
+		name: "Empty objects",
+
+		objs:    Objects{},
+		replace: "REPLACED",
+
+		beforeUpdate: Objects{},
+		want:         Objects{},
+	}}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if err := AddNamespaceIfMissing(tc.objs, tc.replace); !reflect.DeepEqual(tc.objs, tc.want) || err != nil {
+				t.Errorf("AddNamespaceIfMissing(ctx, %v, %s) = %v, %v; want <nil>, %v", tc.beforeUpdate, tc.replace, err, tc.objs, tc.want)
 			}
 		})
 	}
