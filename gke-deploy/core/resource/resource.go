@@ -197,7 +197,7 @@ func addCommentsToLines(s string, lineComments map[string]string) (string, error
 				lines[lineIdx] = fmt.Sprintf("%s  # %s", line, comment)
 			}
 		}
-		lineIdx += 1
+		lineIdx++
 	}
 
 	return strings.Join(lines, "\n"), nil
