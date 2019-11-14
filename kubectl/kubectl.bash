@@ -15,7 +15,7 @@ EOF
   exit 1
 }
 
-kubectl_cmd=kubectl.${KUBECTL_VERSION}
+kubectl_cmd=kubectl${KUBECTL_VERSION:+.${KUBECTL_VERSION}}
 cluster=${CLOUDSDK_CONTAINER_CLUSTER:-$(gcloud config get-value container/cluster 2> /dev/null)}
 region=${CLOUDSDK_COMPUTE_REGION:-$(gcloud config get-value compute/region 2> /dev/null)}
 zone=${CLOUDSDK_COMPUTE_ZONE:-$(gcloud config get-value compute/zone 2> /dev/null)}
