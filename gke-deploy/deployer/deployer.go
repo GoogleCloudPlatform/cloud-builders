@@ -137,9 +137,13 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 
 	if len(objs) > 0 {
 		fmt.Printf("Saving suggested configuration files to %q\n", suggestedOutput)
-		if err := resource.SaveAsConfigs(ctx, objs, suggestedOutput, map[string]string{
-			fmt.Sprintf("image: %s", image.Name(im)): "Will be set to actual image before deployment",
-		}, d.Clients.OS); err != nil {
+		var lineComments map[string]string
+		if im != nil {
+			lineComments = map[string]string{
+				fmt.Sprintf("image: %s", image.Name(im)): "Will be set to actual image before deployment",
+			}
+		}
+		if err := resource.SaveAsConfigs(ctx, objs, suggestedOutput, lineComments, d.Clients.OS); err != nil {
 			return fmt.Errorf("failed to save suggested configuration files to %q: %v", suggestedOutput, err)
 		}
 	}
