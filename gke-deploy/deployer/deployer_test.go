@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/google/go-containerregistry/pkg/name"
-	"github.com/google/go-containerregistry/pkg/v1"
+	v1 "github.com/google/go-containerregistry/pkg/v1"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/testservices"
@@ -47,9 +47,9 @@ func TestPrepare(t *testing.T) {
 	configDir := "path/to/config"
 	deploymentYaml := "deployment.yaml"
 	multiResourceYaml := "multi-resource.yaml"
-	namespaceYaml := "namespace.yaml"
-	hpaYaml := "horizontalpodautoscaler.yaml"
 	serviceYaml := "service.yaml"
+
+	aggregateYaml := "aggregate.yaml"
 
 	tests := []struct {
 		name string
@@ -137,14 +137,8 @@ func TestPrepare(t *testing.T) {
 						expandedDir:  nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, "multi-resource-deployment-test-app.yaml"):   nil,
-						filepath.Join(suggestedDir, "multi-resource-service-test-app.yaml"):      nil,
-						filepath.Join(suggestedDir, "multi-resource-deployment-test-app-2.yaml"): nil,
-						filepath.Join(suggestedDir, "multi-resource-service-test-app-2.yaml"):    nil,
-						filepath.Join(expandedDir, "multi-resource-deployment-test-app.yaml"):    nil,
-						filepath.Join(expandedDir, "multi-resource-service-test-app.yaml"):       nil,
-						filepath.Join(expandedDir, "multi-resource-deployment-test-app-2.yaml"):  nil,
-						filepath.Join(expandedDir, "multi-resource-service-test-app-2.yaml"):     nil,
+						filepath.Join(suggestedDir, aggregateYaml): nil,
+						filepath.Join(expandedDir, aggregateYaml):  nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -203,10 +197,8 @@ func TestPrepare(t *testing.T) {
 						expandedDir:  nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, "multi-resource-deployment-test-app.yaml"): nil,
-						filepath.Join(suggestedDir, "multi-resource-service-test-app.yaml"):    nil,
-						filepath.Join(expandedDir, "multi-resource-deployment-test-app.yaml"):  nil,
-						filepath.Join(expandedDir, "multi-resource-service-test-app.yaml"):     nil,
+						filepath.Join(suggestedDir, aggregateYaml): nil,
+						filepath.Join(expandedDir, aggregateYaml):  nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -280,8 +272,8 @@ func TestPrepare(t *testing.T) {
 						expandedDir:  nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, deploymentYaml): nil,
-						filepath.Join(expandedDir, deploymentYaml):  nil,
+						filepath.Join(suggestedDir, aggregateYaml): nil,
+						filepath.Join(expandedDir, aggregateYaml):  nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -355,8 +347,8 @@ func TestPrepare(t *testing.T) {
 						expandedDir:  nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, deploymentYaml): nil,
-						filepath.Join(expandedDir, deploymentYaml):  nil,
+						filepath.Join(suggestedDir, aggregateYaml): nil,
+						filepath.Join(expandedDir, aggregateYaml):  nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -426,8 +418,8 @@ func TestPrepare(t *testing.T) {
 						expandedDir:  nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, deploymentYaml): nil,
-						filepath.Join(expandedDir, deploymentYaml):  nil,
+						filepath.Join(suggestedDir, aggregateYaml): nil,
+						filepath.Join(expandedDir, aggregateYaml):  nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -497,10 +489,8 @@ func TestPrepare(t *testing.T) {
 						expandedDir:  nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, deploymentYaml): nil,
-						filepath.Join(suggestedDir, namespaceYaml):  nil,
-						filepath.Join(expandedDir, deploymentYaml):  nil,
-						filepath.Join(expandedDir, namespaceYaml):   nil,
+						filepath.Join(suggestedDir, aggregateYaml): nil,
+						filepath.Join(expandedDir, aggregateYaml):  nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -570,8 +560,8 @@ func TestPrepare(t *testing.T) {
 						expandedDir:  nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, serviceYaml): nil,
-						filepath.Join(expandedDir, serviceYaml):  nil,
+						filepath.Join(suggestedDir, aggregateYaml): nil,
+						filepath.Join(expandedDir, aggregateYaml):  nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -641,10 +631,8 @@ func TestPrepare(t *testing.T) {
 						expandedDir:  nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, deploymentYaml): nil,
-						filepath.Join(suggestedDir, hpaYaml):        nil,
-						filepath.Join(expandedDir, deploymentYaml):  nil,
-						filepath.Join(expandedDir, hpaYaml):         nil,
+						filepath.Join(suggestedDir, aggregateYaml): nil,
+						filepath.Join(expandedDir, aggregateYaml):  nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -714,10 +702,8 @@ func TestPrepare(t *testing.T) {
 						expandedDir:  nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, deploymentYaml): nil,
-						filepath.Join(suggestedDir, serviceYaml):    nil,
-						filepath.Join(expandedDir, deploymentYaml):  nil,
-						filepath.Join(expandedDir, serviceYaml):     nil,
+						filepath.Join(suggestedDir, aggregateYaml): nil,
+						filepath.Join(expandedDir, aggregateYaml):  nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -787,8 +773,8 @@ func TestPrepare(t *testing.T) {
 						expandedDir:  nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, deploymentYaml): nil,
-						filepath.Join(expandedDir, deploymentYaml):  nil,
+						filepath.Join(suggestedDir, aggregateYaml): nil,
+						filepath.Join(expandedDir, aggregateYaml):  nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -829,7 +815,7 @@ func TestPrepareErrors(t *testing.T) {
 	annotations := make(map[string]string)
 
 	configDir := "path/to/config"
-	deploymentYaml := "deployment.yaml"
+	aggregateYaml := "aggregate.yaml"
 
 	tests := []struct {
 		name string
@@ -910,7 +896,7 @@ func TestPrepareErrors(t *testing.T) {
 						configDir: {
 							Res: []os.FileInfo{
 								&testservices.TestFileInfo{
-									BaseName:    deploymentYaml,
+									BaseName:    aggregateYaml,
 									IsDirectory: false,
 								},
 							},
@@ -918,7 +904,7 @@ func TestPrepareErrors(t *testing.T) {
 						},
 					},
 					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, deploymentYaml): {
+						filepath.Join(configDir, aggregateYaml): {
 							Res: fileContents(t, testDeploymentFile),
 							Err: nil,
 						},
@@ -927,7 +913,7 @@ func TestPrepareErrors(t *testing.T) {
 						suggestedDir: nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, deploymentYaml): nil,
+						filepath.Join(suggestedDir, aggregateYaml): nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -968,7 +954,7 @@ func TestPrepareErrors(t *testing.T) {
 						configDir: {
 							Res: []os.FileInfo{
 								&testservices.TestFileInfo{
-									BaseName:    deploymentYaml,
+									BaseName:    aggregateYaml,
 									IsDirectory: false,
 								},
 							},
@@ -976,7 +962,7 @@ func TestPrepareErrors(t *testing.T) {
 						},
 					},
 					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, deploymentYaml): {
+						filepath.Join(configDir, aggregateYaml): {
 							Res: fileContents(t, testDeploymentFile),
 							Err: nil,
 						},
@@ -985,7 +971,7 @@ func TestPrepareErrors(t *testing.T) {
 						suggestedDir: nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, deploymentYaml): fmt.Errorf("failed to write file"),
+						filepath.Join(suggestedDir, aggregateYaml): fmt.Errorf("failed to write file"),
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -1034,7 +1020,7 @@ func TestPrepareErrors(t *testing.T) {
 						configDir: {
 							Res: []os.FileInfo{
 								&testservices.TestFileInfo{
-									BaseName:    deploymentYaml,
+									BaseName:    aggregateYaml,
 									IsDirectory: false,
 								},
 							},
@@ -1042,7 +1028,7 @@ func TestPrepareErrors(t *testing.T) {
 						},
 					},
 					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, deploymentYaml): {
+						filepath.Join(configDir, aggregateYaml): {
 							Res: fileContents(t, testDeploymentFile),
 							Err: nil,
 						},
@@ -1052,8 +1038,8 @@ func TestPrepareErrors(t *testing.T) {
 						//expandedDir: nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, deploymentYaml): nil,
-						//filepath.Join(expandedDir, deploymentYaml): nil,
+						filepath.Join(suggestedDir, aggregateYaml): nil,
+						//filepath.Join(expandedDir, aggregateYaml): nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -1102,7 +1088,7 @@ func TestPrepareErrors(t *testing.T) {
 						configDir: {
 							Res: []os.FileInfo{
 								&testservices.TestFileInfo{
-									BaseName:    deploymentYaml,
+									BaseName:    aggregateYaml,
 									IsDirectory: false,
 								},
 							},
@@ -1110,7 +1096,7 @@ func TestPrepareErrors(t *testing.T) {
 						},
 					},
 					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, deploymentYaml): {
+						filepath.Join(configDir, aggregateYaml): {
 							Res: fileContents(t, testDeploymentFile),
 							Err: nil,
 						},
@@ -1119,7 +1105,7 @@ func TestPrepareErrors(t *testing.T) {
 						suggestedDir: nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, deploymentYaml): nil,
+						filepath.Join(suggestedDir, aggregateYaml): nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -1168,7 +1154,7 @@ func TestPrepareErrors(t *testing.T) {
 						configDir: {
 							Res: []os.FileInfo{
 								&testservices.TestFileInfo{
-									BaseName:    deploymentYaml,
+									BaseName:    aggregateYaml,
 									IsDirectory: false,
 								},
 							},
@@ -1176,7 +1162,7 @@ func TestPrepareErrors(t *testing.T) {
 						},
 					},
 					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, deploymentYaml): {
+						filepath.Join(configDir, aggregateYaml): {
 							Res: fileContents(t, testDeploymentFile),
 							Err: nil,
 						},
@@ -1185,7 +1171,7 @@ func TestPrepareErrors(t *testing.T) {
 						suggestedDir: nil,
 					},
 					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, deploymentYaml): nil,
+						filepath.Join(suggestedDir, aggregateYaml): nil,
 					},
 				},
 				Remote: &testservices.TestRemote{
@@ -1777,6 +1763,8 @@ func TestApply(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			fmt.Println("*********************")
+			fmt.Println(tc.name)
 			if err := tc.deployer.Apply(ctx, tc.clusterName, tc.clusterLocation, clusterProject, tc.config, tc.namespace, tc.waitTimeout); err != nil {
 				t.Errorf("Apply(ctx, %s, %s, %s, %s, %v) = %v; want <nil>", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, err)
 			}
