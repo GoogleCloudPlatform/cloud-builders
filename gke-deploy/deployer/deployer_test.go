@@ -1763,8 +1763,6 @@ func TestApply(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			fmt.Println("*********************")
-			fmt.Println(tc.name)
 			if err := tc.deployer.Apply(ctx, tc.clusterName, tc.clusterLocation, clusterProject, tc.config, tc.namespace, tc.waitTimeout); err != nil {
 				t.Errorf("Apply(ctx, %s, %s, %s, %s, %v) = %v; want <nil>", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, err)
 			}
