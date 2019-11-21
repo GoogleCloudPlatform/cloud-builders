@@ -165,7 +165,6 @@ func TestSaveAsConfigs(t *testing.T) {
 	testServiceFile := "testing/service.yaml"
 
 	outputDir := "path/to/output"
-	aggregateYaml := "aggregatedResources.yaml"
 
 	tests := []struct {
 		name string
@@ -193,7 +192,7 @@ func TestSaveAsConfigs(t *testing.T) {
 				outputDir: nil,
 			},
 			WriteFileResponse: map[string]error{
-				filepath.Join(outputDir, aggregateYaml): nil,
+				filepath.Join(outputDir, AggregatedFilename): nil,
 			},
 		},
 	}, {
@@ -216,7 +215,7 @@ func TestSaveAsConfigs(t *testing.T) {
 				outputDir: nil,
 			},
 			WriteFileResponse: map[string]error{
-				filepath.Join(outputDir, aggregateYaml): nil,
+				filepath.Join(outputDir, AggregatedFilename): nil,
 			},
 		},
 	}, {
@@ -244,7 +243,7 @@ func TestSaveAsConfigs(t *testing.T) {
 				outputDir: nil,
 			},
 			WriteFileResponse: map[string]error{
-				filepath.Join(outputDir, aggregateYaml): nil,
+				filepath.Join(outputDir, AggregatedFilename): nil,
 			},
 		},
 	}, {
@@ -269,7 +268,7 @@ func TestSaveAsConfigs(t *testing.T) {
 				outputDir: nil,
 			},
 			WriteFileResponse: map[string]error{
-				filepath.Join(outputDir, aggregateYaml): nil,
+				filepath.Join(outputDir, AggregatedFilename): nil,
 			},
 		},
 	}}
@@ -289,7 +288,6 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 	testDeploymentFile := "testing/deployment.yaml"
 
 	outputDir := "path/to/output"
-	aggregateYaml := "aggregatedResources.yaml"
 
 	tests := []struct {
 		name string
@@ -335,7 +333,7 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 				outputDir: nil,
 			},
 			WriteFileResponse: map[string]error{
-				filepath.Join(outputDir, aggregateYaml): fmt.Errorf("failed to write file"),
+				filepath.Join(outputDir, AggregatedFilename): fmt.Errorf("failed to write file"),
 			},
 		},
 	}, {
