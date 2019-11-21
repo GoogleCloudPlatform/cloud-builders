@@ -204,7 +204,7 @@ func TestSaveAsConfigs(t *testing.T) {
 			"unfound":                                "abc",
 			"image: gcr.io/cbd-test/test-app:latest": "comment 123",
 		},
-		expectedOutputFile: "testing/expected-output/deployment-and-service-comments.yaml",
+		expectedOutputFile: "testing/expected-output/deployment-with-comments.yaml",
 	}}
 
 	for _, tc := range tests {
