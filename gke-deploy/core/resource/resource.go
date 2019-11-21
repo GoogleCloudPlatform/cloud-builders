@@ -36,6 +36,9 @@ import (
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
 )
 
+// AggregatedFilename is the filename for the file created by SaveAsConfigs.
+const AggregatedFilename = "aggregated-resources.yaml"
+
 type resourceDecoder struct{}
 
 func (resourceDecoder) Decode(data []byte, defaults *schema.GroupVersionKind, into runtime.Object) (runtime.Object, *schema.GroupVersionKind, error) {
@@ -162,8 +165,7 @@ func SaveAsConfigs(ctx context.Context, objs Objects, outputDir string, lineComm
 		return fmt.Errorf("failed to create output directory %q: %v", outputDir, err)
 	}
 
-	aggregateName := "aggregatedResources.yaml"
-	filename := filepath.Join(outputDir, aggregateName)
+	filename := filepath.Join(outputDir, AggregatedFilename)
 
 	resources := make([]string, 0, len(objs))
 
