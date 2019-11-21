@@ -165,7 +165,7 @@ func SaveAsConfigs(ctx context.Context, objs Objects, outputDir string, lineComm
 	aggregateName := "aggregate.yaml"
 	filename := filepath.Join(outputDir, aggregateName)
 
-	resources := []string{}
+	resources := make([]string, 0, len(objs))
 
 	for _, obj := range objs {
 		out, err := runtime.Encode(encoder, obj)
