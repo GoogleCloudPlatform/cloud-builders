@@ -165,7 +165,7 @@ func TestSaveAsConfigs(t *testing.T) {
 	testServiceFile := "testing/service.yaml"
 
 	outputDir := "path/to/output"
-	aggregateYaml := "aggregate.yaml"
+	aggregateYaml := "aggregatedResources.yaml"
 
 	tests := []struct {
 		name string
@@ -289,7 +289,7 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 	testDeploymentFile := "testing/deployment.yaml"
 
 	outputDir := "path/to/output"
-	aggregateYaml := "aggregate.yaml"
+	aggregateYaml := "aggregatedResources.yaml"
 
 	tests := []struct {
 		name string

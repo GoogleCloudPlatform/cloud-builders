@@ -162,7 +162,7 @@ func SaveAsConfigs(ctx context.Context, objs Objects, outputDir string, lineComm
 		return fmt.Errorf("failed to create output directory %q: %v", outputDir, err)
 	}
 
-	aggregateName := "aggregate.yaml"
+	aggregateName := "aggregatedResources.yaml"
 	filename := filepath.Join(outputDir, aggregateName)
 
 	resources := []string{}
