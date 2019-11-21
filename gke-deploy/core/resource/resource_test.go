@@ -192,6 +192,9 @@ func TestSaveAsConfigs(t *testing.T) {
 			MkdirAllResponse: map[string]error{
 				outputDir: nil,
 			},
+			WriteFileResponse: map[string]error{
+				filepath.Join(outputDir, aggregateYaml): nil,
+			},
 		},
 	}, {
 		name: "Non-zero objects",
