@@ -322,17 +322,6 @@ func HasObject(ctx context.Context, objs Objects, kind, name string) (bool, erro
 	return false, nil
 }
 
-func (objs Objects) Remove(is []int) Objects {
-	sort.Ints(is)
-	sort.Sort(sort.Reverse(sort.IntSlice(is)))
-
-	for _, i := range is {
-		objs[i] = objs[len(objs)-1]
-		objs = objs[:len(objs)-1]
-	}
-	return objs
-}
-
 // CreateDeploymentObject creates a Deployment object with the given name and image.
 // The created Deployment will have 3 replicas.
 func CreateDeploymentObject(ctx context.Context, name string, selectorValue, image string) (*Object, error) {
