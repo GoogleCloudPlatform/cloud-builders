@@ -18,6 +18,7 @@ require (
 	github.com/go-openapi/spec v0.19.2 // indirect
 	github.com/go-openapi/swag v0.19.4 // indirect
 	github.com/golang/groupcache v0.0.0-20190702054246-869f871628b6 // indirect
+	github.com/google/go-cmp v0.3.0
 	github.com/google/go-containerregistry v0.0.0-20190717132004-e8c6a4993fa7
 	github.com/googleapis/gnostic v0.3.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.9.4 // indirect
