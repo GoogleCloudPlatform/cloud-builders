@@ -26,6 +26,7 @@ import (
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/testservices"
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestEncoder(t *testing.T) {
@@ -164,90 +165,38 @@ func TestSaveAsConfigs(t *testing.T) {
 	testDeploymentFile := "testing/deployment.yaml"
 	testServiceFile := "testing/service.yaml"
 
-	outputDir := "path/to/output"
-	aggregateYaml := "aggregate.yaml"
-
 	tests := []struct {
 		name string
 
-		objs         Objects
-		outputDir    string
-		lineComments map[string]string
-		oss          services.OSService
-
-		want Objects
+		objs               Objects
+		extraDirs          string
+		lineComments       map[string]string
+		expectedOutputFile string
 	}{{
 		name: "Zero objects",
 
-		outputDir:    outputDir,
-		objs:         Objects{},
-		lineComments: nil,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				outputDir: {
-					Res: nil,
-					Err: os.ErrNotExist,
-				},
-			},
-			MkdirAllResponse: map[string]error{
-				outputDir: nil,
-			},
-		},
+		objs:               Objects{},
+		lineComments:       nil,
+		expectedOutputFile: "testing/expected-output/empty.yaml",
+	}, {
+		name: "Output directory doesn't exist",
+
+		extraDirs:          "non/existant/dirs",
+		objs:               Objects{},
+		lineComments:       nil,
+		expectedOutputFile: "testing/expected-output/empty.yaml",
 	}, {
 		name: "Non-zero objects",
 
-		outputDir: outputDir,
 		objs: Objects{
 			newObjectFromFile(t, testDeploymentFile),
 			newObjectFromFile(t, testServiceFile),
 		},
-		lineComments: nil,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				outputDir: {
-					Res: nil,
-					Err: os.ErrNotExist,
-				},
-			},
-			MkdirAllResponse: map[string]error{
-				outputDir: nil,
-			},
-			WriteFileResponse: map[string]error{
-				filepath.Join(outputDir, aggregateYaml): nil,
-			},
-		},
+		lineComments:       nil,
+		expectedOutputFile: "testing/expected-output/deployment-and-service.yaml",
 	}, {
-		name:      "Output directory exists and is empty",
-		outputDir: outputDir,
-		objs: Objects{
-			newObjectFromFile(t, testDeploymentFile),
-			newObjectFromFile(t, testServiceFile),
-		},
-		lineComments: nil,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				outputDir: {
-					Res: nil,
-					Err: os.ErrNotExist,
-				},
-			},
-			ReadDirResponse: map[string]testservices.ReadDirResponse{
-				outputDir: {
-					Res: []os.FileInfo{},
-					Err: nil,
-				},
-			},
-			MkdirAllResponse: map[string]error{
-				outputDir: nil,
-			},
-			WriteFileResponse: map[string]error{
-				filepath.Join(outputDir, aggregateYaml): nil,
-			},
-		},
-	}, {
-		name: "Non-zero objects",
+		name: "Non-zero objects with line comments",
 
-		outputDir: outputDir,
 		objs: Objects{
 			newObjectFromFile(t, testDeploymentFile),
 		},
@@ -255,26 +204,50 @@ func TestSaveAsConfigs(t *testing.T) {
 			"unfound":                                "abc",
 			"image: gcr.io/cbd-test/test-app:latest": "comment 123",
 		},
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				outputDir: {
-					Res: nil,
-					Err: os.ErrNotExist,
-				},
-			},
-			MkdirAllResponse: map[string]error{
-				outputDir: nil,
-			},
-			WriteFileResponse: map[string]error{
-				filepath.Join(outputDir, aggregateYaml): nil,
-			},
-		},
+		expectedOutputFile: "testing/expected-output/deployment-and-service-comments.yaml",
 	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if err := SaveAsConfigs(ctx, tc.objs, tc.outputDir, tc.lineComments, tc.oss); err != nil {
-				t.Errorf("SaveAsConfigs(ctx, %v, %s, %v, oss) = %v; want <nil>", tc.objs, tc.outputDir, tc.lineComments, err)
+			dir, err := ioutil.TempDir("/tmp", "gke-deploy_resource_test")
+			if err != nil {
+				t.Fatalf("Failed to create tmp directory: %v", err)
+			}
+			defer os.RemoveAll(dir)
+
+			dir = dir + tc.extraDirs
+
+			oss, err := services.NewOS(ctx)
+			if err != nil {
+				t.Fatalf("Failed to create OS: %v", err)
+			}
+
+			if err := SaveAsConfigs(ctx, tc.objs, dir, tc.lineComments, oss); err != nil {
+				t.Fatalf("SaveAsConfigs(ctx, %v, %s, %v, oss) = %v; want <nil>", tc.objs, dir, tc.lineComments, err)
+			}
+
+			files, err := ioutil.ReadDir(dir)
+			if err != nil {
+				t.Fatalf("Failed to read directory: %v", dir)
+			}
+
+			if len(files) != 1 {
+				t.Fatalf("Incorrect number of k8s files created: %v", len(files))
+			}
+
+			path := filepath.Join(dir, files[0].Name())
+			actualOutput, err := ioutil.ReadFile(path)
+			if err != nil {
+				t.Fatalf("Failed to read actual output file: %v", path)
+			}
+
+			expectedOutput, err := ioutil.ReadFile(tc.expectedOutputFile)
+			if err != nil {
+				t.Fatalf("Failed to read expected output file: %v", tc.expectedOutputFile)
+			}
+
+			if diff := cmp.Diff(expectedOutput, actualOutput); diff != "" {
+				t.Fatalf("SaveAsConfigs(ctx, %v, %s, %v, oss) produced diff (-want +got):\n%s", tc.objs, dir, tc.lineComments, diff)
 			}
 		})
 	}
