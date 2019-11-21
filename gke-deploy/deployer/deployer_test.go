@@ -49,7 +49,7 @@ func TestPrepare(t *testing.T) {
 	multiResourceYaml := "multi-resource.yaml"
 	serviceYaml := "service.yaml"
 
-	aggregateYaml := "aggregate.yaml"
+	aggregateYaml := "aggregatedResources.yaml"
 
 	tests := []struct {
 		name string
@@ -815,7 +815,7 @@ func TestPrepareErrors(t *testing.T) {
 	annotations := make(map[string]string)
 
 	configDir := "path/to/config"
-	aggregateYaml := "aggregate.yaml"
+	aggregateYaml := "aggregatedResources.yaml"
 
 	tests := []struct {
 		name string
