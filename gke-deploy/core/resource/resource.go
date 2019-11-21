@@ -165,6 +165,8 @@ func SaveAsConfigs(ctx context.Context, objs Objects, outputDir string, lineComm
 	aggregateName := "aggregate.yaml"
 	filename := filepath.Join(outputDir, aggregateName)
 
+	resources := []string{}
+
 	for _, obj := range objs {
 		out, err := runtime.Encode(encoder, obj)
 		if err != nil {
@@ -176,9 +178,12 @@ func SaveAsConfigs(ctx context.Context, objs Objects, outputDir string, lineComm
 			return fmt.Errorf("failed to add comment to object file: %v", err)
 		}
 
-		if err := oss.WriteFile(ctx, filename, []byte(outWithComments), 0644); err != nil {
-			return fmt.Errorf("failed to write file %q: %v", filename, err)
-		}
+		resources = append(resources, outWithComments)
+	}
+
+	contents := strings.Join(resources, "\n\n---\n\n")
+	if err := oss.WriteFile(ctx, filename, []byte(contents), 0644); err != nil {
+		return fmt.Errorf("failed to write file %q: %v", filename, err)
 	}
 	return nil
 }
