@@ -165,8 +165,7 @@ func TestSaveAsConfigs(t *testing.T) {
 	testServiceFile := "testing/service.yaml"
 
 	outputDir := "path/to/output"
-	deploymentYaml := "deployment.yaml"
-	serviceYaml := "service.yaml"
+	aggregateYaml := "aggregatedResources.yaml"
 
 	tests := []struct {
 		name string
@@ -193,14 +192,17 @@ func TestSaveAsConfigs(t *testing.T) {
 			MkdirAllResponse: map[string]error{
 				outputDir: nil,
 			},
+			WriteFileResponse: map[string]error{
+				filepath.Join(outputDir, aggregateYaml): nil,
+			},
 		},
 	}, {
 		name: "Non-zero objects",
 
 		outputDir: outputDir,
 		objs: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
-			serviceYaml:    newObjectFromFile(t, testServiceFile),
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testServiceFile),
 		},
 		lineComments: nil,
 		oss: &testservices.TestOS{
@@ -214,16 +216,15 @@ func TestSaveAsConfigs(t *testing.T) {
 				outputDir: nil,
 			},
 			WriteFileResponse: map[string]error{
-				filepath.Join(outputDir, deploymentYaml): nil,
-				filepath.Join(outputDir, serviceYaml):    nil,
+				filepath.Join(outputDir, aggregateYaml): nil,
 			},
 		},
 	}, {
 		name:      "Output directory exists and is empty",
 		outputDir: outputDir,
 		objs: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
-			serviceYaml:    newObjectFromFile(t, testServiceFile),
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testServiceFile),
 		},
 		lineComments: nil,
 		oss: &testservices.TestOS{
@@ -243,8 +244,7 @@ func TestSaveAsConfigs(t *testing.T) {
 				outputDir: nil,
 			},
 			WriteFileResponse: map[string]error{
-				filepath.Join(outputDir, deploymentYaml): nil,
-				filepath.Join(outputDir, serviceYaml):    nil,
+				filepath.Join(outputDir, aggregateYaml): nil,
 			},
 		},
 	}, {
@@ -252,7 +252,7 @@ func TestSaveAsConfigs(t *testing.T) {
 
 		outputDir: outputDir,
 		objs: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
 		},
 		lineComments: map[string]string{
 			"unfound":                                "abc",
@@ -269,7 +269,7 @@ func TestSaveAsConfigs(t *testing.T) {
 				outputDir: nil,
 			},
 			WriteFileResponse: map[string]error{
-				filepath.Join(outputDir, deploymentYaml): nil,
+				filepath.Join(outputDir, aggregateYaml): nil,
 			},
 		},
 	}}
@@ -289,7 +289,7 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 	testDeploymentFile := "testing/deployment.yaml"
 
 	outputDir := "path/to/output"
-	deploymentYaml := "deployment.yaml"
+	aggregateYaml := "aggregatedResources.yaml"
 
 	tests := []struct {
 		name string
@@ -322,7 +322,7 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 		outputDir:    outputDir,
 		lineComments: nil,
 		objs: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
 		},
 		oss: &testservices.TestOS{
 			StatResponse: map[string]testservices.StatResponse{
@@ -335,7 +335,7 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 				outputDir: nil,
 			},
 			WriteFileResponse: map[string]error{
-				filepath.Join(outputDir, deploymentYaml): fmt.Errorf("failed to write file"),
+				filepath.Join(outputDir, aggregateYaml): fmt.Errorf("failed to write file"),
 			},
 		},
 	}, {
@@ -344,7 +344,7 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 		outputDir:    outputDir,
 		lineComments: nil,
 		objs: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
 		},
 		oss: &testservices.TestOS{
 			StatResponse: map[string]testservices.StatResponse{
@@ -359,7 +359,7 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 		outputDir:    outputDir,
 		lineComments: nil,
 		objs: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
 		},
 		oss: &testservices.TestOS{
 			StatResponse: map[string]testservices.StatResponse{
@@ -387,7 +387,7 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 		outputDir:    outputDir,
 		lineComments: nil,
 		objs: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
 		},
 		oss: &testservices.TestOS{
 			StatResponse: map[string]testservices.StatResponse{
@@ -410,7 +410,7 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 		outputDir:    outputDir,
 		lineComments: nil,
 		objs: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
 		},
 		oss: &testservices.TestOS{
 			StatResponse: map[string]testservices.StatResponse{
@@ -427,7 +427,7 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 
 		outputDir: outputDir,
 		objs: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
 		},
 		lineComments: map[string]string{
 			"asdf\nasdf": "asdf",
@@ -448,7 +448,7 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 
 		outputDir: outputDir,
 		objs: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
 		},
 		lineComments: map[string]string{
 			"asdf": "asdf\nasdf",
@@ -531,7 +531,7 @@ func TestParseConfigs(t *testing.T) {
 		},
 
 		want: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
 		},
 	}, {
 		name: "Configs is a directory with single .yml file",
@@ -566,7 +566,7 @@ func TestParseConfigs(t *testing.T) {
 		},
 
 		want: Objects{
-			deploymentYml: newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
 		},
 	}, {
 		name: "Configs is a directory with multiple .yaml files",
@@ -609,8 +609,8 @@ func TestParseConfigs(t *testing.T) {
 		},
 
 		want: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
-			serviceYaml:    newObjectFromFile(t, testServiceFile),
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testServiceFile),
 		},
 	}, {
 		name: "Configs is a directory containing a multi-resource .yaml file",
@@ -645,8 +645,8 @@ func TestParseConfigs(t *testing.T) {
 		},
 
 		want: Objects{
-			"multi-resource-deployment-test-app.yaml": newObjectFromFile(t, testDeploymentFile),
-			"multi-resource-service-test-app.yaml":    newObjectFromFile(t, testServiceFile),
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testServiceFile),
 		},
 	}, {
 		name: "Configs is a directory containing a multi-resource .yaml file and single-resource .yaml file",
@@ -689,9 +689,9 @@ func TestParseConfigs(t *testing.T) {
 		},
 
 		want: Objects{
-			"multi-resource-deployment-test-app.yaml": newObjectFromFile(t, testDeploymentFile),
-			"multi-resource-service-test-app.yaml":    newObjectFromFile(t, testServiceFile),
-			deploymentYaml:                            newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testServiceFile),
+			newObjectFromFile(t, testDeploymentFile),
 		},
 	}, {
 		name: "Configs is a directory containing two multi-resource .yaml files",
@@ -734,10 +734,10 @@ func TestParseConfigs(t *testing.T) {
 		},
 
 		want: Objects{
-			"multi-resource-deployment-test-app.yaml":   newObjectFromFile(t, testDeploymentFile),
-			"multi-resource-service-test-app.yaml":      newObjectFromFile(t, testServiceFile),
-			"multi-resource-2-deployment-test-app.yaml": newObjectFromFile(t, testDeploymentFile),
-			"multi-resource-2-service-test-app.yaml":    newObjectFromFile(t, testServiceFile),
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testServiceFile),
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testServiceFile),
 		},
 	}, {
 		name: "Configs is a directory containing a multi-resource .yaml file with whitespace",
@@ -772,8 +772,8 @@ func TestParseConfigs(t *testing.T) {
 		},
 
 		want: Objects{
-			"multi-resource-with-whitespace-deployment-test-app.yaml": newObjectFromFile(t, testDeploymentFile),
-			"multi-resource-with-whitespace-service-test-app.yaml":    newObjectFromFile(t, testServiceFile),
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testServiceFile),
 		},
 	}, {
 		name: "Configs is .yaml file",
@@ -797,7 +797,7 @@ func TestParseConfigs(t *testing.T) {
 		},
 
 		want: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
 		},
 	}, {
 		name: "Configs is .yml file",
@@ -821,7 +821,7 @@ func TestParseConfigs(t *testing.T) {
 		},
 
 		want: Objects{
-			deploymentYml: newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
 		},
 	}, {
 		name: "Configs is a multi-resource .yaml file",
@@ -845,8 +845,8 @@ func TestParseConfigs(t *testing.T) {
 		},
 
 		want: Objects{
-			"multi-resource-deployment-test-app.yaml": newObjectFromFile(t, testDeploymentFile),
-			"multi-resource-service-test-app.yaml":    newObjectFromFile(t, testServiceFile),
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testServiceFile),
 		},
 	}, {
 		name: "Configs is a directory containing files that lead to collisions",
@@ -897,10 +897,10 @@ func TestParseConfigs(t *testing.T) {
 		},
 
 		want: Objects{
-			"multi-resource-deployment-test-app.yaml":   newObjectFromFile(t, testDeploymentFile),
-			"multi-resource-service-test-app.yaml":      newObjectFromFile(t, testServiceFile),
-			"multi-resource-deployment-test-app-2.yaml": newObjectFromFile(t, testDeploymentFile),
-			"multi-resource-service-test-app-2.yaml":    newObjectFromFile(t, testServiceFile),
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testServiceFile),
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testServiceFile),
 		},
 	}, {
 		name: "Configs is stdin with single object",
@@ -924,7 +924,7 @@ func TestParseConfigs(t *testing.T) {
 		},
 
 		want: Objects{
-			"k8s.yaml": newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
 		},
 	}, {
 		name: "Configs is stdin with multiple objects",
@@ -948,8 +948,8 @@ func TestParseConfigs(t *testing.T) {
 		},
 
 		want: Objects{
-			"k8s-deployment-test-app.yaml": newObjectFromFile(t, testDeploymentFile),
-			"k8s-service-test-app.yaml":    newObjectFromFile(t, testServiceFile),
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testServiceFile),
 		},
 	}, {
 		name: "Do not parse file with only comments and whitespace",
@@ -1173,15 +1173,6 @@ func TestUpdateMatchingContainerImage(t *testing.T) {
 	testDeployment3File := "testing/deployment-3.yaml"
 	testDeploymentUpdated3File := "testing/deployment-updated-2.yaml"
 
-	cronjobYaml := "cronjob.yaml"
-	daemonsetYaml := "daemonset.yaml"
-	deploymentYaml := "deployment.yaml"
-	jobYaml := "job.yaml"
-	podYaml := "pod.yaml"
-	replicasetYaml := "replicaset.yaml"
-	replicationcontrollerYaml := "replicationcontroller.yaml"
-	statefulsetYaml := "statefulset.yaml"
-
 	imageName := "gcr.io/cbd-test/test-app"
 	replace := "REPLACED"
 
@@ -1203,61 +1194,61 @@ func TestUpdateMatchingContainerImage(t *testing.T) {
 		name: "Update objects",
 
 		objs: Objects{
-			cronjobYaml:               newObjectFromFile(t, testCronjobFile),
-			daemonsetYaml:             newObjectFromFile(t, testDaemonsetFile),
-			deploymentYaml:            newObjectFromFile(t, testDeploymentFile),
-			jobYaml:                   newObjectFromFile(t, testJobFile),
-			podYaml:                   newObjectFromFile(t, testPodFile),
-			replicasetYaml:            newObjectFromFile(t, testReplicasetFile),
-			replicationcontrollerYaml: newObjectFromFile(t, testReplicationcontrollerFile),
-			statefulsetYaml:           newObjectFromFile(t, testStatefulsetFile),
+			newObjectFromFile(t, testCronjobFile),
+			newObjectFromFile(t, testDaemonsetFile),
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testJobFile),
+			newObjectFromFile(t, testPodFile),
+			newObjectFromFile(t, testReplicasetFile),
+			newObjectFromFile(t, testReplicationcontrollerFile),
+			newObjectFromFile(t, testStatefulsetFile),
 		},
 
 		beforeUpdate: Objects{
-			cronjobYaml:               newObjectFromFile(t, testCronjobFile),
-			daemonsetYaml:             newObjectFromFile(t, testDaemonsetFile),
-			deploymentYaml:            newObjectFromFile(t, testDeploymentFile),
-			jobYaml:                   newObjectFromFile(t, testJobFile),
-			podYaml:                   newObjectFromFile(t, testPodFile),
-			replicasetYaml:            newObjectFromFile(t, testReplicasetFile),
-			replicationcontrollerYaml: newObjectFromFile(t, testReplicationcontrollerFile),
-			statefulsetYaml:           newObjectFromFile(t, testStatefulsetFile),
+			newObjectFromFile(t, testCronjobFile),
+			newObjectFromFile(t, testDaemonsetFile),
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testJobFile),
+			newObjectFromFile(t, testPodFile),
+			newObjectFromFile(t, testReplicasetFile),
+			newObjectFromFile(t, testReplicationcontrollerFile),
+			newObjectFromFile(t, testStatefulsetFile),
 		},
 		want: Objects{
-			cronjobYaml:               newObjectFromFile(t, testCronjobUpdatedFile),
-			daemonsetYaml:             newObjectFromFile(t, testDaemonsetUpdatedFile),
-			deploymentYaml:            newObjectFromFile(t, testDeploymentUpdatedFile),
-			jobYaml:                   newObjectFromFile(t, testJobUpdatedFile),
-			podYaml:                   newObjectFromFile(t, testPodUpdatedFile),
-			replicasetYaml:            newObjectFromFile(t, testReplicasetUpdatedFile),
-			replicationcontrollerYaml: newObjectFromFile(t, testReplicationcontrollerUpdatedFile),
-			statefulsetYaml:           newObjectFromFile(t, testStatefulsetUpdatedFile),
+			newObjectFromFile(t, testCronjobUpdatedFile),
+			newObjectFromFile(t, testDaemonsetUpdatedFile),
+			newObjectFromFile(t, testDeploymentUpdatedFile),
+			newObjectFromFile(t, testJobUpdatedFile),
+			newObjectFromFile(t, testPodUpdatedFile),
+			newObjectFromFile(t, testReplicasetUpdatedFile),
+			newObjectFromFile(t, testReplicationcontrollerUpdatedFile),
+			newObjectFromFile(t, testStatefulsetUpdatedFile),
 		},
 	}, {
 		name: "Nothing to update",
 
 		objs: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeployment2File),
+			newObjectFromFile(t, testDeployment2File),
 		},
 
 		beforeUpdate: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeployment2File),
+			newObjectFromFile(t, testDeployment2File),
 		},
 		want: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeployment2File),
+			newObjectFromFile(t, testDeployment2File),
 		},
 	}, {
 		name: "Second image is substring of first",
 
 		objs: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeployment3File),
+			newObjectFromFile(t, testDeployment3File),
 		},
 
 		beforeUpdate: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeployment3File),
+			newObjectFromFile(t, testDeployment3File),
 		},
 		want: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentUpdated3File),
+			newObjectFromFile(t, testDeploymentUpdated3File),
 		},
 	}}
 
@@ -1583,9 +1574,6 @@ func TestUpdateNamespace(t *testing.T) {
 	testDeploymentFile := "testing/deployment.yaml"
 	testDeploymentUpdatedNamespacefile := "testing/deployment-updated-namespace.yaml"
 
-	hpaYaml := "hpa.yaml"
-	deploymentYaml := "deployment.yaml"
-
 	tests := []struct {
 		name string
 
@@ -1598,43 +1586,43 @@ func TestUpdateNamespace(t *testing.T) {
 		name: "Updates namespace",
 
 		objs: Objects{
-			hpaYaml: newObjectFromFile(t, testHpaFile),
+			newObjectFromFile(t, testHpaFile),
 		},
 		replace: "REPLACED",
 
 		beforeUpdate: Objects{
-			hpaYaml: newObjectFromFile(t, testHpaFile),
+			newObjectFromFile(t, testHpaFile),
 		},
 		want: Objects{
-			hpaYaml: newObjectFromFile(t, testHpaUpdatedNamespacefile),
+			newObjectFromFile(t, testHpaUpdatedNamespacefile),
 		},
 	}, {
 		name: "No namespace field",
 
 		objs: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
 		},
 		replace: "REPLACED",
 
 		beforeUpdate: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
 		},
 		want: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentUpdatedNamespacefile),
+			newObjectFromFile(t, testDeploymentUpdatedNamespacefile),
 		},
 	}, {
 		name: "Same namespace",
 
 		objs: Objects{
-			hpaYaml: newObjectFromFile(t, testHpaFile),
+			newObjectFromFile(t, testHpaFile),
 		},
 		replace: "default",
 
 		beforeUpdate: Objects{
-			hpaYaml: newObjectFromFile(t, testHpaFile),
+			newObjectFromFile(t, testHpaFile),
 		},
 		want: Objects{
-			hpaYaml: newObjectFromFile(t, testHpaFile),
+			newObjectFromFile(t, testHpaFile),
 		},
 	}, {
 		name: "Empty objects",
@@ -1660,9 +1648,6 @@ func TestAddNamespaceIfMissing(t *testing.T) {
 	testDeploymentUpdatedNamespacefile := "testing/deployment-updated-namespace.yaml"
 	testHpaFile := "testing/hpa.yaml"
 
-	deploymentYaml := "deployment.yaml"
-	hpaYaml := "hpa.yaml"
-
 	tests := []struct {
 		name string
 
@@ -1675,29 +1660,29 @@ func TestAddNamespaceIfMissing(t *testing.T) {
 		name: "No namespace field, adds namespace",
 
 		objs: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
 		},
 		replace: "REPLACED",
 
 		beforeUpdate: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
 		},
 		want: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentUpdatedNamespacefile),
+			newObjectFromFile(t, testDeploymentUpdatedNamespacefile),
 		},
 	}, {
 		name: "Does not update namespace",
 
 		objs: Objects{
-			hpaYaml: newObjectFromFile(t, testHpaFile),
+			newObjectFromFile(t, testHpaFile),
 		},
 		replace: "REPLACED",
 
 		beforeUpdate: Objects{
-			hpaYaml: newObjectFromFile(t, testHpaFile),
+			newObjectFromFile(t, testHpaFile),
 		},
 		want: Objects{
-			hpaYaml: newObjectFromFile(t, testHpaFile),
+			newObjectFromFile(t, testHpaFile),
 		},
 	}, {
 		name: "Empty objects",
@@ -1724,9 +1709,6 @@ func TestHasObject(t *testing.T) {
 	testDeploymentFile := "testing/deployment.yaml"
 	testHpaFile := "testing/hpa.yaml"
 
-	deploymentYaml := "deployment.yaml"
-	hpaYaml := "hpa.yaml"
-
 	tests := []struct {
 		name string
 
@@ -1739,7 +1721,7 @@ func TestHasObject(t *testing.T) {
 		name: "Has object",
 
 		objs: Objects{
-			deploymentYaml: newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
 		},
 		kind:    "Deployment",
 		objName: "test-app",
@@ -1749,7 +1731,7 @@ func TestHasObject(t *testing.T) {
 		name: "Does not have object",
 
 		objs: Objects{
-			hpaYaml: newObjectFromFile(t, testHpaFile),
+			newObjectFromFile(t, testHpaFile),
 		},
 		kind:    "Deployment",
 		objName: "test-app",
@@ -1767,10 +1749,10 @@ func TestHasObject(t *testing.T) {
 		name: "Duplicate objects",
 
 		objs: Objects{
-			deploymentYaml:      newObjectFromFile(t, testDeploymentFile),
-			"deployment-2.yaml": newObjectFromFile(t, testDeploymentFile),
-			"deployment-3.yaml": newObjectFromFile(t, testDeploymentFile),
-			hpaYaml:             newObjectFromFile(t, testHpaFile),
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testHpaFile),
 		},
 		kind:    "Deployment",
 		objName: "test-app",
@@ -1782,47 +1764,6 @@ func TestHasObject(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			if got, err := HasObject(ctx, tc.objs, tc.kind, tc.objName); got != tc.want || err != nil {
 				t.Errorf("HasObject(ctx, %v, %s, %s) = %t, %v; want %t, <nil>", tc.objs, tc.kind, tc.objName, got, err, tc.want)
-			}
-		})
-	}
-}
-
-func TestAddObject(t *testing.T) {
-	ctx := context.Background()
-
-	testNamespaceFile := "testing/namespace.yaml"
-
-	tests := []struct {
-		name string
-
-		objs Objects
-		obj  *Object
-	}{{
-		name: "Add namespace.yaml",
-
-		objs: Objects{},
-		obj:  newObjectFromFile(t, testNamespaceFile),
-	}, {
-		name: "Add namespace-foobar.yaml",
-
-		objs: Objects{
-			"namespace.yaml": newObjectFromFile(t, testNamespaceFile),
-		},
-		obj: newObjectFromFile(t, testNamespaceFile),
-	}, {
-		name: "Add namespace-foobar-2.yaml",
-
-		objs: Objects{
-			"namespace.yaml":        newObjectFromFile(t, testNamespaceFile),
-			"namespace-foobar.yaml": newObjectFromFile(t, testNamespaceFile),
-		},
-		obj: newObjectFromFile(t, testNamespaceFile),
-	}}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			if err := AddObject(ctx, tc.objs, tc.obj); err != nil {
-				t.Errorf("AddObject(ctx, %v, %v) = %v; want <nil>", tc.objs, tc.obj, err)
 			}
 		})
 	}
@@ -1923,14 +1864,14 @@ func TestDeploySummary(t *testing.T) {
 		name: "Simple deploy summary",
 
 		objs: Objects{
-			"a": newObjectFromFile(t, testCronjobReadyFile),
-			"b": newObjectFromFile(t, testDaemonsetReadyFile),
-			"c": newObjectFromFile(t, testDeploymentReadyFile),
-			"d": newObjectFromFile(t, testNamespaceReadyFile),
-			"e": newObjectFromFile(t, testReplicationcontrollerReadyFile),
-			"f": newObjectFromFile(t, testLoadBalancerServiceReadyFile),
-			"g": newObjectFromFile(t, testExternalNameServiceReadyFile),
-			"h": newObjectFromFile(t, testStatefulsetUnreadyFile),
+			newObjectFromFile(t, testCronjobReadyFile),
+			newObjectFromFile(t, testDaemonsetReadyFile),
+			newObjectFromFile(t, testDeploymentReadyFile),
+			newObjectFromFile(t, testNamespaceReadyFile),
+			newObjectFromFile(t, testReplicationcontrollerReadyFile),
+			newObjectFromFile(t, testLoadBalancerServiceReadyFile),
+			newObjectFromFile(t, testExternalNameServiceReadyFile),
+			newObjectFromFile(t, testStatefulsetUnreadyFile),
 		},
 
 		want: `NAMESPACE                KIND                     NAME                              READY    
@@ -1947,14 +1888,14 @@ default                  StatefulSet              test-app-statefulset          
 		name: "LoadBalancer Service not ready",
 
 		objs: Objects{
-			"a": newObjectFromFile(t, testCronjobReadyFile),
-			"b": newObjectFromFile(t, testDaemonsetReadyFile),
-			"c": newObjectFromFile(t, testDeploymentReadyFile),
-			"d": newObjectFromFile(t, testNamespaceReadyFile),
-			"e": newObjectFromFile(t, testReplicationcontrollerReadyFile),
-			"f": newObjectFromFile(t, testLoadBalancerServiceUnreadyFile),
-			"g": newObjectFromFile(t, testExternalNameServiceReadyFile),
-			"h": newObjectFromFile(t, testStatefulsetUnreadyFile),
+			newObjectFromFile(t, testCronjobReadyFile),
+			newObjectFromFile(t, testDaemonsetReadyFile),
+			newObjectFromFile(t, testDeploymentReadyFile),
+			newObjectFromFile(t, testNamespaceReadyFile),
+			newObjectFromFile(t, testReplicationcontrollerReadyFile),
+			newObjectFromFile(t, testLoadBalancerServiceUnreadyFile),
+			newObjectFromFile(t, testExternalNameServiceReadyFile),
+			newObjectFromFile(t, testStatefulsetUnreadyFile),
 		},
 
 		want: `NAMESPACE                KIND                     NAME                              READY    

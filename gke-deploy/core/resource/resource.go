@@ -52,7 +52,7 @@ var (
 )
 
 // Objects maps resource file base names to corresponding resource objects (mutable).
-type Objects map[string]*Object
+type Objects []*Object
 
 // Object extends unstructured.Unstructured, which implements runtime.Object
 type Object struct {
@@ -110,7 +110,8 @@ func ParseConfigs(ctx context.Context, configs string, oss services.OSService) (
 				continue
 			}
 
-			if err := parseResourcesFromFile(ctx, filename, objs, oss); err != nil {
+			objs, err = parseResourcesFromFile(ctx, filename, objs, oss)
+			if err != nil {
 				return nil, fmt.Errorf("failed to parse config %q: %v", filename, err)
 			}
 			hasResource = true
@@ -124,7 +125,8 @@ func ParseConfigs(ctx context.Context, configs string, oss services.OSService) (
 			return nil, fmt.Errorf("file %q does not end in \".yaml\" or \".yml\"", filename)
 		}
 
-		if err := parseResourcesFromFile(ctx, filename, objs, oss); err != nil {
+		objs, err = parseResourcesFromFile(ctx, filename, objs, oss)
+		if err != nil {
 			return nil, fmt.Errorf("failed to parse config %q: %v", filename, err)
 		}
 	}
@@ -159,8 +161,13 @@ func SaveAsConfigs(ctx context.Context, objs Objects, outputDir string, lineComm
 	if err := oss.MkdirAll(ctx, outputDir, os.ModePerm); err != nil {
 		return fmt.Errorf("failed to create output directory %q: %v", outputDir, err)
 	}
-	for baseName, obj := range objs {
-		filename := filepath.Join(outputDir, baseName)
+
+	aggregateName := "aggregatedResources.yaml"
+	filename := filepath.Join(outputDir, aggregateName)
+
+	resources := []string{}
+
+	for _, obj := range objs {
 		out, err := runtime.Encode(encoder, obj)
 		if err != nil {
 			return fmt.Errorf("failed to encode resource: %v", err)
@@ -171,9 +178,12 @@ func SaveAsConfigs(ctx context.Context, objs Objects, outputDir string, lineComm
 			return fmt.Errorf("failed to add comment to object file: %v", err)
 		}
 
-		if err := oss.WriteFile(ctx, filename, []byte(outWithComments), 0644); err != nil {
-			return fmt.Errorf("failed to write file %q: %v", filename, err)
-		}
+		resources = append(resources, outWithComments)
+	}
+
+	contents := strings.Join(resources, "\n\n---\n\n")
+	if err := oss.WriteFile(ctx, filename, []byte(contents), 0644); err != nil {
+		return fmt.Errorf("failed to write file %q: %v", filename, err)
 	}
 	return nil
 }
@@ -310,36 +320,6 @@ func HasObject(ctx context.Context, objs Objects, kind, name string) (bool, erro
 		}
 	}
 	return false, nil
-}
-
-// AddObject adds the provided object to objs with a generated file base name as its key.
-func AddObject(ctx context.Context, objs Objects, obj *Object) error {
-	// Try <resource-kind>.yaml
-	objKind := strings.ToLower(ObjectKind(obj))
-	baseName := fmt.Sprintf("%s.yaml", objKind)
-	if _, ok := objs[baseName]; !ok {
-		objs[baseName] = obj
-		return nil
-	}
-
-	// Try <resource-kind>-<resource-name>.yaml
-	objName, err := ObjectName(obj)
-	if err != nil {
-		return fmt.Errorf("failed to get resource name: %v", err)
-	}
-	baseName = fmt.Sprintf("%s-%s.yaml", objKind, objName)
-	if _, ok := objs[baseName]; !ok {
-		objs[baseName] = obj
-		return nil
-	}
-
-	// Try <resource-kind>-<resource-name>-#.yaml
-	fixedBaseName, err := fixCollidingFileBaseName(baseName, objs)
-	if err != nil {
-		return fmt.Errorf("failed to fix colliding base name %q: %v", baseName, err)
-	}
-	objs[fixedBaseName] = obj
-	return nil
 }
 
 // CreateDeploymentObject creates a Deployment object with the given name and image.
@@ -556,7 +536,7 @@ func serviceExternalName(obj *Object) (string, error) {
 	return externalName, nil
 }
 
-func parseResourcesFromFile(ctx context.Context, filename string, objs Objects, oss services.OSService) error {
+func parseResourcesFromFile(ctx context.Context, filename string, objs Objects, oss services.OSService) (Objects, error) {
 	readStdin := filename == "-"
 	var printFilename string
 	if readStdin {
@@ -567,7 +547,7 @@ func parseResourcesFromFile(ctx context.Context, filename string, objs Objects, 
 
 	in, err := oss.ReadFile(ctx, filename)
 	if err != nil {
-		return fmt.Errorf("failed to read %s: %v", printFilename, err)
+		return nil, fmt.Errorf("failed to read %s: %v", printFilename, err)
 	}
 	if readStdin {
 		filename = "k8s.yaml" // Files parsed from stdin will have the prefix "k8s".
@@ -591,68 +571,18 @@ func parseResourcesFromFile(ctx context.Context, filename string, objs Objects, 
 
 		obj, err := DecodeFromYAML(ctx, []byte(r))
 		if err != nil {
-			return fmt.Errorf("failed to decode resource from item %d in %s: %v", i+1, printFilename, err)
+			return nil, fmt.Errorf("failed to decode resource from item %d in %s: %v", i+1, printFilename, err)
 		}
 
-		// For configs containing one resource, just use the original file base name.
-		// e.g., if ".../deployment.yaml" contains one resource, the resource should be given the file base name "deployment.yaml".
-		baseName := filepath.Base(filename)
-
-		// For configs containing multiple resources, each resource is given the file base  name <file-prefix>-<resource-kind>-<resource-name>.<file-suffix>.
-		// e.g., if ".../resource.yaml" contains multiple resources, with one being a Deployment with the name "nginx",
-		// the resource will be given the file base name "resource-deployment-nginx.yaml".
-		if len(split) > 1 {
-			// This is the case where the file has more than one resource, separated by "---".
-			ix := strings.LastIndex(baseName, ".")
-			prefix := baseName[:ix]
-			suffix := baseName[ix+1:]
-			objKind := strings.ToLower(ObjectKind(obj))
-			objName, err := ObjectName(obj)
-			if err != nil {
-				return fmt.Errorf("failed to get resource name of item %d in %s: %v", i+1, printFilename, err)
-			}
-			baseName = fmt.Sprintf("%s-%s-%s.%s", prefix, objKind, objName, suffix)
-		}
-
-		fixedBaseName, err := fixCollidingFileBaseName(baseName, objs)
-		if err != nil {
-			return fmt.Errorf("failed to fix colliding base name %q: %v", baseName, err)
-		}
-
-		objs[fixedBaseName] = obj
+		objs = append(objs, obj)
 	}
 
-	return nil
-}
-
-func fixCollidingFileBaseName(name string, objs Objects) (string, error) {
-	if _, ok := objs[name]; !ok {
-		return name, nil
-	}
-
-	const max = 1000
-	var newName string
-	for i := 2; i < max; i++ {
-		x := strings.LastIndex(name, ".")
-		prefix := name[:x]
-		suffix := name[x+1:]
-		newName = fmt.Sprintf("%s-%d.%s", prefix, i, suffix)
-		if _, ok := objs[newName]; !ok {
-			return newName, nil
-		}
-	}
-	return "", fmt.Errorf("reached upper limit %d", max)
+	return objs, nil
 }
 
 // String returns a string representation of objects.
 func (objs Objects) String() string {
-	// Sort values
-	var sorted []*Object
-	for _, obj := range objs {
-		sorted = append(sorted, obj)
-	}
-	sorted = sortObjectsByKindAndName(sorted)
-	return fmt.Sprintf("%v", sorted)
+	return fmt.Sprintf("%v", sortObjectsByKindAndName(objs))
 }
 
 // String returns a string representation of an object.

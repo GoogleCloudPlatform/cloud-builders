@@ -77,9 +77,8 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 			if err != nil {
 				return fmt.Errorf("failed to create Deployment object: %v", err)
 			}
-			if err = resource.AddObject(ctx, objs, dObj); err != nil {
-				return fmt.Errorf("failed to add Deployment object: %v", err)
-			}
+
+			objs = append(objs, dObj)
 
 			hpaName := fmt.Sprintf("%s-hpa", imageNameSuffix)
 			fmt.Printf("Creating suggested HorizontalPodAutoscaler configuration file %q\n", hpaName)
@@ -87,9 +86,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 			if err != nil {
 				return fmt.Errorf("failed to create HorizontalPodAutoscaler object: %v", err)
 			}
-			if err = resource.AddObject(ctx, objs, hpaObj); err != nil {
-				return fmt.Errorf("failed to add HorizontalPodAutoscaler object: %v", err)
-			}
+			objs = append(objs, hpaObj)
 		}
 
 		if exposePort > 0 {
@@ -104,9 +101,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 				if err != nil {
 					return fmt.Errorf("failed to create Service object: %v", err)
 				}
-				if err = resource.AddObject(ctx, objs, svcObj); err != nil {
-					return fmt.Errorf("failed to add Service object: %v", err)
-				}
+				objs = append(objs, svcObj)
 			} else {
 				fmt.Fprintf(os.Stderr, "\nWARNING: Service %q already exists in provided configuration files. Not generating new Service.\n\n", service)
 			}
@@ -129,9 +124,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 			if err != nil {
 				return fmt.Errorf("failed to create Namespace object: %v", err)
 			}
-			if err = resource.AddObject(ctx, objs, nsObj); err != nil {
-				return fmt.Errorf("failed to add Namespace object: %v", err)
-			}
+			objs = append(objs, nsObj)
 		}
 	}
 
@@ -292,7 +285,8 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 	fmt.Printf("Applying configuration files to cluster.\n")
 
 	// Apply all namespace objects first, if they exist
-	for baseName, obj := range objs {
+	filteredObjs := make(resource.Objects, 0, len(objs))
+	for _, obj := range objs {
 		if resource.ObjectKind(obj) == "Namespace" {
 			nsName, err := resource.ObjectName(obj)
 			if err != nil {
@@ -312,10 +306,13 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 					return fmt.Errorf("failed to apply Namespace configuration file with name %q to cluster: %v", nsName, err)
 				}
 			}
+		} else {
 			// Delete namespace from list of objects to be deployed because it has already been deployed we do not want it to show up in the deployment summary.
-			delete(objs, baseName)
+			filteredObjs = append(filteredObjs, obj)
 		}
 	}
+
+	objs = filteredObjs
 
 	// Apply each config file individually vs applying the directory to avoid applying namespaces.
 	// Namespace objects are removed from objs at this point.
@@ -344,7 +341,10 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 	nextPeriodicMsg := time.Now().Add(periodicMsgInterval)
 	ticker := time.NewTicker(5 * time.Second)
 	for len(objs) > 0 {
-		for key, obj := range objs {
+
+		filteredObjs := make(resource.Objects, 0, len(objs))
+
+		for _, obj := range objs {
 			kind := resource.ObjectKind(obj)
 			name, err := resource.ObjectName(obj)
 			if err != nil {
@@ -364,7 +364,7 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 			if err != nil {
 				return fmt.Errorf("failed to get configuration of deployed object with kind %q and name %q: %v", kind, name, err)
 			}
-			deployedObjs[key] = deployedObj
+			deployedObjs = append(deployedObjs, deployedObj)
 			ok, err := resource.IsReady(ctx, deployedObj)
 			if err != nil {
 				return fmt.Errorf("failed to check if deployed object with kind %q and name %q is ready: %v", kind, name, err)
@@ -372,9 +372,13 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 			if ok {
 				dur := time.Now().Sub(start).Round(time.Second / 10) // Round to nearest 0.1 seconds
 				fmt.Printf("Deployed object with kind %q and name %q is ready after %v\n", kind, name, dur)
-				delete(objs, key)
+			} else {
+				filteredObjs = append(filteredObjs, obj)
 			}
 		}
+
+		objs = filteredObjs
+
 		if len(objs) == 0 {
 			// Break out here to avoid waiting for ticker.
 			break
