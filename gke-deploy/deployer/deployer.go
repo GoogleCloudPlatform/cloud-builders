@@ -285,8 +285,8 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 	fmt.Printf("Applying configuration files to cluster.\n")
 
 	// Apply all namespace objects first, if they exist
-	removable_idxs := make([]int, 0, len(objs))
-	for idx, obj := range objs {
+	filteredObjs := make(resource.Objects, 0, len(objs))
+	for _, obj := range objs {
 		if resource.ObjectKind(obj) == "Namespace" {
 			nsName, err := resource.ObjectName(obj)
 			if err != nil {
@@ -306,12 +306,13 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 					return fmt.Errorf("failed to apply Namespace configuration file with name %q to cluster: %v", nsName, err)
 				}
 			}
+		} else {
 			// Delete namespace from list of objects to be deployed because it has already been deployed we do not want it to show up in the deployment summary.
-			removable_idxs = append(removable_idxs, idx)
+			filteredObjs = append(filteredObjs, obj)
 		}
 	}
 
-	objs = objs.Remove(removable_idxs)
+	objs = filteredObjs
 
 	// Apply each config file individually vs applying the directory to avoid applying namespaces.
 	// Namespace objects are removed from objs at this point.
@@ -341,9 +342,9 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 	ticker := time.NewTicker(5 * time.Second)
 	for len(objs) > 0 {
 
-		removable_idxs := make([]int, 0, len(objs))
+		filteredObjs := make(resource.Objects, 0, len(objs))
 
-		for idx, obj := range objs {
+		for _, obj := range objs {
 			kind := resource.ObjectKind(obj)
 			name, err := resource.ObjectName(obj)
 			if err != nil {
@@ -371,11 +372,12 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 			if ok {
 				dur := time.Now().Sub(start).Round(time.Second / 10) // Round to nearest 0.1 seconds
 				fmt.Printf("Deployed object with kind %q and name %q is ready after %v\n", kind, name, dur)
-				removable_idxs = append(removable_idxs, idx)
+			} else {
+				filteredObjs = append(filteredObjs, obj)
 			}
 		}
 
-		objs = objs.Remove(removable_idxs)
+		objs = filteredObjs
 
 		if len(objs) == 0 {
 			// Break out here to avoid waiting for ticker.
