@@ -449,259 +449,48 @@ func TestParseConfigs(t *testing.T) {
 
 	testDeploymentFile := "testing/deployment.yaml"
 	testServiceFile := "testing/service.yaml"
-	testMultiResourceFile := "testing/multi-resource.yaml"
-	testMultiResourceWithWhitespaceFile := "testing/multi-resource-with-whitespace.yaml"
-	testWhitespaceAndCommentsFile := "testing/whitespace-and-comments.yaml"
-
-	configsDir := "path/to/configs"
-	deploymentYaml := "deployment.yaml"
-	deploymentYml := "deployment.yml"
-	serviceYaml := "service.yaml"
-	multiResourceYaml := "multi-resource.yaml"
-	multiResourceWithWhitespaceYaml := "multi-resource-with-whitespace.yaml"
 
 	tests := []struct {
-		name string
-
+		name    string
 		configs string
-		oss     services.OSService
-
-		want Objects
+		want    Objects
 	}{{
-		name: "Configs is a directory with single .yaml file",
-
-		configs: configsDir,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				configsDir: {
-					Res: &testservices.TestFileInfo{
-						IsDirectory: true,
-					},
-					Err: nil,
-				},
-			},
-			ReadDirResponse: map[string]testservices.ReadDirResponse{
-				configsDir: {
-					Res: []os.FileInfo{
-						&testservices.TestFileInfo{
-							BaseName:    deploymentYaml,
-							IsDirectory: false,
-						},
-					},
-					Err: nil,
-				},
-			},
-			ReadFileResponse: map[string]testservices.ReadFileResponse{
-				filepath.Join(configsDir, deploymentYaml): {
-					Res: fileContents(t, testDeploymentFile),
-					Err: nil,
-				},
-			},
-		},
-
+		name:    "Configs is a directory with single .yaml file",
+		configs: "testing/configs/single-yaml",
 		want: Objects{
 			newObjectFromFile(t, testDeploymentFile),
 		},
 	}, {
-		name: "Configs is a directory with single .yml file",
-
-		configs: configsDir,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				configsDir: {
-					Res: &testservices.TestFileInfo{
-						IsDirectory: true,
-					},
-					Err: nil,
-				},
-			},
-			ReadDirResponse: map[string]testservices.ReadDirResponse{
-				configsDir: {
-					Res: []os.FileInfo{
-						&testservices.TestFileInfo{
-							BaseName:    deploymentYml,
-							IsDirectory: false,
-						},
-					},
-					Err: nil,
-				},
-			},
-			ReadFileResponse: map[string]testservices.ReadFileResponse{
-				filepath.Join(configsDir, deploymentYml): {
-					Res: fileContents(t, testDeploymentFile),
-					Err: nil,
-				},
-			},
-		},
-
+		name:    "Configs is a directory with single .yml file",
+		configs: "testing/configs/single-yml",
 		want: Objects{
 			newObjectFromFile(t, testDeploymentFile),
 		},
 	}, {
-		name: "Configs is a directory with multiple .yaml files",
-
-		configs: configsDir,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				configsDir: {
-					Res: &testservices.TestFileInfo{
-						IsDirectory: true,
-					},
-					Err: nil,
-				},
-			},
-			ReadDirResponse: map[string]testservices.ReadDirResponse{
-				configsDir: {
-					Res: []os.FileInfo{
-						&testservices.TestFileInfo{
-							BaseName:    deploymentYaml,
-							IsDirectory: false,
-						},
-						&testservices.TestFileInfo{
-							BaseName:    serviceYaml,
-							IsDirectory: false,
-						},
-					},
-					Err: nil,
-				},
-			},
-			ReadFileResponse: map[string]testservices.ReadFileResponse{
-				filepath.Join(configsDir, deploymentYaml): {
-					Res: fileContents(t, testDeploymentFile),
-					Err: nil,
-				},
-				filepath.Join(configsDir, serviceYaml): {
-					Res: fileContents(t, testServiceFile),
-					Err: nil,
-				},
-			},
-		},
-
+		name:    "Configs is a directory with multiple .yaml files",
+		configs: "testing/configs/multiple-yaml",
 		want: Objects{
 			newObjectFromFile(t, testDeploymentFile),
 			newObjectFromFile(t, testServiceFile),
 		},
 	}, {
-		name: "Configs is a directory containing a multi-resource .yaml file",
-
-		configs: configsDir,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				configsDir: {
-					Res: &testservices.TestFileInfo{
-						IsDirectory: true,
-					},
-					Err: nil,
-				},
-			},
-			ReadDirResponse: map[string]testservices.ReadDirResponse{
-				configsDir: {
-					Res: []os.FileInfo{
-						&testservices.TestFileInfo{
-							BaseName:    multiResourceYaml,
-							IsDirectory: false,
-						},
-					},
-					Err: nil,
-				},
-			},
-			ReadFileResponse: map[string]testservices.ReadFileResponse{
-				filepath.Join(configsDir, multiResourceYaml): {
-					Res: fileContents(t, testMultiResourceFile),
-					Err: nil,
-				},
-			},
-		},
-
+		name:    "Configs is a directory containing a multi-resource .yaml file",
+		configs: "testing/configs/multi-resource-yaml",
 		want: Objects{
 			newObjectFromFile(t, testDeploymentFile),
 			newObjectFromFile(t, testServiceFile),
 		},
 	}, {
-		name: "Configs is a directory containing a multi-resource .yaml file and single-resource .yaml file",
-
-		configs: configsDir,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				configsDir: {
-					Res: &testservices.TestFileInfo{
-						IsDirectory: true,
-					},
-					Err: nil,
-				},
-			},
-			ReadDirResponse: map[string]testservices.ReadDirResponse{
-				configsDir: {
-					Res: []os.FileInfo{
-						&testservices.TestFileInfo{
-							BaseName:    multiResourceYaml,
-							IsDirectory: false,
-						},
-						&testservices.TestFileInfo{
-							BaseName:    deploymentYaml,
-							IsDirectory: false,
-						},
-					},
-					Err: nil,
-				},
-			},
-			ReadFileResponse: map[string]testservices.ReadFileResponse{
-				filepath.Join(configsDir, multiResourceYaml): {
-					Res: fileContents(t, testMultiResourceFile),
-					Err: nil,
-				},
-				filepath.Join(configsDir, deploymentYaml): {
-					Res: fileContents(t, testDeploymentFile),
-					Err: nil,
-				},
-			},
-		},
-
+		name:    "Configs is a directory containing a multi-resource .yaml file and single-resource .yaml file",
+		configs: "testing/configs/multi-and-single-resource-yamls",
 		want: Objects{
 			newObjectFromFile(t, testDeploymentFile),
-			newObjectFromFile(t, testServiceFile),
 			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testServiceFile),
 		},
 	}, {
-		name: "Configs is a directory containing two multi-resource .yaml files",
-
-		configs: configsDir,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				configsDir: {
-					Res: &testservices.TestFileInfo{
-						IsDirectory: true,
-					},
-					Err: nil,
-				},
-			},
-			ReadDirResponse: map[string]testservices.ReadDirResponse{
-				configsDir: {
-					Res: []os.FileInfo{
-						&testservices.TestFileInfo{
-							BaseName:    multiResourceYaml,
-							IsDirectory: false,
-						},
-						&testservices.TestFileInfo{
-							BaseName:    "multi-resource-2.yaml",
-							IsDirectory: false,
-						},
-					},
-					Err: nil,
-				},
-			},
-			ReadFileResponse: map[string]testservices.ReadFileResponse{
-				filepath.Join(configsDir, multiResourceYaml): {
-					Res: fileContents(t, testMultiResourceFile),
-					Err: nil,
-				},
-				filepath.Join(configsDir, "multi-resource-2.yaml"): {
-					Res: fileContents(t, testMultiResourceFile),
-					Err: nil,
-				},
-			},
-		},
-
+		name:    "Configs is a directory containing two multi-resource .yaml files",
+		configs: "testing/configs/two-multi-resource-yamls",
 		want: Objects{
 			newObjectFromFile(t, testDeploymentFile),
 			newObjectFromFile(t, testServiceFile),
@@ -711,276 +500,110 @@ func TestParseConfigs(t *testing.T) {
 	}, {
 		name: "Configs is a directory containing a multi-resource .yaml file with whitespace",
 
-		configs: configsDir,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				configsDir: {
-					Res: &testservices.TestFileInfo{
-						IsDirectory: true,
-					},
-					Err: nil,
-				},
-			},
-			ReadDirResponse: map[string]testservices.ReadDirResponse{
-				configsDir: {
-					Res: []os.FileInfo{
-						&testservices.TestFileInfo{
-							BaseName:    multiResourceWithWhitespaceYaml,
-							IsDirectory: false,
-						},
-					},
-					Err: nil,
-				},
-			},
-			ReadFileResponse: map[string]testservices.ReadFileResponse{
-				filepath.Join(configsDir, multiResourceWithWhitespaceYaml): {
-					Res: fileContents(t, testMultiResourceWithWhitespaceFile),
-					Err: nil,
-				},
-			},
-		},
-
+		configs: "testing/configs/multi-resource-whitespace",
 		want: Objects{
 			newObjectFromFile(t, testDeploymentFile),
 			newObjectFromFile(t, testServiceFile),
 		},
 	}, {
-		name: "Configs is .yaml file",
-
-		configs: deploymentYaml,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				deploymentYaml: {
-					Res: &testservices.TestFileInfo{
-						IsDirectory: false,
-					},
-					Err: nil,
-				},
-			},
-			ReadFileResponse: map[string]testservices.ReadFileResponse{
-				deploymentYaml: {
-					Res: fileContents(t, testDeploymentFile),
-					Err: nil,
-				},
-			},
-		},
-
+		name:    "Configs is .yaml file",
+		configs: "testing/configs/deployment.yaml",
 		want: Objects{
 			newObjectFromFile(t, testDeploymentFile),
 		},
 	}, {
-		name: "Configs is .yml file",
-
-		configs: deploymentYml,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				deploymentYml: {
-					Res: &testservices.TestFileInfo{
-						IsDirectory: false,
-					},
-					Err: nil,
-				},
-			},
-			ReadFileResponse: map[string]testservices.ReadFileResponse{
-				deploymentYml: {
-					Res: fileContents(t, testDeploymentFile),
-					Err: nil,
-				},
-			},
-		},
-
+		name:    "Configs is .yml file",
+		configs: "testing/configs/deployment.yml",
 		want: Objects{
 			newObjectFromFile(t, testDeploymentFile),
 		},
 	}, {
 		name: "Configs is a multi-resource .yaml file",
 
-		configs: multiResourceYaml,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				multiResourceYaml: {
-					Res: &testservices.TestFileInfo{
-						IsDirectory: false,
-					},
-					Err: nil,
-				},
-			},
-			ReadFileResponse: map[string]testservices.ReadFileResponse{
-				multiResourceYaml: {
-					Res: fileContents(t, testMultiResourceFile),
-					Err: nil,
-				},
-			},
-		},
+		configs: "testing/configs/multi-resource.yaml",
 
 		want: Objects{
 			newObjectFromFile(t, testDeploymentFile),
 			newObjectFromFile(t, testServiceFile),
 		},
 	}, {
-		name: "Configs is a directory containing files that lead to collisions",
-
-		configs: configsDir,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				configsDir: {
-					Res: &testservices.TestFileInfo{
-						IsDirectory: true,
-					},
-					Err: nil,
-				},
-			},
-			ReadDirResponse: map[string]testservices.ReadDirResponse{
-				configsDir: {
-					Res: []os.FileInfo{
-						&testservices.TestFileInfo{
-							BaseName:    "multi-resource-deployment-test-app.yaml",
-							IsDirectory: false,
-						},
-						&testservices.TestFileInfo{
-							BaseName:    "multi-resource-service-test-app.yaml",
-							IsDirectory: false,
-						},
-						&testservices.TestFileInfo{
-							BaseName:    multiResourceYaml,
-							IsDirectory: false,
-						},
-					},
-					Err: nil,
-				},
-			},
-			ReadFileResponse: map[string]testservices.ReadFileResponse{
-				filepath.Join(configsDir, "multi-resource-deployment-test-app.yaml"): {
-					Res: fileContents(t, testDeploymentFile),
-					Err: nil,
-				},
-				filepath.Join(configsDir, "multi-resource-service-test-app.yaml"): {
-					Res: fileContents(t, testServiceFile),
-					Err: nil,
-				},
-				filepath.Join(configsDir, multiResourceYaml): {
-					Res: fileContents(t, testMultiResourceFile),
-					Err: nil,
-				},
-			},
-		},
-
+		name:    "Configs is a directory containing files that lead to collisions",
+		configs: "testing/configs/files-with-collisions",
 		want: Objects{
 			newObjectFromFile(t, testDeploymentFile),
-			newObjectFromFile(t, testServiceFile),
 			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testServiceFile),
 			newObjectFromFile(t, testServiceFile),
 		},
 	}, {
-		name: "Configs is stdin with single object",
-
-		configs: "-",
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				"-": {
-					Res: &testservices.TestFileInfo{
-						IsDirectory: false,
-					},
-					Err: nil,
-				},
-			},
-			ReadFileResponse: map[string]testservices.ReadFileResponse{
-				"-": {
-					Res: fileContents(t, testDeploymentFile),
-					Err: nil,
-				},
-			},
-		},
-
-		want: Objects{
-			newObjectFromFile(t, testDeploymentFile),
-		},
+		name:    "Do not parse file with only comments and whitespace",
+		configs: "testing/configs/whitespace-and-comments.yaml",
+		want:    Objects{},
 	}, {
-		name: "Configs is stdin with multiple objects",
-
-		configs: "-",
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				"-": {
-					Res: &testservices.TestFileInfo{
-						IsDirectory: false,
-					},
-					Err: nil,
-				},
-			},
-			ReadFileResponse: map[string]testservices.ReadFileResponse{
-				"-": {
-					Res: fileContents(t, testMultiResourceFile),
-					Err: nil,
-				},
-			},
-		},
-
-		want: Objects{
-			newObjectFromFile(t, testDeploymentFile),
-			newObjectFromFile(t, testServiceFile),
-		},
-	}, {
-		name: "Do not parse file with only comments and whitespace",
-
-		configs: "file.yaml",
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				"file.yaml": {
-					Res: &testservices.TestFileInfo{
-						IsDirectory: false,
-					},
-					Err: nil,
-				},
-			},
-			ReadFileResponse: map[string]testservices.ReadFileResponse{
-				filepath.Join("file.yaml"): {
-					Res: fileContents(t, testWhitespaceAndCommentsFile),
-					Err: nil,
-				},
-			},
-		},
-
-		want: Objects{},
-	}, {
-		name: "Do not parse file in dir with only comments and whitespace",
-
-		configs: configsDir,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				configsDir: {
-					Res: &testservices.TestFileInfo{
-						IsDirectory: true,
-					},
-					Err: nil,
-				},
-			},
-			ReadDirResponse: map[string]testservices.ReadDirResponse{
-				configsDir: {
-					Res: []os.FileInfo{
-						&testservices.TestFileInfo{
-							BaseName:    "file.yaml",
-							IsDirectory: false,
-						},
-					},
-					Err: nil,
-				},
-			},
-			ReadFileResponse: map[string]testservices.ReadFileResponse{
-				filepath.Join(configsDir, "file.yaml"): {
-					Res: fileContents(t, testWhitespaceAndCommentsFile),
-					Err: nil,
-				},
-			},
-		},
-
-		want: Objects{},
+		name:    "Do not parse file in dir with only comments and whitespace",
+		configs: "testing/configs/comments-and-whitespace",
+		want:    Objects{},
 	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if got, err := ParseConfigs(ctx, tc.configs, tc.oss); !reflect.DeepEqual(got, tc.want) || err != nil {
-				t.Errorf("ParseConfigs(ctx, %s, oss) = %v, %v; want %v, <nil>", tc.configs, got, err, tc.want)
+			oss, err := services.NewOS(ctx)
+			if err != nil {
+				t.Fatalf("Failed to create OS: %v", err)
+			}
+
+			configs := tc.configs
+
+			if got, err := ParseConfigs(ctx, configs, oss); !reflect.DeepEqual(got, tc.want) || err != nil {
+				t.Errorf("ParseConfigs(ctx, %s, oss) = %v, %v; want %v, <nil>", configs, got, err, tc.want)
+			}
+		})
+	}
+}
+
+func TestParseConfigsStdIn(t *testing.T) {
+	ctx := context.Background()
+
+	testDeploymentFile := "testing/deployment.yaml"
+	testServiceFile := "testing/service.yaml"
+
+	tests := []struct {
+		name    string
+		configs string
+		want    Objects
+	}{{
+		name:    "Configs is stdin with single object",
+		configs: "testing/configs/deployment.yaml",
+		want: Objects{
+			newObjectFromFile(t, testDeploymentFile),
+		},
+	}, {
+		name:    "Configs is stdin with multiple objects",
+		configs: "testing/configs/multi-resource.yaml",
+		want: Objects{
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testServiceFile),
+		},
+	}}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			oss, err := services.NewOS(ctx)
+			if err != nil {
+				t.Fatalf("Failed to create OS: %v", err)
+			}
+
+			f, err := os.Open(tc.configs)
+			if err != nil {
+				t.Fatalf("Failed to open file: %v, %v", tc.configs, err)
+			}
+
+			oldStdin := os.Stdin
+			defer func() { os.Stdin = oldStdin }()
+			os.Stdin = f
+
+			if got, err := ParseConfigs(ctx, "-", oss); !reflect.DeepEqual(got, tc.want) || err != nil {
+				t.Errorf("ParseConfigs(ctx, %s, oss) = %v, %v; want %v, <nil>", "-", got, err, tc.want)
 			}
 		})
 	}
@@ -989,130 +612,28 @@ func TestParseConfigs(t *testing.T) {
 func TestParseConfigsErrors(t *testing.T) {
 	ctx := context.Background()
 
-	configsDir := "path/to/configs"
-	deploymentYaml := "deployment.yaml"
-	txtFile := "file.txt"
-
 	tests := []struct {
 		name string
 
 		configs string
-		oss     services.OSService
 	}{{
-		name: "Failed to get file info",
-
-		configs: configsDir,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				configsDir: {
-					Res: nil,
-					Err: fmt.Errorf("failed to call stat"),
-				},
-			},
-		},
+		name:    "Failed to get file info",
+		configs: "testing/configs/missing",
 	}, {
-		name: "Failed to read directory",
-
-		configs: configsDir,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				configsDir: {
-					Res: &testservices.TestFileInfo{
-						IsDirectory: true,
-					},
-					Err: nil,
-				},
-			},
-			ReadDirResponse: map[string]testservices.ReadDirResponse{
-				configsDir: {
-					Res: nil,
-					Err: fmt.Errorf("failed to read directory"),
-				},
-			},
-		},
+		name:    "Configs is a directory with no files",
+		configs: "testing/configs/empty-directory",
 	}, {
-		name: "Failed to read file",
-
-		configs: deploymentYaml,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				deploymentYaml: {
-					Res: &testservices.TestFileInfo{
-						IsDirectory: false,
-					},
-					Err: nil,
-				},
-			},
-			ReadFileResponse: map[string]testservices.ReadFileResponse{
-				deploymentYaml: {
-					Res: nil,
-					Err: fmt.Errorf("failed to read file"),
-				},
-			},
-		},
+		name:    "Configs is a file that does not end in .yaml or .yaml",
+		configs: "testing/configs/yaml.txt",
 	}, {
-		name: "Configs is a directory with no files",
-
-		configs: configsDir,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				configsDir: {
-					Res: &testservices.TestFileInfo{
-						IsDirectory: true,
-					},
-					Err: nil,
-				},
-			},
-			ReadDirResponse: map[string]testservices.ReadDirResponse{
-				configsDir: {
-					Res: []os.FileInfo{},
-					Err: nil,
-				},
-			},
-		},
-	}, {
-		name: "Configs is a file that does not end in .yaml or .yaml",
-
-		configs: txtFile,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				txtFile: {
-					Res: &testservices.TestFileInfo{
-						IsDirectory: false,
-					},
-					Err: nil,
-				},
-			},
-		},
-	}, {
-		name: "Configs is a directory with no .yaml or .yml files",
-
-		configs: configsDir,
-		oss: &testservices.TestOS{
-			StatResponse: map[string]testservices.StatResponse{
-				configsDir: {
-					Res: &testservices.TestFileInfo{
-						IsDirectory: true,
-					},
-					Err: nil,
-				},
-			},
-			ReadDirResponse: map[string]testservices.ReadDirResponse{
-				configsDir: {
-					Res: []os.FileInfo{
-						&testservices.TestFileInfo{
-							BaseName: txtFile,
-						},
-					},
-					Err: nil,
-				},
-			},
-		},
+		name:    "Configs is a directory with no .yaml or .yml files",
+		configs: "testing/configs/directory-without-yaml",
 	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if got, err := ParseConfigs(ctx, tc.configs, tc.oss); got != nil || err == nil {
+			oss, _ := services.NewOS(ctx)
+			if got, err := ParseConfigs(ctx, tc.configs, oss); got != nil || err == nil {
 				t.Errorf("ParseConfigs(ctx, %s, oss) = %v, <nil>; want <nil>, error", tc.configs, got)
 			}
 		})
