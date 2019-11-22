@@ -561,7 +561,7 @@ func TestParseConfigs(t *testing.T) {
 	}
 }
 
-func TestParseConfigsStdIn(t *testing.T) {
+func TestParseConfigsFromStdIn(t *testing.T) {
 	ctx := context.Background()
 
 	testDeploymentFile := "testing/deployment.yaml"
@@ -628,12 +628,50 @@ func TestParseConfigsErrors(t *testing.T) {
 	}, {
 		name:    "Configs is a directory with no .yaml or .yml files",
 		configs: "testing/configs/directory-without-yaml",
+	}, {
+		name:    "Configs is a yaml file with invalid syntax",
+		configs: "testing/configs/invalid.yaml",
 	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			oss, _ := services.NewOS(ctx)
 			if got, err := ParseConfigs(ctx, tc.configs, oss); got != nil || err == nil {
+				t.Errorf("ParseConfigs(ctx, %s, oss) = %v, <nil>; want <nil>, error", tc.configs, got)
+			}
+		})
+	}
+}
+
+func TestParseConfigsFromStdInErrors(t *testing.T) {
+	ctx := context.Background()
+
+	tests := []struct {
+		name    string
+		configs string
+		want    Objects
+	}{{
+		name:    "Configs is stdin with invalid yaml",
+		configs: "testing/configs/invalid.yaml",
+	}}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			oss, err := services.NewOS(ctx)
+			if err != nil {
+				t.Fatalf("Failed to create OS: %v", err)
+			}
+
+			f, err := os.Open(tc.configs)
+			if err != nil {
+				t.Fatalf("Failed to open file: %v, %v", tc.configs, err)
+			}
+
+			oldStdin := os.Stdin
+			defer func() { os.Stdin = oldStdin }()
+			os.Stdin = f
+
+			if got, err := ParseConfigs(ctx, "-", oss); got != nil || err == nil {
 				t.Errorf("ParseConfigs(ctx, %s, oss) = %v, <nil>; want <nil>, error", tc.configs, got)
 			}
 		})
