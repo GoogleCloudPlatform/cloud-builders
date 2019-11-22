@@ -453,6 +453,7 @@ func TestParseConfigs(t *testing.T) {
 	tests := []struct {
 		name    string
 		configs string
+		recur   bool
 		want    Objects
 	}{{
 		name:    "Configs is a directory with single .yaml file",
@@ -543,6 +544,66 @@ func TestParseConfigs(t *testing.T) {
 		name:    "Do not parse file in dir with only comments and whitespace",
 		configs: "testing/configs/comments-and-whitespace",
 		want:    Objects{},
+	}, {
+		name:    "Configs is a directory with a yaml file two directories deep",
+		configs: "testing/configs/nested-with-yaml",
+		recur:   true,
+		want:    Objects{
+			newObjectFromFile(t, testDeploymentFile),
+		},
+	}, {
+		name:    "Configs is a directory with a yml file two directories deep",
+		configs: "testing/configs/nested-with-yml",
+		recur:   true,
+		want:    Objects{
+			newObjectFromFile(t, testDeploymentFile),
+		},
+	}, {
+		name:    "Configs is a directory with multiple yaml files two directories deep",
+		configs: "testing/configs/nested-with-2-yamls",
+		recur:   true,
+		want:    Objects{
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testServiceFile),
+		},
+	}, {
+		name:    "Configs is a directory with yamls in each level",
+		configs: "testing/configs/nested-with-yamls-at-each-level",
+		recur:   true,
+		want:    Objects{
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testServiceFile),
+		},
+	}, {
+		name:    "Configs is a directory with yamls in each level but recursive is false",
+		configs: "testing/configs/nested-with-yamls-at-each-level",
+		want:    Objects{
+			newObjectFromFile(t, testDeploymentFile),
+		},
+	}, {
+		name:    "Configs is a nested directory with multi-resource yamls",
+		configs: "testing/configs/nested-multi-resource",
+		recur:   true,
+		want:    Objects{
+			newObjectFromFile(t, testServiceFile),
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testServiceFile),
+		},
+	}, {
+		name:    "Configs is a nested directory with multiple subdirectories",
+		configs: "testing/configs/nested-and-branched",
+		recur:   true,
+		want:    Objects{
+			newObjectFromFile(t, testDeploymentFile),
+			newObjectFromFile(t, testServiceFile),
+		},
+	}, {
+		name:    "Configs is a nested directory with whitespace",
+		configs: "testing/configs/nested-with-whitespace",
+		recur:   true,
+		want:    Objects{
+		},
 	}}
 
 	for _, tc := range tests {
@@ -554,8 +615,8 @@ func TestParseConfigs(t *testing.T) {
 
 			configs := tc.configs
 
-			if got, err := ParseConfigs(ctx, configs, oss); !reflect.DeepEqual(got, tc.want) || err != nil {
-				t.Errorf("ParseConfigs(ctx, %s, oss) = %v, %v; want %v, <nil>", configs, got, err, tc.want)
+			if got, err := ParseConfigs(ctx, configs, oss, tc.recur); !reflect.DeepEqual(got, tc.want) || err != nil {
+				t.Errorf("ParseConfigs(ctx, %s, oss, %v) = %v, %v; want %v, <nil>", configs, tc.recur, got, err, tc.want)
 			}
 		})
 	}
@@ -602,8 +663,8 @@ func TestParseConfigsFromStdIn(t *testing.T) {
 			defer func() { os.Stdin = oldStdin }()
 			os.Stdin = f
 
-			if got, err := ParseConfigs(ctx, "-", oss); !reflect.DeepEqual(got, tc.want) || err != nil {
-				t.Errorf("ParseConfigs(ctx, %s, oss) = %v, %v; want %v, <nil>", "-", got, err, tc.want)
+			if got, err := ParseConfigs(ctx, "-", oss, false); !reflect.DeepEqual(got, tc.want) || err != nil {
+				t.Errorf("ParseConfigs(ctx, %s, oss, false) = %v, %v; want %v, <nil>", "-", got, err, tc.want)
 			}
 		})
 	}
@@ -613,8 +674,8 @@ func TestParseConfigsErrors(t *testing.T) {
 	ctx := context.Background()
 
 	tests := []struct {
-		name string
-
+		name    string
+		recur   bool
 		configs string
 	}{{
 		name:    "Failed to get file info",
@@ -631,13 +692,29 @@ func TestParseConfigsErrors(t *testing.T) {
 	}, {
 		name:    "Configs is a yaml file with invalid syntax",
 		configs: "testing/configs/invalid.yaml",
+	}, {
+		name:    "Configs is a nested directory with no files",
+		configs: "testing/configs/empty-nested",
+		recur:   true,
+	}, {
+		name:    "Configs is a nested directory with no yaml files",
+		configs: "testing/configs/nested-with-text",
+		recur:   true,
+	}, {
+		name:    "Configs is a nested directory with invalid yaml",
+		configs: "testing/configs/nested-with-text",
+		recur:   true,
+	}, {
+		name:    "Configs is a valid nested directory, but recursive is false",
+		configs: "testing/configs/nested-with-yaml",
+		recur:   false,
 	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			oss, _ := services.NewOS(ctx)
-			if got, err := ParseConfigs(ctx, tc.configs, oss); got != nil || err == nil {
-				t.Errorf("ParseConfigs(ctx, %s, oss) = %v, <nil>; want <nil>, error", tc.configs, got)
+			if got, err := ParseConfigs(ctx, tc.configs, oss, tc.recur); got != nil || err == nil {
+				t.Errorf("ParseConfigs(ctx, %s, oss, %v) = %v, <nil>; want <nil>, error", tc.configs, tc.recur, got)
 			}
 		})
 	}
@@ -649,10 +726,14 @@ func TestParseConfigsFromStdInErrors(t *testing.T) {
 	tests := []struct {
 		name    string
 		configs string
-		want    Objects
+		recur   bool
 	}{{
 		name:    "Configs is stdin with invalid yaml",
 		configs: "testing/configs/invalid.yaml",
+	}, {
+		name:    "Configs is stdin with recursion flag",
+		configs: "testing/configs/deployment.yaml",
+		recur:   true,
 	}}
 
 	for _, tc := range tests {
@@ -671,8 +752,8 @@ func TestParseConfigsFromStdInErrors(t *testing.T) {
 			defer func() { os.Stdin = oldStdin }()
 			os.Stdin = f
 
-			if got, err := ParseConfigs(ctx, "-", oss); got != nil || err == nil {
-				t.Errorf("ParseConfigs(ctx, %s, oss) = %v, <nil>; want <nil>, error", tc.configs, got)
+			if got, err := ParseConfigs(ctx, "-", oss, tc.recur); got != nil || err == nil {
+				t.Errorf("ParseConfigs(ctx, %s, oss, %v) = %v, <nil>; want <nil>, error", tc.configs, tc.recur, got)
 			}
 		})
 	}
