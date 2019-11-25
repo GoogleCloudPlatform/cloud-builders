@@ -21,6 +21,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-containerregistry/pkg/name"
 	v1 "github.com/google/go-containerregistry/pkg/v1"
 
@@ -32,195 +33,61 @@ import (
 func TestPrepare(t *testing.T) {
 	ctx := context.Background()
 
-	testDeploymentFile := "testing/deployment.yaml"
-	testServiceFile := "testing/service.yaml"
-	testMultiResourceFile := "testing/multi-resource.yaml"
-
 	image := newImageWithTag(t, "my-image:1.0.0")
 	appName := "my-app"
 	appVersion := "b2e43cb"
-	suggestedDir := "path/to/outputDir/suggested"
-	expandedDir := "path/to/outputDir/expanded"
 	namespace := "default"
 	labels := make(map[string]string)
 	annotations := make(map[string]string)
 
-	configDir := "path/to/config"
-	deploymentYaml := "deployment.yaml"
-	multiResourceYaml := "multi-resource.yaml"
-	serviceYaml := "service.yaml"
-
 	tests := []struct {
 		name string
 
-		image           name.Reference
-		appName         string
-		appVersion      string
-		config          string
-		suggestedOutput string
-		expandedOutput  string
-		namespace       string
-		labels          map[string]string
-		annotations     map[string]string
-		exposePort      int
-
-		deployer *Deployer
+		image             name.Reference
+		appName           string
+		appVersion        string
+		config            string
+		expectedSuggested string
+		expectedExpanded  string
+		namespace         string
+		labels            map[string]string
+		annotations       map[string]string
+		exposePort        int
 	}{{
 		name: "Config is directory",
 
-		image:           image,
-		appName:         appName,
-		appVersion:      appVersion,
-		config:          configDir,
-		suggestedOutput: suggestedDir,
-		expandedOutput:  expandedDir,
-		labels:          labels,
-		annotations:     annotations,
-		namespace:       namespace,
-		exposePort:      0,
-
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						configDir: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: true,
-							},
-							Err: nil,
-						},
-						suggestedDir: {
-							Res: nil,
-							Err: os.ErrNotExist,
-						},
-						expandedDir: {
-							Res: nil,
-							Err: os.ErrNotExist,
-						},
-					},
-					ReadDirResponse: map[string]testservices.ReadDirResponse{
-						configDir: {
-							Res: []os.FileInfo{
-								&testservices.TestFileInfo{
-									BaseName:    "multi-resource-deployment-test-app.yaml",
-									IsDirectory: false,
-								},
-								&testservices.TestFileInfo{
-									BaseName:    "multi-resource-service-test-app.yaml",
-									IsDirectory: false,
-								},
-								&testservices.TestFileInfo{
-									BaseName:    multiResourceYaml,
-									IsDirectory: false,
-								},
-							},
-							Err: nil,
-						},
-					},
-					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, "multi-resource-deployment-test-app.yaml"): {
-							Res: fileContents(t, testDeploymentFile),
-							Err: nil,
-						},
-						filepath.Join(configDir, "multi-resource-service-test-app.yaml"): {
-							Res: fileContents(t, testServiceFile),
-							Err: nil,
-						},
-						filepath.Join(configDir, multiResourceYaml): {
-							Res: fileContents(t, testMultiResourceFile),
-							Err: nil,
-						},
-					},
-					MkdirAllResponse: map[string]error{
-						suggestedDir: nil,
-						expandedDir:  nil,
-					},
-					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, resource.AggregatedFilename): nil,
-						filepath.Join(expandedDir, resource.AggregatedFilename):  nil,
-					},
-				},
-				Remote: &testservices.TestRemote{
-					ImageResp: &testservices.TestImage{
-						Hash: v1.Hash{
-							Algorithm: "sha256",
-							Hex:       "foobar",
-						},
-						Err: nil,
-					},
-					ImageErr: nil,
-				},
-			},
-		},
+		image:             image,
+		appName:           appName,
+		appVersion:        appVersion,
+		config:            "testing/configs/directory",
+		expectedSuggested: "testing/expected-suggested/directory.yaml",
+		expectedExpanded:  "testing/expected-expanded/directory.yaml",
+		labels:            labels,
+		annotations:       annotations,
+		namespace:         namespace,
+		exposePort:        0,
 	}, {
 		name: "Config is file",
 
-		image:           image,
-		appName:         appName,
-		appVersion:      appVersion,
-		config:          multiResourceYaml,
-		suggestedOutput: suggestedDir,
-		expandedOutput:  expandedDir,
-		labels:          labels,
-		annotations:     annotations,
-		namespace:       namespace,
-		exposePort:      0,
-
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						multiResourceYaml: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: false,
-							},
-							Err: nil,
-						},
-						suggestedDir: {
-							Res: nil,
-							Err: os.ErrNotExist,
-						},
-						expandedDir: {
-							Res: nil,
-							Err: os.ErrNotExist,
-						},
-					},
-					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						multiResourceYaml: {
-							Res: fileContents(t, testMultiResourceFile),
-							Err: nil,
-						},
-					},
-					MkdirAllResponse: map[string]error{
-						suggestedDir: nil,
-						expandedDir:  nil,
-					},
-					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, resource.AggregatedFilename): nil,
-						filepath.Join(expandedDir, resource.AggregatedFilename):  nil,
-					},
-				},
-				Remote: &testservices.TestRemote{
-					ImageResp: &testservices.TestImage{
-						Hash: v1.Hash{
-							Algorithm: "sha256",
-							Hex:       "foobar",
-						},
-						Err: nil,
-					},
-					ImageErr: nil,
-				},
-			},
-		},
+		image:             image,
+		appName:           appName,
+		appVersion:        appVersion,
+		config:            "testing/configs/multi-resource.yaml",
+		expectedSuggested: "testing/expected-suggested/multi-resource.yaml",
+		expectedExpanded:  "testing/expected-expanded/multi-resource.yaml",
+		labels:            labels,
+		annotations:       annotations,
+		namespace:         namespace,
+		exposePort:        0,
 	}, {
 		name: "Add custom labels",
 
-		image:           image,
-		appName:         appName,
-		appVersion:      appVersion,
-		config:          configDir,
-		suggestedOutput: suggestedDir,
-		expandedOutput:  expandedDir,
+		image:             image,
+		appName:           appName,
+		appVersion:        appVersion,
+		config:            "testing/configs/deployment.yaml",
+		expectedSuggested: "testing/expected-suggested/custom-labels.yaml",
+		expectedExpanded:  "testing/expected-expanded/custom-labels.yaml",
 		labels: map[string]string{
 			"foo":         "bar",
 			"hi":          "bye",
@@ -229,74 +96,16 @@ func TestPrepare(t *testing.T) {
 		annotations: annotations,
 		namespace:   namespace,
 		exposePort:  0,
-
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						configDir: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: true,
-							},
-							Err: nil,
-						},
-						suggestedDir: {
-							Res: nil,
-							Err: os.ErrNotExist,
-						},
-						expandedDir: {
-							Res: nil,
-							Err: os.ErrNotExist,
-						},
-					},
-					ReadDirResponse: map[string]testservices.ReadDirResponse{
-						configDir: {
-							Res: []os.FileInfo{
-								&testservices.TestFileInfo{
-									BaseName:    deploymentYaml,
-									IsDirectory: false,
-								},
-							},
-							Err: nil,
-						},
-					},
-					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, deploymentYaml): {
-							Res: fileContents(t, testDeploymentFile),
-							Err: nil,
-						},
-					},
-					MkdirAllResponse: map[string]error{
-						suggestedDir: nil,
-						expandedDir:  nil,
-					},
-					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, resource.AggregatedFilename): nil,
-						filepath.Join(expandedDir, resource.AggregatedFilename):  nil,
-					},
-				},
-				Remote: &testservices.TestRemote{
-					ImageResp: &testservices.TestImage{
-						Hash: v1.Hash{
-							Algorithm: "sha256",
-							Hex:       "foobar",
-						},
-						Err: nil,
-					},
-					ImageErr: nil,
-				},
-			},
-		},
 	}, {
 		name: "Add custom annotations",
 
-		image:           image,
-		appName:         appName,
-		appVersion:      appVersion,
-		config:          configDir,
-		suggestedOutput: suggestedDir,
-		expandedOutput:  expandedDir,
-		labels:          labels,
+		image:             image,
+		appName:           appName,
+		appVersion:        appVersion,
+		config:            "testing/configs/deployment.yaml",
+		expectedSuggested: "testing/expected-suggested/custom-annotations.yaml",
+		expectedExpanded:  "testing/expected-expanded/custom-annotations.yaml",
+		labels:            labels,
 		annotations: map[string]string{
 			"foo":         "bar",
 			"hi":          "bye",
@@ -304,496 +113,176 @@ func TestPrepare(t *testing.T) {
 		},
 		namespace:  namespace,
 		exposePort: 0,
-
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						configDir: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: true,
-							},
-							Err: nil,
-						},
-						suggestedDir: {
-							Res: nil,
-							Err: os.ErrNotExist,
-						},
-						expandedDir: {
-							Res: nil,
-							Err: os.ErrNotExist,
-						},
-					},
-					ReadDirResponse: map[string]testservices.ReadDirResponse{
-						configDir: {
-							Res: []os.FileInfo{
-								&testservices.TestFileInfo{
-									BaseName:    deploymentYaml,
-									IsDirectory: false,
-								},
-							},
-							Err: nil,
-						},
-					},
-					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, deploymentYaml): {
-							Res: fileContents(t, testDeploymentFile),
-							Err: nil,
-						},
-					},
-					MkdirAllResponse: map[string]error{
-						suggestedDir: nil,
-						expandedDir:  nil,
-					},
-					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, resource.AggregatedFilename): nil,
-						filepath.Join(expandedDir, resource.AggregatedFilename):  nil,
-					},
-				},
-				Remote: &testservices.TestRemote{
-					ImageResp: &testservices.TestImage{
-						Hash: v1.Hash{
-							Algorithm: "sha256",
-							Hex:       "foobar",
-						},
-						Err: nil,
-					},
-					ImageErr: nil,
-				},
-			},
-		},
 	}, {
 		name: "AppName and AppVersion not set",
 
-		image:           image,
-		appName:         "",
-		appVersion:      "",
-		config:          configDir,
-		suggestedOutput: suggestedDir,
-		expandedOutput:  expandedDir,
-		labels:          labels,
-		annotations:     annotations,
-		namespace:       namespace,
-		exposePort:      0,
-
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						configDir: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: true,
-							},
-							Err: nil,
-						},
-						suggestedDir: {
-							Res: nil,
-							Err: os.ErrNotExist,
-						},
-						expandedDir: {
-							Res: nil,
-							Err: os.ErrNotExist,
-						},
-					},
-					ReadDirResponse: map[string]testservices.ReadDirResponse{
-						configDir: {
-							Res: []os.FileInfo{
-								&testservices.TestFileInfo{
-									BaseName:    deploymentYaml,
-									IsDirectory: false,
-								},
-							},
-							Err: nil,
-						},
-					},
-					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, deploymentYaml): {
-							Res: fileContents(t, testDeploymentFile),
-							Err: nil,
-						},
-					},
-					MkdirAllResponse: map[string]error{
-						suggestedDir: nil,
-						expandedDir:  nil,
-					},
-					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, resource.AggregatedFilename): nil,
-						filepath.Join(expandedDir, resource.AggregatedFilename):  nil,
-					},
-				},
-				Remote: &testservices.TestRemote{
-					ImageResp: &testservices.TestImage{
-						Hash: v1.Hash{
-							Algorithm: "sha256",
-							Hex:       "foobar",
-						},
-						Err: nil,
-					},
-					ImageErr: nil,
-				},
-			},
-		},
+		image:             image,
+		appName:           "",
+		appVersion:        "",
+		config:            "testing/configs/deployment.yaml",
+		expectedSuggested: "testing/expected-suggested/missing-app-name-and-version.yaml",
+		expectedExpanded:  "testing/expected-expanded/missing-app-name-and-version.yaml",
+		labels:            labels,
+		annotations:       annotations,
+		namespace:         namespace,
+		exposePort:        0,
 	}, {
 		name: "Namespace is not default",
 
-		image:           image,
-		appName:         appName,
-		appVersion:      appVersion,
-		config:          configDir,
-		suggestedOutput: suggestedDir,
-		expandedOutput:  expandedDir,
-		labels:          labels,
-		annotations:     annotations,
-		namespace:       "foobar",
-		exposePort:      0,
-
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						configDir: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: true,
-							},
-							Err: nil,
-						},
-						suggestedDir: {
-							Res: nil,
-							Err: os.ErrNotExist,
-						},
-						expandedDir: {
-							Res: nil,
-							Err: os.ErrNotExist,
-						},
-					},
-					ReadDirResponse: map[string]testservices.ReadDirResponse{
-						configDir: {
-							Res: []os.FileInfo{
-								&testservices.TestFileInfo{
-									BaseName:    deploymentYaml,
-									IsDirectory: false,
-								},
-							},
-							Err: nil,
-						},
-					},
-					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, deploymentYaml): {
-							Res: fileContents(t, testDeploymentFile),
-							Err: nil,
-						},
-					},
-					MkdirAllResponse: map[string]error{
-						suggestedDir: nil,
-						expandedDir:  nil,
-					},
-					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, resource.AggregatedFilename): nil,
-						filepath.Join(expandedDir, resource.AggregatedFilename):  nil,
-					},
-				},
-				Remote: &testservices.TestRemote{
-					ImageResp: &testservices.TestImage{
-						Hash: v1.Hash{
-							Algorithm: "sha256",
-							Hex:       "foobar",
-						},
-						Err: nil,
-					},
-					ImageErr: nil,
-				},
-			},
-		},
+		image:             image,
+		appName:           appName,
+		appVersion:        appVersion,
+		config:            "testing/configs/deployment.yaml",
+		expectedSuggested: "testing/expected-suggested/foobar-namespace.yaml",
+		expectedExpanded:  "testing/expected-expanded/foobar-namespace.yaml",
+		labels:            labels,
+		annotations:       annotations,
+		namespace:         "foobar",
+		exposePort:        0,
 	}, {
+		// TODO(gleeper): verify this test still tests what it originally did
 		name: "Wait for service object to be ready",
 
-		image:           image,
-		appName:         appName,
-		appVersion:      appVersion,
-		config:          configDir,
-		suggestedOutput: suggestedDir,
-		expandedOutput:  expandedDir,
-		labels:          labels,
-		annotations:     annotations,
-		namespace:       namespace,
-		exposePort:      0,
-
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						configDir: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: true,
-							},
-							Err: nil,
-						},
-						suggestedDir: {
-							Res: nil,
-							Err: os.ErrNotExist,
-						},
-						expandedDir: {
-							Res: nil,
-							Err: os.ErrNotExist,
-						},
-					},
-					ReadDirResponse: map[string]testservices.ReadDirResponse{
-						configDir: {
-							Res: []os.FileInfo{
-								&testservices.TestFileInfo{
-									BaseName:    serviceYaml,
-									IsDirectory: false,
-								},
-							},
-							Err: nil,
-						},
-					},
-					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, serviceYaml): {
-							Res: fileContents(t, testServiceFile),
-							Err: nil,
-						},
-					},
-					MkdirAllResponse: map[string]error{
-						suggestedDir: nil,
-						expandedDir:  nil,
-					},
-					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, resource.AggregatedFilename): nil,
-						filepath.Join(expandedDir, resource.AggregatedFilename):  nil,
-					},
-				},
-				Remote: &testservices.TestRemote{
-					ImageResp: &testservices.TestImage{
-						Hash: v1.Hash{
-							Algorithm: "sha256",
-							Hex:       "foobar",
-						},
-						Err: nil,
-					},
-					ImageErr: nil,
-				},
-			},
-		},
+		image:             image,
+		appName:           appName,
+		appVersion:        appVersion,
+		config:            "testing/configs/service.yaml",
+		expectedSuggested: "testing/expected-suggested/service.yaml",
+		expectedExpanded:  "testing/expected-expanded/service.yaml",
+		labels:            labels,
+		annotations:       annotations,
+		namespace:         namespace,
+		exposePort:        0,
 	}, {
 		name: "No config arg",
 
-		image:           image,
-		appName:         appName,
-		appVersion:      appVersion,
-		config:          "",
-		suggestedOutput: suggestedDir,
-		expandedOutput:  expandedDir,
-		labels:          labels,
-		annotations:     annotations,
-		namespace:       namespace,
-		exposePort:      0,
-
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						configDir: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: true,
-							},
-							Err: nil,
-						},
-						suggestedDir: {
-							Res: nil,
-							Err: os.ErrNotExist,
-						},
-						expandedDir: {
-							Res: nil,
-							Err: os.ErrNotExist,
-						},
-					},
-					ReadDirResponse: map[string]testservices.ReadDirResponse{
-						configDir: {
-							Res: []os.FileInfo{
-								&testservices.TestFileInfo{
-									BaseName:    deploymentYaml,
-									IsDirectory: false,
-								},
-							},
-							Err: nil,
-						},
-					},
-					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, deploymentYaml): {
-							Res: fileContents(t, testDeploymentFile),
-							Err: nil,
-						},
-					},
-					MkdirAllResponse: map[string]error{
-						suggestedDir: nil,
-						expandedDir:  nil,
-					},
-					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, resource.AggregatedFilename): nil,
-						filepath.Join(expandedDir, resource.AggregatedFilename):  nil,
-					},
-				},
-				Remote: &testservices.TestRemote{
-					ImageResp: &testservices.TestImage{
-						Hash: v1.Hash{
-							Algorithm: "sha256",
-							Hex:       "foobar",
-						},
-						Err: nil,
-					},
-					ImageErr: nil,
-				},
-			},
-		},
+		image:             image,
+		appName:           appName,
+		appVersion:        appVersion,
+		config:            "",
+		expectedSuggested: "testing/expected-suggested/no-config.yaml",
+		expectedExpanded:  "testing/expected-expanded/no-config.yaml",
+		labels:            labels,
+		annotations:       annotations,
+		namespace:         namespace,
+		exposePort:        0,
 	}, {
 		name: "Expose application",
 
-		image:           image,
-		appName:         appName,
-		appVersion:      appVersion,
-		config:          configDir,
-		suggestedOutput: suggestedDir,
-		expandedOutput:  expandedDir,
-		labels:          labels,
-		annotations:     annotations,
-		namespace:       namespace,
-		exposePort:      80,
-
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						configDir: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: true,
-							},
-							Err: nil,
-						},
-						suggestedDir: {
-							Res: nil,
-							Err: os.ErrNotExist,
-						},
-						expandedDir: {
-							Res: nil,
-							Err: os.ErrNotExist,
-						},
-					},
-					ReadDirResponse: map[string]testservices.ReadDirResponse{
-						configDir: {
-							Res: []os.FileInfo{
-								&testservices.TestFileInfo{
-									BaseName:    deploymentYaml,
-									IsDirectory: false,
-								},
-							},
-							Err: nil,
-						},
-					},
-					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, deploymentYaml): {
-							Res: fileContents(t, testDeploymentFile),
-							Err: nil,
-						},
-					},
-					MkdirAllResponse: map[string]error{
-						suggestedDir: nil,
-						expandedDir:  nil,
-					},
-					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, resource.AggregatedFilename): nil,
-						filepath.Join(expandedDir, resource.AggregatedFilename):  nil,
-					},
-				},
-				Remote: &testservices.TestRemote{
-					ImageResp: &testservices.TestImage{
-						Hash: v1.Hash{
-							Algorithm: "sha256",
-							Hex:       "foobar",
-						},
-						Err: nil,
-					},
-					ImageErr: nil,
-				},
-			},
-		},
+		image:             image,
+		appName:           appName,
+		appVersion:        appVersion,
+		config:            "testing/configs/deployment.yaml",
+		expectedSuggested: "testing/expected-suggested/exposed-application.yaml",
+		expectedExpanded:  "testing/expected-expanded/exposed-application.yaml",
+		labels:            labels,
+		annotations:       annotations,
+		namespace:         namespace,
+		exposePort:        80,
 	}, {
 		name: "Namespace is empty",
 
-		image:           image,
-		appName:         appName,
-		appVersion:      appVersion,
-		config:          configDir,
-		suggestedOutput: suggestedDir,
-		expandedOutput:  expandedDir,
-		labels:          labels,
-		annotations:     annotations,
-		namespace:       "",
-		exposePort:      0,
-
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						configDir: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: true,
-							},
-							Err: nil,
-						},
-						suggestedDir: {
-							Res: nil,
-							Err: os.ErrNotExist,
-						},
-						expandedDir: {
-							Res: nil,
-							Err: os.ErrNotExist,
-						},
-					},
-					ReadDirResponse: map[string]testservices.ReadDirResponse{
-						configDir: {
-							Res: []os.FileInfo{
-								&testservices.TestFileInfo{
-									BaseName:    deploymentYaml,
-									IsDirectory: false,
-								},
-							},
-							Err: nil,
-						},
-					},
-					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, deploymentYaml): {
-							Res: fileContents(t, testDeploymentFile),
-							Err: nil,
-						},
-					},
-					MkdirAllResponse: map[string]error{
-						suggestedDir: nil,
-						expandedDir:  nil,
-					},
-					WriteFileResponse: map[string]error{
-						filepath.Join(suggestedDir, resource.AggregatedFilename): nil,
-						filepath.Join(expandedDir, resource.AggregatedFilename):  nil,
-					},
-				},
-				Remote: &testservices.TestRemote{
-					ImageResp: &testservices.TestImage{
-						Hash: v1.Hash{
-							Algorithm: "sha256",
-							Hex:       "foobar",
-						},
-						Err: nil,
-					},
-					ImageErr: nil,
-				},
-			},
-		},
+		image:             image,
+		appName:           appName,
+		appVersion:        appVersion,
+		config:            "testing/configs/deployment.yaml",
+		expectedSuggested: "testing/expected-suggested/empty-namespace.yaml",
+		expectedExpanded:  "testing/expected-expanded/empty-namespace.yaml",
+		labels:            labels,
+		annotations:       annotations,
+		namespace:         "",
+		exposePort:        0,
 	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if err := tc.deployer.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, tc.suggestedOutput, tc.expandedOutput, tc.namespace, tc.labels, tc.annotations, tc.exposePort); err != nil {
-				t.Errorf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %s, %v) = %v; want <nil>", tc.image, tc.appName, tc.appVersion, tc.config, tc.suggestedOutput, tc.expandedOutput, tc.namespace, tc.labels, tc.annotations, err)
+			oss, err := services.NewOS(ctx)
+			if err != nil {
+				t.Fatalf("Failed to create os: %v", err)
+			}
+
+			remote := testservices.TestRemote{
+				ImageResp: &testservices.TestImage{
+					Hash: v1.Hash{
+						Algorithm: "sha256",
+						Hex:       "foobar",
+					},
+					Err: nil,
+				},
+				ImageErr: nil,
+			}
+
+			dir, err := ioutil.TempDir("/tmp", "gke-deploy_deploy_test")
+			if err != nil {
+				t.Fatalf("Failed to create tmp directory: %v", err)
+			}
+			defer os.RemoveAll(dir)
+
+			suggestedDir, err := ioutil.TempDir("/tmp", "gke-deploy_deploy_test_suggested")
+			if err != nil {
+				t.Fatalf("Failed to create tmp directory: %v", err)
+			}
+			defer os.RemoveAll(suggestedDir)
+
+			expandedDir, err := ioutil.TempDir("/tmp", "gke-deploy_deploy_test_expected")
+			if err != nil {
+				t.Fatalf("Failed to create tmp directory: %v", err)
+			}
+			defer os.RemoveAll(expandedDir)
+
+			d := Deployer{Clients: &services.Clients{OS: oss, Remote: &remote}}
+			if err := d.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, tc.exposePort); err != nil {
+				t.Fatalf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %s, %v) = %v; want <nil>", tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, err)
+			}
+
+			// Compare expanded files
+			expandedFiles, err := ioutil.ReadDir(expandedDir)
+			if err != nil {
+				t.Fatalf("Failed to read expanded directory: %v", dir)
+			}
+
+			if len(expandedFiles) != 1 {
+				t.Fatalf("Incorrect number of expanded k8s files created: %v", len(expandedFiles))
+			}
+
+			path := filepath.Join(expandedDir, expandedFiles[0].Name())
+			actualExpandedOutput, err := ioutil.ReadFile(path)
+			if err != nil {
+				t.Fatalf("Failed to read actual output for expanded file: %v", path)
+			}
+
+			expectedExpandedOutput, err := ioutil.ReadFile(tc.expectedExpanded)
+			if err != nil {
+				t.Fatalf("Failed to read expected output for expanded file: %v", tc.expectedExpanded)
+			}
+
+			if diff := cmp.Diff(expectedExpandedOutput, actualExpandedOutput); diff != "" {
+				t.Fatalf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %s, %v) produced diff on expanded files (-want +got):\n%s", tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, diff)
+			}
+
+			// Compare suggested files
+			suggestedFiles, err := ioutil.ReadDir(suggestedDir)
+			if err != nil {
+				t.Fatalf("Failed to read suggested directory: %v", dir)
+			}
+
+			if len(suggestedFiles) != 1 {
+				t.Fatalf("Incorrect number of suggested k8s files created: %v", len(suggestedFiles))
+			}
+
+			suggestedPath := filepath.Join(suggestedDir, suggestedFiles[0].Name())
+			actualSuggestedOutput, err := ioutil.ReadFile(suggestedPath)
+			if err != nil {
+				t.Fatalf("Failed to read actual output for suggested file: %v", path)
+			}
+
+			expectedSuggestedOutput, err := ioutil.ReadFile(tc.expectedSuggested)
+			if err != nil {
+				t.Fatalf("Failed to read expected output for suggested file: %v", tc.expectedSuggested)
+			}
+
+			if diff := cmp.Diff(expectedSuggestedOutput, actualSuggestedOutput); diff != "" {
+				t.Fatalf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %s, %v) produced diff on suggested files (-want +got):\n%s", tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, diff)
 			}
 		})
 	}

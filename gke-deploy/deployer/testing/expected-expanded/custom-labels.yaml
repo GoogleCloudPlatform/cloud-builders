@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    a/b/c.d.f.g: h/i/j.k.l.m
+    app: test-app
+    app.kubernetes.io/managed-by: gcp-cloud-build-deploy
+    app.kubernetes.io/name: my-app
+    app.kubernetes.io/version: b2e43cb
+    foo: bar
+    hi: bye
+  name: test-app
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-app
+  template:
+    metadata:
+      labels:
+        a/b/c.d.f.g: h/i/j.k.l.m
+        app: test-app
+        app.kubernetes.io/managed-by: gcp-cloud-build-deploy
+        app.kubernetes.io/name: my-app
+        app.kubernetes.io/version: b2e43cb
+        foo: bar
+        hi: bye
+    spec:
+      containers:
+      - image: gcr.io/cbd-test/test-app:latest
+        name: test-app
