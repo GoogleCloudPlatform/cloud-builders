@@ -113,6 +113,7 @@ func ParseConfigs(ctx context.Context, configs string, oss services.OSService, r
 
 	hasResources := false
 
+	// Since walk is recursive, we need to declare it before creating the function that refers to it.
 	var walk func(path string, fi os.FileInfo, baseDir bool) error
 	walk = func(path string, fi os.FileInfo, baseDir bool) error {
 		if fi.IsDir() {
