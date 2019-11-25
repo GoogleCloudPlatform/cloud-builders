@@ -771,7 +771,7 @@ func TestApplyErrors(t *testing.T) {
 	testNamespaceFile := "testing/namespace.yaml"
 
 	namespace := "default"
-	waitTimeout := 5 * time.Minute
+	waitTimeout := 10 * time.Second
 
 	clusterName := "test-cluster"
 	clusterLocation := "us-east1-b"
