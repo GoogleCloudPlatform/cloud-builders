@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: gcp-cloud-build-deploy
+    app.kubernetes.io/name: my-app
+    app.kubernetes.io/version: b2e43cb
+  name: my-image
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-image
+  template:
+    metadata:
+      labels:
+        app: my-image
+        app.kubernetes.io/managed-by: gcp-cloud-build-deploy
+        app.kubernetes.io/name: my-app
+        app.kubernetes.io/version: b2e43cb
+    spec:
+      containers:
+      - image: index.docker.io/library/my-image@sha256:foobar
+        name: my-image
+
+
+---
+
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: gcp-cloud-build-deploy
+    app.kubernetes.io/name: my-app
+    app.kubernetes.io/version: b2e43cb
+  name: my-image-hpa
+  namespace: default
+spec:
+  maxReplicas: 5
+  metrics:
+  - resource:
+      name: cpu
+      targetAverageUtilization: 80
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: my-image
