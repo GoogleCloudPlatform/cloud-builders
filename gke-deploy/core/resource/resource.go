@@ -91,47 +91,59 @@ func DecodeFromYAML(ctx context.Context, yaml []byte) (*Object, error) {
 func ParseConfigs(ctx context.Context, configs string, oss services.OSService) (Objects, error) {
 	objs := Objects{}
 
+	if configs == "-" {
+		objs, err := parseResourcesFromFile(ctx, configs, objs, oss)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse config from stdin: %v", err)
+		}
+		return objs, nil
+	}
+
 	fi, err := oss.Stat(ctx, configs)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get file info for %q: %v", configs, err)
 	}
 
-	if fi.IsDir() {
-		d := configs
-		files, err := oss.ReadDir(ctx, d)
-		if err != nil {
-			return nil, fmt.Errorf("failed to list files in directory %q: %v", d, err)
-		}
+	hasResources := false
 
-		hasResource := false
-		for _, fi := range files {
-			if fi.IsDir() {
-				continue
+	var walk func(path string, fi os.FileInfo,  depth int) error
+	walk = func(path string, fi os.FileInfo,  depth int) error {
+		if fi.IsDir() {
+			if depth > 0 {  // TODO(gleeper): && !recursive
+				return nil
 			}
-			filename := filepath.Join(d, fi.Name())
-			if !hasYamlOrYmlSuffix(filename) {
-				continue
-			}
-
-			objs, err = parseResourcesFromFile(ctx, filename, objs, oss)
+			subfiles, err := oss.ReadDir(ctx, path)
 			if err != nil {
-				return nil, fmt.Errorf("failed to parse config %q: %v", filename, err)
+				return fmt.Errorf("failed to list files in directory %q: %v", path, err)
 			}
-			hasResource = true
+			for _, subfile := range subfiles {
+				subpath := filepath.Join(path, subfile.Name())
+				if err = walk(subpath, subfile, depth+1); err != nil {
+					return err
+				}
+			}
+		} else {
+			if hasYamlOrYmlSuffix(path) {
+				hasResources = true
+				objs, err = parseResourcesFromFile(ctx, path, objs, oss)
+				if err != nil {
+					return fmt.Errorf("failed to parse config %q: %v", path, err)
+				}
+			}
 		}
-		if !hasResource {
-			return nil, fmt.Errorf("directory %q has no \".yaml\" or \".yaml\" files to parse", d)
-		}
-	} else {
-		filename := configs
-		if filename != "-" && !hasYamlOrYmlSuffix(filename) {
-			return nil, fmt.Errorf("file %q does not end in \".yaml\" or \".yml\"", filename)
-		}
+		return nil
+	}
 
-		objs, err = parseResourcesFromFile(ctx, filename, objs, oss)
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse config %q: %v", filename, err)
+
+	if err = walk(configs, fi, 0); err != nil {
+		return nil, err
+	}
+
+	if !hasResources {
+		if fi.IsDir() {
+			return nil, fmt.Errorf("directory %q has no \".yaml\" or \".yaml\" files to parse", configs)
 		}
+		return nil, fmt.Errorf("file %q does not end in \".yaml\" or \".yml\"", configs)
 	}
 
 	return objs, nil
