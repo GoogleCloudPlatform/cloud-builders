@@ -148,7 +148,7 @@ func ParseConfigs(ctx context.Context, configs string, oss services.OSService, r
 
 	if !hasResources {
 		if fi.IsDir() {
-			return nil, fmt.Errorf("directory %q has no \".yaml\" or \".yaml\" files to parse", configs)
+			return nil, fmt.Errorf("directory %q has no \".yaml\" or \".yml\" files to parse", configs)
 		}
 		return nil, fmt.Errorf("file %q does not end in \".yaml\" or \".yml\"", configs)
 	}
