@@ -88,10 +88,13 @@ func DecodeFromYAML(ctx context.Context, yaml []byte) (*Object, error) {
 
 // ParseConfigs parses resource objects from a file or directory of files into a map that maps
 // unique file base names to the parsed objects.
-func ParseConfigs(ctx context.Context, configs string, oss services.OSService) (Objects, error) {
+func ParseConfigs(ctx context.Context, configs string, oss services.OSService, recursive bool) (Objects, error) {
 	objs := Objects{}
 
 	if configs == "-" {
+		if recursive {
+			return nil, fmt.Errorf("cannot recur with stdin")
+		}
 		objs, err := parseResourcesFromFile(ctx, configs, objs, oss)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse config from stdin: %v", err)
@@ -104,12 +107,17 @@ func ParseConfigs(ctx context.Context, configs string, oss services.OSService) (
 		return nil, fmt.Errorf("failed to get file info for %q: %v", configs, err)
 	}
 
+	if !fi.IsDir() && recursive {
+		return nil, fmt.Errorf("cannot recur through a file")
+	}
+
 	hasResources := false
 
-	var walk func(path string, fi os.FileInfo,  depth int) error
-	walk = func(path string, fi os.FileInfo,  depth int) error {
+	// Since walk is recursive, we need to declare it before creating the function that refers to it.
+	var walk func(path string, fi os.FileInfo, baseDir bool) error
+	walk = func(path string, fi os.FileInfo, baseDir bool) error {
 		if fi.IsDir() {
-			if depth > 0 {  // TODO(gleeper): && !recursive
+			if !baseDir && !recursive {
 				return nil
 			}
 			subfiles, err := oss.ReadDir(ctx, path)
@@ -118,7 +126,7 @@ func ParseConfigs(ctx context.Context, configs string, oss services.OSService) (
 			}
 			for _, subfile := range subfiles {
 				subpath := filepath.Join(path, subfile.Name())
-				if err = walk(subpath, subfile, depth+1); err != nil {
+				if err = walk(subpath, subfile, false); err != nil {
 					return err
 				}
 			}
@@ -134,8 +142,7 @@ func ParseConfigs(ctx context.Context, configs string, oss services.OSService) (
 		return nil
 	}
 
-
-	if err = walk(configs, fi, 0); err != nil {
+	if err = walk(configs, fi, true); err != nil {
 		return nil, err
 	}
 
