@@ -140,7 +140,6 @@ func TestPrepare(t *testing.T) {
 		namespace:         "foobar",
 		exposePort:        0,
 	}, {
-		// TODO(gleeper): verify this test still tests what it originally did
 		name: "Wait for service object to be ready",
 
 		image:             image,
@@ -235,54 +234,14 @@ func TestPrepare(t *testing.T) {
 				t.Fatalf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %s, %v) = %v; want <nil>", tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, err)
 			}
 
-			// Compare expanded files
-			expandedFiles, err := ioutil.ReadDir(expandedDir)
+			err = compareFiles(tc.expectedExpanded, expandedDir)
 			if err != nil {
-				t.Fatalf("Failed to read expanded directory: %v", dir)
+				t.Fatalf("Failure with expanded file generation: %v", err)
 			}
 
-			if len(expandedFiles) != 1 {
-				t.Fatalf("Incorrect number of expanded k8s files created: %v", len(expandedFiles))
-			}
-
-			path := filepath.Join(expandedDir, expandedFiles[0].Name())
-			actualExpandedOutput, err := ioutil.ReadFile(path)
+			err = compareFiles(tc.expectedSuggested, suggestedDir)
 			if err != nil {
-				t.Fatalf("Failed to read actual output for expanded file: %v", path)
-			}
-
-			expectedExpandedOutput, err := ioutil.ReadFile(tc.expectedExpanded)
-			if err != nil {
-				t.Fatalf("Failed to read expected output for expanded file: %v", tc.expectedExpanded)
-			}
-
-			if diff := cmp.Diff(expectedExpandedOutput, actualExpandedOutput); diff != "" {
-				t.Fatalf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %s, %v) produced diff on expanded files (-want +got):\n%s", tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, diff)
-			}
-
-			// Compare suggested files
-			suggestedFiles, err := ioutil.ReadDir(suggestedDir)
-			if err != nil {
-				t.Fatalf("Failed to read suggested directory: %v", dir)
-			}
-
-			if len(suggestedFiles) != 1 {
-				t.Fatalf("Incorrect number of suggested k8s files created: %v", len(suggestedFiles))
-			}
-
-			suggestedPath := filepath.Join(suggestedDir, suggestedFiles[0].Name())
-			actualSuggestedOutput, err := ioutil.ReadFile(suggestedPath)
-			if err != nil {
-				t.Fatalf("Failed to read actual output for suggested file: %v", path)
-			}
-
-			expectedSuggestedOutput, err := ioutil.ReadFile(tc.expectedSuggested)
-			if err != nil {
-				t.Fatalf("Failed to read expected output for suggested file: %v", tc.expectedSuggested)
-			}
-
-			if diff := cmp.Diff(expectedSuggestedOutput, actualSuggestedOutput); diff != "" {
-				t.Fatalf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %s, %v) produced diff on suggested files (-want +got):\n%s", tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, diff)
+				t.Fatalf("Failure with expanded file generation: %v", err)
 			}
 		})
 	}
@@ -1322,4 +1281,31 @@ func newImageWithTag(t *testing.T, image string) name.Reference {
 		t.Fatalf("failed to create image with tag: %v", err)
 	}
 	return ref
+}
+
+func compareFiles(expectedFile, actualDirectory string) error {
+	actualFiles, err := ioutil.ReadDir(actualDirectory)
+	if err != nil {
+		return fmt.Errorf("Failed to read directory: %v", actualDirectory)
+	}
+
+	if len(actualFiles) != 1 {
+		return fmt.Errorf("Incorrect number of k8s files created in %s: %v", actualDirectory, len(actualFiles))
+	}
+
+	path := filepath.Join(actualDirectory, actualFiles[0].Name())
+	actualContents, err := ioutil.ReadFile(path)
+	if err != nil {
+		return fmt.Errorf("Failed to read actual output file: %v", path)
+	}
+
+	expectedContents, err := ioutil.ReadFile(expectedFile)
+	if err != nil {
+		return fmt.Errorf("Failed to read expected file: %v", expectedFile)
+	}
+
+	if diff := cmp.Diff(expectedContents, actualContents); diff != "" {
+		return fmt.Errorf("produced diff on files (-want +got):\n%s", diff)
+	}
+	return nil
 }
