@@ -241,7 +241,7 @@ func TestPrepare(t *testing.T) {
 
 			err = compareFiles(tc.expectedSuggested, suggestedDir)
 			if err != nil {
-				t.Fatalf("Failure with expanded file generation: %v", err)
+				t.Fatalf("Failure with suggested file generation: %v", err)
 			}
 		})
 	}
@@ -408,7 +408,7 @@ func TestPrepareErrors(t *testing.T) {
 				t.Fatalf("No error substring provided")
 			}
 			if !strings.Contains(prepareErr.Error(), tc.want) {
-				t.Fatalf("Unexpected error: got %v, want substring %s", prepareErr, tc.want)
+				t.Fatalf("Unexpected error: got \"%v\", want substring %s", prepareErr, tc.want)
 			}
 		})
 	}
@@ -419,12 +419,10 @@ func TestApply(t *testing.T) {
 
 	testDeploymentFile := "testing/deployment.yaml"
 	testServiceFile := "testing/service.yaml"
-	testMultiResourceFile := "testing/multi-resource.yaml"
 	testDeploymentReadyFile := "testing/deployment-ready.yaml"
 	testServiceUnreadyFile := "testing/service-unready.yaml"
 	testServiceReadyFile := "testing/service-ready.yaml"
 	testNamespaceFile := "testing/namespace.yaml"
-	testNamespace2File := "testing/namespace-2.yaml"
 	testNamespaceReadyFile := "testing/namespace-ready.yaml"
 	testNamespaceReady2File := "testing/namespace-ready-2.yaml"
 
@@ -432,14 +430,7 @@ func TestApply(t *testing.T) {
 	clusterLocation := "us-east1-b"
 	clusterProject := "my-project"
 	namespace := "default"
-	waitTimeout := 5 * time.Minute
-
-	configDir := "path/to/config"
-	deploymentYaml := "deployment.yaml"
-	multiResourceYaml := "multi-resource.yaml"
-	namespaceYaml := "namespace.yaml"
-	namespace2Yaml := "namespace-2.yaml"
-	serviceYaml := "service.yaml"
+	waitTimeout := 10 * time.Second
 
 	tests := []struct {
 		name string
@@ -450,6 +441,8 @@ func TestApply(t *testing.T) {
 		namespace       string
 		labels          map[string]string
 		waitTimeout     time.Duration
+		gcloud          services.GcloudService
+		kubectl         testservices.TestKubectl
 
 		deployer *Deployer
 	}{{
@@ -457,87 +450,38 @@ func TestApply(t *testing.T) {
 
 		clusterName:     clusterName,
 		clusterLocation: clusterLocation,
-		config:          configDir,
+		config:          "testing/configs/directory",
 		namespace:       namespace,
 		waitTimeout:     waitTimeout,
 
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						configDir: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: true,
-							},
+		gcloud: &testservices.TestGcloud{
+			ContainerClustersGetCredentialsErr: nil,
+		},
+		kubectl: testservices.TestKubectl{
+			ApplyFromStringResponse: map[string][]error{
+				string(fileContents(t, testDeploymentFile)): {nil, nil},
+				string(fileContents(t, testServiceFile)):    {nil, nil},
+			},
+			GetResponse: map[string]map[string][]testservices.GetResponse{
+				"Deployment": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testDeploymentReadyFile)),
 							Err: nil,
-						},
-					},
-					ReadDirResponse: map[string]testservices.ReadDirResponse{
-						configDir: {
-							Res: []os.FileInfo{
-								&testservices.TestFileInfo{
-									BaseName:    "multi-resource-deployment-test-app.yaml",
-									IsDirectory: false,
-								},
-								&testservices.TestFileInfo{
-									BaseName:    "multi-resource-service-test-app.yaml",
-									IsDirectory: false,
-								},
-								&testservices.TestFileInfo{
-									BaseName:    multiResourceYaml,
-									IsDirectory: false,
-								},
-							},
-							Err: nil,
-						},
-					},
-					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, "multi-resource-deployment-test-app.yaml"): {
-							Res: fileContents(t, testDeploymentFile),
-							Err: nil,
-						},
-						filepath.Join(configDir, "multi-resource-service-test-app.yaml"): {
-							Res: fileContents(t, testServiceFile),
-							Err: nil,
-						},
-						filepath.Join(configDir, multiResourceYaml): {
-							Res: fileContents(t, testMultiResourceFile),
+						}, {
+							Res: string(fileContents(t, testDeploymentReadyFile)),
 							Err: nil,
 						},
 					},
 				},
-				Gcloud: &testservices.TestGcloud{
-					ContainerClustersGetCredentialsErr: nil,
-				},
-				Kubectl: &testservices.TestKubectl{
-					ApplyFromStringResponse: map[string]error{
-						string(fileContents(t, testDeploymentFile)): nil,
-						string(fileContents(t, testServiceFile)):    nil,
-					},
-					GetResponse: map[string]map[string]*testservices.GetResponse{
-						"Deployment": {
-							"test-app": &testservices.GetResponse{
-								Res: []string{
-									string(fileContents(t, testDeploymentReadyFile)),
-									string(fileContents(t, testDeploymentReadyFile)),
-								},
-								Err: []error{
-									nil,
-									nil,
-								},
-							},
-						},
-						"Service": {
-							"test-app": &testservices.GetResponse{
-								Res: []string{
-									string(fileContents(t, testServiceReadyFile)),
-									string(fileContents(t, testServiceReadyFile)),
-								},
-								Err: []error{
-									nil,
-									nil,
-								},
-							},
+				"Service": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testServiceReadyFile)),
+							Err: nil,
+						}, {
+							Res: string(fileContents(t, testServiceReadyFile)),
+							Err: nil,
 						},
 					},
 				},
@@ -548,56 +492,32 @@ func TestApply(t *testing.T) {
 
 		clusterName:     clusterName,
 		clusterLocation: clusterLocation,
-		config:          multiResourceYaml,
+		config:          "testing/configs/multi-resource.yaml",
 		namespace:       namespace,
 		waitTimeout:     waitTimeout,
 
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						multiResourceYaml: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: false,
-							},
-							Err: nil,
-						},
-					},
-					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						multiResourceYaml: {
-							Res: fileContents(t, testMultiResourceFile),
+		gcloud: &testservices.TestGcloud{
+			ContainerClustersGetCredentialsErr: nil,
+		},
+		kubectl: testservices.TestKubectl{
+			ApplyFromStringResponse: map[string][]error{
+				string(fileContents(t, testDeploymentFile)): {nil},
+				string(fileContents(t, testServiceFile)):    {nil},
+			},
+			GetResponse: map[string]map[string][]testservices.GetResponse{
+				"Deployment": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testDeploymentReadyFile)),
 							Err: nil,
 						},
 					},
 				},
-				Gcloud: &testservices.TestGcloud{
-					ContainerClustersGetCredentialsErr: nil,
-				},
-				Kubectl: &testservices.TestKubectl{
-					ApplyFromStringResponse: map[string]error{
-						string(fileContents(t, testDeploymentFile)): nil,
-						string(fileContents(t, testServiceFile)):    nil,
-					},
-					GetResponse: map[string]map[string]*testservices.GetResponse{
-						"Deployment": {
-							"test-app": &testservices.GetResponse{
-								Res: []string{
-									string(fileContents(t, testDeploymentReadyFile)),
-								},
-								Err: []error{
-									nil,
-								},
-							},
-						},
-						"Service": {
-							"test-app": &testservices.GetResponse{
-								Res: []string{
-									string(fileContents(t, testServiceReadyFile)),
-								},
-								Err: []error{
-									nil,
-								},
-							},
+				"Service": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testServiceReadyFile)),
+							Err: nil,
 						},
 					},
 				},
@@ -608,75 +528,31 @@ func TestApply(t *testing.T) {
 
 		clusterName:     clusterName,
 		clusterLocation: clusterLocation,
-		config:          configDir,
+		config:          "testing/configs/deployment-and-namespace",
 		namespace:       "foobar",
 		waitTimeout:     waitTimeout,
 
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						configDir: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: true,
-							},
-							Err: nil,
-						},
-					},
-					ReadDirResponse: map[string]testservices.ReadDirResponse{
-						configDir: {
-							Res: []os.FileInfo{
-								&testservices.TestFileInfo{
-									BaseName:    deploymentYaml,
-									IsDirectory: false,
-								},
-								&testservices.TestFileInfo{
-									BaseName:    namespaceYaml,
-									IsDirectory: false,
-								},
-							},
-							Err: nil,
-						},
-					},
-					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, deploymentYaml): {
-							Res: fileContents(t, testDeploymentFile),
-							Err: nil,
-						},
-						filepath.Join(configDir, namespaceYaml): {
-							Res: fileContents(t, testNamespaceFile),
+		gcloud: &testservices.TestGcloud{
+			ContainerClustersGetCredentialsErr: nil,
+		},
+		kubectl: testservices.TestKubectl{
+			ApplyFromStringResponse: map[string][]error{
+				string(fileContents(t, testDeploymentFile)): {nil},
+			},
+			GetResponse: map[string]map[string][]testservices.GetResponse{
+				"Deployment": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testDeploymentReadyFile)),
 							Err: nil,
 						},
 					},
 				},
-				Gcloud: &testservices.TestGcloud{
-					ContainerClustersGetCredentialsErr: nil,
-				},
-				Kubectl: &testservices.TestKubectl{
-					ApplyFromStringResponse: map[string]error{
-						string(fileContents(t, testNamespaceFile)):  nil,
-						string(fileContents(t, testDeploymentFile)): nil,
-					},
-					GetResponse: map[string]map[string]*testservices.GetResponse{
-						"Deployment": {
-							"test-app": &testservices.GetResponse{
-								Res: []string{
-									string(fileContents(t, testDeploymentReadyFile)),
-								},
-								Err: []error{
-									nil,
-								},
-							},
-						},
-						"Namespace": {
-							"foobar": &testservices.GetResponse{
-								Res: []string{
-									string(fileContents(t, testNamespaceReadyFile)),
-								},
-								Err: []error{
-									nil,
-								},
-							},
+				"Namespace": {
+					"foobar": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testNamespaceReadyFile)),
+							Err: nil,
 						},
 					},
 				},
@@ -687,58 +563,26 @@ func TestApply(t *testing.T) {
 
 		clusterName:     clusterName,
 		clusterLocation: clusterLocation,
-		config:          configDir,
+		config:          "testing/configs/service.yaml",
 		namespace:       namespace,
 		waitTimeout:     waitTimeout,
 
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						configDir: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: true,
-							},
+		gcloud: &testservices.TestGcloud{
+			ContainerClustersGetCredentialsErr: nil,
+		},
+		kubectl: testservices.TestKubectl{
+			ApplyFromStringResponse: map[string][]error{
+				string(fileContents(t, testServiceFile)): {nil},
+			},
+			GetResponse: map[string]map[string][]testservices.GetResponse{
+				"Service": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testServiceUnreadyFile)),
 							Err: nil,
-						},
-					},
-					ReadDirResponse: map[string]testservices.ReadDirResponse{
-						configDir: {
-							Res: []os.FileInfo{
-								&testservices.TestFileInfo{
-									BaseName:    serviceYaml,
-									IsDirectory: false,
-								},
-							},
+						}, {
+							Res: string(fileContents(t, testServiceReadyFile)),
 							Err: nil,
-						},
-					},
-					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, serviceYaml): {
-							Res: fileContents(t, testServiceFile),
-							Err: nil,
-						},
-					},
-				},
-				Gcloud: &testservices.TestGcloud{
-					ContainerClustersGetCredentialsErr: nil,
-				},
-				Kubectl: &testservices.TestKubectl{
-					ApplyFromStringResponse: map[string]error{
-						string(fileContents(t, testServiceFile)): nil,
-					},
-					GetResponse: map[string]map[string]*testservices.GetResponse{
-						"Service": {
-							"test-app": &testservices.GetResponse{
-								Res: []string{
-									string(fileContents(t, testServiceUnreadyFile)),
-									string(fileContents(t, testServiceReadyFile)),
-								},
-								Err: []error{
-									nil,
-									nil,
-								},
-							},
 						},
 					},
 				},
@@ -749,92 +593,37 @@ func TestApply(t *testing.T) {
 
 		clusterName:     clusterName,
 		clusterLocation: clusterLocation,
-		config:          configDir,
+		config:          "testing/configs/multiple-namespaces",
 		namespace:       "foobar",
 		waitTimeout:     waitTimeout,
 
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						configDir: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: true,
-							},
-							Err: nil,
-						},
-					},
-					ReadDirResponse: map[string]testservices.ReadDirResponse{
-						configDir: {
-							Res: []os.FileInfo{
-								&testservices.TestFileInfo{
-									BaseName:    deploymentYaml,
-									IsDirectory: false,
-								},
-								&testservices.TestFileInfo{
-									BaseName:    namespaceYaml,
-									IsDirectory: false,
-								},
-								&testservices.TestFileInfo{
-									BaseName:    namespace2Yaml,
-									IsDirectory: false,
-								},
-							},
-							Err: nil,
-						},
-					},
-					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, deploymentYaml): {
-							Res: fileContents(t, testDeploymentFile),
-							Err: nil,
-						},
-						filepath.Join(configDir, namespaceYaml): {
-							Res: fileContents(t, testNamespaceFile),
-							Err: nil,
-						},
-						filepath.Join(configDir, namespace2Yaml): {
-							Res: fileContents(t, testNamespace2File),
+		gcloud: &testservices.TestGcloud{
+			ContainerClustersGetCredentialsErr: nil,
+		},
+		kubectl: testservices.TestKubectl{
+			ApplyFromStringResponse: map[string][]error{
+				string(fileContents(t, testDeploymentFile)): {nil},
+			},
+			GetResponse: map[string]map[string][]testservices.GetResponse{
+				"Deployment": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testDeploymentReadyFile)),
 							Err: nil,
 						},
 					},
 				},
-				Gcloud: &testservices.TestGcloud{
-					ContainerClustersGetCredentialsErr: nil,
-				},
-				Kubectl: &testservices.TestKubectl{
-					ApplyFromStringResponse: map[string]error{
-						string(fileContents(t, testNamespaceFile)):  nil,
-						string(fileContents(t, testNamespace2File)): nil,
-						string(fileContents(t, testDeploymentFile)): nil,
-					},
-					GetResponse: map[string]map[string]*testservices.GetResponse{
-						"Deployment": {
-							"test-app": &testservices.GetResponse{
-								Res: []string{
-									string(fileContents(t, testDeploymentReadyFile)),
-								},
-								Err: []error{
-									nil,
-								},
-							},
+				"Namespace": {
+					"foobar": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testNamespaceReadyFile)),
+							Err: nil,
 						},
-						"Namespace": {
-							"foobar": &testservices.GetResponse{
-								Res: []string{
-									string(fileContents(t, testNamespaceReadyFile)),
-								},
-								Err: []error{
-									nil,
-								},
-							},
-							"foobar-2": &testservices.GetResponse{
-								Res: []string{
-									string(fileContents(t, testNamespaceReady2File)),
-								},
-								Err: []error{
-									nil,
-								},
-							},
+					},
+					"foobar-2": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testNamespaceReady2File)),
+							Err: nil,
 						},
 					},
 				},
@@ -845,53 +634,29 @@ func TestApply(t *testing.T) {
 
 		clusterName:     "",
 		clusterLocation: "",
-		config:          multiResourceYaml,
+		config:          "testing/configs/multi-resource.yaml",
 		namespace:       namespace,
 		waitTimeout:     waitTimeout,
 
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						multiResourceYaml: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: false,
-							},
-							Err: nil,
-						},
-					},
-					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						multiResourceYaml: {
-							Res: fileContents(t, testMultiResourceFile),
+		kubectl: testservices.TestKubectl{
+			ApplyFromStringResponse: map[string][]error{
+				string(fileContents(t, testDeploymentFile)): {nil},
+				string(fileContents(t, testServiceFile)):    {nil},
+			},
+			GetResponse: map[string]map[string][]testservices.GetResponse{
+				"Deployment": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testDeploymentReadyFile)),
 							Err: nil,
 						},
 					},
 				},
-				Kubectl: &testservices.TestKubectl{
-					ApplyFromStringResponse: map[string]error{
-						string(fileContents(t, testDeploymentFile)): nil,
-						string(fileContents(t, testServiceFile)):    nil,
-					},
-					GetResponse: map[string]map[string]*testservices.GetResponse{
-						"Deployment": {
-							"test-app": &testservices.GetResponse{
-								Res: []string{
-									string(fileContents(t, testDeploymentReadyFile)),
-								},
-								Err: []error{
-									nil,
-								},
-							},
-						},
-						"Service": {
-							"test-app": &testservices.GetResponse{
-								Res: []string{
-									string(fileContents(t, testServiceReadyFile)),
-								},
-								Err: []error{
-									nil,
-								},
-							},
+				"Service": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testServiceReadyFile)),
+							Err: nil,
 						},
 					},
 				},
@@ -902,86 +667,96 @@ func TestApply(t *testing.T) {
 
 		clusterName:     clusterName,
 		clusterLocation: clusterLocation,
-		config:          configDir,
+		config:          "testing/configs/deployment-and-namespace",
 		namespace:       "",
 		waitTimeout:     waitTimeout,
 
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						configDir: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: true,
-							},
-							Err: nil,
-						},
-					},
-					ReadDirResponse: map[string]testservices.ReadDirResponse{
-						configDir: {
-							Res: []os.FileInfo{
-								&testservices.TestFileInfo{
-									BaseName:    deploymentYaml,
-									IsDirectory: false,
-								},
-								&testservices.TestFileInfo{
-									BaseName:    namespaceYaml,
-									IsDirectory: false,
-								},
-							},
-							Err: nil,
-						},
-					},
-					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, deploymentYaml): {
-							Res: fileContents(t, testDeploymentFile),
-							Err: nil,
-						},
-						filepath.Join(configDir, namespaceYaml): {
-							Res: fileContents(t, testNamespaceFile),
+		kubectl: testservices.TestKubectl{
+			ApplyFromStringResponse: map[string][]error{
+				string(fileContents(t, testDeploymentFile)): {nil},
+			},
+			GetResponse: map[string]map[string][]testservices.GetResponse{
+				"Deployment": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testDeploymentReadyFile)),
 							Err: nil,
 						},
 					},
 				},
-				Gcloud: &testservices.TestGcloud{
-					ContainerClustersGetCredentialsErr: nil,
-				},
-				Kubectl: &testservices.TestKubectl{
-					ApplyFromStringResponse: map[string]error{
-						string(fileContents(t, testNamespaceFile)):  nil,
-						string(fileContents(t, testDeploymentFile)): nil,
-					},
-					GetResponse: map[string]map[string]*testservices.GetResponse{
-						"Deployment": {
-							"test-app": &testservices.GetResponse{
-								Res: []string{
-									string(fileContents(t, testDeploymentReadyFile)),
-								},
-								Err: []error{
-									nil,
-								},
-							},
-						},
-						"Namespace": {
-							"foobar": &testservices.GetResponse{
-								Res: []string{
-									string(fileContents(t, testNamespaceReadyFile)),
-								},
-								Err: []error{
-									nil,
-								},
-							},
+				"Namespace": {
+					"foobar": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testNamespaceReadyFile)),
+							Err: nil,
 						},
 					},
 				},
 			},
 		},
+		gcloud: &testservices.TestGcloud{
+			ContainerClustersGetCredentialsErr: nil,
+		},
+	}, {
+		name: "Namespace needs to be created",
+
+		clusterName:     clusterName,
+		clusterLocation: clusterLocation,
+		config:          "testing/configs/deployment-and-namespace",
+		namespace:       "",
+		waitTimeout:     waitTimeout,
+
+		kubectl: testservices.TestKubectl{
+			ApplyFromStringResponse: map[string][]error{
+				string(fileContents(t, testDeploymentFile)): {nil},
+				string(fileContents(t, testNamespaceFile)):  {nil},
+			},
+			GetResponse: map[string]map[string][]testservices.GetResponse{
+				"Deployment": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testDeploymentReadyFile)),
+							Err: nil,
+						},
+					},
+				},
+				"Namespace": {
+					"foobar": []testservices.GetResponse{
+						{
+							Res: "",
+							Err: nil,
+						},
+					},
+				},
+			},
+		},
+		gcloud: &testservices.TestGcloud{
+			ContainerClustersGetCredentialsErr: nil,
+		},
 	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if err := tc.deployer.Apply(ctx, tc.clusterName, tc.clusterLocation, clusterProject, tc.config, tc.namespace, tc.waitTimeout); err != nil {
-				t.Errorf("Apply(ctx, %s, %s, %s, %s, %v) = %v; want <nil>", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, err)
+			d := Deployer{
+				Clients: &services.Clients{
+					Kubectl: &tc.kubectl,
+					Gcloud:  tc.gcloud,
+					OS:      &services.OS{},
+				},
+			}
+
+			if err := d.Apply(ctx, tc.clusterName, tc.clusterLocation, clusterProject, tc.config, tc.namespace, tc.waitTimeout); err != nil {
+				t.Fatalf("Apply(ctx, %s, %s, %s, %s, %v) = %v; want <nil>", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, err)
+			}
+
+			// Verify that all expected applies were actually applied
+			if len(tc.kubectl.ApplyFromStringResponse) != 0 {
+				t.Fatalf("Apply(ctx, %s, %s, %s, %s, %v) did not apply all of the expected configs. got %v; want []", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, tc.kubectl.ApplyFromStringResponse)
+			}
+
+			// Verify that all expected gets were executed
+			if len(tc.kubectl.GetResponse) != 0 {
+				t.Fatalf("Apply(ctx, %s, %s, %s, %s, %v) did not get all of the expected configs. got %v; want []", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, tc.kubectl.GetResponse)
 			}
 		})
 	}
@@ -1002,9 +777,6 @@ func TestApplyErrors(t *testing.T) {
 	clusterLocation := "us-east1-b"
 	clusterProject := "my-project"
 	configDir := "path/to/config"
-	deploymentYaml := "deployment.yaml"
-	namespaceYaml := "namespace.yaml"
-	serviceYaml := "service.yaml"
 
 	tests := []struct {
 		name string
@@ -1014,216 +786,97 @@ func TestApplyErrors(t *testing.T) {
 		config          string
 		namespace       string
 		waitTimeout     time.Duration
+		gcloud          services.GcloudService
+		kubectl         testservices.TestKubectl
 
-		deployer *Deployer
+		want string
 	}{{
 		name: "Failed to parse resources",
 
 		clusterName:     clusterName,
 		clusterLocation: clusterLocation,
-		config:          configDir,
+		config:          "testing/configs/empty-directory",
 		namespace:       namespace,
 		waitTimeout:     waitTimeout,
 
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						configDir: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: true,
-							},
-							Err: nil,
-						},
-					},
-					ReadDirResponse: map[string]testservices.ReadDirResponse{
-						configDir: {
-							Res: []os.FileInfo{},
-							Err: nil,
-						},
-					},
-				},
-				Gcloud: &testservices.TestGcloud{
-					ContainerClustersGetCredentialsErr: nil,
-				},
-			},
+		gcloud: &testservices.TestGcloud{
+			ContainerClustersGetCredentialsErr: nil,
 		},
+		want: "directory \"testing/configs/empty-directory\" has no \".yaml\" or \".yml\" files to parse",
 	}, {
 		name: "Failed to get deploy namespace to cluster",
 
 		clusterName:     clusterName,
 		clusterLocation: clusterLocation,
-		config:          configDir,
+		config:          "testing/configs/deployment-and-namespace",
 		namespace:       "foobar",
 		waitTimeout:     waitTimeout,
 
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						configDir: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: true,
-							},
+		gcloud: &testservices.TestGcloud{
+			ContainerClustersGetCredentialsErr: nil,
+		},
+		kubectl: testservices.TestKubectl{
+			ApplyFromStringResponse: map[string][]error{
+				string(fileContents(t, testNamespaceFile)): {fmt.Errorf("failed to apply kubernetes manifests to cluster")},
+			},
+			GetResponse: map[string]map[string][]testservices.GetResponse{
+				"Namespace": {
+					"foobar": []testservices.GetResponse{
+						{
+							Res: "",
 							Err: nil,
-						},
-					},
-					ReadDirResponse: map[string]testservices.ReadDirResponse{
-						configDir: {
-							Res: []os.FileInfo{
-								&testservices.TestFileInfo{
-									BaseName:    deploymentYaml,
-									IsDirectory: false,
-								},
-								&testservices.TestFileInfo{
-									BaseName:    namespaceYaml,
-									IsDirectory: false,
-								},
-							},
-							Err: nil,
-						},
-					},
-					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, deploymentYaml): {
-							Res: fileContents(t, testDeploymentFile),
-							Err: nil,
-						},
-						filepath.Join(configDir, namespaceYaml): {
-							Res: fileContents(t, testNamespaceFile),
-							Err: nil,
-						},
-					},
-				},
-				Gcloud: &testservices.TestGcloud{
-					ContainerClustersGetCredentialsErr: nil,
-				},
-				Kubectl: &testservices.TestKubectl{
-					ApplyFromStringResponse: map[string]error{
-						string(fileContents(t, testNamespaceFile)): fmt.Errorf("failed to apply kubernetes manifests to cluster"),
-					},
-					GetResponse: map[string]map[string]*testservices.GetResponse{
-						"Namespace": {
-							"foobar": &testservices.GetResponse{
-								Res: []string{
-									"",
-								},
-								Err: []error{
-									nil,
-								},
-							},
 						},
 					},
 				},
 			},
 		},
+		want: "failed to apply Namespace configuration file with name \"foobar\" to cluster: failed to apply config from string: failed to apply kubernetes manifests to cluster",
 	}, {
 		name: "Failed to deploy resources to cluster",
 
 		clusterName:     clusterName,
 		clusterLocation: clusterLocation,
-		config:          configDir,
+		config:          "testing/configs/deployment.yaml",
 		namespace:       namespace,
 		waitTimeout:     waitTimeout,
 
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						configDir: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: true,
-							},
-							Err: nil,
-						},
-					},
-					ReadDirResponse: map[string]testservices.ReadDirResponse{
-						configDir: {
-							Res: []os.FileInfo{
-								&testservices.TestFileInfo{
-									BaseName:    deploymentYaml,
-									IsDirectory: false,
-								},
-							},
-							Err: nil,
-						},
-					},
-					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, deploymentYaml): {
-							Res: fileContents(t, testDeploymentFile),
-							Err: nil,
-						},
-					},
-				},
-				Gcloud: &testservices.TestGcloud{
-					ContainerClustersGetCredentialsErr: nil,
-				},
-				Kubectl: &testservices.TestKubectl{
-					ApplyFromStringResponse: map[string]error{
-						string(fileContents(t, testDeploymentFile)): fmt.Errorf("failed to apply kubernetes manifests to cluster"),
-					},
-				},
+		gcloud: &testservices.TestGcloud{
+			ContainerClustersGetCredentialsErr: nil,
+		},
+		kubectl: testservices.TestKubectl{
+			ApplyFromStringResponse: map[string][]error{
+				string(fileContents(t, testDeploymentFile)): {fmt.Errorf("failed to apply kubernetes manifests to cluster")},
 			},
 		},
+		want: "failed to apply Deployment configuration file with name \"test-app\" to cluster: failed to apply config from string",
 	}, {
 		name: "Wait timeout",
 
 		clusterName:     clusterName,
 		clusterLocation: clusterLocation,
-		config:          configDir,
+		config:          "testing/configs/service.yaml",
 		namespace:       namespace,
 		waitTimeout:     0 * time.Minute,
 
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				OS: &testservices.TestOS{
-					StatResponse: map[string]testservices.StatResponse{
-						configDir: {
-							Res: &testservices.TestFileInfo{
-								IsDirectory: true,
-							},
+		gcloud: &testservices.TestGcloud{
+			ContainerClustersGetCredentialsErr: nil,
+		},
+		kubectl: testservices.TestKubectl{
+			ApplyFromStringResponse: map[string][]error{
+				string(fileContents(t, testServiceFile)): {nil},
+			},
+			GetResponse: map[string]map[string][]testservices.GetResponse{
+				"Service": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testServiceUnreadyFile)),
 							Err: nil,
-						},
-					},
-					ReadDirResponse: map[string]testservices.ReadDirResponse{
-						configDir: {
-							Res: []os.FileInfo{
-								&testservices.TestFileInfo{
-									BaseName:    serviceYaml,
-									IsDirectory: false,
-								},
-							},
-							Err: nil,
-						},
-					},
-					ReadFileResponse: map[string]testservices.ReadFileResponse{
-						filepath.Join(configDir, serviceYaml): {
-							Res: fileContents(t, testServiceFile),
-							Err: nil,
-						},
-					},
-				},
-				Gcloud: &testservices.TestGcloud{
-					ContainerClustersGetCredentialsErr: nil,
-				},
-				Kubectl: &testservices.TestKubectl{
-					ApplyFromStringResponse: map[string]error{
-						string(fileContents(t, testServiceFile)): nil,
-					},
-					GetResponse: map[string]map[string]*testservices.GetResponse{
-						"Service": {
-							"test-app": &testservices.GetResponse{
-								Res: []string{
-									string(fileContents(t, testServiceUnreadyFile)),
-								},
-								Err: []error{
-									nil,
-								},
-							},
 						},
 					},
 				},
 			},
 		},
+		want: "timed out after 0s while waiting for deployed objects to be ready",
 	}, {
 		name: "clusterName is provided but clusterLocation is not",
 
@@ -1233,13 +886,11 @@ func TestApplyErrors(t *testing.T) {
 		namespace:       namespace,
 		waitTimeout:     waitTimeout,
 
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				Gcloud: &testservices.TestGcloud{
-					ContainerClustersGetCredentialsErr: nil,
-				},
-			},
+		gcloud: &testservices.TestGcloud{
+			ContainerClustersGetCredentialsErr: nil,
 		},
+
+		want: "clusterName and clusterLocation either must both be provided, or neither should be provided",
 	}, {
 		name: "clusterLocation is provided but clusterName is not",
 
@@ -1249,19 +900,42 @@ func TestApplyErrors(t *testing.T) {
 		namespace:       namespace,
 		waitTimeout:     waitTimeout,
 
-		deployer: &Deployer{
-			Clients: &services.Clients{
-				Gcloud: &testservices.TestGcloud{
-					ContainerClustersGetCredentialsErr: nil,
-				},
-			},
+		gcloud: &testservices.TestGcloud{
+			ContainerClustersGetCredentialsErr: nil,
 		},
+		want: "clusterName and clusterLocation either must both be provided, or neither should be provided",
 	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if err := tc.deployer.Apply(ctx, tc.clusterName, tc.clusterLocation, clusterProject, tc.config, tc.namespace, tc.waitTimeout); err == nil {
+			d := Deployer{
+				Clients: &services.Clients{
+					Kubectl: &tc.kubectl,
+					Gcloud:  tc.gcloud,
+					OS:      &services.OS{},
+				},
+			}
+
+			var applyErr error
+			if applyErr = d.Apply(ctx, tc.clusterName, tc.clusterLocation, clusterProject, tc.config, tc.namespace, tc.waitTimeout); applyErr == nil {
 				t.Errorf("Apply(ctx, %s, %s, %s, %s, %v) = <nil>; want error", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout)
+			}
+
+			// Verify that all expected applies were actually applied
+			if len(tc.kubectl.ApplyFromStringResponse) != 0 {
+				t.Fatalf("Apply(ctx, %s, %s, %s, %s, %v) did not apply all of the expected configs. got %v; want []", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, tc.kubectl.ApplyFromStringResponse)
+			}
+
+			// Verify that all expected gets were executed
+			if len(tc.kubectl.GetResponse) != 0 {
+				t.Fatalf("Apply(ctx, %s, %s, %s, %s, %v) did not get all of the expected configs. got %v; want []", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, tc.kubectl.GetResponse)
+			}
+
+			if tc.want == "" {
+				t.Fatalf("No error substring provided")
+			}
+			if !strings.Contains(applyErr.Error(), tc.want) {
+				t.Fatalf("Unexpected error: got \"%v\", want substring %s", applyErr, tc.want)
 			}
 		})
 	}
