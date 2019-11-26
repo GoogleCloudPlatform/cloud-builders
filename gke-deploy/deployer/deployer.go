@@ -46,12 +46,12 @@ type Deployer struct {
 }
 
 // Prepare handles preparing deployment.
-func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appVersion, config, suggestedOutput, expandedOutput, namespace string, labels, annotations map[string]string, exposePort int) error {
+func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appVersion, config, suggestedOutput, expandedOutput, namespace string, labels, annotations map[string]string, exposePort int, recursive bool) error {
 	fmt.Printf("Preparing deployment.\n")
 
 	var objs resource.Objects
 	if config != "" {
-		parsed, err := resource.ParseConfigs(ctx, config, d.Clients.OS, false)
+		parsed, err := resource.ParseConfigs(ctx, config, d.Clients.OS, recursive)
 		if err != nil {
 			return fmt.Errorf("failed to parse configuration files %q: %v", config, err)
 		}
@@ -220,7 +220,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 }
 
 // Apply handles applying the deployment.
-func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clusterProject, config, namespace string, waitTimeout time.Duration) error {
+func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clusterProject, config, namespace string, waitTimeout time.Duration, recursive bool) error {
 	fmt.Printf("Applying deployment.\n")
 
 	if (clusterName != "" && clusterLocation == "") || (clusterName == "" && clusterLocation != "") {
@@ -255,7 +255,7 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 		}
 	}
 
-	objs, err := resource.ParseConfigs(ctx, config, d.Clients.OS, false)
+	objs, err := resource.ParseConfigs(ctx, config, d.Clients.OS, recursive)
 	if err != nil {
 		return fmt.Errorf("failed to parse configuration files: %v", err)
 	}

@@ -103,7 +103,7 @@ func apply(_ *cobra.Command, options *options) error {
 		return err
 	}
 
-	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, options.filename, options.namespace, options.waitTimeout); err != nil {
+	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, options.filename, options.namespace, options.waitTimeout, false); err != nil {
 		return fmt.Errorf("failed to apply deployment: %v", err)
 	}
 

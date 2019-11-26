@@ -53,6 +53,7 @@ func TestPrepare(t *testing.T) {
 		labels            map[string]string
 		annotations       map[string]string
 		exposePort        int
+		recursive         bool
 	}{{
 		name: "Config is directory",
 
@@ -66,6 +67,20 @@ func TestPrepare(t *testing.T) {
 		annotations:       annotations,
 		namespace:         namespace,
 		exposePort:        0,
+	}, {
+		name: "Config is a recursive directory",
+
+		image:             image,
+		appName:           appName,
+		appVersion:        appVersion,
+		config:            "testing/configs/nested-directory",
+		expectedSuggested: "testing/expected-suggested/nested-directory.yaml",
+		expectedExpanded:  "testing/expected-expanded/nested-directory.yaml",
+		labels:            labels,
+		annotations:       annotations,
+		namespace:         namespace,
+		exposePort:        0,
+		recursive:         true,
 	}, {
 		name: "Config is file",
 
@@ -230,8 +245,8 @@ func TestPrepare(t *testing.T) {
 			defer os.RemoveAll(expandedDir)
 
 			d := Deployer{Clients: &services.Clients{OS: oss, Remote: &remote}}
-			if err := d.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, tc.exposePort); err != nil {
-				t.Fatalf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %s, %v) = %v; want <nil>", tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, err)
+			if err := d.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, tc.exposePort, tc.recursive); err != nil {
+				t.Fatalf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %s, %v, %v) = %v; want <nil>", tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, tc.recursive, err)
 			}
 
 			err = compareFiles(tc.expectedExpanded, expandedDir)
@@ -270,6 +285,7 @@ func TestPrepareErrors(t *testing.T) {
 		labels       map[string]string
 		annotations  map[string]string
 		remote       services.RemoteService
+		recursive    bool
 
 		want string
 	}{{
@@ -400,8 +416,8 @@ func TestPrepareErrors(t *testing.T) {
 			d := Deployer{Clients: &services.Clients{OS: oss, Remote: remote}}
 
 			var prepareErr error
-			if prepareErr = d.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, 0); prepareErr == nil {
-				t.Fatalf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %s, %v) = <nil>; want error", tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations)
+			if prepareErr = d.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, 0, tc.recursive); prepareErr == nil {
+				t.Fatalf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %s, %v, %v) = <nil>; want error", tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, tc.recursive)
 			}
 
 			if tc.want == "" {
@@ -443,8 +459,7 @@ func TestApply(t *testing.T) {
 		waitTimeout     time.Duration
 		gcloud          services.GcloudService
 		kubectl         testservices.TestKubectl
-
-		deployer *Deployer
+		recursive       bool
 	}{{
 		name: "Config is directory",
 
@@ -453,6 +468,49 @@ func TestApply(t *testing.T) {
 		config:          "testing/configs/directory",
 		namespace:       namespace,
 		waitTimeout:     waitTimeout,
+
+		gcloud: &testservices.TestGcloud{
+			ContainerClustersGetCredentialsErr: nil,
+		},
+		kubectl: testservices.TestKubectl{
+			ApplyFromStringResponse: map[string][]error{
+				string(fileContents(t, testDeploymentFile)): {nil, nil},
+				string(fileContents(t, testServiceFile)):    {nil, nil},
+			},
+			GetResponse: map[string]map[string][]testservices.GetResponse{
+				"Deployment": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testDeploymentReadyFile)),
+							Err: nil,
+						}, {
+							Res: string(fileContents(t, testDeploymentReadyFile)),
+							Err: nil,
+						},
+					},
+				},
+				"Service": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testServiceReadyFile)),
+							Err: nil,
+						}, {
+							Res: string(fileContents(t, testServiceReadyFile)),
+							Err: nil,
+						},
+					},
+				},
+			},
+		},
+	}, {
+		name: "Config is nested directory",
+
+		clusterName:     clusterName,
+		clusterLocation: clusterLocation,
+		config:          "testing/configs/nested-directory",
+		namespace:       namespace,
+		waitTimeout:     waitTimeout,
+		recursive:       true,
 
 		gcloud: &testservices.TestGcloud{
 			ContainerClustersGetCredentialsErr: nil,
@@ -745,18 +803,18 @@ func TestApply(t *testing.T) {
 				},
 			}
 
-			if err := d.Apply(ctx, tc.clusterName, tc.clusterLocation, clusterProject, tc.config, tc.namespace, tc.waitTimeout); err != nil {
-				t.Fatalf("Apply(ctx, %s, %s, %s, %s, %v) = %v; want <nil>", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, err)
+			if err := d.Apply(ctx, tc.clusterName, tc.clusterLocation, clusterProject, tc.config, tc.namespace, tc.waitTimeout, tc.recursive); err != nil {
+				t.Fatalf("Apply(ctx, %s, %s, %s, %s, %v, %v) = %v; want <nil>", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, tc.recursive, err)
 			}
 
 			// Verify that all expected applies were actually applied
 			if len(tc.kubectl.ApplyFromStringResponse) != 0 {
-				t.Fatalf("Apply(ctx, %s, %s, %s, %s, %v) did not apply all of the expected configs. got %v; want []", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, tc.kubectl.ApplyFromStringResponse)
+				t.Fatalf("Apply(ctx, %s, %s, %s, %s, %v, %v) did not apply all of the expected configs. got %v; want []", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, tc.recursive, tc.kubectl.ApplyFromStringResponse)
 			}
 
 			// Verify that all expected gets were executed
 			if len(tc.kubectl.GetResponse) != 0 {
-				t.Fatalf("Apply(ctx, %s, %s, %s, %s, %v) did not get all of the expected configs. got %v; want []", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, tc.kubectl.GetResponse)
+				t.Fatalf("Apply(ctx, %s, %s, %s, %s, %v, %v) did not get all of the expected configs. got %v; want []", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, tc.recursive, tc.kubectl.GetResponse)
 			}
 		})
 	}
@@ -788,6 +846,7 @@ func TestApplyErrors(t *testing.T) {
 		waitTimeout     time.Duration
 		gcloud          services.GcloudService
 		kubectl         testservices.TestKubectl
+		recursive       bool
 
 		want string
 	}{{
@@ -917,18 +976,18 @@ func TestApplyErrors(t *testing.T) {
 			}
 
 			var applyErr error
-			if applyErr = d.Apply(ctx, tc.clusterName, tc.clusterLocation, clusterProject, tc.config, tc.namespace, tc.waitTimeout); applyErr == nil {
-				t.Errorf("Apply(ctx, %s, %s, %s, %s, %v) = <nil>; want error", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout)
+			if applyErr = d.Apply(ctx, tc.clusterName, tc.clusterLocation, clusterProject, tc.config, tc.namespace, tc.waitTimeout, tc.recursive); applyErr == nil {
+				t.Errorf("Apply(ctx, %s, %s, %s, %s, %v, %v) = <nil>; want error", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, tc.recursive)
 			}
 
 			// Verify that all expected applies were actually applied
 			if len(tc.kubectl.ApplyFromStringResponse) != 0 {
-				t.Fatalf("Apply(ctx, %s, %s, %s, %s, %v) did not apply all of the expected configs. got %v; want []", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, tc.kubectl.ApplyFromStringResponse)
+				t.Fatalf("Apply(ctx, %s, %s, %s, %s, %v, %v) did not apply all of the expected configs. got %v; want []", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, tc.recursive, tc.kubectl.ApplyFromStringResponse)
 			}
 
 			// Verify that all expected gets were executed
 			if len(tc.kubectl.GetResponse) != 0 {
-				t.Fatalf("Apply(ctx, %s, %s, %s, %s, %v) did not get all of the expected configs. got %v; want []", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, tc.kubectl.GetResponse)
+				t.Fatalf("Apply(ctx, %s, %s, %s, %s, %v, %v) did not get all of the expected configs. got %v; want []", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, tc.recursive, tc.kubectl.GetResponse)
 			}
 
 			if tc.want == "" {

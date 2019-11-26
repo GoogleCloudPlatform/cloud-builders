@@ -127,7 +127,7 @@ func prepare(_ *cobra.Command, options *options) error {
 		return err
 	}
 
-	if err := d.Prepare(ctx, im, options.appName, options.appVersion, options.filename, common.SuggestedOutputPath(options.output), common.ExpandedOutputPath(options.output), options.namespace, labelsMap, annotationsMap, options.exposePort); err != nil {
+	if err := d.Prepare(ctx, im, options.appName, options.appVersion, options.filename, common.SuggestedOutputPath(options.output), common.ExpandedOutputPath(options.output), options.namespace, labelsMap, annotationsMap, options.exposePort, false); err != nil {
 		return fmt.Errorf("failed to prepare deployment: %v", err)
 	}
 
