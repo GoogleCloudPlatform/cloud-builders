@@ -58,8 +58,8 @@ func TestApplyConfigFromString(t *testing.T) {
 	configString := string(fileContents(t, "testing/deployment.yaml"))
 	namespace := "default"
 	ks := &testservices.TestKubectl{
-		ApplyFromStringResponse: map[string]error{
-			configString: nil,
+		ApplyFromStringResponse: map[string][]error{
+			configString: {nil},
 		},
 	}
 
@@ -72,8 +72,8 @@ func TestApplyConfigFromStringErrors(t *testing.T) {
 	configString := string(fileContents(t, "testing/deployment.yaml"))
 	namespace := "default"
 	ks := &testservices.TestKubectl{
-		ApplyFromStringResponse: map[string]error{
-			configString: fmt.Errorf("failed to apply kubernetes manifests to cluster"),
+		ApplyFromStringResponse: map[string][]error{
+			configString: {fmt.Errorf("failed to apply kubernetes manifests to cluster")},
 		},
 	}
 
@@ -104,14 +104,12 @@ func TestGetDeployedObject(t *testing.T) {
 		objName:   "test-app",
 		namespace: "default",
 		ks: &testservices.TestKubectl{
-			GetResponse: map[string]map[string]*testservices.GetResponse{
+			GetResponse: map[string]map[string][]testservices.GetResponse{
 				"Deployment": {
 					"test-app": {
-						Res: []string{
-							string(fileContents(t, testDeploymentFile)),
-						},
-						Err: []error{
-							nil,
+						{
+							Res: string(fileContents(t, testDeploymentFile)),
+							Err: nil,
 						},
 					},
 				},
@@ -126,14 +124,12 @@ func TestGetDeployedObject(t *testing.T) {
 		objName:   "test-app",
 		namespace: "default",
 		ks: &testservices.TestKubectl{
-			GetResponse: map[string]map[string]*testservices.GetResponse{
+			GetResponse: map[string]map[string][]testservices.GetResponse{
 				"Service": {
 					"test-app": {
-						Res: []string{
-							string(fileContents(t, testServiceFile)),
-						},
-						Err: []error{
-							nil,
+						{
+							Res: string(fileContents(t, testServiceFile)),
+							Err: nil,
 						},
 					},
 				},
@@ -173,14 +169,12 @@ func TestDeployedObjectExists(t *testing.T) {
 		objName:   "test-app",
 		namespace: "default",
 		ks: &testservices.TestKubectl{
-			GetResponse: map[string]map[string]*testservices.GetResponse{
+			GetResponse: map[string]map[string][]testservices.GetResponse{
 				"Deployment": {
 					"test-app": {
-						Res: []string{
-							string(fileContents(t, testDeploymentFile)),
-						},
-						Err: []error{
-							nil,
+						{
+							Res: string(fileContents(t, testDeploymentFile)),
+							Err: nil,
 						},
 					},
 				},
@@ -195,14 +189,12 @@ func TestDeployedObjectExists(t *testing.T) {
 		objName:   "test-app",
 		namespace: "default",
 		ks: &testservices.TestKubectl{
-			GetResponse: map[string]map[string]*testservices.GetResponse{
+			GetResponse: map[string]map[string][]testservices.GetResponse{
 				"Service": {
 					"test-app": {
-						Res: []string{
-							"",
-						},
-						Err: []error{
-							nil,
+						{
+							Res: "",
+							Err: nil,
 						},
 					},
 				},
@@ -238,14 +230,12 @@ func TestDeployedObjectExistsErrors(t *testing.T) {
 		objName:   "test-app",
 		namespace: "default",
 		ks: &testservices.TestKubectl{
-			GetResponse: map[string]map[string]*testservices.GetResponse{
+			GetResponse: map[string]map[string][]testservices.GetResponse{
 				"Service": {
 					"test-app": {
-						Res: []string{
-							"",
-						},
-						Err: []error{
-							fmt.Errorf("failed to get service"),
+						{
+							Res: "",
+							Err: fmt.Errorf("failed to get service"),
 						},
 					},
 				},
