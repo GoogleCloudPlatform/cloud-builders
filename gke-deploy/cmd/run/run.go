@@ -67,6 +67,7 @@ type options struct {
 	exposePort      int
 	verbose         bool
 	waitTimeout     time.Duration
+	recursive       bool
 }
 
 // NewRunCommand creates the `gke-deploy run` subcommand.
@@ -99,6 +100,7 @@ func NewRunCommand() *cobra.Command {
 	cmd.Flags().IntVarP(&options.exposePort, "expose", "x", 0, "Creates a Service object that connects to a deployed workload object using a selector that matches the label with key as 'app' and value of the image name's suffix specified by --image. The port provided will be used to expose the deployed workload object (i.e., port and targetPort will be set to the value provided in this flag).")
 	cmd.Flags().BoolVarP(&options.verbose, "verbose", "V", false, "Prints underlying commands being called to stdout.")
 	cmd.Flags().DurationVarP(&options.waitTimeout, "timeout", "t", 5*time.Minute, "Timeout limit for waiting for Kubernetes objects to finish applying.")
+	cmd.Flags().BoolVarP(&options.recursive, "recursive", "R", false, "Recursively search through the configuration directory for all yaml files.")
 
 	return cmd
 }
@@ -154,10 +156,10 @@ func run(_ *cobra.Command, options *options) error {
 	}
 
 	expandedOutput := common.ExpandedOutputPath(options.output)
-	if err := d.Prepare(ctx, im, options.appName, options.appVersion, options.filename, common.SuggestedOutputPath(options.output), expandedOutput, options.namespace, labelsMap, annotationsMap, options.exposePort, false); err != nil {
+	if err := d.Prepare(ctx, im, options.appName, options.appVersion, options.filename, common.SuggestedOutputPath(options.output), expandedOutput, options.namespace, labelsMap, annotationsMap, options.exposePort, options.recursive); err != nil {
 		return fmt.Errorf("failed to prepare deployment: %v", err)
 	}
-	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, expandedOutput, options.namespace, options.waitTimeout, false); err != nil {
+	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, expandedOutput, options.namespace, options.waitTimeout, options.recursive); err != nil {
 		return fmt.Errorf("failed to apply deployment: %v", err)
 	}
 

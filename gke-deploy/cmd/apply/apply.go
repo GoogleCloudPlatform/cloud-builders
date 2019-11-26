@@ -51,6 +51,7 @@ type options struct {
 	namespace       string
 	verbose         bool
 	waitTimeout     time.Duration
+	recursive       bool
 }
 
 // NewApplyCommand creates the `gke-deploy apply` subcommand.
@@ -76,6 +77,7 @@ func NewApplyCommand() *cobra.Command {
 	cmd.Flags().StringVarP(&options.namespace, "namespace", "n", "", "Namespace of GKE cluster to deploy to. If omitted, the namespace(s) specified in each Kubernetes configuration file is used.")
 	cmd.Flags().BoolVarP(&options.verbose, "verbose", "V", false, "Prints underlying commands being called to stdout.")
 	cmd.Flags().DurationVarP(&options.waitTimeout, "timeout", "t", 5*time.Minute, "Timeout limit for waiting for Kubernetes objects to finish applying.")
+	cmd.Flags().BoolVarP(&options.recursive, "recursive", "R", false, "Recursively search through the configuration directory for all yaml files.")
 
 	return cmd
 }
@@ -103,7 +105,7 @@ func apply(_ *cobra.Command, options *options) error {
 		return err
 	}
 
-	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, options.filename, options.namespace, options.waitTimeout, false); err != nil {
+	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, options.filename, options.namespace, options.waitTimeout, options.recursive); err != nil {
 		return fmt.Errorf("failed to apply deployment: %v", err)
 	}
 
