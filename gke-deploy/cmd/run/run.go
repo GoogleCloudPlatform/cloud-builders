@@ -154,10 +154,10 @@ func run(_ *cobra.Command, options *options) error {
 	}
 
 	expandedOutput := common.ExpandedOutputPath(options.output)
-	if err := d.Prepare(ctx, im, options.appName, options.appVersion, options.filename, common.SuggestedOutputPath(options.output), expandedOutput, options.namespace, labelsMap, annotationsMap, options.exposePort); err != nil {
+	if err := d.Prepare(ctx, im, options.appName, options.appVersion, options.filename, common.SuggestedOutputPath(options.output), expandedOutput, options.namespace, labelsMap, annotationsMap, options.exposePort, false); err != nil {
 		return fmt.Errorf("failed to prepare deployment: %v", err)
 	}
-	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, expandedOutput, options.namespace, options.waitTimeout); err != nil {
+	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, expandedOutput, options.namespace, options.waitTimeout, false); err != nil {
 		return fmt.Errorf("failed to apply deployment: %v", err)
 	}
 
