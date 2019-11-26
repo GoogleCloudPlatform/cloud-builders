@@ -30,7 +30,7 @@ func AuthorizeAccess(ctx context.Context, clusterName, clusterLocation, clusterP
 	return nil
 }
 
-// ApplyConfigFromString applies aa config string to the current context's cluster.
+// ApplyConfigFromString applies a config string to the current context's cluster.
 func ApplyConfigFromString(configString, namespace string, ks services.KubectlService) error {
 	if err := ks.ApplyFromString(configString, namespace); err != nil {
 		return fmt.Errorf("failed to apply config from string: %v", err)
