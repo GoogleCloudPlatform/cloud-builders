@@ -56,6 +56,7 @@ type options struct {
 	output      string
 	exposePort  int
 	verbose     bool
+	recursive   bool
 }
 
 // NewPrepareCommand creates the `gke-deploy prepare` subcommand.
@@ -84,6 +85,7 @@ func NewPrepareCommand() *cobra.Command {
 	cmd.Flags().StringVarP(&options.output, "output", "o", "./output", "Target directory to store suggested and expanded Kubernetes configuration files. Suggested files will be stored in \"<output>/suggested\" and expanded files will be stored in \"<output>/expanded\".")
 	cmd.Flags().IntVarP(&options.exposePort, "expose", "x", 0, "Creates a Service object that connects to a deployed workload object using a selector that matches the label with key as 'app' and value of the image name's suffix specified by --image. The port provided will be used to expose the deployed workload object (i.e., port and targetPort will be set to the value provided in this flag).")
 	cmd.Flags().BoolVarP(&options.verbose, "verbose", "V", false, "Prints underlying commands being called to stdout.")
+	cmd.Flags().BoolVarP(&options.recursive, "recursive", "R", false, "Recursively search through the configuration directory for all yaml files.")
 
 	return cmd
 }
@@ -127,7 +129,7 @@ func prepare(_ *cobra.Command, options *options) error {
 		return err
 	}
 
-	if err := d.Prepare(ctx, im, options.appName, options.appVersion, options.filename, common.SuggestedOutputPath(options.output), common.ExpandedOutputPath(options.output), options.namespace, labelsMap, annotationsMap, options.exposePort, false); err != nil {
+	if err := d.Prepare(ctx, im, options.appName, options.appVersion, options.filename, common.SuggestedOutputPath(options.output), common.ExpandedOutputPath(options.output), options.namespace, labelsMap, annotationsMap, options.exposePort, options.recursive); err != nil {
 		return fmt.Errorf("failed to prepare deployment: %v", err)
 	}
 
