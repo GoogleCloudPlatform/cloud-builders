@@ -364,12 +364,12 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 			if err != nil {
 				return fmt.Errorf("failed to get configuration of deployed object with kind %q and name %q: %v", kind, name, err)
 			}
-			deployedObjs = append(deployedObjs, deployedObj)
 			ok, err := resource.IsReady(ctx, deployedObj)
 			if err != nil {
 				return fmt.Errorf("failed to check if deployed object with kind %q and name %q is ready: %v", kind, name, err)
 			}
 			if ok {
+				deployedObjs = append(deployedObjs, deployedObj)
 				dur := time.Now().Sub(start).Round(time.Second / 10) // Round to nearest 0.1 seconds
 				fmt.Printf("Deployed object with kind %q and name %q is ready after %v\n", kind, name, dur)
 			} else {
