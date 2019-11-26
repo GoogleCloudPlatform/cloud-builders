@@ -331,7 +331,8 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 		}
 	}
 
-	deployedObjs := resource.Objects{}
+	deployedObjs := map[string]map[string]resource.Object{}
+	summaryObjs := make(resource.Objects, 0, len(objs))
 	timedOut := false
 
 	fmt.Printf("\nWaiting for deployed objects to be ready with timeout of %v\n", waitTimeout)
@@ -364,12 +365,15 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 			if err != nil {
 				return fmt.Errorf("failed to get configuration of deployed object with kind %q and name %q: %v", kind, name, err)
 			}
+			if deployedObjs[kind] == nil {
+				deployedObjs[kind] = map[string]resource.Object{}
+			}
+			deployedObjs[kind][name] = *deployedObj
 			ok, err := resource.IsReady(ctx, deployedObj)
 			if err != nil {
 				return fmt.Errorf("failed to check if deployed object with kind %q and name %q is ready: %v", kind, name, err)
 			}
 			if ok {
-				deployedObjs = append(deployedObjs, deployedObj)
 				dur := time.Now().Sub(start).Round(time.Second / 10) // Round to nearest 0.1 seconds
 				fmt.Printf("Deployed object with kind %q and name %q is ready after %v\n", kind, name, dur)
 			} else {
@@ -398,7 +402,12 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 
 	fmt.Printf("Finished applying deployment.\n\n")
 
-	summary, err := resource.DeploySummary(ctx, deployedObjs)
+	for _, nameMap := range deployedObjs {
+		for _, obj := range nameMap {
+			summaryObjs = append(summaryObjs, &obj)
+		}
+	}
+	summary, err := resource.DeploySummary(ctx, summaryObjs)
 	if err != nil {
 		return fmt.Errorf("failed to get summary of deployed objects: %v", err)
 	}
