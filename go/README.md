@@ -8,7 +8,7 @@ running the tool.
 
 This Builder (`gcr.io/cloud-builders/go`) is not necessary if you're building using
 [Go modules](https://github.com/golang/go/wiki/Modules), available
-in Go 1.11+. You can **build** with the `golang` image (not `gcr.io/cloud-builders/go`) from [Dockerhub](hub.docker.com/library/golang) and Google's Container Registry [mirror](mirror.gcr.io/library/golang):
+in Go 1.11+. You can **build** with the `golang` image (not `gcr.io/cloud-builders/go`) from [Dockerhub](https://hub.docker.com/_/golang) and Google's Container Registry [mirror](https://cloud.google.com/container-registry/docs/using-dockerhub-mirroring):
 
 ```
 steps:
