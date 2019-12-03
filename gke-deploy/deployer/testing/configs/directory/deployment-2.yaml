@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: test-app-2
+  name: test-app-2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-app-2
+  template:
+    metadata:
+      labels:
+        app: test-app-2
+    spec:
+      containers:
+      - image: gcr.io/cbd-test/test-app-2:latest
+        name: test-app-2

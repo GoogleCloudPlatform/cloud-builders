@@ -403,8 +403,9 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 	fmt.Printf("Finished applying deployment.\n\n")
 
 	for _, nameMap := range deployedObjs {
-		for _, obj := range nameMap {
-			summaryObjs = append(summaryObjs, &obj)
+		for k, _ := range nameMap {
+			o := nameMap[k]
+			summaryObjs = append(summaryObjs, &o)
 		}
 	}
 	summary, err := resource.DeploySummary(ctx, summaryObjs)
