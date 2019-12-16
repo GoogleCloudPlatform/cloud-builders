@@ -1,0 +1,3 @@
+# This directory (/core/resource/testing/configs/empty-directory) is used for testing.
+# Git, however, doesn't include emtpy directories, hence the need for this
+# empty .gitignore file.
