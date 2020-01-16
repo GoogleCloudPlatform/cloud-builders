@@ -447,7 +447,7 @@ func (d *Deployer) gkeLinks(clusterProject string) (string, error) {
 	if _, err := fmt.Fprintf(w, "Services & Ingress:\thttps://console.cloud.google.com/kubernetes/discovery?project=%s\n", clusterProject); err != nil {
 		return "", fmt.Errorf("failed to write to writer: %v", err)
 	}
-	if _, err := fmt.Fprintf(w, "Applications:\thttps://console.cloud.google.com/kubernetes/applications?project=%s\n", clusterProject); err != nil {
+	if _, err := fmt.Fprintf(w, "Applications:\thttps://console.cloud.google.com/kubernetes/application?project=%s\n", clusterProject); err != nil {
 		return "", fmt.Errorf("failed to write to writer: %v", err)
 	}
 	if _, err := fmt.Fprintf(w, "Configuration:\thttps://console.cloud.google.com/kubernetes/config?project=%s\n", clusterProject); err != nil {
