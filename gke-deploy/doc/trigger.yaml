@@ -67,7 +67,6 @@ build:
   options:
     substitution_option: ALLOW_LOOSE
   tags:
-  - gcp-cloud-build-deploy
   - $_K8S_APP_NAME
 substitutions:
   _IMAGE_NAME: @IMAGE_NAME@
