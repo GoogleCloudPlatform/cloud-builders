@@ -24,17 +24,17 @@ project=${CLOUDSDK_CORE_PROJECT:-$(gcloud config get-value core/project 2> /dev/
 [[ -z "$cluster" ]] && var_usage
 [ ! "$zone" -o "$region" ] && var_usage
 if [[ -n "$KUBECTL_VERSION" ]] && [[ ! " ${versions[*]} "  =~ " ${KUBECTL_VERSION} "  ]]; then
-  echo "Bad KUBECTL_VERSION \"${KUBECTL_VERSION}\". Expected one of ${versions[*]}" >&2
+  >&2 echo "Bad KUBECTL_VERSION \"${KUBECTL_VERSION}\". Expected one of ${versions[*]}" >&2
   exit 1
 fi
 
 if [ -n "$region" ]; then
-  echo "Running: gcloud container clusters get-credentials --project=\"$project\" --region=\"$region\" \"$cluster\""
+  >&2 echo "Running: gcloud container clusters get-credentials --project=\"$project\" --region=\"$region\" \"$cluster\""
   gcloud container clusters get-credentials --project="$project" --region="$region" "$cluster" || exit
 else
-  echo "Running: gcloud container clusters get-credentials --project=\"$project\" --zone=\"$zone\" \"$cluster\""
+  >&2 echo "Running: gcloud container clusters get-credentials --project=\"$project\" --zone=\"$zone\" \"$cluster\""
   gcloud container clusters get-credentials --project="$project" --zone="$zone" "$cluster" || exit
  fi
 
-echo "Running: ${kubectl_cmd}" "$@" >&2
+>&2 echo "Running: ${kubectl_cmd}" "$@" >&2
 exec "${kubectl_cmd}" "$@"
