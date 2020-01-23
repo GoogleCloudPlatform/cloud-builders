@@ -28,13 +28,26 @@ if [[ -n "$KUBECTL_VERSION" ]] && [[ ! " ${versions[*]} "  =~ " ${KUBECTL_VERSIO
   exit 1
 fi
 
+# kubectl supports HTTPS_PROXY env variable
+# gcloud crashes if HTTPS_PROXY is set
+# unset HTTPS_PROXY before invoking gcloud
+if [ -n "${HTTPS_PROXY}" ]; then
+  TEMP_HTTPS_PROXY="${HTTPS_PROXY}"
+  export -n HTTPS_PROXY
+  unset HTTPS_PROXY
+fi
+
 if [ -n "$region" ]; then
   echo "Running: gcloud container clusters get-credentials --project=\"$project\" --region=\"$region\" \"$cluster\""
   gcloud container clusters get-credentials --project="$project" --region="$region" "$cluster" || exit
 else
   echo "Running: gcloud container clusters get-credentials --project=\"$project\" --zone=\"$zone\" \"$cluster\""
   gcloud container clusters get-credentials --project="$project" --zone="$zone" "$cluster" || exit
- fi
+fi
+
+if [ -n "${TEMP_HTTPS_PROXY}" ]; then
+  export HTTPS_PROXY="${TEMP_HTTPS_PROXY}"
+fi
 
 echo "Running: ${kubectl_cmd}" "$@" >&2
 exec "${kubectl_cmd}" "$@"
