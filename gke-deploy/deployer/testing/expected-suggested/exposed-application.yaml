@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   labels:
     app: test-app
+    app.kubernetes.io/name: my-app
   name: test-app
 spec:
   replicas: 1
@@ -13,6 +14,7 @@ spec:
     metadata:
       labels:
         app: test-app
+        app.kubernetes.io/name: my-app
     spec:
       containers:
       - image: gcr.io/cbd-test/test-app:latest
@@ -24,12 +26,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: my-image-service
+  labels:
+    app.kubernetes.io/name: my-app
+  name: my-app-service
 spec:
   ports:
   - port: 80
     protocol: TCP
     targetPort: 80
   selector:
-    app: my-image
+    app.kubernetes.io/name: my-app
   type: LoadBalancer

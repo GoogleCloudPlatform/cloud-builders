@@ -548,21 +548,21 @@ func TestParseConfigs(t *testing.T) {
 		name:    "Configs is a directory with a yaml file two directories deep",
 		configs: "testing/configs/nested-with-yaml",
 		recur:   true,
-		want:    Objects{
+		want: Objects{
 			newObjectFromFile(t, testDeploymentFile),
 		},
 	}, {
 		name:    "Configs is a directory with a yml file two directories deep",
 		configs: "testing/configs/nested-with-yml",
 		recur:   true,
-		want:    Objects{
+		want: Objects{
 			newObjectFromFile(t, testDeploymentFile),
 		},
 	}, {
 		name:    "Configs is a directory with multiple yaml files two directories deep",
 		configs: "testing/configs/nested-with-2-yamls",
 		recur:   true,
-		want:    Objects{
+		want: Objects{
 			newObjectFromFile(t, testDeploymentFile),
 			newObjectFromFile(t, testServiceFile),
 		},
@@ -570,7 +570,7 @@ func TestParseConfigs(t *testing.T) {
 		name:    "Configs is a directory with yamls in each level",
 		configs: "testing/configs/nested-with-yamls-at-each-level",
 		recur:   true,
-		want:    Objects{
+		want: Objects{
 			newObjectFromFile(t, testDeploymentFile),
 			newObjectFromFile(t, testDeploymentFile),
 			newObjectFromFile(t, testServiceFile),
@@ -578,14 +578,14 @@ func TestParseConfigs(t *testing.T) {
 	}, {
 		name:    "Configs is a directory with yamls in each level but recursive is false",
 		configs: "testing/configs/nested-with-yamls-at-each-level",
-		want:    Objects{
+		want: Objects{
 			newObjectFromFile(t, testDeploymentFile),
 		},
 	}, {
 		name:    "Configs is a nested directory with multi-resource yamls",
 		configs: "testing/configs/nested-multi-resource",
 		recur:   true,
-		want:    Objects{
+		want: Objects{
 			newObjectFromFile(t, testServiceFile),
 			newObjectFromFile(t, testDeploymentFile),
 			newObjectFromFile(t, testServiceFile),
@@ -594,7 +594,7 @@ func TestParseConfigs(t *testing.T) {
 		name:    "Configs is a nested directory with multiple subdirectories",
 		configs: "testing/configs/nested-and-branched",
 		recur:   true,
-		want:    Objects{
+		want: Objects{
 			newObjectFromFile(t, testDeploymentFile),
 			newObjectFromFile(t, testServiceFile),
 		},
@@ -602,8 +602,7 @@ func TestParseConfigs(t *testing.T) {
 		name:    "Configs is a nested directory with whitespace",
 		configs: "testing/configs/nested-with-whitespace",
 		recur:   true,
-		want:    Objects{
-		},
+		want:    Objects{},
 	}}
 
 	for _, tc := range tests {

@@ -1,0 +1,16 @@
+apiVersion: app.k8s.io/v1beta1
+kind: Application
+metadata:
+  name: test-name
+spec:
+  componentKinds:
+  - group: core
+    kind: Service
+  - group: extensions
+    kind: Deployment
+  descriptor:
+    type: test-type
+    version: test-version
+  selector:
+    matchLabels:
+      foo: bar

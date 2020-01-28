@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   labels:
     app: test-app
-    app.kubernetes.io/name: my-app
   name: test-app
 spec:
   replicas: 1
@@ -14,16 +13,7 @@ spec:
     metadata:
       labels:
         app: test-app
-        app.kubernetes.io/name: my-app
     spec:
       containers:
       - image: gcr.io/cbd-test/test-app:latest
         name: test-app
-
-
----
-
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: foobar
