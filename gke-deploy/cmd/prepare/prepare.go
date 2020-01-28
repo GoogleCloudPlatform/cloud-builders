@@ -46,17 +46,19 @@ const (
 )
 
 type options struct {
-	appName     string
-	appVersion  string
-	filename    string
-	image       string
-	labels      []string
-	annotations []string
-	namespace   string
-	output      string
-	exposePort  int
-	verbose     bool
-	recursive   bool
+	appName             string
+	appVersion          string
+	filename            string
+	image               string
+	labels              []string
+	annotations         []string
+	namespace           string
+	output              string
+	exposePort          int
+	createApplicationCR bool
+	applicationLinks    []string
+	verbose             bool
+	recursive           bool
 }
 
 // NewPrepareCommand creates the `gke-deploy prepare` subcommand.
@@ -83,9 +85,11 @@ func NewPrepareCommand() *cobra.Command {
 	cmd.Flags().StringVarP(&options.namespace, "namespace", "n", "", "Namespace of GKE cluster to deploy to. Creates a namespace Kubernetes configuration file to reflect this and updates the namespace field of each supplied Kubernetes configuration file.")
 	cmd.Flags().StringSliceVarP(&options.annotations, "annotation", "A", nil, "Annotation(s) to add to Kubernetes configuration files (k1=v1). Annotations can be set comma-delimited or as separate flags. If two or more annotations with the same key are listed, the last one is used.")
 	cmd.Flags().StringVarP(&options.output, "output", "o", "./output", "Target directory to store suggested and expanded Kubernetes configuration files. Suggested files will be stored in \"<output>/suggested\" and expanded files will be stored in \"<output>/expanded\".")
-	cmd.Flags().IntVarP(&options.exposePort, "expose", "x", 0, "Creates a Service object that connects to a deployed workload object using a selector that matches the label with key as 'app' and value of the image name's suffix specified by --image. The port provided will be used to expose the deployed workload object (i.e., port and targetPort will be set to the value provided in this flag).")
+	cmd.Flags().IntVarP(&options.exposePort, "expose", "x", 0, "Creates a Service object that connects to a deployed workload object using a selector that matches the label with key as 'app.kubernetes.io/name' and value specified by --app. The port provided will be used to expose the deployed workload object (i.e., port and targetPort will be set to the value provided in this flag).")
 	cmd.Flags().BoolVarP(&options.verbose, "verbose", "V", false, "Prints underlying commands being called to stdout.")
 	cmd.Flags().BoolVarP(&options.recursive, "recursive", "R", false, "Recursively search through the configuration directory for all yaml files.")
+	cmd.Flags().BoolVar(&options.createApplicationCR, "create-application-cr", false, "Creates an Application CR object with the name provided by --app and connects to a deployed objects using a selector that matches the label with key as 'app.kubernetes.io/name' and value specified by --app.")
+	cmd.Flags().StringSliceVar(&options.applicationLinks, "links", nil, "Links(s) to add to the spec.descriptor.links field of an Application CR generated with the --create-application-cr flag or provided via the --filename flag (description=url). Links can be set comma-delimited or as separate flags.")
 
 	return cmd
 }
@@ -112,8 +116,12 @@ func prepare(_ *cobra.Command, options *options) error {
 	if options.exposePort < 0 {
 		return fmt.Errorf("value of -x|--expose must be > 0")
 	}
-	if options.exposePort > 0 && options.image == "" {
-		return fmt.Errorf("exposing a deployed workload object requires -i|--image to be set")
+	if options.exposePort > 0 && options.appName == "" {
+		return fmt.Errorf("exposing a deployed workload object requires -a|--app to be set")
+	}
+
+	if options.createApplicationCR && options.appName == "" {
+		return fmt.Errorf("creating an Application CR requires -a|--app to be set")
 	}
 
 	labelsMap, err := common.CreateMapFromEqualDelimitedStrings(options.labels)
@@ -124,12 +132,16 @@ func prepare(_ *cobra.Command, options *options) error {
 	if err != nil {
 		return err
 	}
+	applicationLinks, err := common.CreateApplicationLinksListFromEqualDelimitedStrings(options.applicationLinks)
+	if err != nil {
+		return err
+	}
 	d, err := common.CreateDeployer(ctx, false /* useGcloud */, options.verbose)
 	if err != nil {
 		return err
 	}
 
-	if err := d.Prepare(ctx, im, options.appName, options.appVersion, options.filename, common.SuggestedOutputPath(options.output), common.ExpandedOutputPath(options.output), options.namespace, labelsMap, annotationsMap, options.exposePort, options.recursive); err != nil {
+	if err := d.Prepare(ctx, im, options.appName, options.appVersion, options.filename, common.SuggestedOutputPath(options.output), common.ExpandedOutputPath(options.output), options.namespace, labelsMap, annotationsMap, options.exposePort, options.recursive, options.createApplicationCR, applicationLinks); err != nil {
 		return fmt.Errorf("failed to prepare deployment: %v", err)
 	}
 
