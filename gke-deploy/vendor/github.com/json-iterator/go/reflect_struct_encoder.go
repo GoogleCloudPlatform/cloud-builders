@@ -2,10 +2,11 @@ package jsoniter
 
 import (
 	"fmt"
-	"github.com/modern-go/reflect2"
 	"io"
 	"reflect"
 	"unsafe"
+
+	"github.com/modern-go/reflect2"
 )
 
 func encoderOfStruct(ctx *ctx, typ reflect2.Type) ValEncoder {
@@ -200,6 +201,7 @@ type stringModeStringEncoder struct {
 
 func (encoder *stringModeStringEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
 	tempStream := encoder.cfg.BorrowStream(nil)
+	tempStream.Attachment = stream.Attachment
 	defer encoder.cfg.ReturnStream(tempStream)
 	encoder.elemEncoder.Encode(ptr, tempStream)
 	stream.WriteString(string(tempStream.Buffer()))
