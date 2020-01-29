@@ -51,18 +51,10 @@ func TestCreateApplicationLinksListFromEqualDelimitedStrings(t *testing.T) {
 		name: "Trailing comma",
 
 		keyValues: []string{
-			"a=b",
-			"c=d",
 			"d=f,",
 		},
 
 		want: []applicationsv1beta1.Link{{
-			Description: "a",
-			URL:         "b",
-		}, {
-			Description: "c",
-			URL:         "d",
-		}, {
 			Description: "d",
 			URL:         "f",
 		}},
@@ -71,57 +63,11 @@ func TestCreateApplicationLinksListFromEqualDelimitedStrings(t *testing.T) {
 
 		keyValues: []string{
 			",a=b",
-			"c=d",
-			"d=f",
 		},
 
 		want: []applicationsv1beta1.Link{{
 			Description: "a",
 			URL:         "b",
-		}, {
-			Description: "c",
-			URL:         "d",
-		}, {
-			Description: "d",
-			URL:         "f",
-		}},
-	}, {
-		name: "Trailing whitespace",
-
-		keyValues: []string{
-			"a=b",
-			"c=d",
-			"d=f    ",
-		},
-
-		want: []applicationsv1beta1.Link{{
-			Description: "a",
-			URL:         "b",
-		}, {
-			Description: "c",
-			URL:         "d",
-		}, {
-			Description: "d",
-			URL:         "f",
-		}},
-	}, {
-		name: "Leading whitespace",
-
-		keyValues: []string{
-			"     a=b",
-			"c=d",
-			"d=f",
-		},
-
-		want: []applicationsv1beta1.Link{{
-			Description: "a",
-			URL:         "b",
-		}, {
-			Description: "c",
-			URL:         "d",
-		}, {
-			Description: "d",
-			URL:         "f",
 		}},
 	}, {
 		name: "Handles whitespace",
@@ -224,14 +170,10 @@ func TestCreateMapFromEqualDelimitedStrings(t *testing.T) {
 		name: "Trailing comma",
 
 		keyValues: []string{
-			"a=b",
-			"c=d",
 			"d=f,",
 		},
 
 		want: map[string]string{
-			"a": "b",
-			"c": "d",
 			"d": "f",
 		},
 	}, {
@@ -239,42 +181,10 @@ func TestCreateMapFromEqualDelimitedStrings(t *testing.T) {
 
 		keyValues: []string{
 			",a=b",
-			"c=d",
-			"d=f",
 		},
 
 		want: map[string]string{
 			"a": "b",
-			"c": "d",
-			"d": "f",
-		},
-	}, {
-		name: "Trailing whitespace",
-
-		keyValues: []string{
-			"a=b",
-			"c=d",
-			"d=f    ",
-		},
-
-		want: map[string]string{
-			"a": "b",
-			"c": "d",
-			"d": "f",
-		},
-	}, {
-		name: "Leading whitespace",
-
-		keyValues: []string{
-			"     a=b",
-			"c=d",
-			"d=f",
-		},
-
-		want: map[string]string{
-			"a": "b",
-			"c": "d",
-			"d": "f",
 		},
 	}, {
 		name: "Handles whitespace",
