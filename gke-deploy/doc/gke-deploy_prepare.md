@@ -37,7 +37,7 @@ gke-deploy prepare [flags]
 ```
   -A, --annotation strings      Annotation(s) to add to Kubernetes configuration files (k1=v1). Annotations can be set comma-delimited or as separate flags. If two or more annotations with the same key are listed, the last one is used.
   -a, --app string              Application name of the Kubernetes deployment.
-      --create-application-cr   Creates an Application CR object with the name provided by --app and connects to a deployed objects using a selector that matches the label with key as 'app.kubernetes.io/name' and value specified by --app.
+      --create-application-cr   Creates an Application CR object with the name provided by --app and connects to deployed objects using a selector that matches the label with key as 'app.kubernetes.io/name' and value specified by --app.
   -x, --expose int              Creates a Service object that connects to a deployed workload object using a selector that matches the label with key as 'app.kubernetes.io/name' and value specified by --app. The port provided will be used to expose the deployed workload object (i.e., port and targetPort will be set to the value provided in this flag).
   -f, --filename string         Configuration file or directory of configuration files to use to create Kubernetes objects (file or files in directory must end with ".yml" or ".yaml"). If this field is not provided, suggested base configs will be created: Deployment with image provided by --image and HorizontalPodAutoscaler. The application's name will be inferred by the image name's suffix.
   -h, --help                    help for prepare

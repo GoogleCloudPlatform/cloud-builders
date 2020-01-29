@@ -54,18 +54,20 @@ deployment.
 
 ## Application CR
 
-gke-deploy supports deploying your application with an Application
-[Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/).
-This requires your GKE cluster to have the Application CRD installed. Follow the
-instructions
+You can deploy an 
+[Application Custom Resource](https://github.com/kubernetes-sigs/application)
+for your application:
+
+1. Follow the instructions
 [here](https://cloud-dot-devsite.googleplex.com/kubernetes-engine/docs/how-to/add-on/application-delivery)
-to create or update a GKE cluster to support the Application
-Delivery, which supports the Application CRD, or install the CRD manually by
-following the instructions
+to create or update a GKE cluster to install Application Delivery, which
+supports the Application CRD.
+
+   You can also install the CRD manually by following the instructions
 [here](https://github.com/kubernetes-sigs/application#installing-the-crd).
 
-Use the `--create-application-cr` flag with `gke-deploy prepare` or `gke-deploy
-apply` to create an Application CR for your application.
+1. Use the `--create-application-cr` flag with `gke-deploy prepare` or
+`gke-deploy apply` to create an Application CR for your application.
 
 ## Testing Locally
 
