@@ -539,7 +539,7 @@ func serviceIPs(obj *Object) (string, error) {
 			ip = fmt.Sprintf("%s:%d", ip, port)
 		}
 
-		ips = append(ips, ip)
+		ips = append(ips, fmt.Sprintf("http://%s", ip))
 	}
 
 	return strings.Join(ips, ", "), nil
