@@ -1,6 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  labels:
+    app.kubernetes.io/name: my-app
   name: my-image
 spec:
   replicas: 3
@@ -11,6 +13,7 @@ spec:
     metadata:
       labels:
         app: my-image
+        app.kubernetes.io/name: my-app
     spec:
       containers:
       - image: index.docker.io/library/my-image  # Will be set to actual image before deployment
@@ -22,6 +25,8 @@ spec:
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
+  labels:
+    app.kubernetes.io/name: my-app
   name: my-image-hpa
 spec:
   maxReplicas: 5

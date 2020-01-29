@@ -1,0 +1,59 @@
+apiVersion: app.k8s.io/v1beta1
+kind: Application
+metadata:
+  labels:
+    app.kubernetes.io/name: my-app
+  name: test-app
+spec:
+  componentKinds:
+  - group: apps
+    kind: Deployment
+  descriptor:
+    type: test-app
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: test-app
+
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: test-app
+    app.kubernetes.io/name: my-app
+  name: test-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-app
+  template:
+    metadata:
+      labels:
+        app: test-app
+        app.kubernetes.io/name: my-app
+    spec:
+      containers:
+      - image: gcr.io/cbd-test/test-app:latest
+        name: test-app
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: test-app
+    app.kubernetes.io/name: my-app
+  name: test-app
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: test-app
+  type: LoadBalancer

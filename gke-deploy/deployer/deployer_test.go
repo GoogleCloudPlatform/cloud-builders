@@ -25,6 +25,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-containerregistry/pkg/name"
 	v1 "github.com/google/go-containerregistry/pkg/v1"
+	applicationsv1beta1 "github.com/kubernetes-sigs/application/pkg/apis/app/v1beta1"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/testservices"
@@ -43,17 +44,19 @@ func TestPrepare(t *testing.T) {
 	tests := []struct {
 		name string
 
-		image             name.Reference
-		appName           string
-		appVersion        string
-		config            string
-		expectedSuggested string
-		expectedExpanded  string
-		namespace         string
-		labels            map[string]string
-		annotations       map[string]string
-		exposePort        int
-		recursive         bool
+		image               name.Reference
+		appName             string
+		appVersion          string
+		config              string
+		expectedSuggested   string
+		expectedExpanded    string
+		namespace           string
+		labels              map[string]string
+		annotations         map[string]string
+		exposePort          int
+		recursive           bool
+		createApplicationCR bool
+		applicationLinks    []applicationsv1beta1.Link
 	}{{
 		name: "Config is directory",
 
@@ -206,6 +209,94 @@ func TestPrepare(t *testing.T) {
 		annotations:       annotations,
 		namespace:         "",
 		exposePort:        0,
+	}, {
+		name: "Create Application CR",
+
+		image:               image,
+		appName:             appName,
+		appVersion:          "",
+		config:              "testing/configs/deployment-and-service",
+		expectedSuggested:   "testing/expected-suggested/create-application-cr.yaml",
+		expectedExpanded:    "testing/expected-expanded/create-application-cr.yaml",
+		labels:              labels,
+		annotations:         annotations,
+		namespace:           namespace,
+		exposePort:          0,
+		createApplicationCR: true,
+	}, {
+		name: "Create Application CR with version",
+
+		image:               image,
+		appName:             appName,
+		appVersion:          appVersion,
+		config:              "testing/configs/deployment-and-service",
+		expectedSuggested:   "testing/expected-suggested/create-application-cr-with-version.yaml",
+		expectedExpanded:    "testing/expected-expanded/create-application-cr-with-version.yaml",
+		labels:              labels,
+		annotations:         annotations,
+		namespace:           namespace,
+		exposePort:          0,
+		createApplicationCR: true,
+	}, {
+		name: "Create Application CR with links",
+
+		image:               image,
+		appName:             appName,
+		appVersion:          "",
+		config:              "testing/configs/deployment-and-service",
+		expectedSuggested:   "testing/expected-suggested/create-application-cr-with-links.yaml",
+		expectedExpanded:    "testing/expected-expanded/create-application-cr-with-links.yaml",
+		labels:              labels,
+		annotations:         annotations,
+		namespace:           namespace,
+		exposePort:          0,
+		createApplicationCR: true,
+		applicationLinks: []applicationsv1beta1.Link{
+			{
+				Description: "My description 1",
+				URL:         "https://foo.com/bar",
+			},
+			{
+				Description: "My description 2",
+				URL:         "https://asdf.com",
+			},
+		},
+	}, {
+		name: "Application CR already exists",
+
+		image:             image,
+		appName:           appName,
+		appVersion:        appVersion,
+		config:            "testing/configs/directory-with-application",
+		expectedSuggested: "testing/expected-suggested/existing-application-cr.yaml",
+		expectedExpanded:  "testing/expected-expanded/existing-application-cr.yaml",
+		labels:            labels,
+		annotations:       annotations,
+		namespace:         namespace,
+		exposePort:        0,
+	}, {
+		name: "Add links to existing Application CR",
+
+		image:             image,
+		appName:           appName,
+		appVersion:        appVersion,
+		config:            "testing/configs/directory-with-application",
+		expectedSuggested: "testing/expected-suggested/existing-application-cr-with-links.yaml",
+		expectedExpanded:  "testing/expected-expanded/existing-application-cr-with-links.yaml",
+		labels:            labels,
+		annotations:       annotations,
+		namespace:         namespace,
+		exposePort:        0,
+		applicationLinks: []applicationsv1beta1.Link{
+			{
+				Description: "My description 1",
+				URL:         "https://foo.com/bar",
+			},
+			{
+				Description: "My description 2",
+				URL:         "https://asdf.com",
+			},
+		},
 	}}
 
 	for _, tc := range tests {
@@ -245,8 +336,8 @@ func TestPrepare(t *testing.T) {
 			defer os.RemoveAll(expandedDir)
 
 			d := Deployer{Clients: &services.Clients{OS: oss, Remote: &remote}}
-			if err := d.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, tc.exposePort, tc.recursive); err != nil {
-				t.Fatalf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %s, %v, %v) = %v; want <nil>", tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, tc.recursive, err)
+			if err := d.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, tc.exposePort, tc.recursive, tc.createApplicationCR, tc.applicationLinks); err != nil {
+				t.Fatalf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %s, %v, %v, %t, %v) = %v; want <nil>", tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, tc.recursive, tc.createApplicationCR, tc.applicationLinks, err)
 			}
 
 			err = compareFiles(tc.expectedExpanded, expandedDir)
@@ -275,17 +366,19 @@ func TestPrepareErrors(t *testing.T) {
 	tests := []struct {
 		name string
 
-		image        name.Reference
-		appName      string
-		appVersion   string
-		config       string
-		extraDirs    string
-		suggestedDir string
-		namespace    string
-		labels       map[string]string
-		annotations  map[string]string
-		remote       services.RemoteService
-		recursive    bool
+		image               name.Reference
+		appName             string
+		appVersion          string
+		config              string
+		extraDirs           string
+		suggestedDir        string
+		namespace           string
+		labels              map[string]string
+		annotations         map[string]string
+		remote              services.RemoteService
+		recursive           bool
+		createApplicationCR bool
+		applicationLinks    []applicationsv1beta1.Link
 
 		want string
 	}{{
@@ -416,8 +509,8 @@ func TestPrepareErrors(t *testing.T) {
 			d := Deployer{Clients: &services.Clients{OS: oss, Remote: remote}}
 
 			var prepareErr error
-			if prepareErr = d.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, 0, tc.recursive); prepareErr == nil {
-				t.Fatalf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %s, %v, %v) = <nil>; want error", tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, tc.recursive)
+			if prepareErr = d.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, 0, tc.recursive, tc.createApplicationCR, tc.applicationLinks); prepareErr == nil {
+				t.Fatalf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %s, %v, %v, %t, %v) = <nil>; want error", tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, tc.recursive, tc.createApplicationCR, tc.applicationLinks)
 			}
 
 			if tc.want == "" {
@@ -1024,22 +1117,22 @@ func newImageWithTag(t *testing.T, image string) name.Reference {
 func compareFiles(expectedFile, actualDirectory string) error {
 	actualFiles, err := ioutil.ReadDir(actualDirectory)
 	if err != nil {
-		return fmt.Errorf("Failed to read directory: %v", actualDirectory)
+		return fmt.Errorf("failed to read directory: %v", actualDirectory)
 	}
 
 	if len(actualFiles) != 1 {
-		return fmt.Errorf("Incorrect number of k8s files created in %s: %v", actualDirectory, len(actualFiles))
+		return fmt.Errorf("incorrect number of k8s files created in %s: %v", actualDirectory, len(actualFiles))
 	}
 
 	path := filepath.Join(actualDirectory, actualFiles[0].Name())
 	actualContents, err := ioutil.ReadFile(path)
 	if err != nil {
-		return fmt.Errorf("Failed to read actual output file: %v", path)
+		return fmt.Errorf("failed to read actual output file: %v", path)
 	}
 
 	expectedContents, err := ioutil.ReadFile(expectedFile)
 	if err != nil {
-		return fmt.Errorf("Failed to read expected file: %v", expectedFile)
+		return fmt.Errorf("failed to read expected file: %v", expectedFile)
 	}
 
 	if diff := cmp.Diff(expectedContents, actualContents); diff != "" {

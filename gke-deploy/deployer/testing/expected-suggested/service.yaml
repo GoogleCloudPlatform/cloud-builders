@@ -3,6 +3,7 @@ kind: Service
 metadata:
   labels:
     app: test-app
+    app.kubernetes.io/name: my-app
   name: test-app
 spec:
   ports:

@@ -35,7 +35,7 @@ metadata:
     app.kubernetes.io/managed-by: gcp-cloud-build-deploy
     app.kubernetes.io/name: my-app
     app.kubernetes.io/version: b2e43cb
-  name: my-image-service
+  name: my-app-service
   namespace: default
 spec:
   ports:
@@ -43,5 +43,5 @@ spec:
     protocol: TCP
     targetPort: 80
   selector:
-    app: my-image
+    app.kubernetes.io/name: my-app
   type: LoadBalancer

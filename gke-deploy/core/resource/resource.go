@@ -348,7 +348,7 @@ func HasObject(ctx context.Context, objs Objects, kind, name string) (bool, erro
 func CreateDeploymentObject(ctx context.Context, name string, selectorValue, image string) (*Object, error) {
 	obj, err := DecodeFromYAML(ctx, []byte(fmt.Sprintf(deploymentTemplate, name, "app", selectorValue, "app", selectorValue, name, image)))
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode Deployment object from template")
+		return nil, fmt.Errorf("failed to decode Deployment object from template: %v", err)
 	}
 	return obj, nil
 }
@@ -359,7 +359,7 @@ func CreateDeploymentObject(ctx context.Context, name string, selectorValue, ima
 func CreateHorizontalPodAutoscalerObject(ctx context.Context, name, deploymentName string) (*Object, error) {
 	obj, err := DecodeFromYAML(ctx, []byte(fmt.Sprintf(horizontalPodAutoscalerTemplate, name, deploymentName)))
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode HorizontalPodAutoscaler object from template")
+		return nil, fmt.Errorf("failed to decode HorizontalPodAutoscaler object from template: %v", err)
 	}
 	return obj, nil
 }
@@ -371,7 +371,7 @@ func CreateNamespaceObject(ctx context.Context, name string) (*Object, error) {
 	}
 	obj, err := DecodeFromYAML(ctx, []byte(fmt.Sprintf(namespaceTemplate, name)))
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode Namespace object from template")
+		return nil, fmt.Errorf("failed to decode Namespace object from template: %v", err)
 	}
 	return obj, nil
 }

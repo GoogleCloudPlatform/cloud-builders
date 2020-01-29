@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/google/go-containerregistry/pkg/name"
+	applicationsv1beta1 "github.com/kubernetes-sigs/application/pkg/apis/app/v1beta1"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/cluster"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/gcp"
@@ -46,7 +47,7 @@ type Deployer struct {
 }
 
 // Prepare handles preparing deployment.
-func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appVersion, config, suggestedOutput, expandedOutput, namespace string, labels, annotations map[string]string, exposePort int, recursive bool) error {
+func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appVersion, config, suggestedOutput, expandedOutput, namespace string, labels, annotations map[string]string, exposePort int, recursive, createApplicationCR bool, applicationLinks []applicationsv1beta1.Link) error {
 	fmt.Printf("Preparing deployment.\n")
 
 	var objs resource.Objects
@@ -89,15 +90,22 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 			objs = append(objs, hpaObj)
 		}
 
+		// Remove tag/digest from image references.
+		if err := resource.UpdateMatchingContainerImage(ctx, objs, imageName, imageName); err != nil {
+			return fmt.Errorf("failed to update container of objects: %v", err)
+		}
+	}
+
+	if appName != "" {
 		if exposePort > 0 {
-			service := fmt.Sprintf("%s-service", imageNameSuffix)
+			service := fmt.Sprintf("%s-service", appName)
 			ok, err := resource.HasObject(ctx, objs, "Service", service)
 			if err != nil {
 				return fmt.Errorf("failed to check if Service %q exists: %v", service, err)
 			}
 			if !ok {
 				fmt.Printf("Creating suggested Service configuration file %q\n", service)
-				svcObj, err := resource.CreateServiceObject(ctx, service, "app", imageNameSuffix, exposePort)
+				svcObj, err := resource.CreateServiceObject(ctx, service, appNameLabelKey, appName, exposePort)
 				if err != nil {
 					return fmt.Errorf("failed to create Service object: %v", err)
 				}
@@ -107,9 +115,21 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 			}
 		}
 
-		// Remove tag/digest from image references.
-		if err := resource.UpdateMatchingContainerImage(ctx, objs, imageName, imageName); err != nil {
-			return fmt.Errorf("failed to update container of objects: %v", err)
+		if createApplicationCR {
+			ok, err := resource.HasObject(ctx, objs, "Application", appName)
+			if err != nil {
+				return fmt.Errorf("failed to check if Application %q exists: %v", appName, err)
+			}
+			if !ok {
+				fmt.Printf("Creating suggested Application configuration file %q\n", appName)
+				appObj, err := resource.CreateApplicationObject(appName, appNameLabelKey, appName, appName, appVersion, objs)
+				if err != nil {
+					return fmt.Errorf("failed to create Application object: %v", err)
+				}
+				objs = append(objs, appObj)
+			} else {
+				fmt.Fprintf(os.Stderr, "\nWARNING: Application %q already exists in provided configuration files. Not generating new Application.\n\n", appName)
+			}
 		}
 	}
 
@@ -125,6 +145,16 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 				return fmt.Errorf("failed to create Namespace object: %v", err)
 			}
 			objs = append(objs, nsObj)
+		}
+	}
+
+	for _, obj := range objs {
+		if resource.ObjectKind(obj) != "Namespace" {
+			if appName != "" {
+				if err := resource.AddLabel(ctx, obj, appNameLabelKey, appName, false); err != nil {
+					return fmt.Errorf("failed to add %s=%s label to object %v: %v", appNameLabelKey, appName, obj, err)
+				}
+			}
 		}
 	}
 
@@ -170,11 +200,6 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 
 	for _, obj := range objs {
 		if resource.ObjectKind(obj) != "Namespace" {
-			if appName != "" {
-				if err := resource.AddLabel(ctx, obj, appNameLabelKey, appName, false); err != nil {
-					return fmt.Errorf("failed to add %s=%s label to object %v: %v", appNameLabelKey, appName, obj, err)
-				}
-			}
 			if appVersion != "" {
 				if err := resource.AddLabel(ctx, obj, appVersionLabelKey, appVersion, false); err != nil {
 					return fmt.Errorf("failed to add %s=%s label to object %v: %v", appVersionLabelKey, appVersion, obj, err)
@@ -205,6 +230,12 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 		for k, v := range annotations {
 			if err := resource.AddAnnotation(obj, k, v); err != nil {
 				return fmt.Errorf("failed to add %s=%s custom annotation to object %v: %v", k, v, obj, err)
+			}
+		}
+
+		if resource.ObjectKind(obj) == "Application" {
+			if err := resource.SetApplicationLinks(obj, applicationLinks); err != nil {
+				return fmt.Errorf("failed to add links to Application: %v", err)
 			}
 		}
 	}

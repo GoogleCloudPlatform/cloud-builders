@@ -22,7 +22,38 @@ import (
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/deployer"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
+	applicationsv1beta1 "github.com/kubernetes-sigs/application/pkg/apis/app/v1beta1"
 )
+
+// CreateApplicationLinksListFromEqualDelimitedStrings creates a []applicationsv1beta1.Link from a slice
+// of "="-delimited strings, where the key is set as Description and the value is set as URL.
+func CreateApplicationLinksListFromEqualDelimitedStrings(applicationLinks []string) ([]applicationsv1beta1.Link, error) {
+	var asList []applicationsv1beta1.Link
+	for _, keyValue := range applicationLinks {
+		p := strings.TrimSpace(keyValue)
+		p = strings.Trim(p, ",")
+		if p == "" {
+			continue
+		}
+		kv := strings.Split(p, "=")
+		if len(kv) != 2 {
+			return nil, fmt.Errorf("invalid key value pair: %q", p)
+		}
+		k := strings.TrimSpace(kv[0])
+		if k == "" {
+			return nil, fmt.Errorf("key must not be empty string")
+		}
+		v := strings.TrimSpace(kv[1])
+		if v == "" {
+			return nil, fmt.Errorf("value must not be empty string")
+		}
+		asList = append(asList, applicationsv1beta1.Link{
+			Description: k,
+			URL:         v,
+		})
+	}
+	return asList, nil
+}
 
 // CreateMapFromEqualDelimitedStrings creates a map[string]string from a slice
 // of "="-delimited strings.
