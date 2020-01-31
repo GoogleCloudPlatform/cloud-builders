@@ -54,7 +54,7 @@ deployment.
 
 ## Application CR
 
-You can deploy an 
+You can deploy an
 [Application Custom Resource](https://github.com/kubernetes-sigs/application)
 for your application:
 
