@@ -1476,7 +1476,7 @@ default                  DaemonSet                test-app-daemonset            
 foobar                   Deployment               test-app                          Yes      
 default                  Namespace                foobar                            Yes      
 test-local-deploy-all    ReplicationController    test-app-replicationcontroller    Yes      
-foobar                   Service                  test-app                          Yes      34.74.85.152
+foobar                   Service                  test-app                          Yes      http://34.74.85.152
 foobar                   Service                  test-app-service-externalname     Yes      test-app.example.com
 default                  StatefulSet              test-app-statefulset              No       
 `,
