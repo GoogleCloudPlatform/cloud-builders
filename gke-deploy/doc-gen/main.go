@@ -1,4 +1,4 @@
-/ doc-gen generates gke-deploy's help docs.
+// doc-gen generates gke-deploy's help docs.
 package main
 
 import (
