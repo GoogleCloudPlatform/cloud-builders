@@ -14,6 +14,8 @@ type TestOS struct {
 	ReadFileResponse  map[string]ReadFileResponse
 	WriteFileResponse map[string]error
 	MkdirAllResponse  map[string]error
+	RemoveAllResponse map[string]error
+	TempDirResponse   map[string]TempDirResponse
 }
 
 // StatResponse represents a response tuple for a Stat function call.
@@ -31,6 +33,12 @@ type ReadDirResponse struct {
 // ReadDirResponse represents a response tuple for a ReadFile function call.
 type ReadFileResponse struct {
 	Res []byte
+	Err error
+}
+
+// TempDirResponse represents a response tuple for a TempDir function call.
+type TempDirResponse struct {
+	Dir string
 	Err error
 }
 
@@ -77,6 +85,24 @@ func (o *TestOS) MkdirAll(ctx context.Context, dirname string, perm os.FileMode)
 		panic(fmt.Sprintf("MkdirAllResponse has no response for dirname %q", dirname))
 	}
 	return err
+}
+
+// RemoveAll removes path and any children it contains.
+func (o *TestOS) RemoveAll(ctx context.Context, path string) error {
+	err, ok := o.RemoveAllResponse[path]
+	if !ok {
+		panic(fmt.Sprintf("RemoveAllResponse has no response for path %q", path))
+	}
+	return err
+}
+
+// TempDir creates a new temporary directory in the directory dir.
+func (o *TestOS) TempDir(ctx context.Context, dir, pattern string) (string, error) {
+	resp, ok := o.TempDirResponse[dir+pattern]
+	if !ok {
+		panic(fmt.Sprintf("TempDirResponse has no response for  dir + pattern %q", dir+pattern))
+	}
+	return resp.Dir, resp.Err
 }
 
 // TestFileInfo implements the os.FileInfo interface.

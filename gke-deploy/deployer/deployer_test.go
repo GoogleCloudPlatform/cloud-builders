@@ -2,8 +2,11 @@ package deployer
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,6 +21,20 @@ import (
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/testservices"
 )
+
+const (
+	singleGcsFile      = "gs://bucket/multi-resource.yaml"
+	gcsDirectory       = "gs://bucket/directory/*"
+	gcsNestedDir       = "gs://bucket/nested-directory"
+	dirWithoutWildcard = "gs://bucket/directory"
+	//gcsBucket          = "gs://bucket"
+	gcsOutputBucket = "gs://out"
+	expandedFile    = "gs://out/expanded-resources.yaml"
+	suggestedFile   = "gs://out/suggested-resources.yaml"
+	//testConfig         = "testing/configs/multi-resource.yaml"
+)
+
+var testOutputDir string
 
 func TestPrepare(t *testing.T) {
 	ctx := context.Background()
@@ -285,25 +302,64 @@ func TestPrepare(t *testing.T) {
 				URL:         "https://asdf.com",
 			},
 		},
+	}, {
+		name:              "Single config file in GCS",
+		image:             image,
+		appName:           appName,
+		appVersion:        appVersion,
+		config:            singleGcsFile,
+		expectedSuggested: "testing/expected-suggested/multi-resource.yaml",
+		expectedExpanded:  "testing/expected-expanded/multi-resource.yaml",
+		labels:            labels,
+		annotations:       annotations,
+		namespace:         namespace,
+		exposePort:        0,
+	}, {
+		name:              "Config files in a GCS directory",
+		image:             image,
+		appName:           appName,
+		appVersion:        appVersion,
+		config:            gcsDirectory,
+		expectedSuggested: "testing/expected-suggested/directory.yaml",
+		expectedExpanded:  "testing/expected-expanded/directory.yaml",
+		labels:            labels,
+		annotations:       annotations,
+		namespace:         namespace,
+		exposePort:        0,
+	}, {
+		name:              "Config files in a nested GCS directory",
+		image:             image,
+		appName:           appName,
+		appVersion:        appVersion,
+		config:            gcsNestedDir,
+		expectedSuggested: "testing/expected-suggested/nested-directory.yaml",
+		expectedExpanded:  "testing/expected-expanded/nested-directory.yaml",
+		labels:            labels,
+		annotations:       annotations,
+		namespace:         namespace,
+		exposePort:        0,
+		recursive:         true,
 	}}
+
+	gcs := buildTestGcsService(t)
+	remote := testservices.TestRemote{
+		ImageResp: &testservices.TestImage{
+			Hash: v1.Hash{
+				Algorithm: "sha256",
+				Hex:       "foobar",
+			},
+			Err: nil,
+		},
+		ImageErr: nil,
+	}
+	oss, err := services.NewOS(ctx)
+	if err != nil {
+		t.Fatalf("Failed to create os: %v", err)
+	}
+	d := Deployer{Clients: &services.Clients{OS: oss, Remote: &remote, GCS: gcs}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			oss, err := services.NewOS(ctx)
-			if err != nil {
-				t.Fatalf("Failed to create os: %v", err)
-			}
-
-			remote := testservices.TestRemote{
-				ImageResp: &testservices.TestImage{
-					Hash: v1.Hash{
-						Algorithm: "sha256",
-						Hex:       "foobar",
-					},
-					Err: nil,
-				},
-				ImageErr: nil,
-			}
 
 			dir, err := ioutil.TempDir("/tmp", "gke-deploy_deploy_test")
 			if err != nil {
@@ -323,7 +379,6 @@ func TestPrepare(t *testing.T) {
 			}
 			defer os.RemoveAll(expandedDir)
 
-			d := Deployer{Clients: &services.Clients{OS: oss, Remote: &remote}}
 			if err := d.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, tc.exposePort, tc.recursive, tc.createApplicationCR, tc.applicationLinks); err != nil {
 				t.Fatalf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %s, %v, %v, %t, %v) = %v; want <nil>", tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, tc.recursive, tc.createApplicationCR, tc.applicationLinks, err)
 			}
@@ -339,6 +394,55 @@ func TestPrepare(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("Output to GCS", func(t *testing.T) {
+
+		testOutputDir, err = ioutil.TempDir("", "gke-deploy_deploy_test_output")
+		config := "testing/configs/multi-resource.yaml"
+
+		if err != nil {
+			t.Fatalf("Failed to create tmp directory: %v", err)
+		}
+		defer os.RemoveAll(testOutputDir)
+
+		if err := d.Prepare(ctx, image, appName, appVersion, config, gcsOutputBucket, gcsOutputBucket, namespace, labels, annotations, 0, false, false, nil); err != nil {
+			t.Fatalf("Prepare(ctx, %v, %s, %s, %s, %s, %s, %s, %s, %v, %v, %t, %v) = %v; want <nil>", image, appName, appVersion, config, gcsOutputBucket, gcsOutputBucket, namespace, labels, annotations, false, false, nil, err)
+		}
+
+		suggestedDir, err := ioutil.TempDir("/tmp", "gke-deploy_deploy_test_suggested")
+		if err != nil {
+			t.Fatalf("Failed to create tmp directory: %v", err)
+		}
+		defer os.RemoveAll(suggestedDir)
+		err = gcs.Copy(ctx, suggestedFile, suggestedDir, false)
+		if err != nil {
+			t.Fatalf("Failed to create tmp directory: %v", err)
+		}
+
+		expandedDir, err := ioutil.TempDir("/tmp", "gke-deploy_deploy_test_expected")
+		if err != nil {
+			t.Fatalf("Failed to create tmp directory: %v", err)
+		}
+		defer os.RemoveAll(expandedDir)
+		err = gcs.Copy(ctx, expandedFile, expandedDir, false)
+		if err != nil {
+			t.Fatalf("Failed to create tmp directory: %v", err)
+		}
+
+		expectedSuggested := "testing/expected-suggested/multi-resource.yaml"
+		err = compareFiles(expectedSuggested, suggestedDir)
+		if err != nil {
+			t.Fatalf("Failure with suggested file generation: %v", err)
+		}
+
+		expectedExpanded := "testing/expected-expanded/multi-resource.yaml"
+		err = compareFiles(expectedExpanded, expandedDir)
+		if err != nil {
+			t.Fatalf("Failure with expanded file generation: %v", err)
+		}
+
+	})
+
 }
 
 func TestPrepareErrors(t *testing.T) {
@@ -448,6 +552,16 @@ func TestPrepareErrors(t *testing.T) {
 		annotations: annotations,
 		namespace:   namespace,
 		want:        "app.kubernetes.io/managed-by label cannot be explicitly set",
+	}, {
+		name:        "GCS path is a directory but recursive flag is false",
+		image:       image,
+		appName:     appName,
+		appVersion:  appVersion,
+		config:      dirWithoutWildcard,
+		labels:      labels,
+		annotations: annotations,
+		namespace:   namespace,
+		want:        "failed to download configuration files",
 	}}
 
 	for _, tc := range tests {
@@ -494,7 +608,8 @@ func TestPrepareErrors(t *testing.T) {
 			}
 			defer os.RemoveAll(expandedDir)
 
-			d := Deployer{Clients: &services.Clients{OS: oss, Remote: remote}}
+			gcs := buildTestGcsService(t)
+			d := Deployer{Clients: &services.Clients{OS: oss, Remote: remote, GCS: gcs}}
 
 			var prepareErr error
 			if prepareErr = d.Prepare(ctx, tc.image, tc.appName, tc.appVersion, tc.config, suggestedDir, expandedDir, tc.namespace, tc.labels, tc.annotations, 0, tc.recursive, tc.createApplicationCR, tc.applicationLinks); prepareErr == nil {
@@ -530,6 +645,8 @@ func TestApply(t *testing.T) {
 	namespace := "default"
 	waitTimeout := 10 * time.Second
 
+	gcs, _ := services.NewGsutil(ctx, true)
+
 	tests := []struct {
 		name string
 
@@ -541,6 +658,7 @@ func TestApply(t *testing.T) {
 		waitTimeout     time.Duration
 		gcloud          services.GcloudService
 		kubectl         testservices.TestKubectl
+		gcs             services.GcsService
 		recursive       bool
 	}{{
 		name: "Config is directory",
@@ -877,6 +995,134 @@ func TestApply(t *testing.T) {
 		gcloud: &testservices.TestGcloud{
 			ContainerClustersGetCredentialsErr: nil,
 		},
+	}, {
+		name: "Config files in a GCS directory ",
+
+		clusterName:     clusterName,
+		clusterLocation: clusterLocation,
+		config:          gcsDirectory,
+		namespace:       namespace,
+		waitTimeout:     waitTimeout,
+
+		gcloud: &testservices.TestGcloud{
+			ContainerClustersGetCredentialsErr: nil,
+		},
+		kubectl: testservices.TestKubectl{
+			ApplyFromStringResponse: map[string][]error{
+				string(fileContents(t, "testing/deployment-2.yaml")): {nil},
+				string(fileContents(t, testDeploymentFile)):          {nil},
+				string(fileContents(t, testServiceFile)):             {nil, nil},
+			},
+			GetResponse: map[string]map[string][]testservices.GetResponse{
+				"Deployment": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testDeploymentReadyFile)),
+							Err: nil,
+						},
+					},
+					"test-app-2": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testDeployment2ReadyFile)),
+							Err: nil,
+						},
+					},
+				},
+				"Service": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testServiceReadyFile)),
+							Err: nil,
+						}, {
+							Res: string(fileContents(t, testServiceReadyFile)),
+							Err: nil,
+						},
+					},
+				},
+			},
+		},
+		gcs: gcs,
+	}, {
+		name: "Config files in a nested GCS directory",
+
+		clusterName:     clusterName,
+		clusterLocation: clusterLocation,
+		config:          gcsNestedDir,
+		namespace:       namespace,
+		waitTimeout:     waitTimeout,
+		recursive:       true,
+
+		gcloud: &testservices.TestGcloud{
+			ContainerClustersGetCredentialsErr: nil,
+		},
+		kubectl: testservices.TestKubectl{
+			ApplyFromStringResponse: map[string][]error{
+				string(fileContents(t, testDeploymentFile)): {nil, nil},
+				string(fileContents(t, testServiceFile)):    {nil, nil},
+			},
+			GetResponse: map[string]map[string][]testservices.GetResponse{
+				"Deployment": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testDeploymentReadyFile)),
+							Err: nil,
+						}, {
+							Res: string(fileContents(t, testDeploymentReadyFile)),
+							Err: nil,
+						},
+					},
+				},
+				"Service": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testServiceReadyFile)),
+							Err: nil,
+						}, {
+							Res: string(fileContents(t, testServiceReadyFile)),
+							Err: nil,
+						},
+					},
+				},
+			},
+		},
+		gcs: gcs,
+	}, {
+		name: "Single config file in GCS",
+
+		clusterName:     clusterName,
+		clusterLocation: clusterLocation,
+		config:          singleGcsFile,
+		namespace:       namespace,
+		waitTimeout:     waitTimeout,
+
+		gcloud: &testservices.TestGcloud{
+			ContainerClustersGetCredentialsErr: nil,
+		},
+		kubectl: testservices.TestKubectl{
+			ApplyFromStringResponse: map[string][]error{
+				string(fileContents(t, testDeploymentFile)): {nil},
+				string(fileContents(t, testServiceFile)):    {nil},
+			},
+			GetResponse: map[string]map[string][]testservices.GetResponse{
+				"Deployment": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testDeploymentReadyFile)),
+							Err: nil,
+						},
+					},
+				},
+				"Service": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testServiceReadyFile)),
+							Err: nil,
+						},
+					},
+				},
+			},
+		},
+		gcs: gcs,
 	}}
 
 	for _, tc := range tests {
@@ -886,6 +1132,7 @@ func TestApply(t *testing.T) {
 					Kubectl: &tc.kubectl,
 					Gcloud:  tc.gcloud,
 					OS:      &services.OS{},
+					GCS:     tc.gcs,
 				},
 			}
 
@@ -922,6 +1169,8 @@ func TestApplyErrors(t *testing.T) {
 	clusterProject := "my-project"
 	configDir := "path/to/config"
 
+	gcs, _ := services.NewGsutil(ctx, true)
+
 	tests := []struct {
 		name string
 
@@ -932,6 +1181,7 @@ func TestApplyErrors(t *testing.T) {
 		waitTimeout     time.Duration
 		gcloud          services.GcloudService
 		kubectl         testservices.TestKubectl
+		gcs             services.GcsService
 		recursive       bool
 
 		want string
@@ -1049,6 +1299,15 @@ func TestApplyErrors(t *testing.T) {
 			ContainerClustersGetCredentialsErr: nil,
 		},
 		want: "clusterName and clusterLocation either must both be provided, or neither should be provided",
+	}, {
+		name:            "GCS path is a directory but recursive flag is false",
+		clusterName:     clusterName,
+		clusterLocation: clusterLocation,
+		config:          dirWithoutWildcard,
+		namespace:       namespace,
+		waitTimeout:     waitTimeout,
+		want:            "failed to download configuration files",
+		gcs:             gcs,
 	}}
 
 	for _, tc := range tests {
@@ -1058,6 +1317,7 @@ func TestApplyErrors(t *testing.T) {
 					Kubectl: &tc.kubectl,
 					Gcloud:  tc.gcloud,
 					OS:      &services.OS{},
+					GCS:     tc.gcs,
 				},
 			}
 
@@ -1127,4 +1387,63 @@ func compareFiles(expectedFile, actualDirectory string) error {
 		return fmt.Errorf("produced diff on files (-want +got):\n%s", diff)
 	}
 	return nil
+}
+
+func buildTestGcsService(t *testing.T) *testservices.TestGcsService {
+	t.Helper()
+
+	gsutil, err := services.NewGsutil(context.Background(), false)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &testservices.TestGcsService{CopyResponse: map[string]func(src, dst string, recursive bool) error{
+		singleGcsFile: func(src, dst string, recursive bool) error {
+			return gsutil.Copy(context.Background(), "testing/configs/multi-resource.yaml", dst, recursive)
+		},
+		gcsDirectory: func(src, dst string, recursive bool) error {
+			return gsutil.Copy(context.Background(), "testing/configs/directory/*", dst, recursive)
+		},
+		gcsNestedDir: func(src, dst string, recursive bool) error {
+			return gsutil.Copy(context.Background(), "testing/configs/nested-directory", dst, recursive)
+		},
+		dirWithoutWildcard: func(src, dst string, recursive bool) error {
+
+			return errors.New("failed to download configuration files")
+		},
+		expandedFile: func(src, dst string, recursive bool) error {
+			if strings.HasPrefix(src, gcsOutputBucket) {
+				return gsutil.Copy(context.Background(), strings.Join([]string{testOutputDir, "expanded-resources.yaml"}, "/"), dst, recursive)
+			}
+			return gsutil.Copy(context.Background(), src, strings.Join([]string{testOutputDir, "expanded-resources.yaml"}, "/"), recursive)
+		},
+		suggestedFile: func(src, dst string, recursive bool) error {
+			if strings.HasPrefix(src, gcsOutputBucket) {
+				return gsutil.Copy(context.Background(), strings.Join([]string{testOutputDir, "suggested-resources.yaml"}, "/"), dst, recursive)
+			}
+			return gsutil.Copy(context.Background(), src, strings.Join([]string{testOutputDir, "suggested-resources.yaml"}, "/"), recursive)
+
+		},
+	},
+	}
+
+}
+
+func copyFile(src, dst, name string) {
+	from, err := os.Open(src)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer from.Close()
+
+	to, err := os.OpenFile(strings.Join([]string{dst, name}, "/"), os.O_RDWR|os.O_CREATE, 0777)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer to.Close()
+
+	_, err = io.Copy(to, from)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

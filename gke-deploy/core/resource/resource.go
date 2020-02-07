@@ -148,28 +148,28 @@ func ParseConfigs(ctx context.Context, configs string, oss services.OSService, r
 // If any lines in a resource object's string representation contain a key in
 // lineComments, the corresponding value will be added as a comment at the end of
 // the line.
-func SaveAsConfigs(ctx context.Context, objs Objects, outputDir string, lineComments map[string]string, oss services.OSService) error {
+func SaveAsConfigs(ctx context.Context, objs Objects, outputDir string, lineComments map[string]string, oss services.OSService) (string, error) {
 	fi, err := oss.Stat(ctx, outputDir)
 	if err != nil && !os.IsNotExist(err) {
-		return fmt.Errorf("failed to get file info for output directory %q: %v", outputDir, err)
+		return "", fmt.Errorf("failed to get file info for output directory %q: %v", outputDir, err)
 	}
 
 	if err == nil && !fi.IsDir() {
-		return fmt.Errorf("output directory %q exists as a file", outputDir)
+		return "", fmt.Errorf("output directory %q exists as a file", outputDir)
 	}
 
 	if err == nil && fi.IsDir() {
 		files, err := oss.ReadDir(ctx, outputDir)
 		if err != nil {
-			return fmt.Errorf("failed to list files in output directory %q: %v", outputDir, err)
+			return "", fmt.Errorf("failed to list files in output directory %q: %v", outputDir, err)
 		}
 		if len(files) != 0 {
-			return fmt.Errorf("output directory %q exists and is not empty", outputDir)
+			return "", fmt.Errorf("output directory %q exists and is not empty", outputDir)
 		}
 	}
 
 	if err := oss.MkdirAll(ctx, outputDir, os.ModePerm); err != nil {
-		return fmt.Errorf("failed to create output directory %q: %v", outputDir, err)
+		return "", fmt.Errorf("failed to create output directory %q: %v", outputDir, err)
 	}
 
 	filename := filepath.Join(outputDir, AggregatedFilename)
@@ -179,12 +179,12 @@ func SaveAsConfigs(ctx context.Context, objs Objects, outputDir string, lineComm
 	for _, obj := range objs {
 		out, err := runtime.Encode(encoder, obj)
 		if err != nil {
-			return fmt.Errorf("failed to encode resource: %v", err)
+			return "", fmt.Errorf("failed to encode resource: %v", err)
 		}
 
 		outWithComments, err := addCommentsToLines(string(out), lineComments)
 		if err != nil {
-			return fmt.Errorf("failed to add comment to object file: %v", err)
+			return "", fmt.Errorf("failed to add comment to object file: %v", err)
 		}
 
 		resources = append(resources, outWithComments)
@@ -192,9 +192,9 @@ func SaveAsConfigs(ctx context.Context, objs Objects, outputDir string, lineComm
 
 	contents := strings.Join(resources, "\n\n---\n\n")
 	if err := oss.WriteFile(ctx, filename, []byte(contents), 0644); err != nil {
-		return fmt.Errorf("failed to write file %q: %v", filename, err)
+		return "", fmt.Errorf("failed to write file %q: %v", filename, err)
 	}
-	return nil
+	return filename, nil
 }
 
 // addCommentsToLines iterates through the lines of a string ('-n'-delimited)
