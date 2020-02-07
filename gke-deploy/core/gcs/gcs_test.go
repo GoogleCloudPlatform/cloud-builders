@@ -40,37 +40,6 @@ const (
 	errBucketNotFound = "error is NotFoundException: 404 The destination bucket does not exist"
 )
 
-//type testGCSResponse struct {
-//	err   string
-//	sleep time.Duration
-//}
-//
-//func (r *testGCSResponse) Error() error {
-//	time.Sleep(r.sleep)
-//	if r.err == "" {
-//		return nil
-//	}
-//	return errors.New(r.err)
-//}
-//
-//func buildTestGCS(t *testing.T) *GCS {
-//	t.Helper()
-//
-//	s := &testservices.TestGcsService{CopyResponse: map[string]testservices.GCSResponse{
-//		singleFile:           &testGCSResponse{},
-//		directory:            &testGCSResponse{},
-//		nestedDir:            &testGCSResponse{},
-//		slowReadFile:         &testGCSResponse{sleep: 3 * time.Second},
-//		errorFile:            &testGCSResponse{err: errMsg},
-//		accessDeniedFile:     &testGCSResponse{err: errDenied},
-//		notFoundFile:         &testGCSResponse{err: errFileNotFound},
-//		expandedK8sConfig:    &testGCSResponse{},
-//		slowUploadConfig:     &testGCSResponse{sleep: 3 * time.Second},
-//		accessDeniedConfig:   &testGCSResponse{err: errDenied},
-//		bucketNotFoundConfig: &testGCSResponse{err: errBucketNotFound},
-//	},
-//	}
-
 func buildTestGCS(t *testing.T) *GCS {
 	t.Helper()
 
