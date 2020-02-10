@@ -18,10 +18,10 @@ var (
 )
 
 type GCS struct {
-	Timeout    time.Duration
-	Retries    int
-	Delay      time.Duration
-	GcsService services.GcsService
+	timeout    time.Duration
+	retries    int
+	delay      time.Duration
+	gcsService services.GcsService
 }
 
 // Download copies file(s) from GCS. <dst> should be a directory, not a path to a file
@@ -41,13 +41,13 @@ func (s *GCS) Upload(ctx context.Context, src, dst string) error {
 // with appropriate retry backoff.
 func (s *GCS) copyWithRetry(ctx context.Context, src, dst string, recursive bool) error {
 	var err error
-	delay := s.Delay
-	for retryNum := 0; retryNum <= s.Retries; retryNum++ {
+	delay := s.delay
+	for retryNum := 0; retryNum <= s.retries; retryNum++ {
 		if retryNum > 0 {
 			time.Sleep(delay)
 			delay *= 2
 		}
-		timeout := s.timeout()
+		timeout := s.getTimeout()
 		e := s.copyWithTimeout(ctx, src, dst, recursive, timeout)
 		if e != nil {
 			err = e
@@ -65,7 +65,7 @@ func (s *GCS) copyWithRetry(ctx context.Context, src, dst string, recursive bool
 func (s *GCS) copyWithTimeout(ctx context.Context, src, dst string, recursive bool, timeout time.Duration) error {
 	status := make(chan error, 1)
 	go func() {
-		status <- s.GcsService.Copy(ctx, src, dst, recursive)
+		status <- s.gcsService.Copy(ctx, src, dst, recursive)
 	}()
 
 	select {
@@ -83,9 +83,9 @@ func (s *GCS) copyWithTimeout(ctx context.Context, src, dst string, recursive bo
 }
 
 //timeout returns the GCS timeout that will be used to call GcsService.
-func (s *GCS) timeout() time.Duration {
-	if int64(s.Timeout) == 0 {
+func (s *GCS) getTimeout() time.Duration {
+	if int64(s.timeout) == 0 {
 		return defaultTimeout
 	}
-	return s.Timeout
+	return s.timeout
 }

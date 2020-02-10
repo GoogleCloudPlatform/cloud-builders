@@ -76,10 +76,10 @@ func buildTestGCS(t *testing.T) *GCS {
 	}
 
 	return &GCS{
-		Timeout:    timeoutGCS,
-		Retries:    retries,
-		Delay:      delay,
-		GcsService: s,
+		timeout:    timeoutGCS,
+		retries:    retries,
+		delay:      delay,
+		gcsService: s,
 	}
 
 }
