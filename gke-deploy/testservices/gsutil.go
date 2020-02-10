@@ -5,11 +5,6 @@ import (
 	"fmt"
 )
 
-// GCSResponse simulates errors while calling GcsService.
-//type GCSResponse interface {
-//	Error() error
-//}
-
 type TestGcsService struct {
 	CopyResponse map[string]func(src, dst string, recursive bool) error
 }
