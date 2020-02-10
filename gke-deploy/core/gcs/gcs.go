@@ -14,6 +14,7 @@ const TimeoutErr = "GCS timeout"
 
 var (
 	defaultTimeout = 1 * time.Hour
+	defaultDelay   = 2 * time.Second
 	errGCSTimeout  = errors.New(TimeoutErr)
 )
 
@@ -42,10 +43,12 @@ func (s *GCS) Upload(ctx context.Context, src, dst string) error {
 func (s *GCS) copyWithRetry(ctx context.Context, src, dst string, recursive bool) error {
 	var err error
 	delay := s.delay
+	if int64(delay) == 0 {
+		delay = defaultDelay
+	}
 	for retryNum := 0; retryNum <= s.retries; retryNum++ {
 		if retryNum > 0 {
 			time.Sleep(delay)
-			delay *= 2
 		}
 		timeout := s.getTimeout()
 		e := s.copyWithTimeout(ctx, src, dst, recursive, timeout)
