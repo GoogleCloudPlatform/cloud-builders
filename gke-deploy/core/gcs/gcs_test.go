@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	retries    = 2
+	retries    = 3
 	dstDir     = ".workspace/"
 	timeoutGCS = 1 * time.Second
 	delay      = 1 * time.Second
@@ -20,6 +20,7 @@ const (
 	directory  = "gs://configs"
 	nestedDir  = "gs://configs/nested"
 	retryFile  = "gs://k8s_retry.yml"
+	skipRetry  = "gs://k8s_skip.yml"
 
 	slowReadFile     = "gs://project/bucket/slow_file.yaml"
 	errorFile        = "gs://project/bucket/not_existed"
@@ -41,11 +42,11 @@ const (
 	errBucketNotFound = "error is NotFoundException: 404 The destination bucket does not exist"
 )
 
-var counter int
+var counter1 int
+var counter2 int
 
 func buildTestGCS(t *testing.T) *GCS {
 	t.Helper()
-
 	s := &testservices.TestGcsService{CopyResponse: map[string]func(src, dst string, recursive bool) error{
 		singleFile: func(src, dst string, recursive bool) error { return nil },
 		directory:  func(src, dst string, recursive bool) error { return nil },
@@ -55,9 +56,17 @@ func buildTestGCS(t *testing.T) *GCS {
 			return nil
 		},
 		retryFile: func(src, dst string, recursive bool) error {
-			if counter == 0 {
-				counter++
+			if counter1 == 0 {
+				counter1++
 				return errors.New(errMsg)
+			}
+			return nil
+		},
+
+		skipRetry: func(src, dst string, recursive bool) error {
+			if counter2 <= 1 {
+				counter2++
+				return errors.New(errDenied)
 			}
 			return nil
 		},
@@ -76,10 +85,10 @@ func buildTestGCS(t *testing.T) *GCS {
 	}
 
 	return &GCS{
-		timeout:    timeoutGCS,
-		retries:    retries,
-		delay:      delay,
-		gcsService: s,
+		Timeout:    timeoutGCS,
+		Retries:    retries,
+		Delay:      delay,
+		GcsService: s,
 	}
 
 }
@@ -95,7 +104,7 @@ func TestFetch(t *testing.T) {
 		{"download single file", singleFile, dstDir, false},
 		{"download files from a directory", directory, dstDir, false},
 		{"download files from a directory with nested folders", nestedDir, dstDir, true},
-		{"error first then retry", retryFile, dstDir, false},
+		{"fail first then retry", retryFile, dstDir, false},
 	}
 
 	gcs := buildTestGCS(t)
@@ -122,6 +131,7 @@ func TestFetchErrors(t *testing.T) {
 		{"download files with failure", errorFile, dstDir, false},
 		{"download files with access denied failure", accessDeniedFile, dstDir, false},
 		{"download files with not found failure", notFoundFile, dstDir, false},
+		{"skip retry with access denied failure", skipRetry, dstDir, false},
 	}
 
 	gcs := buildTestGCS(t)
@@ -133,7 +143,7 @@ func TestFetchErrors(t *testing.T) {
 				t.Errorf("Download(ctx, %s, %s, %t) = <nil>; want error", tc.src, tc.dst, tc.recursive)
 				return
 			}
-			if tc.src == slowReadFile && err.Error() != TimeoutErr {
+			if tc.src == slowReadFile && err.Error() != timeoutErr {
 				t.Errorf("error is %t, want %q error", err, "Timout")
 			}
 			if tc.src == accessDeniedFile && !strings.Contains(err.Error(), "AccessDeniedException") {
@@ -141,6 +151,9 @@ func TestFetchErrors(t *testing.T) {
 			}
 			if tc.src == notFoundFile && !strings.Contains(err.Error(), "CommandException") {
 				t.Errorf("error is %t, want %q", err, "CommandException")
+			}
+			if tc.src == skipRetry && (!strings.Contains(err.Error(), "AccessDeniedException") || counter2 != 1) {
+				t.Errorf("error is %t, want %q", err, "AccessDeniedException")
 			}
 		})
 	}
@@ -190,7 +203,7 @@ func TestUploadErrors(t *testing.T) {
 				t.Errorf("Upload(ctx, %s, %s) = <nil>; want error", tc.src, tc.dst)
 				return
 			}
-			if tc.src == slowUploadConfig && err.Error() != TimeoutErr {
+			if tc.src == slowUploadConfig && err.Error() != timeoutErr {
 				t.Errorf("error is %t, want %q error", err, "Timout")
 			}
 			if tc.src == accessDeniedConfig && !strings.Contains(err.Error(), "AccessDeniedException") {

@@ -5,35 +5,38 @@ import (
 	"context"
 	"errors"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
 )
 
-const TimeoutErr = "GCS timeout"
+const (
+	timeoutErr = "GCS timeout"
+)
 
 var (
 	defaultTimeout = 1 * time.Hour
 	defaultDelay   = 2 * time.Second
-	errGCSTimeout  = errors.New(TimeoutErr)
+	errGCSTimeout  = errors.New(timeoutErr)
 )
 
 type GCS struct {
-	timeout    time.Duration
-	retries    int
-	delay      time.Duration
-	gcsService services.GcsService
+	Timeout    time.Duration
+	Retries    int
+	Delay      time.Duration
+	GcsService services.GcsService
 }
 
 // Download copies file(s) from GCS. <dst> should be a directory, not a path to a file
 func (s *GCS) Download(ctx context.Context, src, dst string, recursive bool) error {
-	log.Printf("Downloading file(s) from GCS. Source: %s  Destination: %s.\n", src, dst)
+	log.Printf("Downloading file(s) %s from %s.\n", src, dst)
 	return s.copyWithRetry(ctx, src, dst, recursive)
 }
 
 // Upload copies file(s) to GCS.
 func (s *GCS) Upload(ctx context.Context, src, dst string) error {
-	log.Printf("Uploading file(s) to GCS.  Source: %s  Destination: %s.\n", src, dst)
+	log.Printf("Uploading file(s) %s to %s.\n", src, dst)
 	return s.copyWithRetry(ctx, src, dst, false)
 
 }
@@ -42,18 +45,21 @@ func (s *GCS) Upload(ctx context.Context, src, dst string) error {
 // with appropriate retry backoff.
 func (s *GCS) copyWithRetry(ctx context.Context, src, dst string, recursive bool) error {
 	var err error
-	delay := s.delay
+	delay := s.Delay
 	if int64(delay) == 0 {
 		delay = defaultDelay
 	}
-	for retryNum := 0; retryNum <= s.retries; retryNum++ {
+	for retryNum := 0; retryNum <= s.Retries; retryNum++ {
 		if retryNum > 0 {
 			time.Sleep(delay)
 		}
-		timeout := s.getTimeout()
+		timeout := s.timeout()
 		e := s.copyWithTimeout(ctx, src, dst, recursive, timeout)
 		if e != nil {
 			err = e
+			if strings.Contains(err.Error(), "AccessDeniedException") {
+				return err
+			}
 			continue
 		}
 		return nil
@@ -66,29 +72,20 @@ func (s *GCS) copyWithRetry(ctx context.Context, src, dst string, recursive bool
 // copyWithTimeout calls GcsService to move the files. The call will time out if it
 // takes too long.
 func (s *GCS) copyWithTimeout(ctx context.Context, src, dst string, recursive bool, timeout time.Duration) error {
-	status := make(chan error, 1)
-	go func() {
-		status <- s.gcsService.Copy(ctx, src, dst, recursive)
-	}()
-
-	select {
-	case <-ctx.Done():
-		if ctx.Err() == context.DeadlineExceeded {
-			return errGCSTimeout
-		}
-		return ctx.Err()
-	case <-time.After(timeout):
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+	err := s.GcsService.Copy(ctx, src, dst, recursive)
+	if ctx.Err() == context.DeadlineExceeded {
 		return errGCSTimeout
-	case err := <-status:
-		return err
 	}
+	return err
 
 }
 
 //timeout returns the GCS timeout that will be used to call GcsService.
-func (s *GCS) getTimeout() time.Duration {
-	if int64(s.timeout) == 0 {
+func (s *GCS) timeout() time.Duration {
+	if int64(s.Timeout) == 0 {
 		return defaultTimeout
 	}
-	return s.timeout
+	return s.Timeout
 }
