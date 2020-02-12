@@ -46,7 +46,7 @@ func (s *GCS) Upload(ctx context.Context, src, dst string) error {
 func (s *GCS) copyWithRetry(ctx context.Context, src, dst string, recursive bool) error {
 	var err error
 	delay := s.Delay
-	if int64(delay) == 0 {
+	if delay == 0 {
 		delay = defaultDelay
 	}
 	for retryNum := 0; retryNum <= s.Retries; retryNum++ {
@@ -84,7 +84,7 @@ func (s *GCS) copyWithTimeout(ctx context.Context, src, dst string, recursive bo
 
 //timeout returns the GCS timeout that will be used to call GcsService.
 func (s *GCS) timeout() time.Duration {
-	if int64(s.Timeout) == 0 {
+	if s.Timeout == 0 {
 		return defaultTimeout
 	}
 	return s.Timeout
