@@ -1,29 +1,16 @@
 package services
 
 import (
+	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
-)
 
-func runCommand(printCommand bool, name string, args ...string) (string, error) {
-	if printCommand {
-		fmt.Printf("\n--------------------------------------------------------------------------------\n")
-		fmt.Printf("> Running command\n\n")
-		fmt.Printf("   %s %s\n", name, strings.Join(args, " "))
-		fmt.Printf("\n--------------------------------------------------------------------------------\n\n")
-	}
-	cmd := exec.Command(name, args...)
-	cmd.Stderr = os.Stderr
-	cmd.Stdin = os.Stdin
-	out, err := cmd.Output()
-	if err != nil {
-		return "", err
-	}
-	return string(out), nil
-}
+	"github.com/pkg/errors"
+)
 
 func runCommandWithStdinRedirection(printCommand bool, name, input string, args ...string) (string, error) {
 	if printCommand {
@@ -46,6 +33,24 @@ func runCommandWithStdinRedirection(printCommand bool, name, input string, args 
 	out, err := cmd.Output()
 	if err != nil {
 		return "", err
+	}
+	return string(out), nil
+}
+
+func runCommandWithContext(ctx context.Context, printCommand bool, name string, args ...string) (string, error) {
+	if printCommand {
+		fmt.Printf("\n--------------------------------------------------------------------------------\n")
+		fmt.Printf("> Running command\n\n")
+		fmt.Printf("   %s %s\n", name, strings.Join(args, " "))
+		fmt.Printf("\n--------------------------------------------------------------------------------\n\n")
+	}
+	cmd := exec.CommandContext(ctx, name, args...)
+	var buf bytes.Buffer
+	cmd.Stderr = &buf
+	cmd.Stdin = os.Stdin
+	out, err := cmd.Output()
+	if err != nil {
+		return "", errors.Errorf("%s %s", buf.String(), err.Error())
 	}
 	return string(out), nil
 }
