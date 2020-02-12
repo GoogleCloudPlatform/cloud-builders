@@ -27,11 +27,9 @@ const (
 	gcsDirectory       = "gs://bucket/directory/*"
 	gcsNestedDir       = "gs://bucket/nested-directory"
 	dirWithoutWildcard = "gs://bucket/directory"
-	//gcsBucket          = "gs://bucket"
-	gcsOutputBucket = "gs://out"
-	expandedFile    = "gs://out/expanded-resources.yaml"
-	suggestedFile   = "gs://out/suggested-resources.yaml"
-	//testConfig         = "testing/configs/multi-resource.yaml"
+	gcsOutputBucket    = "gs://out"
+	expandedFile       = "gs://out/expanded-resources.yaml"
+	suggestedFile      = "gs://out/suggested-resources.yaml"
 )
 
 var testOutputDir string
@@ -645,7 +643,7 @@ func TestApply(t *testing.T) {
 	namespace := "default"
 	waitTimeout := 10 * time.Second
 
-	gcs, _ := services.NewGsutil(ctx, true)
+	gcs := buildTestGcsService(t)
 
 	tests := []struct {
 		name string
@@ -1160,16 +1158,14 @@ func TestApplyErrors(t *testing.T) {
 	testServiceFile := "testing/service.yaml"
 	testServiceUnreadyFile := "testing/service-unready.yaml"
 	testNamespaceFile := "testing/namespace.yaml"
-
 	namespace := "default"
 	waitTimeout := 10 * time.Second
-
 	clusterName := "test-cluster"
 	clusterLocation := "us-east1-b"
 	clusterProject := "my-project"
 	configDir := "path/to/config"
 
-	gcs, _ := services.NewGsutil(ctx, true)
+	gcs := buildTestGcsService(t)
 
 	tests := []struct {
 		name string

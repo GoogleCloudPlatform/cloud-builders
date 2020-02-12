@@ -46,6 +46,9 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 	fmt.Printf("Preparing deployment.\n")
 
 	var objs resource.Objects
+	ss := &gcs.GCS{
+		GcsService: d.Clients.GCS,
+	}
 	if config != "" {
 
 		if strings.HasPrefix(config, "gs://") {
@@ -54,7 +57,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 				return fmt.Errorf("failed to create tmp directory: %v", err)
 			}
 			defer d.Clients.OS.RemoveAll(ctx, tmpDir)
-			err = getGCS(d).Download(ctx, config, tmpDir, recursive)
+			err = ss.Download(ctx, config, tmpDir, recursive)
 			if err != nil {
 				return fmt.Errorf("failed to download configuration files from GCS %q: %v", config, err)
 			}
@@ -195,7 +198,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 		}
 
 		if toGcs {
-			err := getGCS(d).Upload(ctx, fileName, gcsPath)
+			err := ss.Upload(ctx, fileName, gcsPath)
 			if err != nil {
 				return fmt.Errorf("failed to download configuration files from GCS %q: %v", config, err)
 			}
@@ -290,7 +293,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 	}
 
 	if toGcs {
-		err := getGCS(d).Upload(ctx, fileName, gcsPath)
+		err := ss.Upload(ctx, fileName, gcsPath)
 		if err != nil {
 			return fmt.Errorf("failed to download configuration files from GCS %q: %v", config, err)
 		}
@@ -338,12 +341,16 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 	}
 
 	if strings.HasPrefix(config, "gs://") {
+
 		tmpDir, err := d.Clients.OS.TempDir(ctx, "", K8sConfigStagingDir)
 		if err != nil {
 			return fmt.Errorf("failed to create tmp directory: %v", err)
 		}
 		defer d.Clients.OS.RemoveAll(ctx, tmpDir)
-		err = getGCS(d).Download(ctx, config, tmpDir, recursive)
+		ss := &gcs.GCS{
+			GcsService: d.Clients.GCS,
+		}
+		err = ss.Download(ctx, config, tmpDir, recursive)
 		if err != nil {
 			return fmt.Errorf("failed to download configuration files from GCS %q: %v", config, err)
 		}
@@ -557,14 +564,4 @@ func (d *Deployer) gkeLinks(clusterProject string) (string, error) {
 	}
 
 	return buf.String(), nil
-}
-
-func getGCS(d *Deployer) *gcs.GCS {
-	if s != nil {
-		return s
-	}
-	s = &gcs.GCS{
-		GcsService: d.Clients.GCS,
-	}
-	return s
 }
