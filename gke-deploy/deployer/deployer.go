@@ -28,7 +28,7 @@ const (
 
 	managedByLabelValue = "gcp-cloud-build-deploy"
 	//temporary folder pattern used to create tmp folders for the files downloaded from GCS
-	K8sConfigStagingDir = "gke_deployer_temp_"
+	k8sConfigStagingDir = "gke_deploy_temp_"
 	expendedFileName    = "expanded-resources.yaml"
 	suggestedFileName   = "suggested-resources.yaml"
 )
