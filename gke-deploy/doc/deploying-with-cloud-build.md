@@ -56,7 +56,7 @@ git clone https://github.com/GoogleCloudPlatform/cloud-builders.git && cd cloud-
 
 # Variables for resources that were initialized above the Setup section.
 PROJECT=my-project
-BUCKET=my-bucket
+BUCKET_PATH=gs://my-bucket/config
 CLUSTER=my-cluster
 LOCATION=us-east1-b
 
@@ -66,7 +66,7 @@ APP=my-app
 NAMESPACE=my-namespace
 
 # Run build, replacing substitution variables accordingly.
-gcloud builds submit . --project=$PROJECT --config cloudbuild-no-configs.yaml --substitutions=_IMAGE_NAME=gcr.io/$PROJECT/$APP,_IMAGE_VERSION=$VERSION,_GKE_CLUSTER=$CLUSTER,_GKE_LOCATION=$LOCATION,_K8S_APP_NAME=$APP,_K8S_NAMESPACE=$NAMESPACE,_OUTPUT_BUCKET_PATH=$BUCKET
+gcloud builds submit . --project=$PROJECT --config cloudbuild-no-configs.yaml --substitutions=_IMAGE_NAME=gcr.io/$PROJECT/$APP,_IMAGE_VERSION=$VERSION,_GKE_CLUSTER=$CLUSTER,_GKE_LOCATION=$LOCATION,_K8S_APP_NAME=$APP,_K8S_NAMESPACE=$NAMESPACE,_OUTPUT_PATH=$BUCKET_PATH
 ```
 
 ### Build, publish, and deploy application with Kubernetes configuration files
@@ -85,7 +85,7 @@ git clone https://github.com/GoogleCloudPlatform/cloud-builders.git && cd cloud-
 
 # Variables for resources that were initialized above the Setup section.
 PROJECT=my-project
-BUCKET=my-bucket
+BUCKET_PATH=gs://my-bucket/config
 CLUSTER=my-cluster
 LOCATION=us-east1-b
 
@@ -101,10 +101,10 @@ sed -i "s#@IMAGE_NAME@#$IMAGE_NAME#g" config/deployment.yaml
 sed -i "s#@NAMESPACE@#$NAMESPACE#g" config/namespace.yaml
 
 # Run build, replacing substitution variables accordingly.
-gcloud builds submit . --project=$PROJECT --config cloudbuild-with-configs.yaml --substitutions=_IMAGE_NAME=gcr.io/$PROJECT/$APP,_IMAGE_VERSION=$VERSION,_GKE_CLUSTER=$CLUSTER,_GKE_LOCATION=$LOCATION,_K8S_YAML_PATH=config,_K8S_APP_NAME=$APP,_K8S_NAMESPACE=$NAMESPACE,_OUTPUT_BUCKET_PATH=$BUCKET
+gcloud builds submit . --project=$PROJECT --config cloudbuild-with-configs.yaml --substitutions=_IMAGE_NAME=gcr.io/$PROJECT/$APP,_IMAGE_VERSION=$VERSION,_GKE_CLUSTER=$CLUSTER,_GKE_LOCATION=$LOCATION,_K8S_YAML_PATH=config,_K8S_APP_NAME=$APP,_K8S_NAMESPACE=$NAMESPACE,_OUTPUT_PATH=$BUCKET_PATH
 ```
 
-You can remove the `Save configs` build step in your Cloud Build config if you do not
+You can replace the GCS url with a UNIX file path if you do not
 want to store configs to a bucket.
 
 Builds can use `$SHORT_SHA` instead of an explicit `$_IMAGE_VERSION` for the
