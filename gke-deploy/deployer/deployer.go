@@ -52,7 +52,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 	if config != "" {
 
 		if strings.HasPrefix(config, "gs://") {
-			tmpDir, err := d.Clients.OS.TempDir(ctx, "", K8sConfigStagingDir)
+			tmpDir, err := d.Clients.OS.TempDir(ctx, "", k8sConfigStagingDir)
 			if err != nil {
 				return fmt.Errorf("failed to create tmp directory: %v", err)
 			}
@@ -182,7 +182,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 		}
 
 		if strings.HasPrefix(suggestedOutput, "gs://") {
-			tmpDir, err := d.Clients.OS.TempDir(ctx, "", K8sConfigStagingDir)
+			tmpDir, err := d.Clients.OS.TempDir(ctx, "", k8sConfigStagingDir)
 			if err != nil {
 				return fmt.Errorf("failed to create tmp directory: %v", err)
 			}
@@ -277,7 +277,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 	fmt.Printf("Saving expanded configuration files to %q\n", expandedOutput)
 
 	if strings.HasPrefix(expandedOutput, "gs://") {
-		tmpDir, err := d.Clients.OS.TempDir(ctx, "", K8sConfigStagingDir)
+		tmpDir, err := d.Clients.OS.TempDir(ctx, "", k8sConfigStagingDir)
 		if err != nil {
 			return fmt.Errorf("failed to create tmp directory: %v", err)
 		}
@@ -342,7 +342,7 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 
 	if strings.HasPrefix(config, "gs://") {
 
-		tmpDir, err := d.Clients.OS.TempDir(ctx, "", K8sConfigStagingDir)
+		tmpDir, err := d.Clients.OS.TempDir(ctx, "", k8sConfigStagingDir)
 		if err != nil {
 			return fmt.Errorf("failed to create tmp directory: %v", err)
 		}
