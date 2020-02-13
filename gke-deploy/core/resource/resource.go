@@ -147,7 +147,7 @@ func ParseConfigs(ctx context.Context, configs string, oss services.OSService, r
 // SaveAsConfigs saves resource objects as config files to a target output directory.
 // If any lines in a resource object's string representation contain a key in
 // lineComments, the corresponding value will be added as a comment at the end of
-// the line.
+// the line. The string being returned is the path of the saved file.
 func SaveAsConfigs(ctx context.Context, objs Objects, outputDir string, lineComments map[string]string, oss services.OSService) (string, error) {
 	fi, err := oss.Stat(ctx, outputDir)
 	if err != nil && !os.IsNotExist(err) {

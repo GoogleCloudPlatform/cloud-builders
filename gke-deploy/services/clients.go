@@ -46,7 +46,7 @@ type RemoteService interface {
 	Image(ref name.Reference) (v1.Image, error)
 }
 
-//GcsService is an interface for interacting with Google Cloud Storage
+// GcsService is an interface for interacting with Google Cloud Storage
 type GcsService interface {
 	Copy(ctx context.Context, src, dst string, recursive bool) error
 }
