@@ -4,6 +4,8 @@ package common
 import (
 	"context"
 	"fmt"
+	"log"
+	"net/url"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -86,13 +88,13 @@ func CreateDeployer(ctx context.Context, useGcloud, verbose bool) (*deployer.Dep
 // SuggestedOutputPath takes a root output directory and returns the path where
 // suggested configs should be stored.
 func SuggestedOutputPath(root string) string {
-	return filepath.Join(root, "suggested")
+	return join(root, "suggested")
 }
 
 // ExpandedOutputPath takes a root output directory and returns the path where
 // expanded configs should be stored.
 func ExpandedOutputPath(root string) string {
-	return filepath.Join(root, "expanded")
+	return join(root, "expanded")
 }
 
 // GcloudInPath returns true if the `gcloud` command is in this machine's PATH.
@@ -101,4 +103,13 @@ func GcloudInPath() bool {
 		return false
 	}
 	return true
+}
+
+func join(base, path string) string {
+	u, err := url.Parse(base)
+	if err != nil {
+		log.Fatal(err)
+	}
+	u.Path = filepath.Join(u.Path, path)
+	return u.String()
 }

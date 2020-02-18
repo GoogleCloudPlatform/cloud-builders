@@ -44,3 +44,13 @@ func (o *OS) WriteFile(ctx context.Context, filename string, data []byte, perm o
 func (o *OS) MkdirAll(ctx context.Context, dirname string, perm os.FileMode) error {
 	return os.MkdirAll(dirname, perm)
 }
+
+// RemoveAll removes path and any children it contains.
+func (o *OS) RemoveAll(ctx context.Context, path string) error {
+	return os.RemoveAll(path)
+}
+
+// TempDir creates a new temporary directory in the directory dir.
+func (o *OS) TempDir(ctx context.Context, dir, pattern string) (string, error) {
+	return ioutil.TempDir(dir, pattern)
+}

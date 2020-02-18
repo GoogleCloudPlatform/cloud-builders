@@ -210,7 +210,7 @@ func TestSaveAsConfigs(t *testing.T) {
 				t.Fatalf("Failed to create OS: %v", err)
 			}
 
-			if err := SaveAsConfigs(ctx, tc.objs, dir, tc.lineComments, oss); err != nil {
+			if _, err := SaveAsConfigs(ctx, tc.objs, dir, tc.lineComments, oss); err != nil {
 				t.Fatalf("SaveAsConfigs(ctx, %v, %s, %v, oss) = %v; want <nil>", tc.objs, dir, tc.lineComments, err)
 			}
 
@@ -425,7 +425,7 @@ func TestSaveAsConfigsErrors(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if err := SaveAsConfigs(ctx, tc.objs, tc.outputDir, tc.lineComments, tc.oss); err == nil {
+			if _, err := SaveAsConfigs(ctx, tc.objs, tc.outputDir, tc.lineComments, tc.oss); err == nil {
 				t.Errorf("SaveAsConfigs(ctx, %v, %s, %v, oss) = <nil>; want error", tc.objs, tc.outputDir, tc.lineComments)
 			}
 		})

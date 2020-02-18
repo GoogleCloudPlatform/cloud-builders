@@ -15,6 +15,7 @@ type Clients struct {
 	Kubectl KubectlService
 	OS      OSService
 	Remote  RemoteService
+	GCS     GcsService
 }
 
 // OSService is an interface for os operations.
@@ -24,6 +25,8 @@ type OSService interface {
 	ReadFile(ctx context.Context, filename string) ([]byte, error)
 	WriteFile(ctx context.Context, filename string, data []byte, perm os.FileMode) error
 	MkdirAll(ctx context.Context, dirname string, perm os.FileMode) error
+	RemoveAll(ctx context.Context, dir string) error
+	TempDir(ctx context.Context, dir, pattern string) (string, error)
 }
 
 // GcloudService is an interface for gcloud operations.
@@ -41,6 +44,11 @@ type KubectlService interface {
 // RemoteService is an interface for github.com/google/go-containerregistry/pkg/v1/remote.
 type RemoteService interface {
 	Image(ref name.Reference) (v1.Image, error)
+}
+
+// GcsService is an interface for interacting with Google Cloud Storage
+type GcsService interface {
+	Copy(ctx context.Context, src, dst string, recursive bool) error
 }
 
 // NewClients returns a new Clients object with default services.
@@ -66,10 +74,16 @@ func NewClients(ctx context.Context, useGcloud, printCommands bool) (*Clients, e
 		return nil, err
 	}
 
+	ss, err := NewGsutil(ctx, printCommands)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Clients{
 		OS:      oss,
 		Gcloud:  gs,
 		Kubectl: ks,
 		Remote:  rs,
+		GCS:     ss,
 	}, nil
 }

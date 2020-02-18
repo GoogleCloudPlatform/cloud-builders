@@ -15,6 +15,7 @@ import (
 
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/cluster"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/gcp"
+	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/gcs"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/image"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/resource"
 	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/services"
@@ -26,6 +27,10 @@ const (
 	managedByLabelKey  = "app.kubernetes.io/managed-by"
 
 	managedByLabelValue = "gcp-cloud-build-deploy"
+	//temporary folder pattern used to create tmp folders for the files downloaded from GCS
+	k8sConfigStagingDir = "gke_deploy_temp_"
+	expendedFileName    = "expanded-resources.yaml"
+	suggestedFileName   = "suggested-resources.yaml"
 )
 
 // Deployer handles the deployment of an image to a cluster.
@@ -39,7 +44,24 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 	fmt.Printf("Preparing deployment.\n")
 
 	var objs resource.Objects
+	ss := &gcs.GCS{
+		GcsService: d.Clients.GCS,
+	}
 	if config != "" {
+
+		if strings.HasPrefix(config, "gs://") {
+			tmpDir, err := d.Clients.OS.TempDir(ctx, "", k8sConfigStagingDir)
+			if err != nil {
+				return fmt.Errorf("failed to create tmp directory: %v", err)
+			}
+			defer d.Clients.OS.RemoveAll(ctx, tmpDir)
+			err = ss.Download(ctx, config, tmpDir, recursive)
+			if err != nil {
+				return fmt.Errorf("failed to download configuration files from GCS %q: %v", config, err)
+			}
+			config = tmpDir
+		}
+
 		parsed, err := resource.ParseConfigs(ctx, config, d.Clients.OS, recursive)
 		if err != nil {
 			return fmt.Errorf("failed to parse configuration files %q: %v", config, err)
@@ -146,6 +168,8 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 		}
 	}
 
+	var toGcs bool
+	var gcsPath string
 	if len(objs) > 0 {
 		fmt.Printf("Saving suggested configuration files to %q\n", suggestedOutput)
 		var lineComments map[string]string
@@ -154,8 +178,28 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 				fmt.Sprintf("image: %s", image.Name(im)): "Will be set to actual image before deployment",
 			}
 		}
-		if err := resource.SaveAsConfigs(ctx, objs, suggestedOutput, lineComments, d.Clients.OS); err != nil {
+
+		if strings.HasPrefix(suggestedOutput, "gs://") {
+			tmpDir, err := d.Clients.OS.TempDir(ctx, "", k8sConfigStagingDir)
+			if err != nil {
+				return fmt.Errorf("failed to create tmp directory: %v", err)
+			}
+			defer d.Clients.OS.RemoveAll(ctx, tmpDir)
+			gcsPath = strings.Join([]string{suggestedOutput, suggestedFileName}, "/")
+			suggestedOutput = tmpDir
+			toGcs = true
+		}
+
+		fileName, err := resource.SaveAsConfigs(ctx, objs, suggestedOutput, lineComments, d.Clients.OS)
+		if err != nil {
 			return fmt.Errorf("failed to save suggested configuration files to %q: %v", suggestedOutput, err)
+		}
+
+		if toGcs {
+			err := ss.Upload(ctx, fileName, gcsPath)
+			if err != nil {
+				return fmt.Errorf("failed to download configuration files from GCS %q: %v", config, err)
+			}
 		}
 	}
 
@@ -229,8 +273,28 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 	}
 
 	fmt.Printf("Saving expanded configuration files to %q\n", expandedOutput)
-	if err := resource.SaveAsConfigs(ctx, objs, expandedOutput, nil, d.Clients.OS); err != nil {
+
+	if strings.HasPrefix(expandedOutput, "gs://") {
+		tmpDir, err := d.Clients.OS.TempDir(ctx, "", k8sConfigStagingDir)
+		if err != nil {
+			return fmt.Errorf("failed to create tmp directory: %v", err)
+		}
+		defer d.Clients.OS.RemoveAll(ctx, tmpDir)
+		gcsPath = strings.Join([]string{expandedOutput, expendedFileName}, "/")
+		expandedOutput = tmpDir
+		toGcs = true
+	}
+
+	fileName, err := resource.SaveAsConfigs(ctx, objs, expandedOutput, nil, d.Clients.OS)
+	if err != nil {
 		return fmt.Errorf("failed to save expanded configuration files to %q: %v", expandedOutput, err)
+	}
+
+	if toGcs {
+		err := ss.Upload(ctx, fileName, gcsPath)
+		if err != nil {
+			return fmt.Errorf("failed to download configuration files from GCS %q: %v", config, err)
+		}
 	}
 
 	fmt.Printf("Finished preparing deployment.\n\n")
@@ -272,6 +336,23 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 			}
 			return fmt.Errorf("failed to get access to cluster: %v", err)
 		}
+	}
+
+	if strings.HasPrefix(config, "gs://") {
+
+		tmpDir, err := d.Clients.OS.TempDir(ctx, "", k8sConfigStagingDir)
+		if err != nil {
+			return fmt.Errorf("failed to create tmp directory: %v", err)
+		}
+		defer d.Clients.OS.RemoveAll(ctx, tmpDir)
+		ss := &gcs.GCS{
+			GcsService: d.Clients.GCS,
+		}
+		err = ss.Download(ctx, config, tmpDir, recursive)
+		if err != nil {
+			return fmt.Errorf("failed to download configuration files from GCS %q: %v", config, err)
+		}
+		config = tmpDir
 	}
 
 	objs, err := resource.ParseConfigs(ctx, config, d.Clients.OS, recursive)
