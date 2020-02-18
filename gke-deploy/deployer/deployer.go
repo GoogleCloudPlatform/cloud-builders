@@ -39,8 +39,6 @@ type Deployer struct {
 	UseGcloud bool
 }
 
-var s *gcs.GCS
-
 // Prepare handles preparing deployment.
 func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appVersion, config, suggestedOutput, expandedOutput, namespace string, labels, annotations map[string]string, exposePort int, recursive, createApplicationCR bool, applicationLinks []applicationsv1beta1.Link) error {
 	fmt.Printf("Preparing deployment.\n")
