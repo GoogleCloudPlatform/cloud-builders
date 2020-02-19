@@ -12,14 +12,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-func runCommandWithStdinRedirection(printCommand bool, name, input string, args ...string) (string, error) {
+func runCommandWithStdinRedirection(ctx context.Context, printCommand bool, name, input string, args ...string) (string, error) {
 	if printCommand {
 		fmt.Printf("\n--------------------------------------------------------------------------------\n")
 		fmt.Printf("> Running command\n\n")
 		fmt.Printf("   %s %s < %s\n", name, strings.Join(args, " "), input)
 		fmt.Printf("\n--------------------------------------------------------------------------------\n\n")
 	}
-	cmd := exec.Command(name, args...)
+	cmd := exec.CommandContext(ctx, name, args...)
 	cmd.Stderr = os.Stderr
 	// Example taken from https://golang.org/src/os/exec/example_test.go
 	stdin, err := cmd.StdinPipe()
@@ -37,7 +37,7 @@ func runCommandWithStdinRedirection(printCommand bool, name, input string, args 
 	return string(out), nil
 }
 
-func runCommandWithContext(ctx context.Context, printCommand bool, name string, args ...string) (string, error) {
+func runCommand(ctx context.Context, printCommand bool, name string, args ...string) (string, error) {
 	if printCommand {
 		fmt.Printf("\n--------------------------------------------------------------------------------\n")
 		fmt.Printf("> Running command\n\n")

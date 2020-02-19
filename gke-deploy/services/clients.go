@@ -37,7 +37,7 @@ type GcloudService interface {
 
 // KubectlService is an interface for kubectl operations.
 type KubectlService interface {
-	ApplyFromString(configString, namespace string) error
+	ApplyFromString(ctx context.Context, configString, namespace string) error
 	Get(ctx context.Context, kind, name, namespace, format string, ignoreNotFound bool) (string, error)
 }
 

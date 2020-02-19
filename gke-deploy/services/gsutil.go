@@ -28,7 +28,7 @@ func (g *Gsutil) Copy(ctx context.Context, src, dst string, recursive bool) erro
 	if !recursive {
 		args = append(args[:1], args[2:]...)
 	}
-	if _, err := runCommandWithContext(ctx, g.printCommands, GsutilExec, args...); err != nil {
+	if _, err := runCommand(ctx, g.printCommands, GsutilExec, args...); err != nil {
 		return fmt.Errorf("copy file(s) with %s failed: %v", GsutilExec, err.Error())
 	}
 	return nil
