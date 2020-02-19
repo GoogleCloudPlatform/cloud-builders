@@ -46,16 +46,16 @@ gke-deploy run [flags]
   -c, --cluster string          Name of GKE cluster to deploy to.
       --create-application-cr   Creates an Application CR object with the name provided by --app and connects to deployed objects using a selector that matches the label with key as 'app.kubernetes.io/name' and value specified by --app.
   -x, --expose int              Creates a Service object that connects to a deployed workload object using a selector that matches the label with key as 'app.kubernetes.io/name' and value specified by --app. The port provided will be used to expose the deployed workload object (i.e., port and targetPort will be set to the value provided in this flag).
-  -f, --filename string         Configuration file or directory of configuration files to use to create Kubernetes objects (file or files in directory must end with ".yml" or ".yaml"). The configuration file(s) will be download to a temporary folder first if the file or directory is a GCS URL, e.g. gs://bucket/directory/*. If this field is not provided, suggested base configs will be created: Deployment with image provided by --image and HorizontalPodAutoscaler. The application's name will be inferred by the image name's suffix.
+  -f, --filename string         Local or GCS path to configuration file or directory of configuration files to use to create Kubernetes objects (file or files in directory must end in ".yml" or ".yaml"). Prefix this value with "gs://" to indicate a GCS path. If this field is not provided, a Deployment (with image provided by --image) and a HorizontalPodAutoscaler are created as suggested based configs. The application's name is inferred from the image name's suffix.
   -h, --help                    help for run
   -i, --image string            Image to be deployed.
   -L, --label strings           Label(s) to add to Kubernetes configuration files (k1=v1). Labels can be set comma-delimited or as separate flags. If two or more labels with the same key are listed, the last one is used.
       --links strings           Links(s) to add to the spec.descriptor.links field of an Application CR generated with the --create-application-cr flag or provided via the --filename flag (description=URL). Links can be set comma-delimited or as separate flags.
   -l, --location string         Region/zone of GKE cluster to deploy to.
   -n, --namespace string        Namespace of GKE cluster to deploy to. If omitted, the namespace(s) specified in each Kubernetes configuration file is used.
-  -o, --output string           Target directory or GCS bucket(e.g. gs://bucket/output) to store suggested and expanded Kubernetes configuration files. Suggested files will be stored in "<output>/suggested" and expanded files will be stored in "<output>/expanded". (default "./output")
+  -o, --output string           Target directory or GCS path to store suggested and expanded Kubernetes configuration files. Prefix this value with "gs://" to indicate a GCS path. Suggested files will be stored in "<output>/suggested" and expanded files will be stored in "<output>/expanded". (default "./output")
   -p, --project string          Project of GKE cluster to deploy to. If this field is not provided, the current set GCP project is used.
-  -R, --recursive               Recursively search through the configuration directory or the GCS bucket(if "filename" is a GCS URL) for all YAML files. 
+  -R, --recursive               Recursively search through the provided path in --filename for all YAML files.
   -t, --timeout duration        Timeout limit for waiting for Kubernetes objects to finish applying. (default 5m0s)
   -V, --verbose                 Prints underlying commands being called to stdout.
   -v, --version string          Version of the Kubernetes deployment.

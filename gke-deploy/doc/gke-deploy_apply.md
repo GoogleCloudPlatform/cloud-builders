@@ -34,12 +34,12 @@ gke-deploy apply [flags]
 
 ```
   -c, --cluster string     Name of GKE cluster to deploy to.
-  -f, --filename string    Configuration file or directory of configuration files to use to create Kubernetes objects (file or files in directory must end with ".yml" or ".yaml"). The configuration file(s) will be download to a temporary folder first if the file or directory is a GCS URL, e.g. gs://bucket/directory/*.
+  -f, --filename string    Local or GCS path to configuration file or directory of configuration files to use to create Kubernetes objects (file or files in directory must end in ".yml" or ".yaml"). Prefix this value with "gs://" to indicate a GCS path.
   -h, --help               help for apply
   -l, --location string    Region/zone of GKE cluster to deploy to.
   -n, --namespace string   Namespace of GKE cluster to deploy to. If omitted, the namespace(s) specified in each Kubernetes configuration file is used.
   -p, --project string     Project of GKE cluster to deploy to. If this field is not provided, the current set GCP project is used.
-  -R, --recursive          Recursively search through the configuration directory or the GCS bucket(if "filename" is a GCS URL) for all YAML files. 
+  -R, --recursive          Recursively search through the provided path in --filename for all YAML files. 
   -t, --timeout duration   Timeout limit for waiting for Kubernetes objects to finish applying. (default 5m0s)
   -V, --verbose            Prints underlying commands being called to stdout.
 ```
