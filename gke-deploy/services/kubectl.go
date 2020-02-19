@@ -47,7 +47,7 @@ func (k *Kubectl) Get(ctx context.Context, kind, name, namespace, format string,
 	if ignoreNotFound {
 		args = append(args, "--ignore-not-found=true")
 	}
-	out, err := runCommandWithContext(ctx, k.printCommands, "kubectl", args...)
+	out, err := runCommand(ctx, k.printCommands, "kubectl", args...)
 	if err != nil {
 		return "", fmt.Errorf("command to get kubernetes config: %v", err)
 	}

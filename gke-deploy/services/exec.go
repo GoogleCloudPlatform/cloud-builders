@@ -37,7 +37,7 @@ func runCommandWithStdinRedirection(ctx context.Context, printCommand bool, name
 	return string(out), nil
 }
 
-func runCommandWithContext(ctx context.Context, printCommand bool, name string, args ...string) (string, error) {
+func runCommand(ctx context.Context, printCommand bool, name string, args ...string) (string, error) {
 	if printCommand {
 		fmt.Printf("\n--------------------------------------------------------------------------------\n")
 		fmt.Printf("> Running command\n\n")

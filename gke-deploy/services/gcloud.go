@@ -25,7 +25,7 @@ func NewGcloud(ctx context.Context, printCommands bool) (*Gcloud, error) {
 // ContainerClustersGetCredentials calls `gcloud container clusters get-credentials <clusterName> --zone=<clusterLocation> --project=<clusterProject>`.
 // Both region and zone can be passed to the --zone flag.
 func (g *Gcloud) ContainerClustersGetCredentials(ctx context.Context, clusterName, clusterLocation, clusterProject string) error {
-	if _, err := runCommandWithContext(ctx, g.printCommands, "gcloud", "container", "clusters", "get-credentials", clusterName, fmt.Sprintf("--zone=%s", clusterLocation), fmt.Sprintf("--project=%s", clusterProject), "--quiet"); err != nil {
+	if _, err := runCommand(ctx, g.printCommands, "gcloud", "container", "clusters", "get-credentials", clusterName, fmt.Sprintf("--zone=%s", clusterLocation), fmt.Sprintf("--project=%s", clusterProject), "--quiet"); err != nil {
 		return fmt.Errorf("command to get cluster credentials failed: %v", err)
 	}
 	return nil
@@ -33,7 +33,7 @@ func (g *Gcloud) ContainerClustersGetCredentials(ctx context.Context, clusterNam
 
 // ConfigGetValue calls `gcloud config get-value <property>` and returns stdout.
 func (g *Gcloud) ConfigGetValue(ctx context.Context, property string) (string, error) {
-	out, err := runCommandWithContext(ctx, g.printCommands, "gcloud", "config", "get-value", property, "--quiet")
+	out, err := runCommand(ctx, g.printCommands, "gcloud", "config", "get-value", property, "--quiet")
 	if err != nil {
 		return "", fmt.Errorf("command to get property value failed: %v", err)
 	}
