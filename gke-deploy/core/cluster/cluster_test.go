@@ -51,7 +51,7 @@ func TestApplyConfigFromString(t *testing.T) {
 		},
 	}
 
-	if err := ApplyConfigFromString(configString, namespace, ks); err != nil {
+	if err := ApplyConfigFromString(context.Background(), configString, namespace, ks); err != nil {
 		t.Errorf("ApplyConfigFromString(%s, %s, ks) = %v; want <nil>", configString, namespace, err)
 	}
 }
@@ -65,7 +65,7 @@ func TestApplyConfigFromStringErrors(t *testing.T) {
 		},
 	}
 
-	if err := ApplyConfigFromString(configString, namespace, ks); err == nil {
+	if err := ApplyConfigFromString(context.Background(), configString, namespace, ks); err == nil {
 		t.Errorf("ApplyConfigs(%s, %s, ks) = <nil>; want error", configString, namespace)
 	}
 }

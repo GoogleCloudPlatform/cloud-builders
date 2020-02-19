@@ -18,7 +18,7 @@ type GetResponse struct {
 }
 
 // ApplyFromString calls `kubectl apply -f - -n <namespace> < ${configString}`.
-func (k *TestKubectl) ApplyFromString(configString, namespace string) error {
+func (k *TestKubectl) ApplyFromString(ctx context.Context, configString, namespace string) error {
 	errors, ok := k.ApplyFromStringResponse[configString]
 	if !ok {
 		panic(fmt.Sprintf("ApplyFromStringResponse has no response for configs %q", configString))

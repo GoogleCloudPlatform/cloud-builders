@@ -402,7 +402,7 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 				if err != nil {
 					return fmt.Errorf("failed to encode obj to string")
 				}
-				if err := cluster.ApplyConfigFromString(objString, "", d.Clients.Kubectl); err != nil {
+				if err := cluster.ApplyConfigFromString(ctx, objString, "", d.Clients.Kubectl); err != nil {
 					return fmt.Errorf("failed to apply Namespace configuration file with name %q to cluster: %v", nsName, err)
 				}
 			}
@@ -426,7 +426,7 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 			return fmt.Errorf("failed to encode obj to string")
 		}
 		// If namespace == "", uses the namespace defined in each config.
-		if err := cluster.ApplyConfigFromString(objString, namespace, d.Clients.Kubectl); err != nil {
+		if err := cluster.ApplyConfigFromString(ctx, objString, namespace, d.Clients.Kubectl); err != nil {
 			return fmt.Errorf("failed to apply %s configuration file with name %q to cluster: %v", resource.ObjectKind(obj), objName, err)
 		}
 	}
