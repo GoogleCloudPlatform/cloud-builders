@@ -1,0 +1,53 @@
+steps:
+- name: 'gcr.io/$PROJECT_ID/gke-deploy'
+  args:
+  - 'prepare'
+  - '--image=gcr.io/google-containers/nginx:latest'
+  - '--app=test-name'
+  - '--version=test-version'
+  - '--expose=80'
+  - '--namespace=$_NAMESPACE'
+  - '--label=foo=bar'
+  - '--annotation=hi=bye'
+  - '--output=$_OUTPUT'
+- name: 'gcr.io/cloud-builders/gsutil'
+  entrypoint: 'sh'
+  args:
+  - '-c'
+  - |
+    set -x  # Print commands
+    set -e  # Fail if any command below fails
+    gsutil -q stat $_OUTPUT/expanded/expanded-resources.yaml
+    gsutil -q stat $_OUTPUT/suggested/suggested-resources.yaml
+- name: 'gcr.io/$PROJECT_ID/gke-deploy'
+  args:
+  - 'apply'
+  - '--filename=$_OUTPUT/expanded/*'
+  - '--namespace=$_NAMESPACE'
+  - '--cluster=$_CLUSTER'
+  - '--location=$_LOCATION'
+  - '--project=$PROJECT_ID'
+- name: 'gcr.io/cloud-builders/kubectl'
+  entrypoint: 'sh'
+  args:
+  - '-c'
+  - |
+    set -x  # Print commands
+    set -e  # Fail if any command below fails
+    mkdir check && cd check
+    gcloud container clusters get-credentials $_CLUSTER --zone $_LOCATION --project $PROJECT_ID
+    kubectl get deployment nginx -n $_NAMESPACE -o yaml > deployment.yaml
+    grep -Fq "app.kubernetes.io/managed-by: gcp-cloud-build-deploy" deployment.yaml
+    grep -Fq "app.kubernetes.io/name: test-name" deployment.yaml
+    grep -Fq "app.kubernetes.io/version: test-version" deployment.yaml
+    grep -Fq "foo: bar" deployment.yaml
+    grep -Fq "hi: bye" deployment.yaml
+    grep -Fq "gcr.io/google-containers/nginx@sha256" deployment.yaml  # Can't guarantee digest won't change, but can check that a digest was added.
+    kubectl get service test-name-service -n $_NAMESPACE -o yaml > service.yaml
+    SERVICE_IP="$(grep -F "ip:" service.yaml | awk '{print $$NF}')"
+    curl "$${SERVICE_IP}"
+substitutions:
+  _CLUSTER:
+  _LOCATION:
+  _NAMESPACE:
+  _OUTPUT:

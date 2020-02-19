@@ -16,23 +16,11 @@ steps:
   - '--namespace=$_K8S_NAMESPACE'
   - '--output=output'
   - '--annotation=gcb-build-id=$BUILD_ID'
-- name: 'gcr.io/cloud-builders/gsutil'
-  id: 'Save configs'
-  entrypoint: 'sh'
-  args:
-  - '-c'
-  - |
-    set -e
-
-    gsutil cp -r output/suggested gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/suggested
-    echo "Copied suggested base configs to gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/suggested"
-    gsutil cp -r output/expanded gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/expanded
-    echo "Copied expanded configs to gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/expanded"
 - name: 'gcr.io/cloud-builders/gke-deploy'
   id: 'Apply deploy'
   args:
   - 'apply'
-  - '--filename=output/expanded'
+  - '--filename=$_OUTPUT_BUCKET_PATH/expanded/*'
   - '--namespace=$_K8S_NAMESPACE'
   - '--cluster=$_GKE_CLUSTER'
   - '--location=$_GKE_LOCATION'
