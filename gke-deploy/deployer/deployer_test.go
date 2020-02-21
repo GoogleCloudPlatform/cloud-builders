@@ -634,6 +634,7 @@ func TestApply(t *testing.T) {
 	testNamespaceFile := "testing/namespace.yaml"
 	testNamespaceReadyFile := "testing/namespace-ready.yaml"
 	testNamespaceReady2File := "testing/namespace-ready-2.yaml"
+	testApplicationFile := "testing/application.yaml"
 
 	clusterName := "test-cluster"
 	clusterLocation := "us-east1-b"
@@ -1119,6 +1120,41 @@ func TestApply(t *testing.T) {
 			},
 		},
 		gcs: gcs,
+	}, {
+		name: "Ensure Application CRD installed",
+
+		clusterName:     clusterName,
+		clusterLocation: clusterLocation,
+		config:          "testing/configs/application.yaml",
+		namespace:       namespace,
+		waitTimeout:     waitTimeout,
+
+		gcloud: &testservices.TestGcloud{
+			ContainerClustersGetCredentialsErr: nil,
+		},
+		kubectl: testservices.TestKubectl{
+			ApplyFromStringResponse: map[string][]error{
+				string(fileContents(t, testApplicationFile)): {nil},
+			},
+			GetResponse: map[string]map[string][]testservices.GetResponse{
+				"customresourcedefinition.apiextensions.k8s.io/applications.app.k8s.io": {
+					"": []testservices.GetResponse{
+						{
+							Res: "application crd yaml not empty",
+							Err: nil,
+						},
+					},
+				},
+				"Application": {
+					"test-app": []testservices.GetResponse{
+						{
+							Res: string(fileContents(t, testApplicationFile)),
+							Err: nil,
+						},
+					},
+				},
+			},
+		},
 	}}
 
 	for _, tc := range tests {

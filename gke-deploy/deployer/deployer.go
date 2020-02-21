@@ -10,6 +10,7 @@ import (
 	"text/tabwriter"
 	"time"
 
+	"github.com/GoogleCloudPlatform/cloud-builders/gke-deploy/core/crd"
 	"github.com/google/go-containerregistry/pkg/name"
 	applicationsv1beta1 "github.com/kubernetes-sigs/application/pkg/apis/app/v1beta1"
 
@@ -416,11 +417,20 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 
 	// Apply each config file individually vs applying the directory to avoid applying namespaces.
 	// Namespace objects are removed from objs at this point.
+	ensuredInstallApplicationCRD := false // Only need to do this once, in the case where the user provides more than one Application CR
 	for _, obj := range objs {
 		objName, err := resource.ObjectName(obj)
 		if err != nil {
 			return fmt.Errorf("failed to get name of object: %v", err)
 		}
+
+		if !ensuredInstallApplicationCRD && resource.ObjectKind(obj) == "Application" {
+			if err := crd.EnsureInstallApplicationCRD(ctx, d.Clients.Kubectl); err != nil {
+				return fmt.Errorf("failed to ensure installation of Application CRD on target cluster: %v", err)
+			}
+			ensuredInstallApplicationCRD = true
+		}
+
 		objString, err := resource.EncodeToYAMLString(obj)
 		if err != nil {
 			return fmt.Errorf("failed to encode obj to string")
