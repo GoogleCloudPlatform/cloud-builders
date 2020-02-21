@@ -16,6 +16,7 @@ limitations under the License.
 package fetcher
 
 import (
+	"archive/zip"
 	"bytes"
 	"context"
 	"errors"
@@ -788,5 +789,155 @@ func TestTimeout(t *testing.T) {
 		if got != test.want {
 			t.Errorf("getTimeout(%v, %v) got %v, want %v", test.filename, test.retrynum, got, test.want)
 		}
+	}
+}
+
+func TestUnzip(t *testing.T) {
+	type zipEntry struct {
+		name    string
+		content string
+		mode    os.FileMode
+		modeStr string // Used later for comparison to avoid extended attributes introduced by zip package.
+	}
+
+	tests := []struct {
+		name    string
+		entries []zipEntry
+	}{
+		{
+			name: "empty zip",
+		},
+		{
+			name: "single file",
+			entries: []zipEntry{
+				{name: "file.txt", content: "file.txt content", mode: 0644},
+			},
+		},
+		{
+			name: "multiple files",
+			entries: []zipEntry{
+				{name: "file.txt", content: "file.txt content", mode: 0644},
+				{name: "another/", mode: 0755},
+				{name: "another/file.txt", content: "another file-2.txt content", mode: 0644},
+			},
+		},
+		{
+			name: "single directory",
+			entries: []zipEntry{
+				{name: "directory/", mode: 0755},
+			},
+		},
+		{
+			name: "multiple directories",
+			entries: []zipEntry{
+				{name: "some/", mode: 0755},
+				{name: "some/directory/", mode: 0755},
+			},
+		},
+		{
+			name: "complex",
+			entries: []zipEntry{
+				{name: "file.txt", content: "file.txt content", mode: 0644},
+				{name: "some/", mode: 0755},
+				{name: "some/directory/", mode: 0755},
+				{name: "some/directory/file.txt", content: "another file-2.txt content", mode: 0644},
+				{name: "some/other-directory/", mode: 0755},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tmp, err := ioutil.TempDir("", "gcs-fetcher-unzip-")
+			if err != nil {
+				t.Fatalf("Creating temp dir: %v", err)
+			}
+			defer func() {
+				if err := os.RemoveAll(tmp); err != nil {
+					t.Fatalf("Removing temp dir %s: %v", tmp, err)
+				}
+			}()
+
+			// Create a zipfile.
+			want := make(map[string]zipEntry)
+			zipfile := filepath.Join(tmp, "source.zip")
+			outfile, err := os.OpenFile(zipfile, os.O_WRONLY|os.O_CREATE, 0666)
+			if err != nil {
+				t.Fatalf("Creating zipfile: %v", err)
+			}
+			writer := zip.NewWriter(outfile)
+			for _, entry := range tc.entries {
+				fh := &zip.FileHeader{Name: entry.name}
+
+				m := entry.mode
+				if strings.HasSuffix(entry.name, "/") {
+					m = m + os.ModeDir
+				}
+				fh.SetMode(m)
+
+				want[entry.name] = zipEntry{name: entry.name, content: entry.content, modeStr: m.String()}
+
+				f, err := writer.CreateHeader(fh)
+				if err != nil {
+					t.Fatalf("Creating entry %s in zipfile: %v", entry.name, err)
+				}
+
+				if entry.content == "" {
+					continue
+				}
+
+				if _, err = f.Write([]byte(entry.content)); err != nil {
+					t.Fatalf("Writing content for file %s in zipfile: %v", entry.name, err)
+				}
+			}
+			if err := writer.Close(); err != nil {
+				t.Fatalf("Closing zipfile: %v", err)
+			}
+
+			// Create an unzip directory.
+			dest := filepath.Join(tmp, "unzip")
+			if err := os.MkdirAll(dest, 0777); err != nil {
+				t.Fatalf("Creating unzip dir: %v", err)
+			}
+
+			// Unzip the archive (this is the function under test).
+			_, err = unzip(zipfile, dest)
+
+			// Walk the unzip folder and store the unzipped results for comparison.
+			got := make(map[string]zipEntry)
+			err = filepath.Walk(dest, func(path string, info os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+
+				// Skip the root directory.
+				if path == dest {
+					return nil
+				}
+
+				e := zipEntry{name: strings.TrimPrefix(path, dest+"/"), modeStr: info.Mode().String()}
+
+				if info.IsDir() {
+					e.name = e.name + "/"
+				} else {
+					// Read the file contents.
+					b, err := ioutil.ReadFile(path)
+					if err != nil {
+						return fmt.Errorf("reading file %s: %v", path, err)
+					}
+					e.content = string(b)
+				}
+
+				got[e.name] = e
+				return nil
+			})
+			if err != nil {
+				t.Fatalf("walking unzip folder %s: %v", dest, err)
+			}
+
+			if !reflect.DeepEqual(got, want) {
+				t.Errorf("unzipped files do not match, got %#v, want %#v", got, want)
+			}
+		})
 	}
 }

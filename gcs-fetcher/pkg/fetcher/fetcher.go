@@ -702,32 +702,11 @@ func (gf *Fetcher) fetchFromZip(ctx context.Context) (err error) {
 	}
 
 	// Unzip into the destination directory
-	unzipStart := time.Now()
 	zipfile := filepath.Join(zipDir, gf.Object)
-	zipReader, err := zip.OpenReader(zipfile)
+	unzipStart := time.Now()
+	numFiles, err := unzip(zipfile, gf.DestDir)
 	if err != nil {
-		return fmt.Errorf("failed to open archive %s: %v", zipfile, err)
-	}
-	defer func() {
-		if cerr := zipReader.Close(); cerr != nil {
-			err = fmt.Errorf("Failed to close file %q: %v", zipfile, cerr)
-		}
-	}()
-
-	numFiles := 0
-	for _, file := range zipReader.File {
-		if file.FileInfo().IsDir() {
-			continue
-		}
-
-		numFiles++
-		zf, err := file.Open()
-		if err != nil {
-			return err
-		}
-		if err := gf.copyFile(file.Name, file.Mode(), zf); err != nil {
-			return err
-		}
+		return err
 	}
 	unzipDuration := time.Since(unzipStart)
 
@@ -760,6 +739,76 @@ func (gf *Fetcher) fetchFromZip(ctx context.Context) (err error) {
 	gf.log("Total time:        %9.2f s", time.Since(started).Seconds())
 	gf.log("******************************************************")
 	return nil
+}
+
+func unzip(zipfile, dest string) (numFiles int, err error) {
+	zipReader, err := zip.OpenReader(zipfile)
+	if err != nil {
+		return 0, fmt.Errorf("opening archive %s: %v", zipfile, err)
+	}
+	defer func() {
+		if cerr := zipReader.Close(); cerr != nil {
+			err = fmt.Errorf("closing archive %s: %v", zipfile, cerr)
+		}
+	}()
+
+	numFiles = 0
+	for _, file := range zipReader.File {
+		target := filepath.Join(dest, file.Name)
+
+		if file.FileInfo().IsDir() {
+			// Create directory with appropriate permissions if it doesn't exist.
+			if _, err := os.Stat(target); os.IsNotExist(err) {
+				if err := os.MkdirAll(target, file.Mode()); err != nil {
+					return 0, fmt.Errorf("making directory %s: %v", target, err)
+				}
+				continue
+			} else if err != nil {
+				return 0, fmt.Errorf("checking existence on %s: %v", target, err)
+			}
+			// If directory already exists, it may have been created below as a
+			// parent directory when processing a file. In this case, we must
+			// set the directory's permissions correctly.
+			if err := os.Chmod(target, file.Mode()); err != nil {
+				return 0, fmt.Errorf("setting permissions on %s: %v", target, err)
+			}
+			continue
+		}
+
+		// Create parent directories with full access. This only matters if the
+		// file comes from zipReader before the directory. In this case, the
+		// file permissions will be set to the correct value when the directory
+		// itself is processed above.
+		if err := os.MkdirAll(filepath.Dir(target), 0777); err != nil {
+			return 0, fmt.Errorf("making parent directories for %s: %v", target, err)
+		}
+
+		// Actually copy the bytes, using func to get early defer calls
+		// (important for large numbers of files).
+		numFiles++
+		reader, err := file.Open()
+		if err != nil {
+			return 0, fmt.Errorf("opening file in %s: %v", target, err)
+		}
+		if err := func() (ferr error) {
+			writer, err := os.OpenFile(target, os.O_WRONLY|os.O_CREATE, file.Mode())
+			if err != nil {
+				return fmt.Errorf("opening target file %s: %v", target, err)
+			}
+			defer func() {
+				if cerr := writer.Close(); cerr != nil {
+					ferr = fmt.Errorf("closing target file %s: %v", target, cerr)
+				}
+			}()
+			if _, err := io.Copy(writer, reader); err != nil {
+				return fmt.Errorf("copying %s to %s: %v", file.Name, target, err)
+			}
+			return nil
+		}(); err != nil {
+			return 0, err
+		}
+	}
+	return numFiles, nil
 }
 
 // fetchFromTarGz is used when downloading a single .tar.gz of source files. It
