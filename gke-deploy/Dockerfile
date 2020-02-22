@@ -1,6 +1,9 @@
 FROM golang:stretch AS build-env
-ADD . /go-src
 WORKDIR /go-src
+COPY go.mod /
+COPY go.sum /
+RUN go mod download
+ADD . /go-src
 RUN go build -o /gke-deploy
 
 FROM google/cloud-sdk:alpine
