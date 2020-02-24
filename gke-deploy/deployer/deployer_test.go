@@ -4,9 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -1388,58 +1386,33 @@ func compareFiles(expectedFile, actualDirectory string) error {
 func buildTestGcsService(t *testing.T) *testservices.TestGcsService {
 	t.Helper()
 
-	gsutil, err := services.NewGsutil(context.Background(), false)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return &testservices.TestGcsService{CopyResponse: map[string]func(src, dst string, recursive bool) error{
-		singleGcsFile: func(src, dst string, recursive bool) error {
-			return gsutil.Copy(context.Background(), "testing/configs/multi-resource.yaml", dst, recursive)
+	return &testservices.TestGcsService{CopyResponse: map[string]func(src, dst string) error{
+		singleGcsFile: func(src, dst string) error {
+			return testservices.Copy("testing/configs/multi-resource.yaml", dst)
 		},
-		gcsDirectory: func(src, dst string, recursive bool) error {
-			return gsutil.Copy(context.Background(), "testing/configs/directory/*", dst, recursive)
+		gcsDirectory: func(src, dst string) error {
+			return testservices.Copy("testing/configs/directory", dst)
 		},
-		gcsNestedDir: func(src, dst string, recursive bool) error {
-			return gsutil.Copy(context.Background(), "testing/configs/nested-directory", dst, recursive)
+		gcsNestedDir: func(src, dst string) error {
+			return testservices.Copy("testing/configs/nested-directory", dst)
 		},
-		dirWithoutWildcard: func(src, dst string, recursive bool) error {
+		dirWithoutWildcard: func(src, dst string) error {
 
 			return errors.New("failed to download configuration files")
 		},
-		expandedFile: func(src, dst string, recursive bool) error {
+		expandedFile: func(src, dst string) error {
 			if strings.HasPrefix(src, gcsOutputBucket) {
-				return gsutil.Copy(context.Background(), strings.Join([]string{testOutputDir, "expanded-resources.yaml"}, "/"), dst, recursive)
+				return testservices.Copy(strings.Join([]string{testOutputDir, "expanded-resources.yaml"}, "/"), dst)
 			}
-			return gsutil.Copy(context.Background(), src, strings.Join([]string{testOutputDir, "expanded-resources.yaml"}, "/"), recursive)
+			return testservices.Copy(src, strings.Join([]string{testOutputDir, "expanded-resources.yaml"}, "/"))
 		},
-		suggestedFile: func(src, dst string, recursive bool) error {
+		suggestedFile: func(src, dst string) error {
 			if strings.HasPrefix(src, gcsOutputBucket) {
-				return gsutil.Copy(context.Background(), strings.Join([]string{testOutputDir, "suggested-resources.yaml"}, "/"), dst, recursive)
+				return testservices.Copy(strings.Join([]string{testOutputDir, "suggested-resources.yaml"}, "/"), dst)
 			}
-			return gsutil.Copy(context.Background(), src, strings.Join([]string{testOutputDir, "suggested-resources.yaml"}, "/"), recursive)
-
+			return testservices.Copy(src, strings.Join([]string{testOutputDir, "suggested-resources.yaml"}, "/"))
 		},
 	},
 	}
 
-}
-
-func copyFile(src, dst, name string) {
-	from, err := os.Open(src)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer from.Close()
-
-	to, err := os.OpenFile(strings.Join([]string{dst, name}, "/"), os.O_RDWR|os.O_CREATE, 0777)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer to.Close()
-
-	_, err = io.Copy(to, from)
-	if err != nil {
-		log.Fatal(err)
-	}
 }

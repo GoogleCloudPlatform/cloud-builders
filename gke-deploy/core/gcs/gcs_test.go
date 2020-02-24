@@ -47,15 +47,15 @@ var counter2 int
 
 func buildTestGCS(t *testing.T) *GCS {
 	t.Helper()
-	s := &testservices.TestGcsService{CopyResponse: map[string]func(src, dst string, recursive bool) error{
-		singleFile: func(src, dst string, recursive bool) error { return nil },
-		directory:  func(src, dst string, recursive bool) error { return nil },
-		nestedDir:  func(src, dst string, recursive bool) error { return nil },
-		slowReadFile: func(src, dst string, recursive bool) error {
+	s := &testservices.TestGcsService{CopyResponse: map[string]func(src, dst string) error{
+		singleFile: func(src, dst string) error { return nil },
+		directory:  func(src, dst string) error { return nil },
+		nestedDir:  func(src, dst string) error { return nil },
+		slowReadFile: func(src, dst string) error {
 			time.Sleep(3 * time.Second)
 			return nil
 		},
-		retryFile: func(src, dst string, recursive bool) error {
+		retryFile: func(src, dst string) error {
 			if counter1 == 0 {
 				counter1++
 				return errors.New(errMsg)
@@ -63,7 +63,7 @@ func buildTestGCS(t *testing.T) *GCS {
 			return nil
 		},
 
-		skipRetry: func(src, dst string, recursive bool) error {
+		skipRetry: func(src, dst string) error {
 			if counter2 <= 1 {
 				counter2++
 				return errors.New(errDenied)
@@ -71,16 +71,16 @@ func buildTestGCS(t *testing.T) *GCS {
 			return nil
 		},
 
-		errorFile:         func(src, dst string, recursive bool) error { return errors.New(errMsg) },
-		accessDeniedFile:  func(src, dst string, recursive bool) error { return errors.New(errDenied) },
-		notFoundFile:      func(src, dst string, recursive bool) error { return errors.New(errFileNotFound) },
-		expandedK8sConfig: func(src, dst string, recursive bool) error { return nil },
-		slowUploadConfig: func(src, dst string, recursive bool) error {
+		errorFile:         func(src, dst string) error { return errors.New(errMsg) },
+		accessDeniedFile:  func(src, dst string) error { return errors.New(errDenied) },
+		notFoundFile:      func(src, dst string) error { return errors.New(errFileNotFound) },
+		expandedK8sConfig: func(src, dst string) error { return nil },
+		slowUploadConfig: func(src, dst string) error {
 			time.Sleep(3 * time.Second)
 			return nil
 		},
-		accessDeniedConfig:   func(src, dst string, recursive bool) error { return errors.New(errDenied) },
-		bucketNotFoundConfig: func(src, dst string, recursive bool) error { return errors.New(errBucketNotFound) },
+		accessDeniedConfig:   func(src, dst string) error { return errors.New(errDenied) },
+		bucketNotFoundConfig: func(src, dst string) error { return errors.New(errBucketNotFound) },
 	},
 	}
 
