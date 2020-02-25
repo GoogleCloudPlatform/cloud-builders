@@ -81,6 +81,7 @@ func copyDir(srcdir, destdir string, info os.FileInfo) error {
 	return nil
 }
 
+// Copy simulates the gsutil copy.
 func Copy(src, dest string) error {
 	info, err := os.Stat(src)
 	if err != nil {
