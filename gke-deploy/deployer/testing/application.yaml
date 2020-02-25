@@ -1,0 +1,20 @@
+apiVersion: app.k8s.io/v1beta1
+kind: Application
+metadata:
+  labels:
+    app.kubernetes.io/name: nginx
+  name: test-app
+spec:
+  componentKinds:
+  - group: apps
+    kind: Deployment
+  - group: autoscaling
+    kind: HorizontalPodAutoscaler
+  - group: core
+    kind: Service
+  descriptor:
+    type: nginx
+    version: asdf
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nginx

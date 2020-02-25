@@ -7,6 +7,7 @@ import (
 
 // TestKubectl implements the KubectlService interface.
 type TestKubectl struct {
+	ApplyResponse           map[string][]error
 	ApplyFromStringResponse map[string][]error
 	GetResponse             map[string]map[string][]GetResponse
 }
@@ -15,6 +16,24 @@ type TestKubectl struct {
 type GetResponse struct {
 	Res string
 	Err error
+}
+
+// Apply calls `kubectl apply -f <filename> -n <namespace>`.
+func (k *TestKubectl) Apply(ctx context.Context, filename, namespace string) error {
+	errors, ok := k.ApplyResponse[filename]
+	if !ok {
+		panic(fmt.Sprintf("ApplyResponse has no response for filename %q", filename))
+	}
+	if len(errors) == 0 {
+		panic(fmt.Sprintf("ApplyResponse ran out of responses for filename %q", filename))
+	}
+	err := errors[0]
+	if len(errors) == 1 {
+		delete(k.ApplyResponse, filename)
+	} else {
+		k.ApplyResponse[filename] = k.ApplyResponse[filename][:1]
+	}
+	return err
 }
 
 // ApplyFromString calls `kubectl apply -f - -n <namespace> < ${configString}`.
