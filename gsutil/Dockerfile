@@ -1,7 +1,7 @@
 FROM gcr.io/cloud-builders/gcloud-slim
 
 RUN apt-get -y update && \
-    apt-get -y install unzip zip && \
+    apt-get -y install unzip zip zstd && \
     rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["gsutil"]
