@@ -59,7 +59,7 @@ You can deploy an
 for your application:
 
 1. Follow the instructions
-[here](https://cloud-dot-devsite.googleplex.com/kubernetes-engine/docs/how-to/add-on/application-delivery)
+[here](https://cloud.google.com/kubernetes-engine/docs/how-to/add-on/application-delivery)
 to create or update a GKE cluster to install Application Delivery, which
 supports the Application CRD.
 
