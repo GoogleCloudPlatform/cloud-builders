@@ -25,9 +25,9 @@ func CreateApplicationLinksListFromEqualDelimitedStrings(applicationLinks []stri
 		if p == "" {
 			continue
 		}
-		kv := strings.Split(p, "=")
+		kv := strings.SplitN(p, "=", 2)
 		if len(kv) != 2 {
-			return nil, fmt.Errorf("invalid key value pair: %q", p)
+			return nil, fmt.Errorf("key value pair must be separated by a '=' character")
 		}
 		k := strings.TrimSpace(kv[0])
 		if k == "" {
@@ -55,9 +55,9 @@ func CreateMapFromEqualDelimitedStrings(labels []string) (map[string]string, err
 		if p == "" {
 			continue
 		}
-		kv := strings.Split(p, "=")
+		kv := strings.SplitN(p, "=", 2)
 		if len(kv) != 2 {
-			return nil, fmt.Errorf("invalid key value pair: %q", p)
+			return nil, fmt.Errorf("key value pair must be separated by a '=' character")
 		}
 		k := strings.TrimSpace(kv[0])
 		if k == "" {
