@@ -76,6 +76,17 @@ func TestCreateApplicationLinksListFromEqualDelimitedStrings(t *testing.T) {
 			Description: "d",
 			URL:         "f",
 		}},
+	}, {
+		name: "More than one =",
+
+		keyValues: []string{
+			"a=b=",
+		},
+
+		want: []applicationsv1beta1.Link{{
+			Description: "a",
+			URL:         "b=",
+		}},
 	}}
 
 	for _, tc := range tests {
@@ -97,12 +108,6 @@ func TestCreateApplicationLinksListFromEqualDelimitedStringsErrors(t *testing.T)
 
 		keyValues: []string{
 			"a",
-		},
-	}, {
-		name: "More than one =",
-
-		keyValues: []string{
-			"a=b=",
 		},
 	}, {
 		name: "No key",
@@ -188,6 +193,16 @@ func TestCreateMapFromEqualDelimitedStrings(t *testing.T) {
 			"c": "d",
 			"d": "f",
 		},
+	}, {
+		name: "More than one =",
+
+		keyValues: []string{
+			"a=b=",
+		},
+
+		want: map[string]string{
+			"a": "b=",
+		},
 	}}
 
 	for _, tc := range tests {
@@ -209,12 +224,6 @@ func TestCreateMapFromEqualDelimitedStringsErrors(t *testing.T) {
 
 		keyValues: []string{
 			"a",
-		},
-	}, {
-		name: "More than one =",
-
-		keyValues: []string{
-			"a=b=",
 		},
 	}, {
 		name: "No key",
