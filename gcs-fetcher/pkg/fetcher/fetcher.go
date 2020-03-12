@@ -67,7 +67,8 @@ var (
 	noTimeout      = 0 * time.Second
 	errGCSTimeout  = errors.New("GCS timeout")
 
-	robotRegex = regexp.MustCompile(`<Details>(\S+@\S+)\s`)
+	robotRegex  = regexp.MustCompile(`<Details>(\S+@\S+)\s`)
+	nonHexRegex = regexp.MustCompile(`[^0-9a-f]`)
 )
 
 type sizeBytes int64
@@ -402,14 +403,15 @@ func (gf *Fetcher) fetchObjectOnce(ctx context.Context, j job, dest string, brea
 		result.err = errGCSTimeout
 		return result
 	default:
-		result.size = sizeBytes(n)
-		return result
+		// Fallthrough
 	}
+
+	result.size = sizeBytes(n)
 
 	// Verify the sha1sum before declaring success.
 	if j.sha1sum != "" {
-		got := fmt.Sprintf("%x", h.Sum(nil))
-		want := j.sha1sum
+		got := strings.ToLower(fmt.Sprintf("%x", h.Sum(nil)))
+		want := strings.ToLower(nonHexRegex.ReplaceAllString(j.sha1sum, ""))
 		if got != want {
 			result.err = fmt.Errorf("%s SHA mismatch, got %q, want %q", j.filename, got, want)
 			return result
