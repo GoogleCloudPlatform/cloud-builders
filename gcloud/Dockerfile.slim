@@ -23,6 +23,7 @@ RUN apt-get -y update && \
 
     # Clean up
     apt-get -y remove gcc python-dev python-setuptools wget && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf ~/.config/gcloud
 
