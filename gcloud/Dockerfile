@@ -28,4 +28,6 @@ RUN apt-get -y update && \
     /builder/google-cloud-sdk/bin/gcloud components list && \
 
     # Clean up
+    apt-get --purge -y autoremove && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
