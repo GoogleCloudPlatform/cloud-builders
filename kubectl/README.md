@@ -47,7 +47,7 @@ first run a command to fetch cluster credentials as follows.
 
 Then, `kubectl` will have the configuration needed to talk to your GKE cluster.
 
-**Alternate Configuration with you custom kube config
+**Alternate Configuration with you custom kube config**
 
 As an altrnative, you may provide an own kube configuration (as found in .kube/config) by passing an environemnt variable containing the path to your conf file: 
 ```KUBERNETES_CONFIG_FILE=mykubeconf.yml```
