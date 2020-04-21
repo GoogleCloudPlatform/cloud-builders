@@ -13,8 +13,8 @@ import (
 const (
 	retries    = 3
 	dstDir     = ".workspace/"
-	timeoutGCS = 1 * time.Second
-	delay      = 1 * time.Second
+	timeoutGCS = 10 * time.Millisecond
+	delay      = 10 * time.Millisecond
 
 	singleFile = "gs://k8s.yml"
 	directory  = "gs://configs"
@@ -52,7 +52,7 @@ func buildTestGCS(t *testing.T) *GCS {
 		directory:  func(src, dst string) error { return nil },
 		nestedDir:  func(src, dst string) error { return nil },
 		slowReadFile: func(src, dst string) error {
-			time.Sleep(3 * time.Second)
+			time.Sleep(20 * time.Millisecond)
 			return nil
 		},
 		retryFile: func(src, dst string) error {
@@ -76,7 +76,7 @@ func buildTestGCS(t *testing.T) *GCS {
 		notFoundFile:      func(src, dst string) error { return errors.New(errFileNotFound) },
 		expandedK8sConfig: func(src, dst string) error { return nil },
 		slowUploadConfig: func(src, dst string) error {
-			time.Sleep(3 * time.Second)
+			time.Sleep(20 * time.Millisecond)
 			return nil
 		},
 		accessDeniedConfig:   func(src, dst string) error { return errors.New(errDenied) },
