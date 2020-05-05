@@ -1,7 +1,7 @@
 # Google Cloud Build official builder images
 
 This repository contains source code for official builders used with the [Google
-Cloud Build API](https://cloud.google.com/cloud-build/docs/)...
+Cloud Build API](https://cloud.google.com/cloud-build/docs/)....
 
 Pre-built images are available at `gcr.io/cloud-builders/...` and include:
 
