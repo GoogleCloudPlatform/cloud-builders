@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo           ***** DEPRECATION NOTICE *****
+echo           \*\*\*\*\* DEPRECATION NOTICE \*\*\*\*\*
 echo
 echo This image is deprecated and will no longer be updated.
 echo This recent version of the image will continue to exist.
@@ -15,6 +15,6 @@ echo
 echo Please note that these images support pinned versions
 echo as well.
 echo
-echo           ***** DEPRECATION NOTICE *****
+echo           \*\*\*\*\* DEPRECATION NOTICE \*\*\*\*\*
 
 /builder/google-cloud-sdk/bin/gcloud $@
