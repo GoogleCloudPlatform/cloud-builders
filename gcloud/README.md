@@ -12,7 +12,18 @@ credentials of the [builder service
 account](https://cloud.google.com/cloud-build/docs/permissions) for the
 project.
 
-The latest released version of `gcloud` is used.
+Note: This image is deprecated in favor of
+[google/cloud-sdk](https://hub.docker.com/r/google/cloud-sdk/). Users can switch
+to using the `google/cloud-sdk` image today for a maintained and up-to-date 
+gcloud` builder. The deprecation is tracked in
+[issue638](https://github.com/GoogleCloudPlatform/cloud-builders/issues/638).
+
+The below documentation applies to the existing image and is maintained here
+for historical purposes and for existing users. If your testing with
+`google/cloud-sdk` reveals incompatibilities, please post a comment in
+[issue638](https://github.com/GoogleCloudPlatform/cloud-builders/issues/638).
+
+-------
 
 ## Examples
 
