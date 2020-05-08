@@ -36,8 +36,8 @@ This `cloudbuild.yaml` invokes `gcloud source repos clone` to clone the
 
 ```
 steps:
-- name: gcr.io/cloud-builders/gcloud
-  args: ['source', 'repos', 'clone', 'default']
+- name: 'google/cloud-sdk'
+  args: ['gcloud', 'source', 'repos', 'clone', 'default']
 ```
 
 
