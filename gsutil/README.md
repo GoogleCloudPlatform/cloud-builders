@@ -14,8 +14,8 @@ project.
 
 Note: This image is deprecated in favor of
 [`google/cloud-sdk`](https://hub.docker.com/r/google/cloud-sdk/). Users can switch
-to using the `google/cloud-sdk` image today for a maintained and up-to-date 
-`gcloud` builder. The deprecation is tracked in
+to using the `google/cloud-sdk` image today for a maintained and up-to-date
+`gsutil` builder. The deprecation is tracked in
 [issue638](https://github.com/GoogleCloudPlatform/cloud-builders/issues/638).
 
 The below documentation applies to the existing image and is maintained here
