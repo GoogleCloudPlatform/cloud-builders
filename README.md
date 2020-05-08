@@ -9,11 +9,9 @@ Pre-built images are available at `gcr.io/cloud-builders/...` and include:
 *   `curl`: runs the [curl](https://curl.haxx.se) tool
 *   `docker`: runs the [docker](https://docker.com) tool
 *   `dotnet`: run the [dotnet](https://docs.microsoft.com/dotnet/core/tools/) tool
-*   `gcloud`: runs the [gcloud](https://cloud.google.com/sdk/gcloud/) tool
 *   `git`: runs the [git](https://git-scm.com/) tool
 *   `go`: runs the [go](https://golang.org/cmd/go) tool
 *   `gradle`: runs the [gradle](https://gradle.org/) tool
-*   `gsutil`: runs the [gsutil](https://cloud.google.com/storage/docs/gsutil) tool
 *   `kubectl`: runs the [kubectl](https://kubernetes.io/docs/user-guide/kubectl-overview/) tool
 *   `mvn`: runs the [maven](https://maven.apache.org/) tool
 *   `npm`: runs the [npm](https://docs.npmjs.com/) tool
@@ -30,3 +28,12 @@ If you are experiencing an issue with the Cloud Build service or
 have a feature request, e-mail google-cloud-dev@googlegroups.com
 or see our [Getting support](https://cloud.google.com/cloud-build/docs/getting-support)
 documentation.
+
+---
+
+The following builders in this repo are deprecated and will be deleted in the future:
+
+*   `gcloud`: runs the [gcloud](https://cloud.google.com/sdk/gcloud/) tool
+*   `gsutil`: runs the [gsutil](https://cloud.google.com/storage/docs/gsutil) tool
+
+Both are replaced by [`google/cloud-sdk`](https://hub.docker.com/r/google/cloud-sdk/).
