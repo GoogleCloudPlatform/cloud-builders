@@ -37,8 +37,8 @@ workspace.
 
 ```
 steps:
-- name: gcr.io/cloud-builders/gsutil
-  args: ['cp', 'gs://mybucket/remotefile.zip', 'localfile.zip']
+- name: google/cloud-sdk
+  args: ['gsutil', 'cp', 'gs://mybucket/remotefile.zip', 'localfile.zip']
 ```
 
 ### Copy a local file to Google Cloud Storage
@@ -48,6 +48,6 @@ Storage.
 
 ```
 steps:
-- name: gcr.io/cloud-builders/gsutil
-  args: ['cp', 'localfile.zip', 'gs://mybucket/remotefile.zip']
+- name: google/cloud-sdk
+  args: ['gsutil', 'cp', 'localfile.zip', 'gs://mybucket/remotefile.zip']
 ```
