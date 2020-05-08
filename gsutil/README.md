@@ -37,7 +37,7 @@ workspace.
 
 ```
 steps:
-- name: google/cloud-sdk
+- name: 'google/cloud-sdk'
   args: ['gsutil', 'cp', 'gs://mybucket/remotefile.zip', 'localfile.zip']
 ```
 
@@ -48,6 +48,6 @@ Storage.
 
 ```
 steps:
-- name: google/cloud-sdk
+- name: 'google/cloud-sdk'
   args: ['gsutil', 'cp', 'localfile.zip', 'gs://mybucket/remotefile.zip']
 ```
