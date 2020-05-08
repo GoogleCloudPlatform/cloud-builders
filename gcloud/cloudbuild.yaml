@@ -14,10 +14,9 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/gcloud-slim'
   args: ['info']
 
-# Invoke a command that requires auth, to check that it gets piped through
-# correctly.
+# Confirm that auth is piped through correctly.
 - name: 'gcr.io/$PROJECT_ID/gcloud'
-  args: ['source', 'repos', 'clone', 'default']
+  args: ['builds', 'list']
 
 images:
 - 'gcr.io/$PROJECT_ID/gcloud'
