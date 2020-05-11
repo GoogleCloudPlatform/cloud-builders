@@ -48,9 +48,3 @@ There are two variants of the `gcloud` builder:
 * `gcloud` installs all optional gcloud components, and is much larger.
 * `gcloud-slim` installs only the `gcloud` CLI and no components, and is
   smaller.
-
-Both images are cached on Cloud Build VMs, so the size of the image should not
-matter in most cases when running in that environment. However, in other
-environments where images are not cached, you may find that a smaller builder
-image is faster to pull, and might be preferrable to the larger "kitchen sink"
-`gcloud` builder image.
