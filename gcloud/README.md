@@ -18,8 +18,7 @@ to using the `google/cloud-sdk` image today for a maintained and up-to-date
 `gcloud` builder. The deprecation is tracked in
 [issue638](https://github.com/GoogleCloudPlatform/cloud-builders/issues/638).
 
-The below documentation applies to the existing image and is maintained here
-for historical purposes and for existing users. If your testing with
+If your testing with
 `google/cloud-sdk` reveals incompatibilities, please post a comment in
 [issue638](https://github.com/GoogleCloudPlatform/cloud-builders/issues/638).
 
@@ -27,7 +26,7 @@ for historical purposes and for existing users. If your testing with
 
 ## Examples
 
-The following examples demonstrate build request that use this builder:
+The following examples demonstrate build request that use `gcloud`.
 
 ### Clone a Cloud Source Repository using `gcloud`
 
