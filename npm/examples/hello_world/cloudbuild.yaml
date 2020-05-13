@@ -1,7 +1,9 @@
 steps:
-- name: 'gcr.io/cloud-builders/npm'
+- name: 'node'
+  entrypoint: 'npm'
   args: ['install']
-- name: 'gcr.io/cloud-builders/npm'
+- name: 'node'
+  entrypoint: 'npm'
   args: ['test']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--tag=gcr.io/$PROJECT_ID/hello_npm', '.']
