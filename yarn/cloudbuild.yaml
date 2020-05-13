@@ -3,8 +3,6 @@
 
 steps:
 # Build all supported versions.
-# TODO(jasonhall): Deprecate and stop building these tagged images. Users
-# should use the official node image directly.
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'

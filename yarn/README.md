@@ -2,8 +2,12 @@
 
 This Cloud Build builder runs the `yarn` tool.
 
-You should consider instead using an [official `node`
-image](https://hub.docker.com/_/node/) and specifying the `yarn` entrypoint:
+## Deprecation Notice
+
+This builder is deprecated in favor of the supported
+[official `node` images](https://hub.docker.com/_/node/).
+
+Example `cloudbuild.yaml`:
 
 ```yaml
 steps:
@@ -12,10 +16,4 @@ steps:
   args: ['install']
 ```
 
-This allows you to use any supported version of Yarn.
-
-## Building this builder
-
-To build this builder, run the following command in this directory.
-
-    $ gcloud builds submit
+This builder will be deleted in an upcoming release.
