@@ -1,2 +1,3 @@
 FROM microsoft/dotnet:sdk
-ENTRYPOINT ["dotnet"]
+COPY ./deprecation.sh /
+ENTRYPOINT ["/deprecation.sh"]
