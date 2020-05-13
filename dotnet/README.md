@@ -8,7 +8,7 @@ entrypoint:
 
 ```yaml
 steps:
-- name: microsoft/dotnet:sdk
-  entrypoint: dotnet
+- name: 'microsoft/dotnet:sdk'
+  entrypoint: 'dotnet'
   args: ['build']
 ```
