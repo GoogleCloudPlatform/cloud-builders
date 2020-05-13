@@ -8,7 +8,6 @@ Pre-built images are available at `gcr.io/cloud-builders/...` and include:
 *   `bazel`: runs the [bazel](https://bazel.io) tool
 *   `curl`: runs the [curl](https://curl.haxx.se) tool
 *   `docker`: runs the [docker](https://docker.com) tool
-*   `dotnet`: run the [dotnet](https://docs.microsoft.com/dotnet/core/tools/) tool
 *   `git`: runs the [git](https://git-scm.com/) tool
 *   `go`: runs the [go](https://golang.org/cmd/go) tool
 *   `gradle`: runs the [gradle](https://gradle.org/) tool
@@ -39,3 +38,5 @@ The following builders in this repo are deprecated and will be deleted in the fu
 *   Replaced by the [`node`](https://hub.docker.com/_/node) image:
     *   `npm`: runs the [npm](https://docs.npmjs.com/) tool
     *   `yarn`: runs the [yarn](https://yarnpkg.com/) tool
+*   Replaced by [`microsoft/dotnet:sdk`](https://hub.docker.com/_/microsoft-dotnet-core):
+    *   `dotnet`: runs the [dotnet](https://docs.microsoft.com/dotnet/core/tools/) tool
