@@ -14,9 +14,7 @@ Pre-built images are available at `gcr.io/cloud-builders/...` and include:
 *   `gradle`: runs the [gradle](https://gradle.org/) tool
 *   `kubectl`: runs the [kubectl](https://kubernetes.io/docs/user-guide/kubectl-overview/) tool
 *   `mvn`: runs the [maven](https://maven.apache.org/) tool
-*   `npm`: runs the [npm](https://docs.npmjs.com/) tool
 *   `wget`: runs the [wget](https://www.gnu.org/software/wget/) tool
-*   `yarn`: runs the [yarn](https://yarnpkg.com/) tool
 
 Builders contributed by the public are available in the [Cloud Builders
 Community
@@ -31,9 +29,13 @@ documentation.
 
 ---
 
+# Deprecated Images
+
 The following builders in this repo are deprecated and will be deleted in the future:
 
-*   `gcloud`: runs the [gcloud](https://cloud.google.com/sdk/gcloud/) tool
-*   `gsutil`: runs the [gsutil](https://cloud.google.com/storage/docs/gsutil) tool
-
-Both are replaced by [`google/cloud-sdk`](https://hub.docker.com/r/google/cloud-sdk/).
+*   Replaced by [`google/cloud-sdk`](https://hub.docker.com/r/google/cloud-sdk/) image:
+    *   `gcloud`: runs the [gcloud](https://cloud.google.com/sdk/gcloud/) tool
+    *   `gsutil`: runs the [gsutil](https://cloud.google.com/storage/docs/gsutil) tool
+*   Replaced by the [`node`](https://hub.docker.com/_/node) image:
+    *   `npm`: runs the [npm](https://docs.npmjs.com/) tool
+    *   `yarn`: runs the [yarn](https://yarnpkg.com/) tool
