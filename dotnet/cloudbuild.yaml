@@ -5,7 +5,6 @@ steps:
   args:
   - 'build'
   - '--tag=gcr.io/$PROJECT_ID/dotnet'
-  - '--tag=gcr.io/$PROJECT_ID/csharp/dotnet'
   - '.'
 
 # Build the test projects
