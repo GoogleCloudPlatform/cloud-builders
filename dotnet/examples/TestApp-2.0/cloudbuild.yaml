@@ -3,7 +3,8 @@ steps:
 
 # .NET Core 2.0 by default restores before any build, so we can
 # combine the restore and publish operations in a single statement.
-- name: 'gcr.io/cloud-builders/dotnet'
+- name: 'microsoft/dotnet:sdk'
+  entrypoint: 'dotnet'
   args: [ 'publish', '-c', 'Release' ]
 
 # Build the app image.
