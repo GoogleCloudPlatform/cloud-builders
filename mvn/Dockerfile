@@ -1,3 +1,4 @@
 ARG MAVEN_VERSION=latest
 FROM maven:${MAVEN_VERSION}
-ENTRYPOINT ["mvn"]
+COPY deprecation.sh /bin
+ENTRYPOINT ["/bin/deprecation.sh"]
