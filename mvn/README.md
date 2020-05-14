@@ -1,13 +1,13 @@
 # Tool builder: `gcr.io/cloud-builders/mvn`
 
-This Cloud Build builder runs Maven.
+This Cloud Build builder is deprecated and will be deleted in an upcoming
+release.
 
-You should consider instead using an [official `maven`
-image](https://hub.docker.com/_/maven/) and specifying the `mvn` entrypoint:
+Please use an [official `maven` image](https://hub.docker.com/_/maven/):
 
 ```yaml
 steps:
-- name: maven:3.6.0-jdk-11-slim
+- name: 'maven'
   entrypoint: 'mvn'
   args: ['install']
 ```
