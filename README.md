@@ -5,7 +5,6 @@ Cloud Build API](https://cloud.google.com/cloud-build/docs/).
 
 Pre-built images are available at `gcr.io/cloud-builders/...` and include:
 
-*   `docker`: runs the [docker](https://docker.com) tool
 *   `git`: runs the [git](https://git-scm.com/) tool
 *   `go`: runs the [go](https://golang.org/cmd/go) tool
 *   `kubectl`: runs the [kubectl](https://kubernetes.io/docs/user-guide/kubectl-overview/) tool
@@ -28,6 +27,8 @@ documentation.
 
 The following builders in this repo are deprecated and will be deleted in the future:
 
+*   Replaced by [`docker`](https://hub.docker.com/_/docker/) image:
+    *   `docker`: runs the [docker](https://docker.com) tool
 *   Replaced by [`google/cloud-sdk`](https://hub.docker.com/r/google/cloud-sdk/) image:
     *   `gcloud`: runs the [gcloud](https://cloud.google.com/sdk/gcloud/) tool
     *   `gsutil`: runs the [gsutil](https://cloud.google.com/storage/docs/gsutil) tool
