@@ -1,9 +1,10 @@
 # curl
 
-This is a tool build to simply invoke the
-[`curl`](https://www.gnu.org/software/curl/) command.
+## Deprecation Notice
 
-Arguments passed to this builder will be passed to `curl` directly.
+This image is deprecated, replaced by the
+[`curlimages/curl`](https://hub.docker.com/r/curlimages/curl) image on
+Dockerhub.
 
 ## Examples
 
@@ -16,7 +17,7 @@ file must be publicly readable, since no credentials are passed in the request.
 
 ```
 steps:
-- name: gcr.io/cloud-builders/curl
+- name: 'curlimages/curl'
   args: ['http://www.example.com/remotefile.zip', '--output', 'localfile.zip']
 ```
 
@@ -27,6 +28,6 @@ has happened, including the build's unique ID in the JSON body of the request.
 
 ```
 steps:
-- name: gcr.io/cloud-builders/curl
+- name: 'curlimages/curl'
   args: ['-d', '"{\"id\":\"$BUILD_ID\"}"', '-X', 'POST', 'http://www.example.com']
 ```
