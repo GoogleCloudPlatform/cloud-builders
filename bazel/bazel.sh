@@ -1,5 +1,21 @@
 #!/bin/bash
 
+echo
+echo           \*\*\*\*\* DEPRECATION NOTICE \*\*\*\*\*
+echo
+echo This image is deprecated and will no longer be updated.
+echo This recent version of the image will continue to exist.
+echo
+echo In place of this image, please use one of the official
+echo \`bazel\` images available at
+echo \`gcr.io/cloud-marketplace-containers/google/bazel\`.
+echo
+echo For details, visit
+echo http://gcr.io/cloud-marketplace-containers/google/bazel
+echo
+echo           \*\*\*\*\* DEPRECATION NOTICE \*\*\*\*\*
+echo
+
 set -e
 
 # Always write the build_event_text_file to a temp file we create.
