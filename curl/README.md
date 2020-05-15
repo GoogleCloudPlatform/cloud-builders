@@ -18,7 +18,7 @@ file must be publicly readable, since no credentials are passed in the request.
 ```
 steps:
 - name: 'curlimages/curl'
-  args: ['http://www.example.com/remotefile.zip', '--output', 'localfile.zip']
+  args: ['http://www.example.com/']
 ```
 
 ### Ping a remote URL
