@@ -1,5 +1,24 @@
 # Bazel
 
+## Deprecation Notice
+
+This builder is deprecated and will be deleted in an upcoming release.
+The recent version of the image will remain available for use. As a
+replacement, please use one of the supported images at
+http://gcr.io/cloud-marketplace-containers/google/bazel.
+
+Usage:
+```
+steps:
+- name: 'gcr.io/cloud-marketplace-containers/google/bazel'
+  entrypoint: 'bazel'
+  args: ['build', '//java/com/company/service:server']
+```
+
+---
+
+## Deprecated Usage Details
+
 This is a tool builder to simply invoke [`bazel`](https://bazel.io) commands.
 
 Arguments passed to this builder will be passed to `bazel` directly.
