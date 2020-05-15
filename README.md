@@ -38,6 +38,8 @@ The following builders in this repo are deprecated and will be deleted in the fu
     *   `yarn`: runs the [yarn](https://yarnpkg.com/) tool
 *   Replaced by [`microsoft/dotnet:sdk`](https://hub.docker.com/_/microsoft-dotnet-core):
     *   `dotnet`: runs the [dotnet](https://docs.microsoft.com/dotnet/core/tools/) tool
+*   Replaced by [`openjdk`](https://hub.docker.com/_/openjdk)
+    *   `javac`: runs the [javac](https://docs.oracle.com/javase/7/docs/technotes/tools/windows/javac.html) tool
 *   Replaced by [`gradle`](https://hub.docker.com/_/gradle/):
     *   `gradle`: runs the [gradle](https://gradle.org/) tool
 *   Replaced by [`maven`](https://hub.docker.com/_/maven/):
