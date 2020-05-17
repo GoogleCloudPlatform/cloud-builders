@@ -6,7 +6,7 @@ RUN go mod download
 ADD . /go-src
 RUN go build -o /gke-deploy
 
-FROM google/cloud-sdk:alpine
+FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
 RUN gcloud -q components install kubectl
 RUN gcloud -q components install gsutil
 

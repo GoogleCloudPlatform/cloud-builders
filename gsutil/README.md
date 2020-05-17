@@ -13,13 +13,13 @@ account](https://cloud.google.com/cloud-build/docs/permissions) for the
 project.
 
 Note: This image is deprecated in favor of
-[`google/cloud-sdk`](https://hub.docker.com/r/google/cloud-sdk/). Users can switch
-to using the `google/cloud-sdk` image today for a maintained and up-to-date
+[`gcr.io/google.com/cloudsdktool/cloud-sdk`](https://github.com/GoogleCloudPlatform/cloud-sdk-docker). Users can switch
+to using the `gcr.io/google.com/cloudsdktool/cloud-sdk` image today for a maintained and up-to-date
 `gsutil` builder. The deprecation is tracked in
 [issue638](https://github.com/GoogleCloudPlatform/cloud-builders/issues/638).
 
 If your testing with
-`google/cloud-sdk` reveals incompatibilities, please post a comment in
+`gcr.io/google.com/cloudsdktool/cloud-sdk` reveals incompatibilities, please post a comment in
 [issue638](https://github.com/GoogleCloudPlatform/cloud-builders/issues/638).
 
 ## Examples
@@ -36,7 +36,7 @@ workspace.
 
 ```
 steps:
-- name: 'google/cloud-sdk'
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   args: ['gsutil', 'cp', 'gs://mybucket/remotefile.zip', 'localfile.zip']
 ```
 
@@ -47,6 +47,6 @@ Storage.
 
 ```
 steps:
-- name: 'google/cloud-sdk'
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   args: ['gsutil', 'cp', 'localfile.zip', 'gs://mybucket/remotefile.zip']
 ```

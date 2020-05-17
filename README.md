@@ -30,7 +30,7 @@ The following builders in this repo are deprecated and will be deleted in the fu
 
 *   Replaced by [`docker`](https://hub.docker.com/_/docker/) image:
     *   `docker`: runs the [docker](https://docker.com) tool
-*   Replaced by [`google/cloud-sdk`](https://hub.docker.com/r/google/cloud-sdk/) image:
+*   Replaced by [`gcr.io/google.com/cloudsdktool/cloud-sdk`](https://github.com/GoogleCloudPlatform/cloud-sdk-docker) image:
     *   `gcloud`: runs the [gcloud](https://cloud.google.com/sdk/gcloud/) tool
     *   `gsutil`: runs the [gsutil](https://cloud.google.com/storage/docs/gsutil) tool
 *   Replaced by the [`node`](https://hub.docker.com/_/node) image:

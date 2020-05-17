@@ -34,7 +34,7 @@ steps:
   args: ['cat', 'fetched/cloudbuild.yaml']
 
 # Tar.gz and upload the current directory, then fetch and check contents.
-- name: google/cloud-sdk
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
   entrypoint: 'bash'
   args:
   - -c
@@ -52,7 +52,7 @@ steps:
   - targz/cloudbuild.yaml
 
 # Zip and upload the current directory, then fetch and check contents.
-- name: google/cloud-sdk
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
   entrypoint: 'bash'
   args:
   - -c
