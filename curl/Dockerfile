@@ -1,7 +1,3 @@
-FROM launcher.gcr.io/google/ubuntu16_04
-
-RUN apt-get update && \
-  apt-get -y install curl ca-certificates
-
+FROM marketplace.gcr.io/google/ubuntu1604
 COPY deprecation.sh /usr/bin
 ENTRYPOINT ["/usr/bin/deprecation.sh"]

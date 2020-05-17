@@ -2,9 +2,20 @@
 
 ## Deprecation Notice
 
-This image is deprecated, replaced by the
-[`curlimages/curl`](https://hub.docker.com/r/curlimages/curl) image on
-Dockerhub.
+This image is deprecated.
+
+For best support of `curl` please use one of the official `curl` images
+maintained by the curlimages community on Dockerhub.
+
+For details, visit https://hub.docker.com/r/curlimages/curl.
+
+Note that `curlimages/curl` executes as special user `curl_user` and thus may
+not echo be suitable for all purposes.
+
+Alternatively, image `marketplace.gcr.io/google/ubuntu1604` is maintained by
+Google, has `curl` installed, and executes as `root`.
+
+For details, visit https://console.cloud.google.com/marketplace/details/google/ubuntu1604
 
 ## Examples
 
@@ -14,6 +25,13 @@ The following examples demonstrate build requests that use this builder.
 
 This `cloudbuild.yaml` fetches contents of a file by URL. For this to work the
 file must be publicly readable, since no credentials are passed in the request.
+
+```
+steps:
+- name: 'marketplace.gcr.io/google/ubuntu1604'
+  entrypoint: 'curl'
+  args: ['http://www.example.com/']
+```
 
 ```
 steps:
