@@ -12,10 +12,10 @@ For details, visit https://hub.docker.com/r/curlimages/curl.
 Note that `curlimages/curl` executes as special user `curl_user` and thus may
 not echo be suitable for all purposes.
 
-Alternatively, image `marketplace.gcr.io/google/ubuntu1604` is maintained by
+Alternatively, image `launcher.gcr.io/google/ubuntu1604` is maintained by
 Google, has `curl` installed, and executes as `root`.
 
-For details, visit https://console.cloud.google.com/marketplace/details/google/ubuntu1604
+For details, visit https://console.cloud.google.com/launcher/details/google/ubuntu1604
 
 ## Examples
 
@@ -28,7 +28,7 @@ file must be publicly readable, since no credentials are passed in the request.
 
 ```
 steps:
-- name: 'marketplace.gcr.io/google/ubuntu1604'
+- name: 'launcher.gcr.io/google/ubuntu1604'
   entrypoint: 'curl'
   args: ['http://www.example.com/']
 ```
