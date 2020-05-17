@@ -45,5 +45,5 @@ The following builders in this repo are deprecated and will be deleted in the fu
     *   `mvn`: runs the [maven](https://maven.apache.org/) tool
 *   Replaced by [`gcr.io/cloud-marketplace-containers/google/bazel`](http://gcr.io/cloud-marketplace-containers/google/bazel):
     *   `bazel`: runs the [bazel](https://bazel.io) tool
-*   Replaced by [`marketplace.gcr.io/google/ubuntu1604`](https://console.cloud.google.com/marketplace/details/google/ubuntu1604) or [`curlimages/curl`](https://hub.docker.com/r/curlimages/curl):
+*   Replaced by [`launcher.gcr.io/google/ubuntu1604`](https://console.cloud.google.com/launcher/details/google/ubuntu1604) or [`curlimages/curl`](https://hub.docker.com/r/curlimages/curl):
 	*   `curl`: runs the [curl](https://curl.haxx.se) tool
