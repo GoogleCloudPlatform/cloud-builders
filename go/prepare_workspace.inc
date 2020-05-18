@@ -12,6 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+echo '
+          ***** DEPRECATION NOTICE *****
+
+This image is deprecated and will no longer be updated.
+This recent version of the image will continue to exist.
+
+In place of this image, please use one of the official
+`golang` images maintained by the Docker Community.
+For details, visit https://hub.docker.com/_/golang.
+
+          ***** DEPRECATION NOTICE *****
+'
+
 prepare_workspace() {
     # We record the original working directory because some tools need to
     # remember, and sometimes this function changes directory.
