@@ -4,3 +4,8 @@ steps:
   env:
   - 'CLOUDSDK_COMPUTE_ZONE=us-east4-b'
   - 'CLOUDSDK_CONTAINER_CLUSTER=your-cluster'
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  args: ['get', 'pods']
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=us-east4-b'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=your-cluster'
