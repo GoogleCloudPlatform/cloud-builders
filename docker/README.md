@@ -11,7 +11,7 @@ steps:
   args: ['build', '-t', '...']
 ```
 
-Note tha the official images support many tagged version of Docker across many
+Note that the official images support many tagged version of Docker across many
 base image configurations.
 
 ## GCR Credentials
