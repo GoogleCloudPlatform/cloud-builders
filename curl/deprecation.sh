@@ -9,7 +9,7 @@ echo For best support of \`curl\` please use one of the official
 echo \`curl\` images maintained by the curlimages community
 echo on Dockerhub.
 echo For details, visit https://hub.docker.com/r/curlimages/curl. Note that
-echo this image executes as special user \`curl_user\` and thus may not echo be
+echo this image executes as special user \`curl_user\` and thus may not be
 echo suitable for all purposes.
 echo
 echo Alternatively, image \`launcher.gcr.io/google/ubuntu1604\` is maintained
