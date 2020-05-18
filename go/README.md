@@ -141,3 +141,7 @@ If you use the `install` subcommand, the binaries will end up in `$GOPATH/bin`.
 To build this builder, run the following command in this directory.
 
     $ gcloud builds submit
+
+## Deprecation
+
+Reminder: this deprecated builder will be deleted in an upcoming release.
