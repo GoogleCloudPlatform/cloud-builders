@@ -5,7 +5,9 @@ Cloud Build API](https://cloud.google.com/cloud-build/docs/).
 
 Pre-built images are available at `gcr.io/cloud-builders/...` and include:
 
+*   `gcs-fetcher`: efficiently fetches objects from Google Cloud Storage
 *   `git`: runs the [git](https://git-scm.com/) tool
+*   `gke-deploy`: deploys an application to a Kubernetes cluster, following Google's recommended best practices
 *   `wget`: runs the [wget](https://www.gnu.org/software/wget/) tool
 
 Builders contributed by the public are available in the [Cloud Builders
