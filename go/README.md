@@ -1,23 +1,22 @@
 # Tool builder: `gcr.io/cloud-builders/go`
 
-This builder runs the `go` tool (`go build`, `go test`, etc.)
-after placing source in `/workspace` into the `GOPATH` before
-running the tool.
+# Deprecation Notice
 
-# Using `golang` and [Go Modules](https://github.com/golang/go/wiki/Modules)
+This builder is deprecated and will be deleted in an upcoming release. The
+functionality previously provided by this builder is replaced by the use of [Go
+modules](https://github.com/golang/go/wiki/Modules), available since Go 1.11+.
 
-This Builder (`gcr.io/cloud-builders/go`) is not necessary if you're building using
-[Go modules](https://github.com/golang/go/wiki/Modules), available
-in Go 1.11+. You can **build** with the `golang` image (not `gcr.io/cloud-builders/go`) from [Dockerhub](https://hub.docker.com/_/golang) and Google's Container Registry [mirror](https://cloud.google.com/container-registry/docs/using-dockerhub-mirroring):
+In place of this builder, use the [`golang`
+image](https://hub.docker.com/_/golang) from Dockerhub.
 
 ```
 steps:
 # If you already have a go.mod file, you can skip this step.
-- name: mirror.gcr.io/library/golang
+- name: 'mirror.gcr.io/library/golang'
   args: ['go', 'mod', 'init', 'github.com/your/import/path']
 
 # Build the module.
-- name: mirror.gcr.io/library/golang
+- name: 'mirror.gcr.io/library/golang'
   env: ['GO111MODULE=on']
   args: ['go', 'build', './...']
 ```
@@ -72,6 +71,12 @@ The Go team provides a Golang Module Mirror ([https://proxy.golang.org/](https:/
     path: /go
 
 ```
+----
+## Historical Usage
+
+This builder runs the `go` tool (`go build`, `go test`, etc.)
+after placing source in `/workspace` into the `GOPATH` before
+running the tool.
 
 ## Using `gcr.io/cloud-builders/go`
 
@@ -135,4 +140,4 @@ If you use the `install` subcommand, the binaries will end up in `$GOPATH/bin`.
 
 To build this builder, run the following command in this directory.
 
-    $ gcloud builds submit . --config=cloudbuild.yaml
+    $ gcloud builds submit
