@@ -35,7 +35,7 @@ If your GKE cluster is in a different project than Cloud Build, also set:
 
 To use this builder on Google Cloud Build, your [builder service
 account](https://cloud.google.com/cloud-build/docs/how-to/service-account-permissions)
-will need IAM permissions sufficient for the operations you want to perform. 
+will need IAM permissions sufficient for the operations you want to perform.
 
 For typical read-only usage, enable the "Kubernetes Engine Viewer" role. Check the
 [GKE IAM page](https://cloud.google.com/kubernetes-engine/docs/how-to/iam#roles) for
