@@ -5,7 +5,7 @@
 This image is deprecated.
 
 For best support of `curl` please use one of the official `curl` images
-maintained by the curlimages community on Dockerhub.
+maintained by the `curlimages` community on Dockerhub.
 
 For details, visit https://hub.docker.com/r/curlimages/curl.
 
@@ -43,6 +43,13 @@ steps:
 
 This `cloudbuild.yaml` sends a `POST` request to a URL to notify that the build
 has happened, including the build's unique ID in the JSON body of the request.
+
+```
+steps:
+- name: 'launcher.gcr.io/google/ubuntu1604'
+  entrypoint: 'curl'
+  args: ['-d', '"{\"id\":\"$BUILD_ID\"}"', '-X', 'POST', 'http://www.example.com']
+```
 
 ```
 steps:
