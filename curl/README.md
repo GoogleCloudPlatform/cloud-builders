@@ -1,9 +1,21 @@
 # curl
 
-This is a tool build to simply invoke the
-[`curl`](https://www.gnu.org/software/curl/) command.
+## Deprecation Notice
 
-Arguments passed to this builder will be passed to `curl` directly.
+This image is deprecated.
+
+For best support of `curl` please use one of the official `curl` images
+maintained by the `curlimages` community on Dockerhub.
+
+For details, visit https://hub.docker.com/r/curlimages/curl.
+
+Note that `curlimages/curl` executes as special user `curl_user` and thus may
+not be suitable for all purposes.
+
+Alternatively, image `launcher.gcr.io/google/ubuntu1604` is maintained by
+Google, has `curl` installed, and executes as `root`.
+
+For details, visit https://console.cloud.google.com/launcher/details/google/ubuntu1604
 
 ## Examples
 
@@ -16,8 +28,15 @@ file must be publicly readable, since no credentials are passed in the request.
 
 ```
 steps:
-- name: gcr.io/cloud-builders/curl
-  args: ['http://www.example.com/remotefile.zip', '--output', 'localfile.zip']
+- name: 'launcher.gcr.io/google/ubuntu1604'
+  entrypoint: 'curl'
+  args: ['http://www.example.com/']
+```
+
+```
+steps:
+- name: 'curlimages/curl'
+  args: ['http://www.example.com/']
 ```
 
 ### Ping a remote URL
@@ -27,6 +46,13 @@ has happened, including the build's unique ID in the JSON body of the request.
 
 ```
 steps:
-- name: gcr.io/cloud-builders/curl
+- name: 'launcher.gcr.io/google/ubuntu1604'
+  entrypoint: 'curl'
+  args: ['-d', '"{\"id\":\"$BUILD_ID\"}"', '-X', 'POST', 'http://www.example.com']
+```
+
+```
+steps:
+- name: 'curlimages/curl'
   args: ['-d', '"{\"id\":\"$BUILD_ID\"}"', '-X', 'POST', 'http://www.example.com']
 ```

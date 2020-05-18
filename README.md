@@ -5,7 +5,6 @@ Cloud Build API](https://cloud.google.com/cloud-build/docs/).
 
 Pre-built images are available at `gcr.io/cloud-builders/...` and include:
 
-*   `curl`: runs the [curl](https://curl.haxx.se) tool
 *   `git`: runs the [git](https://git-scm.com/) tool
 *   `go`: runs the [go](https://golang.org/cmd/go) tool
 *   `wget`: runs the [wget](https://www.gnu.org/software/wget/) tool
@@ -46,3 +45,5 @@ The following builders in this repo are deprecated and will be deleted in the fu
     *   `mvn`: runs the [maven](https://maven.apache.org/) tool
 *   Replaced by [`gcr.io/cloud-marketplace-containers/google/bazel`](http://gcr.io/cloud-marketplace-containers/google/bazel):
     *   `bazel`: runs the [bazel](https://bazel.io) tool
+*   Replaced by [`launcher.gcr.io/google/ubuntu1604`](https://console.cloud.google.com/launcher/details/google/ubuntu1604) or [`curlimages/curl`](https://hub.docker.com/r/curlimages/curl):
+	*   `curl`: runs the [curl](https://curl.haxx.se) tool
