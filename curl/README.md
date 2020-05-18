@@ -10,7 +10,7 @@ maintained by the `curlimages` community on Dockerhub.
 For details, visit https://hub.docker.com/r/curlimages/curl.
 
 Note that `curlimages/curl` executes as special user `curl_user` and thus may
-not echo be suitable for all purposes.
+not be suitable for all purposes.
 
 Alternatively, image `launcher.gcr.io/google/ubuntu1604` is maintained by
 Google, has `curl` installed, and executes as `root`.
