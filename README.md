@@ -8,7 +8,6 @@ Pre-built images are available at `gcr.io/cloud-builders/...` and include:
 *   `curl`: runs the [curl](https://curl.haxx.se) tool
 *   `git`: runs the [git](https://git-scm.com/) tool
 *   `go`: runs the [go](https://golang.org/cmd/go) tool
-*   `kubectl`: runs the [kubectl](https://kubernetes.io/docs/user-guide/kubectl-overview/) tool
 *   `wget`: runs the [wget](https://www.gnu.org/software/wget/) tool
 
 Builders contributed by the public are available in the [Cloud Builders
@@ -33,6 +32,7 @@ The following builders in this repo are deprecated and will be deleted in the fu
 *   Replaced by [`gcr.io/google.com/cloudsdktool/cloud-sdk`](https://github.com/GoogleCloudPlatform/cloud-sdk-docker) image:
     *   `gcloud`: runs the [gcloud](https://cloud.google.com/sdk/gcloud/) tool
     *   `gsutil`: runs the [gsutil](https://cloud.google.com/storage/docs/gsutil) tool
+    *   `kubectl`: runs the [kubectl](https://kubernetes.io/docs/user-guide/kubectl-overview/) tool
 *   Replaced by the [`node`](https://hub.docker.com/_/node) image:
     *   `npm`: runs the [npm](https://docs.npmjs.com/) tool
     *   `yarn`: runs the [yarn](https://yarnpkg.com/) tool
