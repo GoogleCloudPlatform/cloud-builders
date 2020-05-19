@@ -12,11 +12,11 @@ image](https://hub.docker.com/_/golang) from Dockerhub.
 ```
 steps:
 # If you already have a go.mod file, you can skip this step.
-- name: 'mirror.gcr.io/library/golang'
+- name: 'golang'
   args: ['go', 'mod', 'init', 'github.com/your/import/path']
 
 # Build the module.
-- name: 'mirror.gcr.io/library/golang'
+- name: 'golang'
   env: ['GO111MODULE=on']
   args: ['go', 'build', './...']
 ```
@@ -34,7 +34,7 @@ Because `/go` is outside of `/workspace`, the `/go` directory is not persisted a
 One advantage with Go Modules is that packages are now semantically versioned and immutable; one a package has been pulled once, it should not need to be pulled again. Because the `golang` image uses `/go` as its working directory and this is outside of Cloud Build's `/workspace` directory, `/go` is recreated in each `Golang` step. To avoid this and share packages across steps, you may use Cloud Build `volumes`. An example to prove the point:
 
 ```YAML
-- name: mirror.gcr.io/golang
+- name: golang
   env:
   - GO111MODULE=on
   args: ['go','get','-u','github.com/golang/glog']
@@ -61,7 +61,7 @@ for a working example.
 
 The Go team provides a Golang Module Mirror ([https://proxy.golang.org/](https://proxy.golang.org/)). You may utilize the Mirror by including `GOPROXY=https://proxy.golang.org` in your build steps, e.g.:
 ```YAML
-- name: mirror.gcr.io/golang
+- name: golang
   env:
   - GO111MODULE=on
   - GOPROXY=https://proxy.golang.org
