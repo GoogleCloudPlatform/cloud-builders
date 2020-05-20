@@ -1,9 +1,12 @@
 # Docker
 
-## Deprecation Notice
+## Alternative Official Images
 
-This tool builder to invoke `docker` commands is deprecated in favor of the
-[official `docker` images](https://hub.docker.com/_/docker/) on Dockerhub.
+Alternative official `docker` images, including multiple versions across
+multiple platforms, are maintained by the Docker Team. For details, please
+visit https://hub.docker.com/_/docker.
+
+Usage:
 
 ```yaml
 steps:
