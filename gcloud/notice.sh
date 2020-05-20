@@ -15,7 +15,7 @@ Suggested alternative images include:
 
 Please note that the `gcloud` entrypoint must be specified to use these images.
 
-                   ***** NOTICE *****
+                ***** END OF NOTICE *****
 '
 
 /builder/google-cloud-sdk/bin/gcloud $@

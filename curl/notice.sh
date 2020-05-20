@@ -7,6 +7,6 @@ are available at
 https://console.cloud.google.com/launcher/details/google/ubuntu1604
 and https://hub.docker.com/r/curlimages/curl.
 
-                   ***** NOTICE *****
+                ***** END OF NOTICE *****
 '
 curl $@

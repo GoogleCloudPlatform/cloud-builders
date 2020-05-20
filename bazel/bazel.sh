@@ -7,7 +7,7 @@ A supported `bazel` image, including multiple tagged versions,
 is available at
 http://gcr.io/cloud-marketplace-containers/google/bazel.
 
-                   ***** NOTICE *****
+                ***** END OF NOTICE *****
 '
 
 set -e

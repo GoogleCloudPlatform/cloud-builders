@@ -20,7 +20,7 @@ multiple platforms, are maintained by the Docker Community.
 
 For details, visit https://hub.docker.com/_/golang.
 
-                   ***** NOTICE *****
+                ***** END OF NOTICE *****
 '
 
 prepare_workspace() {
