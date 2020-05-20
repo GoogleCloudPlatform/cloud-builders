@@ -1,6 +1,6 @@
 # curl
 
-## Altnernative Official Image
+## Altnernative Official Images
 
 This image is a simple wrapper on top of `launcher.gcr.io/google/ubuntu1604`
 that specifies `curl` as the `entrypoint`. For a community-supported version of

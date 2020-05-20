@@ -1,6 +1,6 @@
 # Tool builder: `gcr.io/cloud-builders/go`
 
-# Alternative Official Image
+# Alternative Official Images
 
 The functionality provided by this builder is replaced by the use of [Go
 modules](https://github.com/golang/go/wiki/Modules), available since Go 1.11+.
