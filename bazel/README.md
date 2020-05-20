@@ -1,6 +1,6 @@
 # Bazel
 
-## Altnernative Official Image
+## Alternative Official Image
 
 A supported `bazel` image, including multiple tagged versions,
 is available at
