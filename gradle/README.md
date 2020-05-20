@@ -1,7 +1,7 @@
 # Tool builder: `gcr.io/cloud-builders/gradle`
 
-Alternative official \`gradle\` images, including multiple taged version across
-multiple jdk versions and platforms, can be found at
+Alternative official `gradle` images, including multiple tagged versions
+across multiple jdk versions and platforms, can be found at
 https://hub.docker.com/_/gradle.
 
 ```yaml
