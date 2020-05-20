@@ -1,9 +1,8 @@
 # Tool builder: `gcr.io/cloud-builders/gradle`
 
-This Cloud Build builder is deprecated and will be deleted in an upcoming
-release.
-
-Please use an [official `gradle` image](https://hub.docker.com/_/gradle/):
+Alternative official \`gradle\` images, including multiple taged version across
+multiple jdk versions and platforms, can be found at
+https://hub.docker.com/_/gradle.
 
 ```yaml
 steps:
@@ -11,9 +10,6 @@ steps:
   entrypoint: 'gradle'
   args: ['...']
 ```
-
-This allows you to use any supported version of Gradle with any supported JDK
-version.
 
 ## Building this builder
 
