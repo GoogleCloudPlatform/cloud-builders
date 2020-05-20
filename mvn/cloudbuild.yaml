@@ -3,8 +3,6 @@
 
 steps:
 # Build old tagged images.
-# TODO(jasonhall): Deprecate and stop building these tagged images. Users
-# should use the official maven image directly.
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'

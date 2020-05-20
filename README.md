@@ -5,10 +5,24 @@ Cloud Build API](https://cloud.google.com/cloud-build/docs/).
 
 Pre-built images are available at `gcr.io/cloud-builders/...` and include:
 
+*   `bazel`: runs the [bazel](https://bazel.io) tool
+*   `curl`: runs the [curl](https://curl.haxx.se) tool
+*   `docker`: runs the [docker](https://docker.com) tool
+*   `dotnet`: run the [dotnet](https://docs.microsoft.com/dotnet/core/tools/) tool
+*   `gcloud`: runs the [gcloud](https://cloud.google.com/sdk/gcloud/) tool
 *   `gcs-fetcher`: efficiently fetches objects from Google Cloud Storage
 *   `git`: runs the [git](https://git-scm.com/) tool
 *   `gke-deploy`: deploys an application to a Kubernetes cluster, following Google's recommended best practices
+*   `go`: runs the [go](https://golang.org/cmd/go) tool
+*   `gradle`: runs the [gradle](https://gradle.org/) tool
+*   `gsutil`: runs the [gsutil](https://cloud.google.com/storage/docs/gsutil) tool
+*   `javac`: runs the [javac](https://docs.oracle.com/javase/7/docs/technotes/tools/windows/javac.html) tool
+*   `kubectl`: runs the [kubectl](https://kubernetes.io/docs/user-guide/kubectl-overview/) tool
+*   `mvn`: runs the [maven](https://maven.apache.org/) tool
+*   `npm`: runs the [npm](https://docs.npmjs.com/) tool
 *   `wget`: runs the [wget](https://www.gnu.org/software/wget/) tool
+*   `wget`: runs the [wget](https://www.gnu.org/software/wget/) tool
+*   `yarn`: runs the [yarn](https://yarnpkg.com/) tool
 
 Builders contributed by the public are available in the [Cloud Builders
 Community
@@ -23,30 +37,33 @@ documentation.
 
 ---
 
-# Deprecated Images
+# Alternative Official Images
 
-The following builders in this repo are deprecated and will be deleted in the future:
+Most of the tools in this repo are also available in official
+community-supported publicly available repositories. Such
+repos also generally support multiple versions and platforms,
+available by tag.
 
-*   Replaced by [`docker`](https://hub.docker.com/_/docker/) image:
-    *   `docker`: runs the [docker](https://docker.com) tool
-*   Replaced by [`gcr.io/google.com/cloudsdktool/cloud-sdk`](https://github.com/GoogleCloudPlatform/cloud-sdk-docker) image:
+The following official community-supported images are compatible with the
+hosted Cloud Build service and function well as build steps; note that
+some will require that you specify an `entrypoint` for the image.
+
+*   [`docker`](https://hub.docker.com/_/docker/)
+*   [`gcr.io/google.com/cloudsdktool/cloud-sdk`](https://github.com/GoogleCloudPlatform/cloud-sdk-docker) includes multiple entrypoints:
     *   `gcloud`: runs the [gcloud](https://cloud.google.com/sdk/gcloud/) tool
     *   `gsutil`: runs the [gsutil](https://cloud.google.com/storage/docs/gsutil) tool
     *   `kubectl`: runs the [kubectl](https://kubernetes.io/docs/user-guide/kubectl-overview/) tool
-*   Replaced by the [`node`](https://hub.docker.com/_/node) image:
+*   [`node`](https://hub.docker.com/_/node) includes these entrypoints:
     *   `npm`: runs the [npm](https://docs.npmjs.com/) tool
     *   `yarn`: runs the [yarn](https://yarnpkg.com/) tool
-*   Replaced by [`microsoft/dotnet:sdk`](https://hub.docker.com/_/microsoft-dotnet-core):
+*   [`microsoft/dotnet:sdk`](https://hub.docker.com/_/microsoft-dotnet-core) includes
     *   `dotnet`: runs the [dotnet](https://docs.microsoft.com/dotnet/core/tools/) tool
-*   Replaced by [`openjdk`](https://hub.docker.com/_/openjdk)
-    *   `javac`: runs the [javac](https://docs.oracle.com/javase/7/docs/technotes/tools/windows/javac.html) tool
-*   Replaced by [`gradle`](https://hub.docker.com/_/gradle/):
-    *   `gradle`: runs the [gradle](https://gradle.org/) tool
-*   Replaced by [`maven`](https://hub.docker.com/_/maven/):
-    *   `mvn`: runs the [maven](https://maven.apache.org/) tool
-*   Replaced by [`gcr.io/cloud-marketplace-containers/google/bazel`](http://gcr.io/cloud-marketplace-containers/google/bazel):
-    *   `bazel`: runs the [bazel](https://bazel.io) tool
-*   Replaced by [`launcher.gcr.io/google/ubuntu1604`](https://console.cloud.google.com/launcher/details/google/ubuntu1604) or [`curlimages/curl`](https://hub.docker.com/r/curlimages/curl):
-    *   `curl`: runs the [curl](https://curl.haxx.se) tool
-*   Replaced by [`golang`](https://hub.docker.com/_/golang):
-    *   `go`: runs the [go](https://golang.org/cmd/go) tool
+*   Java builders include:
+    *   [`openjdk`](https://hub.docker.com/_/openjdk): supports all production versions of Java across multiple platforms
+    *   [`gradle`](https://hub.docker.com/_/gradle/)
+    *   [`maven`](https://hub.docker.com/_/maven/)
+*   [`gcr.io/cloud-marketplace-containers/google/bazel`](http://gcr.io/cloud-marketplace-containers/google/bazel)
+*   `curl` is packaged in:
+    *   [`launcher.gcr.io/google/ubuntu1604`](https://console.cloud.google.com/launcher/details/google/ubuntu1604)
+    *   [`curlimages/curl`](https://hub.docker.com/r/curlimages/curl) is community-supported
+*   [`golang`](https://hub.docker.com/_/golang)

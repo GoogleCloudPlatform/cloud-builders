@@ -1,21 +1,18 @@
 # curl
 
-## Deprecation Notice
+## Alternative Official Images
 
-This image is deprecated.
+This image is a simple wrapper on top of `launcher.gcr.io/google/ubuntu1604`
+that specifies `curl` as the `entrypoint`. For a community-supported version of
+`curl`, `launcher.gcr.io/google/ubuntu1604` can be used directly with Cloud Build.
+For details, visit https://console.cloud.google.com/launcher/details/google/ubuntu1604.
 
-For best support of `curl` please use one of the official `curl` images
-maintained by the `curlimages` community on Dockerhub.
+Also note that the community-supported
+[`curlimages/curl`](https://hub.docker.com/r/curlimages/curl) is compatible
+with Cloud Build and available in numerous tagged versions for multiple
+platforms, but it runs as user `curl_user` and thus may not be suitable for all
+purposes. For details, visit https://hub.docker.com/r/curlimages/curl.
 
-For details, visit https://hub.docker.com/r/curlimages/curl.
-
-Note that `curlimages/curl` executes as special user `curl_user` and thus may
-not be suitable for all purposes.
-
-Alternatively, image `launcher.gcr.io/google/ubuntu1604` is maintained by
-Google, has `curl` installed, and executes as `root`.
-
-For details, visit https://console.cloud.google.com/launcher/details/google/ubuntu1604
 
 ## Examples
 

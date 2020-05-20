@@ -1,11 +1,12 @@
-# Tool builder: `gcr.io/cloud-builders/javac`
+#!/bin/sh
+echo '
+                   ***** NOTICE *****
 
 Alternative official `openjdk` images, including multiple tagged versions
 across multiple jdk versions and multiple platforms, can be found at
 https://hub.docker.com/_/openjdk.
 
-## Building this builder
+                ***** END OF NOTICE *****
+'
 
-To build this builder, run the following command in this directory.
-
-    $ gcloud builds submit
+javac $@

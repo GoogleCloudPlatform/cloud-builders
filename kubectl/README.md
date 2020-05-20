@@ -3,12 +3,17 @@
 This Cloud Build build step runs
 [`kubectl`](https://kubernetes.io/docs/user-guide/kubectl-overview/).
 
-## Deprecation Notice
+Note: official `cloud-sdk` images, including multiple tagged versions across
+multiple platforms, can be found at
+https://github.com/GoogleCloudPlatform/cloud-sdk-docker.
 
-This builder is deprecated and will be deleted in an upcoming release.  In its
-place, please use one of the official
-[`gcr.io/google.com/cloudsdktool/cloud-sdk`](https://github.com/GoogleCloudPlatform/cloud-sdk-docker)
-images and set the `entrypoint` to `kubectl`.
+Suggested alternative images include:
+
+    gcr.io/google.com/cloudsdktool/cloud-sdk
+    gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+
+Please note that the `kubectl` entrypoint must be specified to use these images.
 
 ## Usage
 
@@ -52,7 +57,7 @@ Make sure you also grant the Cloud Build service account permissions in the GKE 
 
 ---
 
-## Deprecated Usage
+## Additional Usage Information
 
 When using `gcr.io/cloud-builders/kubectl`, setting the environment variables
 described above will cause this step's entrypoint to first run a command to

@@ -1,3 +1,3 @@
 FROM microsoft/dotnet:sdk
-COPY ./deprecation.sh /
-ENTRYPOINT ["/deprecation.sh"]
+COPY notice.sh /usr/bin
+ENTRYPOINT ["/usr/bin/notice.sh"]

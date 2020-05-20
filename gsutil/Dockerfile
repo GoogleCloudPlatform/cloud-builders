@@ -4,6 +4,6 @@ RUN apt-get -y update && \
     apt-get -y install unzip zip && \
     rm -rf /var/lib/apt/lists/*
 
-COPY ./gsutil-deprecation.sh /builder
+COPY notice.sh /builder
 
-ENTRYPOINT ["/builder/gsutil-deprecation.sh"]
+ENTRYPOINT ["/builder/notice.sh"]

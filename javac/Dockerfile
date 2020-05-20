@@ -22,6 +22,6 @@ RUN \
    apt-get remove -y --purge curl gnupg2 software-properties-common && \
    apt-get clean
 
-COPY deprecation.sh /usr/bin/deprecation.sh
+COPY notice.sh /usr/bin/notice.sh
 
-ENTRYPOINT ["/usr/bin/deprecation.sh"]
+ENTRYPOINT ["/usr/bin/notice.sh"]

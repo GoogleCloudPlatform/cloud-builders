@@ -1,13 +1,13 @@
 # Tool builder: `gcr.io/cloud-builders/go`
 
-# Deprecation Notice
+# Alternative Official Images
 
-This builder is deprecated and will be deleted in an upcoming release. The
-functionality previously provided by this builder is replaced by the use of [Go
+The functionality provided by this builder is replaced by the use of [Go
 modules](https://github.com/golang/go/wiki/Modules), available since Go 1.11+.
 
-In place of this builder, use the [`golang`
-image](https://hub.docker.com/_/golang) from Dockerhub.
+In place of this builder, the [`golang` image](https://hub.docker.com/_/golang)
+on Dockerhub is suitable for Go builds and supports multiple tagged versions
+across numerous platforms.
 
 ```
 steps:
@@ -141,7 +141,3 @@ If you use the `install` subcommand, the binaries will end up in `$GOPATH/bin`.
 To build this builder, run the following command in this directory.
 
     $ gcloud builds submit
-
-## Deprecation
-
-Reminder: this deprecated builder will be deleted in an upcoming release.

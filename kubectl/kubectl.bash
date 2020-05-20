@@ -1,25 +1,24 @@
 #!/bin/bash
 
-echo           \*\*\*\*\* DEPRECATION NOTICE \*\*\*\*\*
-echo
-echo This image is deprecated and will no longer be updated.
-echo This recent version of the image will continue to exist.
-echo
-echo In place of this image, please use one of the following
-echo images built from
-echo https://github.com/GoogleCloudPlatform/cloud-sdk-docker:
-echo
-echo     gcr.io/google.com/cloudsdktool/cloud-sdk
-echo     gcr.io/google.com/cloudsdktool/cloud-sdk:slim
-echo     gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
-echo
-echo Please note that these images support pinned versions
-echo as well.
-echo
-echo Note that when using any of these replacement images,
-echo you\'ll need to set the \`entrypoint\` to \`kubectl\`.
-echo
-echo           \*\*\*\*\* DEPRECATION NOTICE \*\*\*\*\*
+echo '
+                   ***** NOTICE *****
+
+Official `cloud-sdk` images, including multiple tagged versions across multiple
+platforms, can be found at
+https://github.com/GoogleCloudPlatform/cloud-sdk-docker.
+
+Suggested alternative images include:
+
+    gcr.io/google.com/cloudsdktool/cloud-sdk
+    gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+
+Please note that the `kubectl` entrypoint must be specified when using these
+images.
+
+                ***** END OF NOTICE *****
+'
+
 
 versions=( $(cd "$(gcloud info --format='value(installation.sdk_root)')/bin/" && ls kubectl.* | sed s/kubectl.//g) )
 
