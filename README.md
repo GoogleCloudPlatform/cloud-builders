@@ -48,7 +48,7 @@ The following official community-supported images are compatible with the
 hosted Cloud Build service and function well as build steps; note that
 some will require that you specify an `entrypoint` for the image.
 
-*   [`docker`](https://hub.docker.com/_/docker/)
+*   [`docker`](https://hub.docker.com/_/docker/) supports tagged docker versions across multiple platforms
 *   [`gcr.io/google.com/cloudsdktool/cloud-sdk`](https://github.com/GoogleCloudPlatform/cloud-sdk-docker) includes multiple entrypoints:
     *   `gcloud`: runs the [gcloud](https://cloud.google.com/sdk/gcloud/) tool
     *   `gsutil`: runs the [gsutil](https://cloud.google.com/storage/docs/gsutil) tool
@@ -59,9 +59,9 @@ some will require that you specify an `entrypoint` for the image.
 *   [`microsoft/dotnet:sdk`](https://hub.docker.com/_/microsoft-dotnet-core) includes
     *   `dotnet`: runs the [dotnet](https://docs.microsoft.com/dotnet/core/tools/) tool
 *   Java builders include:
-    *   [`openjdk`](https://hub.docker.com/_/openjdk): supports all production versions of Java across multiple platforms
-    *   [`gradle`](https://hub.docker.com/_/gradle/)
-    *   [`maven`](https://hub.docker.com/_/maven/)
+    *   [`openjdk`](https://hub.docker.com/_/openjdk) supports all production versions of Java across multiple platforms
+    *   [`gradle`](https://hub.docker.com/_/gradle/) supports a matrix of Java and gradle versions across multiple platforms
+    *   [`maven`](https://hub.docker.com/_/maven/) supports a matrix of Java and maven versions across multiple platforms
 *   [`gcr.io/cloud-marketplace-containers/google/bazel`](http://gcr.io/cloud-marketplace-containers/google/bazel) is supported by the bazel team and runs the `bazel` tool
 *   `curl` is packaged in:
     *   [`launcher.gcr.io/google/ubuntu1604`](https://console.cloud.google.com/launcher/details/google/ubuntu1604)
