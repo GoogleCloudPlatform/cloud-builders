@@ -62,8 +62,8 @@ some will require that you specify an `entrypoint` for the image.
     *   [`openjdk`](https://hub.docker.com/_/openjdk) supports all production versions of Java across multiple platforms
     *   [`gradle`](https://hub.docker.com/_/gradle/) supports a matrix of Java and gradle versions across multiple platforms
     *   [`maven`](https://hub.docker.com/_/maven/) supports a matrix of Java and maven versions across multiple platforms
-*   [`gcr.io/cloud-marketplace-containers/google/bazel`](http://gcr.io/cloud-marketplace-containers/google/bazel) is supported by the bazel team and runs the `bazel` tool
+*   [`gcr.io/cloud-marketplace-containers/google/bazel`](http://gcr.io/cloud-marketplace-containers/google/bazel) is supported by the bazel team and runs the [`bazel`](https://bazel.build/) tool
 *   `curl` is packaged in:
     *   [`launcher.gcr.io/google/ubuntu1604`](https://console.cloud.google.com/launcher/details/google/ubuntu1604)
     *   [`curlimages/curl`](https://hub.docker.com/r/curlimages/curl) is community-supported
-*   [`golang`](https://hub.docker.com/_/golang) is supported by the Go team and runs the `go` tool
+*   [`golang`](https://hub.docker.com/_/golang) is supported by the Go team and runs the [`go`](https://golang.org/cmd/go/) tool
