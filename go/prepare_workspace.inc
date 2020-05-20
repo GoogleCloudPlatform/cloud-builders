@@ -13,16 +13,14 @@
 # limitations under the License.
 
 echo '
-          ***** DEPRECATION NOTICE *****
+                   ***** NOTICE *****
 
-This image is deprecated and will no longer be updated.
-This recent version of the image will continue to exist.
+Alternative official `golang` images, including multiple versions across
+multiple platforms, are maintained by the Docker Community.
 
-In place of this image, please use one of the official
-`golang` images maintained by the Docker Community.
 For details, visit https://hub.docker.com/_/golang.
 
-          ***** DEPRECATION NOTICE *****
+                   ***** NOTICE *****
 '
 
 prepare_workspace() {
