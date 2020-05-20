@@ -1,6 +1,6 @@
-# Tool builder: `gcr.io/cloud-builders/yarn`
-
-This Cloud Build builder runs the `yarn` tool.
+#!/bin/sh
+echo '
+                   ***** NOTICE *****
 
 Alternative official `node` images, including multiple tagged versions
 across multiple platforms are maintained by the Node.js Docker Team.
@@ -10,11 +10,7 @@ entrypoint.
 
 For further details, please visit https://hub.docker.com/_/node.
 
-Example `cloudbuild.yaml`:
+                ***** END OF NOTICE *****
+'
 
-```yaml
-steps:
-- name: 'node:10.15.1.
-  entrypoint: 'yarn'
-  args: ['install']
-```
+yarn $@
