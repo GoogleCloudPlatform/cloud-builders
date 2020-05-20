@@ -26,8 +26,8 @@ RUN apt-get -y update && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf ~/.config/gcloud
 
-COPY ./gcloud-deprecation.sh /builder
+COPY notice.sh /builder
 
 ENV PATH=/builder/google-cloud-sdk/bin/:$PATH
 
-ENTRYPOINT ["/builder/gcloud-deprecation.sh"]
+ENTRYPOINT ["/builder/notice.sh"]
