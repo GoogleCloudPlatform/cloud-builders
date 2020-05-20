@@ -1,9 +1,8 @@
 # Tool builder: `gcr.io/cloud-builders/mvn`
 
-This Cloud Build builder is deprecated and will be deleted in an upcoming
-release.
-
-Please use an [official `maven` image](https://hub.docker.com/_/maven/):
+Alternative official `maven` images, including multiple tagged versions
+across multiple jdk versions and multiple platforms, can be found at
+https://hub.docker.com/_/maven.
 
 ```yaml
 steps:
