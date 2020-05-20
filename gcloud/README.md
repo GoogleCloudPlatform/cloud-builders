@@ -12,7 +12,7 @@ credentials of the [builder service
 account](https://cloud.google.com/cloud-build/docs/permissions) for the
 project.
 
-Note: official `gcloud` images, including multiple tagged versions across
+Note: official `cloud-sdk` images, including multiple tagged versions across
 multiple platforms, can be found at
 https://github.com/GoogleCloudPlatform/cloud-sdk-docker.
 
@@ -28,7 +28,7 @@ Please note that the `gcloud` entrypoint must be specified to use these images.
 
 ## Examples
 
-The following examples demonstrate build request that use `gcloud`.
+The following examples demonstrate build requests that use `gcloud`.
 
 ### Clone a Cloud Source Repository using `gcloud`
 

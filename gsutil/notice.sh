@@ -13,10 +13,10 @@ Suggested alternative images include:
     gcr.io/google.com/cloudsdktool/cloud-sdk:slim
     gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
 
-Please note that the `gcloud` entrypoint must be specified when using these
+Please note that the `gsutil` entrypoint must be specified when using these
 images.
 
                 ***** END OF NOTICE *****
 '
 
-/builder/google-cloud-sdk/bin/gcloud $@
+/builder/google-cloud-sdk/bin/gsutil $@

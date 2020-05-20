@@ -12,15 +12,19 @@ credentials of the [builder service
 account](https://cloud.google.com/cloud-build/docs/permissions) for the
 project.
 
-Note: This image is deprecated in favor of
-[`gcr.io/google.com/cloudsdktool/cloud-sdk`](https://github.com/GoogleCloudPlatform/cloud-sdk-docker). Users can switch
-to using the `gcr.io/google.com/cloudsdktool/cloud-sdk` image today for a maintained and up-to-date
-`gsutil` builder. The deprecation is tracked in
-[issue638](https://github.com/GoogleCloudPlatform/cloud-builders/issues/638).
+Note: official `cloud-sdk` images, including multiple tagged versions across
+multiple platforms, can be found at
+https://github.com/GoogleCloudPlatform/cloud-sdk-docker.
 
-If your testing with
-`gcr.io/google.com/cloudsdktool/cloud-sdk` reveals incompatibilities, please post a comment in
-[issue638](https://github.com/GoogleCloudPlatform/cloud-builders/issues/638).
+Suggested alternative images include:
+
+    gcr.io/google.com/cloudsdktool/cloud-sdk
+    gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+
+Please note that the `gsutil` entrypoint must be specified to use these images.
+
+-------
 
 ## Examples
 
