@@ -1,10 +1,9 @@
 # Bazel
 
-## Deprecation Notice
+## Altnernative Official Image
 
-This builder is deprecated and will be deleted in an upcoming release.
-The recent version of the image will remain available for use. As a
-replacement, please use one of the supported images at
+A supported `bazel` image, including multiple tagged versions,
+is available at
 http://gcr.io/cloud-marketplace-containers/google/bazel.
 
 Usage:
@@ -17,7 +16,7 @@ steps:
 
 ---
 
-## Deprecated Usage Details
+## Usage Details
 
 This is a tool builder to simply invoke [`bazel`](https://bazel.io) commands.
 
