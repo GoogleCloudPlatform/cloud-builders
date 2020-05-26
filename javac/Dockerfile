@@ -16,7 +16,7 @@ RUN \
       $(lsb_release -cs) \
       stable" && \
    apt-get -y update && \
-   apt-get -y install docker-ce=${DOCKER_VERSION} && \
+   apt-get -y install docker-ce=${DOCKER_VERSION} docker-ce-cli=${DOCKER_VERSION} && \
 
    # Clean up build packages
    apt-get remove -y --purge curl gnupg2 software-properties-common && \
