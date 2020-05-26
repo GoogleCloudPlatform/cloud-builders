@@ -1,6 +1,7 @@
 FROM launcher.gcr.io/google/ubuntu16_04
 
 ADD bazel.sh /builder/bazel.sh
+ARG DOCKER_VERSION=5:19.03.8~3-0~ubuntu-xenial
 
 RUN \
     # This makes add-apt-repository available.
@@ -16,6 +17,15 @@ RUN \
     apt-get -y update && \
     apt-get -y install git && \
 
+    # Install bazel (https://docs.bazel.build/versions/master/install-ubuntu.html)
+    apt-get -y install openjdk-8-jdk && \
+    echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list && \
+    curl https://bazel.build/bazel-release.pub.gpg | apt-key add - && \
+    apt-get update && \
+
+    apt-get -y install bazel && \
+    apt-get -y upgrade bazel && \
+
     # Install Docker (https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/#uninstall-old-versions)
     apt-get -y install \
         linux-image-extra-virtual \
@@ -28,17 +38,7 @@ RUN \
       $(lsb_release -cs) \
       stable edge" && \
     apt-get -y update && \
-    apt-get install -y docker-ce=5:19.03.8~3-0~ubuntu-xenial unzip && \
-    apt-get update && \
-
-    # Install bazel (https://docs.bazel.build/versions/master/install-ubuntu.html)
-    apt-get -y install openjdk-8-jdk && \
-    echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list && \
-    curl https://bazel.build/bazel-release.pub.gpg | apt-key add - && \
-    apt-get update && \
-
-    apt-get -y install bazel && \
-    apt-get -y upgrade bazel && \
+    apt-get install -y docker-ce=${DOCKER_VERSION} docker-ce-cli=${DOCKER_VERSION} unzip && \
 
     mv /usr/bin/bazel /builder/bazel           && \
     mv /usr/bin/bazel-real /builder/bazel-real && \
