@@ -5,7 +5,7 @@ but it may not support the most recent features or versions of Maven. We also do
 not provide historical pinned versions of Maven.
 
 A supported `maven` image, including multiple tagged versions across multiple
-versions of Java and multiple platofrms, is maintained by the Maven team at
+versions of Java and multiple platforms, is maintained by the Maven team at
 https://hub.docker.com/_/maven.
 
 To migrate to the Maven team's official `maven` image, make the following
