@@ -1,19 +1,12 @@
 # gsutil
 
-This is a tool builder to simply invoke
-[`gsutil`](https://cloud.google.com/storage/docs/gsutil) commands.
+The `gcr.io/cloud-builders/gsutil` image is maintained by the Cloud Build team,
+but it may not support the most recent versions of `gsutil`. We also do not
+provide historical pinned versions of `gsutil` not support across multiple
+platforms.
 
-Arguments passed to this builder will be passed to `gsutil` directly, allowing
-callers to run [any `gsutil`
-command](https://cloud.google.com/storage/docs/gsutil).
-
-When executed in the Cloud Build environment, commands are executed with
-credentials of the [builder service
-account](https://cloud.google.com/cloud-build/docs/permissions) for the
-project.
-
-Note: official `cloud-sdk` images, including multiple tagged versions across
-multiple platforms, can be found at
+A supported `cloud-sdk` image, including multiple tagged versions across several
+platforms, is maintained by the Cloud SDK team at
 https://github.com/GoogleCloudPlatform/cloud-sdk-docker.
 
 Suggested alternative images include:
@@ -21,8 +14,25 @@ Suggested alternative images include:
     gcr.io/google.com/cloudsdktool/cloud-sdk
     gcr.io/google.com/cloudsdktool/cloud-sdk:slim
     gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+	google/cloud-sdk
+	google/cloud-sdk:slim
+	google/cloud-sdk:alpine
 
 Please note that the `gsutil` entrypoint must be specified to use these images.
+
+When executed in the Cloud Build environment, commands are executed with
+credentials of the [builder service
+account](https://cloud.google.com/cloud-build/docs/permissions) for the build
+project.
+
+To migrate to the Cloud SDK team's official image, make the following changes
+to your `cloudbuild.yaml`:
+
+```
+- name: 'gcr.io/cloud-builders/gsutil'
++ name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
++ entrypoint: 'gsutil'
+```
 
 -------
 

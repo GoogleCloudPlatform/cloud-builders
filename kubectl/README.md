@@ -3,17 +3,39 @@
 This Cloud Build build step runs
 [`kubectl`](https://kubernetes.io/docs/user-guide/kubectl-overview/).
 
-Note: official `cloud-sdk` images, including multiple tagged versions across
-multiple platforms, can be found at
+The `gcr.io/cloud-builders/kubectl` image is maintained by the Cloud Build team,
+but it may not support the most recent versions of `kubectl`. We also do not
+provide historical pinned versions of `kubectl` not support across multiple
+platforms.
+
+A supported `cloud-sdk` image, including multiple tagged versions across several
+platforms, is maintained by the Cloud SDK team at
 https://github.com/GoogleCloudPlatform/cloud-sdk-docker.
 
 Suggested alternative images include:
 
     gcr.io/google.com/cloudsdktool/cloud-sdk
-    gcr.io/google.com/cloudsdktool/cloud-sdk:slim
     gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+	google/cloud-sdk
+	google/cloud-sdk:alpine
 
 Please note that the `kubectl` entrypoint must be specified to use these images.
+
+When executed in the Cloud Build environment, commands are executed with
+credentials of the [builder service
+account](https://cloud.google.com/cloud-build/docs/permissions) for the build
+project.
+
+To migrate to the Cloud SDK team's official image, make the following changes
+to your `cloudbuild.yaml`:
+
+```
+- name: 'gcr.io/cloud-builders/kubectl'
++ name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
++ entrypoint: 'kubectl'
+```
+
+-----
 
 ## Usage
 
@@ -32,7 +54,7 @@ cluster. You can configure the cluster by setting environment variables.
 every step that uses the `kubectl` builder; this context is not persisted across
 steps.**
 
-If your GKE cluster is in a different project than Cloud Build, also set:
+If your GKE cluster is in a different project than the build itself, also set:
 
 ```CLOUDSDK_CORE_PROJECT=<the GKE cluster project>```
 

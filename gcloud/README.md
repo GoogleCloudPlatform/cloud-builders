@@ -1,19 +1,12 @@
 # gcloud
 
-This is a tool builder to simply invoke
-[`gcloud`](https://cloud.google.com/sdk/gcloud/) commands.
+The `gcr.io/cloud-builders/gcloud` image is maintained by the Cloud Build team,
+but it may not support the most recent versions of `gcloud`. We also do not
+provide historical pinned versions of `gcloud` not support across multiple
+platforms.
 
-Arguments passed to this builder will be passed to `gcloud` directly, allowing
-callers to run [any `gcloud`
-command](https://cloud.google.com/sdk/gcloud/reference/).
-
-When executed in the Cloud Build environment, commands are executed with
-credentials of the [builder service
-account](https://cloud.google.com/cloud-build/docs/permissions) for the
-project.
-
-Note: official `cloud-sdk` images, including multiple tagged versions across
-multiple platforms, can be found at
+A supported `cloud-sdk` image, including multiple tagged versions across several
+platforms, is maintained by the Cloud SDK team at
 https://github.com/GoogleCloudPlatform/cloud-sdk-docker.
 
 Suggested alternative images include:
@@ -21,8 +14,25 @@ Suggested alternative images include:
     gcr.io/google.com/cloudsdktool/cloud-sdk
     gcr.io/google.com/cloudsdktool/cloud-sdk:slim
     gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+	google/cloud-sdk
+	google/cloud-sdk:slim
+	google/cloud-sdk:alpine
 
 Please note that the `gcloud` entrypoint must be specified to use these images.
+
+When executed in the Cloud Build environment, commands are executed with
+credentials of the [builder service
+account](https://cloud.google.com/cloud-build/docs/permissions) for the build
+project.
+
+To migrate to the Cloud SDK team's official image, make the following changes
+to your `cloudbuild.yaml`:
+
+```
+- name: 'gcr.io/cloud-builders/gcloud'
++ name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
++ entrypoint: 'gcloud'
+```
 
 -------
 
@@ -40,7 +50,6 @@ steps:
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   args: ['gcloud', 'source', 'repos', 'clone', 'default']
 ```
-
 
 ## `gcloud` vs `gcloud-slim`
 

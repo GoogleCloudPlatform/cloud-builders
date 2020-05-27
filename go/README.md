@@ -1,13 +1,29 @@
 # Tool builder: `gcr.io/cloud-builders/go`
 
-# Alternative Official Images
+The `gcr.io/cloud-builders/go` image is maintained by the Cloud Build team, but
+it may not support the most recent features or versions of Go. We also do not
+provide historical pinned versions of Go.
 
-The functionality provided by this builder is replaced by the use of [Go
-modules](https://github.com/golang/go/wiki/Modules), available since Go 1.11+.
+A supported `golang` image, including additiobal Go tooling and multiple tagged
+versions across several platforms, is maintained by the Go team at [`golang`
+image](https://hub.docker.com/_/golang).
 
-In place of this builder, the [`golang` image](https://hub.docker.com/_/golang)
-on Dockerhub is suitable for Go builds and supports multiple tagged versions
-across numerous platforms.
+To migrate to the Go team's official `golang` image, make the following changes
+to your `cloudbuild.yaml`:
+
+```
+- name: 'gcr.io/cloud-builders/go'
++ name: 'golang'
++ entrypoint: 'go'
+```
+
+# Go Modules
+
+The functionality previously provided by this builder is replaced by the use of
+[Go modules](https://github.com/golang/go/wiki/Modules), available since Go
+1.11+.
+
+## Example
 
 ```
 steps:
