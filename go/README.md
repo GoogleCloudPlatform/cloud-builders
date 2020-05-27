@@ -5,8 +5,8 @@ it may not support the most recent features or versions of Go. We also do not
 provide historical pinned versions of Go.
 
 A supported `golang` image, including additiobal Go tooling and multiple tagged
-versions across several platforms, is maintained by the Go team at [`golang`
-image](https://hub.docker.com/_/golang).
+versions across several platforms, is maintained by the Go team on Dockerhub
+at [`golang`](https://hub.docker.com/_/golang).
 
 To migrate to the Go team's official `golang` image, make the following changes
 to your `cloudbuild.yaml`:
