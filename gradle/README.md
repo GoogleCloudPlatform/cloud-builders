@@ -4,9 +4,9 @@ The `gcr.io/cloud-builders/gradle` image is maintained by the Cloud Build team,
 but it may not support the most recent features or versions of Gradle. We also do
 not provide historical pinned versions of Gradle.
 
-A supported `gradle` image, including multiple tagged versions across multiple
-versions of Java and multiple platforms, is maintained by the Gradle team at
-https://hub.docker.com/_/gradle.
+The Gradle team provides a `gradle` image that supports multiple tagged versions
+across multiple versions of Java and multiple platforms. Please visit
+https://hub.docker.com/_/gradle for details.
 
 To migrate to the Gradle team's official `gradle` image, make the following
 changes to your `cloudbuild.yaml`:

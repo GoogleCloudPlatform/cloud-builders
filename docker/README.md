@@ -4,9 +4,9 @@ The `gcr.io/cloud-builders/docker` image is maintained by the Cloud Build team,
 but it may not support the most recent features or versions of Docker. We also do
 not provide historical pinned versions of Docker.
 
-A supported `docker` image, including multiple tagged versions as well as
-additional Docker tooling, is maintained by the Docker Team.  For details,
-please visit https://hub.docker.com/_/docker.
+The Docker Team provides a `docker` image that supports multiple tagged versions
+as well as additional Docker tooling. For details, please visit
+https://hub.docker.com/_/docker.
 
 To migrate to the Docker Team's official image, make the following changes to
 your `cloudbuild.yaml`:

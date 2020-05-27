@@ -8,9 +8,9 @@ but it may not support the most recent versions of `kubectl`. We also do not
 provide historical pinned versions of `kubectl` nor support across multiple
 platforms.
 
-A supported `cloud-sdk` image, including multiple tagged versions across several
-platforms, is maintained by the Cloud SDK team at
-https://github.com/GoogleCloudPlatform/cloud-sdk-docker.
+The Cloud SDK team maintains a `cloud-sdk` image that supports multiple tagged
+versions of Cloud SDK across multiple platforms. Please visit
+https://github.com/GoogleCloudPlatform/cloud-sdk-docker for details.
 
 Suggested alternative images include:
 
