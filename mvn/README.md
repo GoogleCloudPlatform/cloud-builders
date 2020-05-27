@@ -1,8 +1,23 @@
 # Tool builder: `gcr.io/cloud-builders/mvn`
 
-Alternative official `maven` images, including multiple tagged versions
-across multiple jdk versions and multiple platforms, can be found at
+The `gcr.io/cloud-builders/mvn` image is maintained by the Cloud Build team,
+but it may not support the most recent features or versions of Maven. We also do
+not provide historical pinned versions of Maven.
+
+A supported `maven` image, including multiple tagged versions across multiple
+versions of Java and multiple platforms, is maintained by the Maven team at
 https://hub.docker.com/_/maven.
+
+To migrate to the Maven team's official `maven` image, make the following
+changes to your `cloudbuild.yaml`:
+
+```
+- name: 'gcr.io/cloud-builders/maven'
++ name: 'maven'
++ entrypoint: 'mvn'
+```
+
+## Example:
 
 ```yaml
 steps:
@@ -10,9 +25,6 @@ steps:
   entrypoint: 'mvn'
   args: ['install']
 ```
-
-This allows you to use any supported version of Maven with any supported JDK
-version.
 
 ## Building this builder
 

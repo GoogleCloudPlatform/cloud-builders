@@ -1,20 +1,30 @@
 # Tool builder: `gcr.io/cloud-builders/yarn`
 
-This Cloud Build builder runs the `yarn` tool.
+The `gcr.io/cloud-builders/yarn` image is maintained by the Cloud Build team, but
+it may not support the most recent features or versions of `yarn`. We also do not
+provide historical pinned versions of `yarn`.
 
-Alternative official `node` images, including multiple tagged versions
-across multiple platforms are maintained by the Node.js Docker Team.
+A supported `yarn` image, including multiple tagged versions, is maintained by
+the Node team at https://hub.docker.com/_/node. This image also provides
+additional Node tooling.
 
-Please note that the `yarn` entrypoint must be specified when using these
-images.
+To migrate to the Node team's official Node image, make the following changes
+to your `cloudbuild.yaml`:
 
-For further details, please visit https://hub.docker.com/_/node.
+```
+- name: 'gcr.io/cloud-builders/yarn'
++ name: 'node'
++ entrypoint: 'yarn'
+```
 
-Example `cloudbuild.yaml`:
+
+## Example:
+
+`cloudbuild.yaml`:
 
 ```yaml
 steps:
-- name: 'node:10.15.1.
+- name: 'node'
   entrypoint: 'yarn'
   args: ['install']
 ```

@@ -1,12 +1,23 @@
 # Bazel
 
-## Alternative Official Image
+The `gcr.io/cloud-builders/bazel` image is maintained by the Cloud Build team,
+but it may not support the most recent features or versions of Bazel. We also do
+not provide historical pinned versions of bazel.
 
-A supported `bazel` image, including multiple tagged versions,
-is available at
-http://gcr.io/cloud-marketplace-containers/google/bazel.
+A supported `bazel` image, including multiple tagged versions, is maintained by
+the Bazel team at http://gcr.io/cloud-marketplace-containers/google/bazel.
 
-Usage:
+To migrate to the Bazel team's official Bazel image, make the following changes
+to your `cloudbuild.yaml`:
+
+```
+- name: 'gcr.io/cloud-builders/bazel'
++ name: 'gcr.io/cloud-marketplace-containers/google/bazel'
++ entrypoint: 'bazel'
+```
+
+## Example Usage
+
 ```
 steps:
 - name: 'gcr.io/cloud-marketplace-containers/google/bazel'

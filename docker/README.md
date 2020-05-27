@@ -1,10 +1,22 @@
 # Docker
 
-## Alternative Official Images
+The `gcr.io/cloud-builders/docker` image is maintained by the Cloud Build team,
+but it may not support the most recent features or versions of Docker. We also do
+not provide historical pinned versions of Docker.
 
-Alternative official `docker` images, including multiple versions across
-multiple platforms, are maintained by the Docker Team. For details, please
-visit https://hub.docker.com/_/docker.
+A supported `docker` image, including multiple tagged versions as well as
+additional Docker tooling, is maintained by the Docker Team.  For details,
+please visit https://hub.docker.com/_/docker.
+
+To migrate to the Docker Team's official image, make the following changes to
+your `cloudbuild.yaml`:
+
+```
+- name: 'gcr.io/cloud-builders/docker'
++ name: 'docker'
+```
+
+## Example
 
 Usage:
 
@@ -13,9 +25,6 @@ steps:
 - name: 'docker'
   args: ['build', '-t', '...']
 ```
-
-Note that the official images support many tagged version of Docker across many
-base image configurations.
 
 ## GCR Credentials
 

@@ -1,16 +1,26 @@
 # Tool builder: `gcr.io/cloud-builders/npm`
 
-This Cloud Build builder runs the `npm` tool.
+The `gcr.io/cloud-builders/npm` image is maintained by the Cloud Build team, but
+it may not support the most recent features or versions of `npm`. We also do not
+provide historical pinned versions of `npm`.
 
-Alternative official `node` images, including multiple tagged versions
-across multiple platforms are maintained by the Node.js Docker Team.
+A supported `npm` image, including multiple tagged versions, is maintained by
+the Node team at https://hub.docker.com/_/node. This image also provides
+additional Node tooling.
 
-Please note that the `npm` entrypoint must be specified when using these
-images.
+To migrate to the Node team's official Node image, make the following changes
+to your `cloudbuild.yaml`:
 
-For further details, please visit https://hub.docker.com/_/node.
+```
+- name: 'gcr.io/cloud-builders/npm'
++ name: 'node'
++ entrypoint: 'npm'
+```
 
-Example `cloudbuild.yaml`:
+
+## Example:
+
+`cloudbuild.yaml`:
 
 ```yaml
 steps:
