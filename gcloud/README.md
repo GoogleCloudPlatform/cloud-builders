@@ -2,7 +2,7 @@
 
 The `gcr.io/cloud-builders/gcloud` image is maintained by the Cloud Build team,
 but it may not support the most recent versions of `gcloud`. We also do not
-provide historical pinned versions of `gcloud` not support across multiple
+provide historical pinned versions of `gcloud` nor support across multiple
 platforms.
 
 A supported `cloud-sdk` image, including multiple tagged versions across several
