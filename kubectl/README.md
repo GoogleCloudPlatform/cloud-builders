@@ -5,7 +5,7 @@ This Cloud Build build step runs
 
 The `gcr.io/cloud-builders/kubectl` image is maintained by the Cloud Build team,
 but it may not support the most recent versions of `kubectl`. We also do not
-provide historical pinned versions of `kubectl` not support across multiple
+provide historical pinned versions of `kubectl` nor support across multiple
 platforms.
 
 A supported `cloud-sdk` image, including multiple tagged versions across several
