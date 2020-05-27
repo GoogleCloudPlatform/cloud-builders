@@ -19,9 +19,9 @@ to your `cloudbuild.yaml`:
 
 # Go Modules
 
-The functionality previously provided by this builder is replaced by the use of
-[Go modules](https://github.com/golang/go/wiki/Modules), available since Go
-1.11+.
+The functionality previously provided by `gcr.io/cloud-builders/go` is replaced
+by the use of [Go modules](https://github.com/golang/go/wiki/Modules), available
+since Go 1.11.
 
 ## Example
 
