@@ -11,10 +11,10 @@ is compatible with the hosted Cloud Build service, it runs as user `curl_user`
 and thus may not be suitable for all purposes. For details, visit
 https://hub.docker.com/r/curlimages/curl.
 
-This image is a simple wrapper on top of `launcher.gcr.io/google/ubuntu1604`
-that specifies `curl` as the `entrypoint`. For a community-supported version of
-`curl`, `launcher.gcr.io/google/ubuntu1604` can be used directly with Cloud
-Build.  For details, visit
+This 'gcr.io/cloud-builders/curl' image is a simple wrapper on top of
+`launcher.gcr.io/google/ubuntu1604` that specifies `curl` as the `entrypoint`.
+As a Google-supported image, `launcher.gcr.io/google/ubuntu1604` can be used
+directly with Cloud Build.  For details, visit
 https://console.cloud.google.com/launcher/details/google/ubuntu1604. Using this
 image directly will mean that you are always using the latest patched version.
 
