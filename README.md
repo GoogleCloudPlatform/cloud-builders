@@ -48,7 +48,7 @@ The following official community-supported images are compatible with the
 hosted Cloud Build service and function well as build steps; note that
 some will require that you specify an `entrypoint` for the image. Additional
 details regarding each alternative official image are available in the `README.md`
-for the corresponding CLoud Builder.
+for the corresponding Cloud Builder.
 
 *   [`docker`](https://hub.docker.com/_/docker/) supports tagged docker versions across multiple platforms
 *   [`gcr.io/google.com/cloudsdktool/cloud-sdk`](https://github.com/GoogleCloudPlatform/cloud-sdk-docker) includes multiple entrypoints:
