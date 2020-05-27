@@ -4,9 +4,9 @@ The `gcr.io/cloud-builders/mvn` image is maintained by the Cloud Build team,
 but it may not support the most recent features or versions of Maven. We also do
 not provide historical pinned versions of Maven.
 
-A supported `maven` image, including multiple tagged versions across multiple
-versions of Java and multiple platforms, is maintained by the Maven team at
-https://hub.docker.com/_/maven.
+The Maven team provides a `maven` image that supports multiple tagged versions
+of Maven across multiple versions of Java and multiple platforms. Please visit
+https://hub.docker.com/_/maven for details.
 
 To migrate to the Maven team's official `maven` image, make the following
 changes to your `cloudbuild.yaml`:
