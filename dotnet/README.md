@@ -14,9 +14,8 @@ steps:
   entrypoint: 'dotnet'
 ```
 
-For alternative official `dotnet` builer images, including multiple tagged
-versions across a variety of platforms, and for additional dotnet tooling
-suitable for use in Cloud Build, please visit
+For alternative official `dotnet` builer images, including additional
+dotnet tooling suitable for use in Cloud Build, please visit
 https://hub.docker.com/r/microsoft/dotnet/).
 
 To migrate to the official `dotnet` image, make the following changes
