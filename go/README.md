@@ -4,7 +4,7 @@ The `gcr.io/cloud-builders/go` image is maintained by the Cloud Build team, but
 it may not support the most recent features or versions of Go. We also do not
 provide historical pinned versions of Go.
 
-A supported `golang` image, including additiobal Go tooling and multiple tagged
+A supported `golang` image, including additional Go tooling and multiple tagged
 versions across several platforms, is maintained by the Go team on Dockerhub
 at [`golang`](https://hub.docker.com/_/golang).
 
@@ -19,9 +19,10 @@ to your `cloudbuild.yaml`:
 
 # Go Modules
 
-The functionality previously provided by `gcr.io/cloud-builders/go` is replaced
-by the use of [Go modules](https://github.com/golang/go/wiki/Modules), available
-since Go 1.11.
+The functionality previously provided by `gcr.io/cloud-builders/go` in
+[`prepare_workspace`](https://github.com/GoogleCloudPlatform/cloud-builders/blob/master/go/prepare_workspace.inc)
+is replaced by the use of [Go
+modules](https://github.com/golang/go/wiki/Modules), available since Go 1.11.
 
 ## Example
 
