@@ -15,9 +15,7 @@ https://github.com/GoogleCloudPlatform/cloud-sdk-docker.
 Suggested alternative images include:
 
     gcr.io/google.com/cloudsdktool/cloud-sdk
-    gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
-	google/cloud-sdk
-	google/cloud-sdk:alpine
+    google/cloud-sdk
 
 Please note that the `kubectl` entrypoint must be specified to use these images.
 
