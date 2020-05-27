@@ -12,10 +12,9 @@ specifies `dotnet` as an entrypoint. It is functionally equivalent to:
 steps:
 - name: 'microsoft/dotnet:sdk'
   entrypoint: 'dotnet'
-  args: ['build']
 ```
 
-For an alternative official `dotnet` builer images, including multiple tagged
+For alternative official `dotnet` builer images, including multiple tagged
 versions across a variety of platforms, and for additional dotnet tooling
 suitable for use in Cloud Build, please visit
 https://hub.docker.com/r/microsoft/dotnet/).
