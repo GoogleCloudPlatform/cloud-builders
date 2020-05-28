@@ -8,4 +8,4 @@ multiple platforms, can be found at https://hub.docker.com/_/gradle.
                 ***** END OF NOTICE *****
 '
 
-/usr/bin/gradle $@
+/usr/bin/gradle "$@"

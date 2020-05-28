@@ -8,4 +8,4 @@ https://hub.docker.com/_/maven.
 
                 ***** END OF NOTICE *****
 '
-mvn $@
+mvn "$@"

@@ -7,4 +7,4 @@ https://hub.docker.com/r/microsoft/dotnet.
 
                 ***** END OF NOTICE *****
 '
-dotnet $@
+dotnet "$@"

@@ -9,4 +9,4 @@ and https://hub.docker.com/r/curlimages/curl.
 
                 ***** END OF NOTICE *****
 '
-curl $@
+curl "$@"
