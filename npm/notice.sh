@@ -13,4 +13,4 @@ For further details, please visit https://hub.docker.com/_/node.
                 ***** END OF NOTICE *****
 '
 
-npm $@
+npm "$@"

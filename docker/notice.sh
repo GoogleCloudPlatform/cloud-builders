@@ -8,4 +8,4 @@ visit https://hub.docker.com/_/docker.
 
                 ***** END OF NOTICE *****
 '
-/usr/bin/docker $@
+/usr/bin/docker "$@"

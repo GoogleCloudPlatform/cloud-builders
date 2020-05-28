@@ -19,4 +19,4 @@ images.
                 ***** END OF NOTICE *****
 '
 
-/builder/google-cloud-sdk/bin/gcloud $@
+/builder/google-cloud-sdk/bin/gcloud "$@"
