@@ -14,9 +14,9 @@ Suggested alternative images include:
     gcr.io/google.com/cloudsdktool/cloud-sdk
     gcr.io/google.com/cloudsdktool/cloud-sdk:slim
     gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
-	google/cloud-sdk
-	google/cloud-sdk:slim
-	google/cloud-sdk:alpine
+    google/cloud-sdk
+    google/cloud-sdk:slim
+    google/cloud-sdk:alpine
 
 Please note that the `gsutil` entrypoint must be specified to use these images.
 
