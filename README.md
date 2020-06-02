@@ -21,7 +21,6 @@ Pre-built images are available at `gcr.io/cloud-builders/...` and include:
 *   `mvn`: runs the [maven](https://maven.apache.org/) tool
 *   `npm`: runs the [npm](https://docs.npmjs.com/) tool
 *   `wget`: runs the [wget](https://www.gnu.org/software/wget/) tool
-*   `wget`: runs the [wget](https://www.gnu.org/software/wget/) tool
 *   `yarn`: runs the [yarn](https://yarnpkg.com/) tool
 
 Builders contributed by the public are available in the [Cloud Builders
