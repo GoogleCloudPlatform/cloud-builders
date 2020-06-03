@@ -1,2 +1,3 @@
 FROM gcr.io/cloud-builders/gcloud
-ENTRYPOINT ["git"]
+COPY notice.sh /usr/bin
+ENTRYPOINT ["/usr/bin/notice.sh"]
