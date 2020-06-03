@@ -70,7 +70,7 @@ steps:
 
 ### Push changes to a remote Git repository
 
-This `cloudbuild.yaml` demonstrates three functionally equivalent ways to push
+This `cloudbuild.yaml` demonstrates two functionally equivalent ways to push
 local changes to a remote Git repository authenticated with Application Default
 Credentials.
 
@@ -80,8 +80,5 @@ steps:
   args: ['push', 'https://source.developers.google.com/p/$PROJECT_ID/r/$REPO', 'master']
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:alpine'
   entrypoint: 'git'
-  args: ['push', 'https://source.developers.google.com/p/$PROJECT_ID/r/$REPO', 'master']
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-  entrypoint: 'gcloud'
   args: ['push', 'https://source.developers.google.com/p/$PROJECT_ID/r/$REPO', 'master']
 ```
