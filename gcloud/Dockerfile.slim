@@ -29,5 +29,6 @@ RUN apt-get -y update && \
 COPY notice.sh /builder
 
 ENV PATH=/builder/google-cloud-sdk/bin/:$PATH
+RUN git config --system credential.helper gcloud.sh
 
 ENTRYPOINT ["/builder/notice.sh"]
