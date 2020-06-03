@@ -12,11 +12,13 @@ https://github.com/GoogleCloudPlatform/cloud-sdk-docker for details.
 Suggested alternative images include:
 
     gcr.io/google.com/cloudsdktool/cloud-sdk
-    gcr.io/google.com/cloudsdktool/cloud-sdk:slim
     gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+    gcr.io/google.com/cloudsdktool/cloud-sdk:debian_component_based
+    gcr.io/google.com/cloudsdktool/cloud-sdk:slim
     google/cloud-sdk
-    google/cloud-sdk:slim
     google/cloud-sdk:alpine
+    google/cloud-sdk:debian_component_based
+    google/cloud-sdk:slim
 
 Please note that the `gcloud` entrypoint must be specified to use these images.
 
