@@ -42,7 +42,7 @@ Please note that the `git` entrypoint must be specified to use these images.
 
 The following examples demonstrate build requests that use this builder.
 
-For these to work, the remote repository must either be public, or the builder
+For these to work, either the remote repository must be public or the builder
 service account must have permission to access it.
 
 ### Clone a Git repository
