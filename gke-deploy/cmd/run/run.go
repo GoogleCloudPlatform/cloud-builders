@@ -58,6 +58,7 @@ type options struct {
 	verbose             bool
 	waitTimeout         time.Duration
 	recursive           bool
+	serverDryRun        bool
 }
 
 // NewRunCommand creates the `gke-deploy run` subcommand.
@@ -93,6 +94,7 @@ func NewRunCommand() *cobra.Command {
 	cmd.Flags().BoolVarP(&options.recursive, "recursive", "R", false, "Recursively search through the provided path in --filename for all YAML files.")
 	cmd.Flags().BoolVar(&options.createApplicationCR, "create-application-cr", false, "Creates an Application CR object with the name provided by --app and connects to deployed objects using a selector that matches the label with key as 'app.kubernetes.io/name' and value specified by --app.")
 	cmd.Flags().StringSliceVar(&options.applicationLinks, "links", nil, "Links(s) to add to the spec.descriptor.links field of an Application CR generated with the --create-application-cr flag or provided via the --filename flag (description=URL). Links can be set comma-delimited or as separate flags.")
+	cmd.Flags().BoolVarP(&options.serverDryRun, "server-dry-run", "D", false, "Perform kubectl apply server dry run to validate configurations without persisting resources.")
 
 	return cmd
 }
@@ -150,7 +152,7 @@ func run(_ *cobra.Command, options *options) error {
 	if err != nil {
 		return err
 	}
-	d, err := common.CreateDeployer(ctx, useGcloud, options.verbose)
+	d, err := common.CreateDeployer(ctx, useGcloud, options.verbose, options.serverDryRun)
 	if err != nil {
 		return err
 	}

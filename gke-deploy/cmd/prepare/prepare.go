@@ -124,7 +124,7 @@ func prepare(_ *cobra.Command, options *options) error {
 	if err != nil {
 		return err
 	}
-	d, err := common.CreateDeployer(ctx, false /* useGcloud */, options.verbose)
+	d, err := common.CreateDeployer(ctx, false /* useGcloud */, options.verbose, false /* serverDryRun */)
 	if err != nil {
 		return err
 	}

@@ -36,8 +36,9 @@ const (
 
 // Deployer handles the deployment of an image to a cluster.
 type Deployer struct {
-	Clients   *services.Clients
-	UseGcloud bool
+	Clients      *services.Clients
+	UseGcloud    bool
+	ServerDryRun bool
 }
 
 // Prepare handles preparing deployment.
@@ -305,7 +306,11 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 
 // Apply handles applying the deployment.
 func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clusterProject, config, namespace string, waitTimeout time.Duration, recursive bool) error {
-	fmt.Printf("Applying deployment.\n")
+	if d.ServerDryRun {
+		fmt.Printf("Applying deployment in server dry run mode.\n")
+	} else {
+		fmt.Printf("Applying deployment.\n")
+	}
 
 	if (clusterName != "" && clusterLocation == "") || (clusterName == "" && clusterLocation != "") {
 		return fmt.Errorf("clusterName and clusterLocation either must both be provided, or neither should be provided")
@@ -444,6 +449,11 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 	deployedObjs := map[string]map[string]resource.Object{}
 	summaryObjs := make(resource.Objects, 0, len(objs))
 	timedOut := false
+
+	if d.ServerDryRun {
+		fmt.Printf("Server-side dry run deployment succeeded.\n\n")
+		return nil
+	}
 
 	fmt.Printf("\nWaiting for deployed objects to be ready with timeout of %v\n", waitTimeout)
 	start := time.Now()

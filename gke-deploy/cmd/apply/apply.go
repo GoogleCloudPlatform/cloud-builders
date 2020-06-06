@@ -40,6 +40,7 @@ type options struct {
 	verbose         bool
 	waitTimeout     time.Duration
 	recursive       bool
+	serverDryRun    bool
 }
 
 // NewApplyCommand creates the `gke-deploy apply` subcommand.
@@ -66,6 +67,7 @@ func NewApplyCommand() *cobra.Command {
 	cmd.Flags().BoolVarP(&options.verbose, "verbose", "V", false, "Prints underlying commands being called to stdout.")
 	cmd.Flags().DurationVarP(&options.waitTimeout, "timeout", "t", 5*time.Minute, "Timeout limit for waiting for Kubernetes objects to finish applying.")
 	cmd.Flags().BoolVarP(&options.recursive, "recursive", "R", false, "Recursively search through the provided path in --filename for all YAML files.")
+	cmd.Flags().BoolVarP(&options.serverDryRun, "server-dry-run", "D", false, "Perform kubectl apply server dry run to validate configurations without persisting resources.")
 
 	return cmd
 }
@@ -88,7 +90,7 @@ func apply(_ *cobra.Command, options *options) error {
 		return fmt.Errorf("gcloud must be installed and in PATH to use -c|--cluster and -l|--location")
 	}
 
-	d, err := common.CreateDeployer(ctx, useGcloud, options.verbose)
+	d, err := common.CreateDeployer(ctx, useGcloud, options.verbose, options.serverDryRun)
 	if err != nil {
 		return err
 	}
