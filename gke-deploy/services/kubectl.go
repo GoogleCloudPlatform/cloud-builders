@@ -11,21 +11,26 @@ import (
 // e.g., to run on GCB: gcloud projects add-iam-policy-binding <project-id> --member=serviceAccount:<project-number>@cloudbuild.gserviceaccount.com --role=roles/container.admin
 type Kubectl struct {
 	printCommands bool
+	serverDryRun  bool
 }
 
 // NewKubectl returns a new Kubectl object.
-func NewKubectl(ctx context.Context, printCommands bool) (*Kubectl, error) {
+func NewKubectl(ctx context.Context, printCommands bool, serverDryRun bool) (*Kubectl, error) {
 	if _, err := exec.LookPath("kubectl"); err != nil {
 		return nil, err
 	}
 	return &Kubectl{
 		printCommands,
+		serverDryRun,
 	}, nil
 }
 
 // Apply calls `kubectl apply -f <filename> n <namespace>`.
 func (k *Kubectl) Apply(ctx context.Context, filename, namespace string) error {
 	args := []string{"apply", "-f", filename}
+	if k.serverDryRun {
+		args = append(args, "--server-dry-run")
+	}
 	if namespace != "" {
 		args = append(args, "-n", namespace)
 	}
@@ -38,6 +43,9 @@ func (k *Kubectl) Apply(ctx context.Context, filename, namespace string) error {
 // ApplyFromString calls `kubectl apply -f - -n <namespace> < ${configString}`.
 func (k *Kubectl) ApplyFromString(ctx context.Context, configString, namespace string) error {
 	args := []string{"apply", "-f", "-"}
+	if k.serverDryRun {
+		args = append(args, "--server-dry-run")
+	}
 	if namespace != "" {
 		args = append(args, "-n", namespace)
 	}

@@ -52,3 +52,7 @@ Tests `gke-deploy run` locally with no -f flag and with -x flag.
 ### test_local_run_diff_namespaces.sh
 
 Tests `gke-deploy run` locally with no -n flag where each config has its own namespace.
+
+### test_local_server_dry_run.sh
+
+Tests `gke-deploy run` locally with -D flag for --server-dry-run, ensuring nothing is created.

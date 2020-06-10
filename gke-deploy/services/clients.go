@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/google/go-containerregistry/pkg/name"
-	"github.com/google/go-containerregistry/pkg/v1"
+	v1 "github.com/google/go-containerregistry/pkg/v1"
 )
 
 // Clients is a wrapper around HTTP clients and CLIs.
@@ -53,7 +53,7 @@ type GcsService interface {
 }
 
 // NewClients returns a new Clients object with default services.
-func NewClients(ctx context.Context, useGcloud, printCommands bool) (*Clients, error) {
+func NewClients(ctx context.Context, useGcloud, printCommands bool, serverDryRun bool) (*Clients, error) {
 	oss, err := NewOS(ctx)
 	if err != nil {
 		return nil, err
@@ -66,7 +66,7 @@ func NewClients(ctx context.Context, useGcloud, printCommands bool) (*Clients, e
 		}
 		gs = svc
 	}
-	ks, err := NewKubectl(ctx, printCommands)
+	ks, err := NewKubectl(ctx, printCommands, serverDryRun)
 	if err != nil {
 		return nil, err
 	}

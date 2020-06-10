@@ -73,14 +73,15 @@ func CreateMapFromEqualDelimitedStrings(labels []string) (map[string]string, err
 }
 
 // CreateDeployer creates a Deployer with initialized clients.
-func CreateDeployer(ctx context.Context, useGcloud, verbose bool) (*deployer.Deployer, error) {
-	c, err := services.NewClients(ctx, useGcloud, verbose)
+func CreateDeployer(ctx context.Context, useGcloud, verbose bool, serverDryRun bool) (*deployer.Deployer, error) {
+	c, err := services.NewClients(ctx, useGcloud, verbose, serverDryRun)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize Clients: %v", err)
 	}
 	d := &deployer.Deployer{
-		Clients:   c,
-		UseGcloud: useGcloud,
+		Clients:      c,
+		UseGcloud:    useGcloud,
+		ServerDryRun: serverDryRun,
 	}
 	return d, nil
 }
