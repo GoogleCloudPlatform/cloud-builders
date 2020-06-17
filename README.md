@@ -68,3 +68,12 @@ for the corresponding Cloud Builder.
     *   [`launcher.gcr.io/google/ubuntu1604`](https://console.cloud.google.com/launcher/details/google/ubuntu1604)
     *   [`curlimages/curl`](https://hub.docker.com/r/curlimages/curl) is community-supported
 *   [`golang`](https://hub.docker.com/_/golang) is provided by the Go team and runs the [`go`](https://golang.org/cmd/go/) tool
+
+# Future Direction
+
+You may have already noticed that most of the images in this repo now provide notices to the
+above alternative images. For the hosted Cloud Build service, we are formulating plans
+surrounding both improved support for existing `cloud-builder` images and documentation for
+alternative community-supported images that may be more appropriate for some users. Both this
+page and the related [open issues](https://github.com/GoogleCloudPlatform/cloud-builders/labels/augmentation)
+will be updated with details soon.
