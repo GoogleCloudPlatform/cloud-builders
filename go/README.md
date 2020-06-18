@@ -48,7 +48,9 @@ Because `/go` is outside of `/workspace`, the `/go` directory is not persisted a
 
 ## Note #2 Sharing packages across steps
 
-One advantage with Go Modules is that packages are now semantically versioned and immutable; one a package has been pulled once, it should not need to be pulled again. Because the `golang` image uses `/go` as its working directory and this is outside of Cloud Build's `/workspace` directory, `/go` is recreated in each `Golang` step. To avoid this and share packages across steps, you may use Cloud Build `volumes`. An example to prove the point:
+One advantage with Go Modules is that packages are now semantically versioned and immutable; one a package has been pulled once, it should not need to be pulled again. Because the `golang` image uses `/go` as its working directory and this is outside of Cloud Build's `/workspace` directory, `/go` is recreated in each `Golang` step. To avoid this and share packages across steps, you may use Cloud Build `volumes`.
+
+Here is an example to prove the point. Be sure to include the `go mod init` step above or create a `go.mod` locally first:
 
 ```YAML
 - name: golang
@@ -76,7 +78,7 @@ for a working example.
 
 ## Note #3 Golang Module Mirror
 
-The Go team provides a Golang Module Mirror ([https://proxy.golang.org/](https://proxy.golang.org/)). You may utilize the Mirror by including `GOPROXY=https://proxy.golang.org` in your build steps, e.g.:
+The Go team provides a Golang Module Mirror ([https://proxy.golang.org/](https://proxy.golang.org/)). The module mirror is enabled by default for Go 1.13 and newer. You may utilize the Mirror by including `GOPROXY=https://proxy.golang.org` in your build steps, e.g.:
 ```YAML
 - name: golang
   env:
