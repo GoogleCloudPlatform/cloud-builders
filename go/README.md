@@ -42,43 +42,57 @@ See [`examples/module`](https://github.com/GoogleCloudPlatform/cloud-builders/tr
 for a working example.
 
 ## Note #1 `/workspace` and `/go`
-The `Golang` image defaults to a working directory of `/go` whereas Cloud Build mounts your sources under `/workspace`. This reflects the recommend best practice when using Modules of placing your sources *outside* of `GOPATH`. When you `go build ./...` you will run this in the working directory of `/workspace` *but* the packages will be pulled into `/go/pkg`.
+The `Golang` image defaults to a working directory of `/go` whereas Cloud Build
+mounts your sources under `/workspace`. This reflects the recommend best
+practice when using Modules of placing your sources *outside* of `GOPATH`. When
+you `go build ./...` you will run this in the working directory of `/workspace`
+*but* the packages will be pulled into `/go/pkg`.
 
-Because `/go` is outside of `/workspace`, the `/go` directory is not persisted across Cloud Build steps. See next note.
+Because `/go` is outside of `/workspace`, the `/go` directory is not persisted
+across Cloud Build steps. See next note.
 
 ## Note #2 Sharing packages across steps
 
-One advantage with Go Modules is that packages are now semantically versioned and immutable; one a package has been pulled once, it should not need to be pulled again. Because the `golang` image uses `/go` as its working directory and this is outside of Cloud Build's `/workspace` directory, `/go` is recreated in each `Golang` step. To avoid this and share packages across steps, you may use Cloud Build `volumes`.
+One advantage with Go Modules is that packages are now semantically versioned
+and immutable; one a package has been pulled once, it should not need to be
+pulled again. Because the `golang` image uses `/go` as its working directory and
+this is outside of Cloud Build's `/workspace` directory, `/go` is recreated in
+each `Golang` step. To avoid this and share packages across steps, you may use
+Cloud Build `volumes`.
 
-Here is an example to prove the point. Be sure to include the `go mod init` step above or create a `go.mod` locally first:
+Here is an example to prove the point; this example uses `go mod init` as the
+first step rather than creating a `go.mod`:
 
 ```YAML
-- name: golang
-  env:
-  - GO111MODULE=on
-  args: ['go','get','-u','github.com/golang/glog']
-  volumes:
-  - name: go-modules
-    path: /go
-
-- name: golang
-  env:
-  - GO111MODULE=on
+steps:
+- name: 'golang'
+  args: ['go','mod','init','github.com/golang/glog']
+- name: 'golang'
   args: ['go','list','-f','{{ .Dir }}','-m','github.com/golang/glog']
+options:
   volumes:
   - name: go-modules
     path: /go
+  env:
+  - GO111MODULE=on
 ```
-In the above, if the `volumes` section were omitted, the second step would fail. This is because `/go` would be created anew for the step and `github.com/golang/glob` would not be present in it.
+Note that this examples defines `volumes` and `env` as global build options
+(rather than on each build step). This allows the `/go` directory to be shared
+across stepped -- initialized in the first and used in the second.
 
-**NB** Cloud Build supports using build-wide settings for `env` and `volumes` using `options` (see [link](https://cloud.google.com/cloud-build/docs/build-config#options)). I've duplicated here to aid clarity.
+**NB** Cloud Build supports using build-wide settings for `env` and `volumes`
+using `options` (see
+[link](https://cloud.google.com/cloud-build/docs/build-config#options)).
 
 See [`examples/multi_step`](https://github.com/GoogleCloudPlatform/cloud-builders/tree/master/go/examples/multi_step/README.md)
 for a working example.
 
 ## Note #3 Golang Module Mirror
 
-The Go team provides a Golang Module Mirror ([https://proxy.golang.org/](https://proxy.golang.org/)). The module mirror is enabled by default for Go 1.13 and newer. You may utilize the Mirror by including `GOPROXY=https://proxy.golang.org` in your build steps, e.g.:
+The Go team provides a Golang Module Mirror
+([https://proxy.golang.org/](https://proxy.golang.org/)). The module mirror is
+enabled by default for Go 1.13 and newer. You may utilize the Mirror by
+including `GOPROXY=https://proxy.golang.org` in your build steps, e.g.:
 ```YAML
 - name: golang
   env:
@@ -88,7 +102,6 @@ The Go team provides a Golang Module Mirror ([https://proxy.golang.org/](https:/
   volumes:
   - name: go-modules
     path: /go
-
 ```
 ----
 ## Historical Usage
