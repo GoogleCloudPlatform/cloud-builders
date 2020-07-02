@@ -14,8 +14,6 @@ steps:
   - 'build'
   - '--build-arg=NODE_VERSION=8.12.0'
   - '--tag=gcr.io/$PROJECT_ID/yarn:node-8.12.0'
-  # 8.12.0 is tagged :latest
-  - '--tag=gcr.io/$PROJECT_ID/yarn:latest'
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
   args:
@@ -34,11 +32,24 @@ steps:
   - 'build'
   - '--build-arg=NODE_VERSION=10.10.0'
   - '--tag=gcr.io/$PROJECT_ID/yarn:node-10.10.0'
-  # 10.10.0 is tagged :current
-  - '--tag=gcr.io/$PROJECT_ID/yarn:current'
+  - '.'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=NODE_VERSION=12.18.2'
+  - '--tag=gcr.io/$PROJECT_ID/yarn:node-12.18.2'
+  - '--tag=gcr.io/$PROJECT_ID/yarn:lts'
   - '--tag=gcr.io/$PROJECT_ID/nodejs/yarn'
   - '.'
-
+ - name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=NODE_VERSION=14.5.0'
+  - '--tag=gcr.io/$PROJECT_ID/yarn:node-14.5.0'
+  - '--tag=gcr.io/$PROJECT_ID/yarn:latest'
+  - '--tag=gcr.io/$PROJECT_ID/yarn:current'
+  - '.'
+  
 # Print for each version
 - name: 'gcr.io/$PROJECT_ID/yarn:node-6.14.4'
   args: ['--version']
@@ -50,7 +61,10 @@ steps:
   args: ['--version']
 - name: 'gcr.io/$PROJECT_ID/yarn:node-10.10.0'
   args: ['--version']
-
+- name: 'gcr.io/$PROJECT_ID/yarn:node-12.18.2'
+  args: ['--version']
+- name: 'gcr.io/$PROJECT_ID/yarn:node-14.5.0'
+  args: ['--version']
 # Test the examples with :latest
 
 # hello_world
@@ -72,3 +86,6 @@ images:
 - 'gcr.io/$PROJECT_ID/yarn:node-8.4.0'
 - 'gcr.io/$PROJECT_ID/yarn:node-9.11.2'
 - 'gcr.io/$PROJECT_ID/yarn:node-10.10.0'
+- 'gcr.io/$PROJECT_ID/yarn:node-12.18.2'
+- 'gcr.io/$PROJECT_ID/yarn:node-14.5.0'
+
