@@ -9,7 +9,6 @@ RUN apt-get -y update && \
         alpha beta \
         app-engine-go \
         app-engine-java \
-        app-engine-php \
         app-engine-python \
         app-engine-python-extras \
         bigtable \
