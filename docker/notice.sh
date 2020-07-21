@@ -1,5 +1,6 @@
 #!/bin/sh
-echo '
+if [[ $(( $RANDOM % 20 )) -eq 1 ]]; then
+  echo '
                    ***** NOTICE *****
 
 Alternative official `docker` images, including multiple versions across
@@ -8,4 +9,5 @@ visit https://hub.docker.com/_/docker.
 
                 ***** END OF NOTICE *****
 '
+fi
 /usr/bin/docker "$@"

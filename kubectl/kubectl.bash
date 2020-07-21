@@ -1,6 +1,7 @@
 #!/bin/bash
 echoerr() { echo "$@" 1>&2; }
-echoerr '
+if [[ $(( $RANDOM % 20 )) -eq 1 ]]; then
+  echoerr '
                    ***** NOTICE *****
 
 Official `cloud-sdk` images, including multiple tagged versions across multiple
@@ -16,7 +17,7 @@ image or a version-tagged variant.
 
                 ***** END OF NOTICE *****
 '
-
+fi
 
 versions=( $(cd "$(gcloud info --format='value(installation.sdk_root)')/bin/" && ls kubectl.* | sed s/kubectl.//g) )
 
