@@ -1,5 +1,6 @@
 #!/bin/sh
-echo '
+if [[ $(( $RANDOM % 20 )) -eq 1 ]]; then
+  echo '
                    ***** NOTICE *****
 
 Please visit
@@ -9,4 +10,5 @@ images that may provide better alternatives to the use of wget.
 
                 ***** END OF NOTICE *****
 '
+fi
 wget "$@"

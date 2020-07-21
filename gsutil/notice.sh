@@ -1,6 +1,6 @@
 #!/bin/sh
-
-echo '
+if [[ $(( $RANDOM % 20 )) -eq 1 ]]; then
+  echo '
                    ***** NOTICE *****
 
 Official `cloud-sdk` images, including multiple tagged versions across multiple
@@ -19,5 +19,5 @@ images.
 
                 ***** END OF NOTICE *****
 '
-
+fi
 /builder/google-cloud-sdk/bin/gsutil "$@"

@@ -1,5 +1,6 @@
 #!/bin/sh
-echo '
+if [[ $(( $RANDOM % 20 )) -eq 1 ]]; then
+  echo '
                    ***** NOTICE *****
 
 Alternative official `maven` images, including multiple tagged versions
@@ -8,4 +9,5 @@ https://hub.docker.com/_/maven.
 
                 ***** END OF NOTICE *****
 '
+fi
 mvn "$@"
