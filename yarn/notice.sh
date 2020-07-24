@@ -1,5 +1,6 @@
 #!/bin/sh
-echo '
+if [[ $(( $RANDOM % 20 )) -eq 1 ]]; then
+  echo '
                    ***** NOTICE *****
 
 Alternative official `node` images, including multiple tagged versions
@@ -12,5 +13,5 @@ For further details, please visit https://hub.docker.com/_/node.
 
                 ***** END OF NOTICE *****
 '
-
+fi
 yarn "$@"

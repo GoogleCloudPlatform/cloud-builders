@@ -1,5 +1,6 @@
 #!/bin/sh
-echo '
+if [[ $(( $RANDOM % 20 )) -eq 1 ]]; then
+  echo '
                    ***** NOTICE *****
 
 Supported `curl` images, including multiple tagged versions,
@@ -9,4 +10,5 @@ and https://hub.docker.com/r/curlimages/curl.
 
                 ***** END OF NOTICE *****
 '
+fi
 curl "$@"
