@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 if [[ $(( $RANDOM % 20 )) -eq 1 ]]; then
   echo '
                    ***** NOTICE *****
