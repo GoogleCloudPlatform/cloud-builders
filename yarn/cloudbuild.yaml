@@ -6,12 +6,6 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=NODE_VERSION=6.14.4'
-  - '--tag=gcr.io/$PROJECT_ID/yarn:node-6.14.4'
-  - '.'
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'build'
   - '--build-arg=NODE_VERSION=8.12.0'
   - '--tag=gcr.io/$PROJECT_ID/yarn:node-8.12.0'
   # 8.12.0 is tagged :latest
@@ -40,8 +34,6 @@ steps:
   - '.'
 
 # Print for each version
-- name: 'gcr.io/$PROJECT_ID/yarn:node-6.14.4'
-  args: ['--version']
 - name: 'gcr.io/$PROJECT_ID/yarn:node-8.12.0'
   args: ['--version']
 - name: 'gcr.io/$PROJECT_ID/yarn:node-8.4.0'
@@ -67,7 +59,6 @@ steps:
 images:
 - 'gcr.io/$PROJECT_ID/yarn:latest'
 - 'gcr.io/$PROJECT_ID/yarn:current'
-- 'gcr.io/$PROJECT_ID/yarn:node-6.14.4'
 - 'gcr.io/$PROJECT_ID/yarn:node-8.12.0'
 - 'gcr.io/$PROJECT_ID/yarn:node-8.4.0'
 - 'gcr.io/$PROJECT_ID/yarn:node-9.11.2'
