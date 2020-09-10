@@ -89,6 +89,7 @@ steps:
   dir: 'examples/hello_world'
 
 images:
+- 'gcr.io/$PROJECT_ID/npm:lts'
 - 'gcr.io/$PROJECT_ID/npm:latest'
 - 'gcr.io/$PROJECT_ID/npm:current'
 - 'gcr.io/$PROJECT_ID/npm:node-6.14.4'
