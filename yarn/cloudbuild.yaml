@@ -43,7 +43,7 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/yarn:latest'
   - '--tag=gcr.io/$PROJECT_ID/yarn:current'
   - '.'
-  
+
 # Print for each version
 - name: 'gcr.io/$PROJECT_ID/yarn:node-8.12.0'
   args: ['--version']
