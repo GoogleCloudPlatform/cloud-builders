@@ -35,7 +35,7 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/yarn:lts'
   - '--tag=gcr.io/$PROJECT_ID/nodejs/yarn'
   - '.'
- - name: 'gcr.io/cloud-builders/docker'
+- name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
   - '--build-arg=NODE_VERSION=14.10.0'
