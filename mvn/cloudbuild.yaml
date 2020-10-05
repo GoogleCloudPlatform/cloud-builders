@@ -60,6 +60,9 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/mvn:gcloud'
   args: ['install']
   dir: 'examples/spring_boot'
+- name: 'gcr.io/$PROJECT_ID/mvn:appengine'
+  args: ['package', 'appengine:stage']
+  dir: 'examples/hello_appengine'
 
 # Demonstrate using the maven image directly.
 - name: 'maven'

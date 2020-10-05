@@ -1,0 +1,3 @@
+steps:
+- name: 'gcr.io/cloud-builders/mvn:appengine'
+  args: ['package', 'appengine:deploy']

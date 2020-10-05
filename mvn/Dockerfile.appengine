@@ -11,5 +11,4 @@ RUN set -eux; \
   curl https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz --output google-cloud-sdk.tar.gz; \
   tar -xzvf google-cloud-sdk.tar.gz; \
   ./google-cloud-sdk/bin/gcloud components install app-engine-java; \
-  rm google-cloud-sdk.tar.gz; \
-  cd ~
+  rm google-cloud-sdk.tar.gz;
