@@ -18,7 +18,7 @@ public class MyServlet extends HttpServlet {
             throws IOException {
         String name = req.getParameter("name");
         resp.setContentType("text/plain");
-        if(name == null) {
+        if (name == null) {
             resp.getWriter().println("Please enter a shame");
         }
         resp.getWriter().println("Hello " + name);
