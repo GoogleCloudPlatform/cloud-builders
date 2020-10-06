@@ -1,7 +1,9 @@
 package com.example;
 
 import java.io.IOException;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class MyServlet extends HttpServlet {
     @Override
