@@ -5,6 +5,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * MyServlet is an example class that demonstrates use of the App Engine maven
+ * plug-in.
+ */
 public class MyServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
