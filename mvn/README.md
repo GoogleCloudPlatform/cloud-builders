@@ -32,7 +32,7 @@ The community-supported `maven` image no longer ships with `python`; this breaks
 the [App Engine `maven`
 plugin](https://cloud.google.com/appengine/docs/standard/java/using-maven).
 
-This builder supports 
+This builder supports
 [`Dockerfile.appengine`](Dockerfile.appengine) that is compatible with the
 App Engine-compatible image and is hosted at
 `gcr.io/cloud-builders/mvn:appengine`.
