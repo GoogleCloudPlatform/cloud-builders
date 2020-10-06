@@ -279,7 +279,6 @@ func podIsReady(ctx context.Context, obj *Object) (bool, error) {
 // podDisruptionBudget returns true if a deployed object with kind "PodDisruptionBudget" is ready.
 // This returns true if the following bullets are true:
 // * status.observedGeneration == metadata.generation
-// * status.desiredHealthy == spec.minAvailable
 // * status.currentHealthy >= status.desiredHealthy
 func podDisruptionBudgetIsReady(ctx context.Context, obj *Object) (bool, error) {
 	generation, ok, err := unstructured.NestedInt64(obj.Object, "metadata", "generation")
@@ -298,22 +297,11 @@ func podDisruptionBudgetIsReady(ctx context.Context, obj *Object) (bool, error) 
 		return false, nil
 	}
 
-	minAvailable, ok, err := unstructured.NestedInt64(obj.Object, "spec", "minAvailable")
-	if err != nil {
-		return false, fmt.Errorf("failed to get spec.minAvailable field: %v", err)
-	}
-	if !ok {
-		return false, nil
-	}
-
 	desiredHealthy, ok, err := unstructured.NestedInt64(obj.Object, "status", "desiredHealthy")
 	if err != nil {
 		return false, fmt.Errorf("failed to get status.desiredHealthy field: %v", err)
 	}
-	if !ok || desiredHealthy != minAvailable {
-		return false, nil
-	}
-
+	
 	currentHealthy, ok, err := unstructured.NestedInt64(obj.Object, "status", "currentHealthy")
 	if err != nil {
 		return false, fmt.Errorf("failed to get status.currentHealthy field: %v", err)
