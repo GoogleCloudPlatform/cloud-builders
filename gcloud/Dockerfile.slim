@@ -20,9 +20,11 @@ RUN apt-get -y update && \
     # install crcmod: https://cloud.google.com/storage/docs/gsutil/addlhelp/CRC32CandInstallingcrcmod
     easy_install -U pip && \
     pip install -U crcmod && \
+    apt-get install python3-pip -y -q && \
+    pip3 install -U crcmod && \
 
     # Clean up
-    apt-get -y remove gcc python-dev python-setuptools wget && \
+    apt-get -y remove gcc python-dev python-setuptools wget python3-pip && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf ~/.config/gcloud
 
