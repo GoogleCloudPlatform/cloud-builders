@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 if [ "$(shuf -i 1-20 -n 1)" -eq 1 ]; then
   echo '
                    ***** NOTICE *****
