@@ -18,6 +18,4 @@ RUN apt-get -y update && \
     apt-get -y update && \
     apt-get -y install docker-ce=${DOCKER_VERSION} docker-ce-cli=${DOCKER_VERSION}
 
-COPY notice.sh /usr/bin
-
-ENTRYPOINT ["/usr/bin/notice.sh"]
+ENTRYPOINT ["/usr/bin/docker"]
