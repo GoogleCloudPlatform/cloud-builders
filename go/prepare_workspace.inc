@@ -12,17 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-echo '
-                   ***** NOTICE *****
-
-Alternative official `golang` images, including multiple versions across
-multiple platforms, are maintained by the Docker Community.
-
-For details, visit https://hub.docker.com/_/golang.
-
-                ***** END OF NOTICE *****
-'
-
 prepare_workspace() {
     # We record the original working directory because some tools need to
     # remember, and sometimes this function changes directory.

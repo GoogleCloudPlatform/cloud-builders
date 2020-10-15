@@ -22,6 +22,4 @@ RUN \
    apt-get remove -y --purge curl gnupg2 software-properties-common && \
    apt-get clean
 
-COPY notice.sh /usr/bin/notice.sh
-
-ENTRYPOINT ["/usr/bin/notice.sh"]
+ENTRYPOINT ["javac"]

@@ -22,6 +22,4 @@ RUN apt-get update -qqy && apt-get install -qqy curl \
 
 ADD gradle.properties "${GRADLE_USER_HOME}"
 
-COPY notice.sh /usr/bin/notice.sh
-ENTRYPOINT ["/usr/bin/notice.sh"]
-
+ENTRYPOINT ["/usr/bin/gradle"]

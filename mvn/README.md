@@ -12,7 +12,7 @@ To migrate to the Maven team's official `maven` image, make the following
 changes to your `cloudbuild.yaml`:
 
 ```
-- name: 'gcr.io/cloud-builders/maven'
+- name: 'gcr.io/cloud-builders/mvn'
 + name: 'maven'
 + entrypoint: 'mvn'
 ```
@@ -25,6 +25,17 @@ steps:
   entrypoint: 'mvn'
   args: ['install']
 ```
+
+## Python, Cloud SDK, and App Engine use
+
+The community-supported `maven` image no longer ships with `python`; this breaks
+the [App Engine `maven`
+plugin](https://cloud.google.com/appengine/docs/standard/java/using-maven).
+
+This builder supports
+[`Dockerfile.appengine`](Dockerfile.appengine) that is compatible with the
+App Engine-compatible image and is hosted at
+`gcr.io/cloud-builders/mvn:appengine`.
 
 ## Building this builder
 
