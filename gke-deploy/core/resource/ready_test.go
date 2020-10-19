@@ -31,10 +31,8 @@ func TestIsReady(t *testing.T) {
 	testPodUnready2File := "testing/pod-unready-2.yaml"
 	testPdbReadyFile := "testing/pdb-ready.yaml"
 	testPdbReady2File := "testing/pdb-ready-2.yaml"
-	testPdbReady3File := "testing/pdb-ready-3.yaml"
 	testPdbUnreadyFile := "testing/pdb-unready.yaml"
 	testPdbUnready2File := "testing/pdb-unready-2.yaml"
-	testPdbUnready3File := "testing/pdb-unready-3.yaml"
 	testReplicasetReadyFile := "testing/replicaset-ready.yaml"
 	testReplicasetUnreadyFile := "testing/replicaset-unready.yaml"
 	testReplicasetUnready2File := "testing/replicaset-unready-2.yaml"
@@ -195,39 +193,27 @@ func TestIsReady(t *testing.T) {
 
 		want: false,
 	}, {
-		name: "PodDisruptionBudget is ready, status.desiredHealthy == spec.minAvailable and status.currentHealthy > status.desiredHealthy",
+		name: "PodDisruptionBudget is ready, status.currentHealthy > status.desiredHealthy",
 
 		obj: newObjectFromFile(t, testPdbReadyFile),
 
 		want: true,
 	}, {
-		name: "PodDisruptionBudget is ready, status.desiredHealthy == spec.minAvailable and status.currentHealthy > status.desiredHealthy, spec.minAvailable == 0",
+		name: "PodDisruptionBudget is ready, status.currentHealthy == status.desiredHealthy",
 
 		obj: newObjectFromFile(t, testPdbReady2File),
 
 		want: true,
 	}, {
-		name: "PodDisruptionBudget is ready, status.desiredHealthy == spec.minAvailable and status.currentHealthy == status.desiredHealthy",
-
-		obj: newObjectFromFile(t, testPdbReady3File),
-
-		want: true,
-	}, {
-		name: "PodDisruptionBudget is not ready, status.desiredHealthy != spec.minAvailable",
+		name: "PodDisruptionBudget is not ready, status.currentHealthy < status.desiredHealthy",
 
 		obj: newObjectFromFile(t, testPdbUnreadyFile),
 
 		want: false,
 	}, {
-		name: "PodDisruptionBudget is not ready, status.currentHealthy < status.desiredHealthy",
-
-		obj: newObjectFromFile(t, testPdbUnready2File),
-
-		want: false,
-	}, {
 		name: "PodDisruptionBudget is not ready, status.observedGeneration != metadata.generation",
 
-		obj: newObjectFromFile(t, testPdbUnready3File),
+		obj: newObjectFromFile(t, testPdbUnready2File),
 
 		want: false,
 	}, {

@@ -3,22 +3,22 @@ kind: PodDisruptionBudget
 metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"policy/v1beta1","kind":"PodDisruptionBudget","metadata":{"annotations":{},"name":"test-app-pdb","namespace":"test-local-deploy-all"},"spec":{"minAvailable":2,"selector":{"matchLabels":{"app":"test-app-deployment"}}}}
-  creationTimestamp: 2019-06-11T15:11:58Z
-  generation: 1
+      {"apiVersion":"policy/v1beta1","kind":"PodDisruptionBudget","metadata":{"annotations":{},"name":"test-app-pdb","namespace":"test-local-deploy-all"},"spec":{"minAvailable":2,"selector":{"matchLabels":{"app":"test-app"}}}}
+  creationTimestamp: 2019-06-11T15:14:19Z
+  generation: 2
   name: test-app-pdb
   namespace: test-local-deploy-all
-  resourceVersion: "6036053"
+  resourceVersion: "6036558"
   selfLink: /apis/policy/v1beta1/namespaces/test-local-deploy-all/poddisruptionbudgets/test-app-pdb
-  uid: 41d83cf7-8c5b-11e9-8840-42010a8e00dc
+  uid: 958e7b84-8c5b-11e9-8840-42010a8e00dc
 spec:
   minAvailable: 2
   selector:
     matchLabels:
-      app: test-app-deployment
+      app: test-app
 status:
-  currentHealthy: 0
+  currentHealthy: 11
   desiredHealthy: 2
-  disruptionsAllowed: 0
-  expectedPods: 0
+  disruptionsAllowed: 9
+  expectedPods: 11
   observedGeneration: 1

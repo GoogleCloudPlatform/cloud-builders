@@ -8,7 +8,7 @@ metadata:
   generation: 1
   name: test-app-pdb
   namespace: test-local-deploy-all
-  resourceVersion: "6036052"
+  resourceVersion: "6036053"
   selfLink: /apis/policy/v1beta1/namespaces/test-local-deploy-all/poddisruptionbudgets/test-app-pdb
   uid: 41d83cf7-8c5b-11e9-8840-42010a8e00dc
 spec:
@@ -18,7 +18,7 @@ spec:
       app: test-app-deployment
 status:
   currentHealthy: 0
-  desiredHealthy: 0
+  desiredHealthy: 2
   disruptionsAllowed: 0
   expectedPods: 0
   observedGeneration: 1
