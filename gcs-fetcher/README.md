@@ -24,8 +24,7 @@ The following is an example source manifest:
   "path/to/main.go": {
     "sourceUrl": "gs://my-bucket/ghijk",
     "sha1sum": "<sha-1 digest>"
-  },
-  ...
+  }
 }
 ```
 
