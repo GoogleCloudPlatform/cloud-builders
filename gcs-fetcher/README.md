@@ -15,7 +15,7 @@ can be found.
 
 The following is an example source manifest:
 
-```
+```json
 {
   "Dockerfile": {
     "sourceUrl": "gs://my-bucket/abcdef",
@@ -60,7 +60,7 @@ the path to place the file fetched from Cloud Storage.
 To fetch source described in a source manifest, add the following line to your
 build config:
 
-```
+```yaml
 steps:
 - name: 'gcr.io/cloud-builders/gcs-fetcher'
   args:
@@ -72,16 +72,15 @@ steps:
 It may also be useful to _produce_ and upload source manifests describing some
 source, which you can do with `gcr.io/cloud-builders/gcs-uploader`:
 
-```
+```yaml
 steps:
 - name: 'gcr.io/cloud-builders/gcs-uploader'
-  args: ['--bucket=${PROJECT_ID}_cloudbuild']
+  args: ['--location=${PROJECT_ID}_cloudbuild/manifest-${BUILD_ID}.json']
 ```
 
 This will upload the contents of the workspace directory, ignoring objects that
-are already present in Cloud Storage, and upload a randomly named manifest JSON
-object to Cloud Storage. You can specify the location of that manifest with the
-`--manifest_file` flag.
+are already present in Cloud Storage, and upload a manifest JSON object named
+`manifest-${BUILD_ID}.json` to the same Cloud Storage bucket.
 
 `gcs-uploader` will not delete remote objects that are not present locally.
 
@@ -95,7 +94,7 @@ files at the end of the build.
 In order to benefit from this you would need to define a well-known reusable
 manifest file location.
 
-```
+```yaml
 steps:
 # Attempt to fetch whatever files are available.
 - name: 'gcr.io/cloud-builders/gcs-fetcher'
@@ -104,7 +103,8 @@ steps:
   - '--location=gs://${PROJECT_ID}_cloudbuild_cache/manifest-foo.json'
 
 # Generate new files, ignoring those that already exist.
-- name: 'generate-new-files'
+# - name: 'generate-new-files'
+#   ...
 
 # Upload all files; only new and changed files will be uploaded to
 # Cloud Storage.
