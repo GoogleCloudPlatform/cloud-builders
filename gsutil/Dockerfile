@@ -4,6 +4,8 @@ RUN apt-get -y update && \
     apt-get -y install unzip zip && \
     rm -rf /var/lib/apt/lists/*
 
+RUN pip install pyopenssl
+
 COPY notice.sh /builder
 
 ENTRYPOINT ["/builder/notice.sh"]
