@@ -1,0 +1,15 @@
+# In this directory, run the following command to build this builder.
+# $ gcloud builds submit
+
+steps:
+# Build all supported versions.
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--tag=us.gcr.io/$PROJECT_ID/zoneinfo:2020f'
+  - '.'
+
+timeout: 1m0s
+
+images:
+- 'us.gcr.io/$PROJECT_ID/zoneinfo:2020f'
