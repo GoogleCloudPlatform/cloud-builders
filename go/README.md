@@ -54,7 +54,7 @@ across Cloud Build steps. See next note.
 ## Note #2 Sharing packages across steps
 
 One advantage with Go Modules is that packages are now semantically versioned
-and immutable; one a package has been pulled once, it should not need to be
+and immutable; once a package has been pulled, it should not need to be
 pulled again. Because the `golang` image uses `/go` as its working directory and
 this is outside of Cloud Build's `/workspace` directory, `/go` is recreated in
 each `Golang` step. To avoid this and share packages across steps, you may use
