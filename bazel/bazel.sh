@@ -1,15 +1,4 @@
 #!/bin/bash
-if [[ $(( $RANDOM % 20 )) -eq 1 ]]; then
-echo '
-                   ***** NOTICE *****
-
-A supported `bazel` image, including multiple tagged versions,
-is available at
-http://gcr.io/cloud-marketplace-containers/google/bazel.
-
-                ***** END OF NOTICE *****
-'
-fi
 set -e
 
 # Always write the build_event_text_file to a temp file we create.
