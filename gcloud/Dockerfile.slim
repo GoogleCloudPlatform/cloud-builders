@@ -18,7 +18,7 @@ RUN apt-get -y update && \
         --disable-installation-options && \
 
     # install crcmod: https://cloud.google.com/storage/docs/gsutil/addlhelp/CRC32CandInstallingcrcmod
-    easy_install -U pip && \
+    easy_install -U pip==20.3 && \
     pip install -U crcmod && \
     apt-get install python3-pip -y -q && \
     pip3 install -U crcmod && \
