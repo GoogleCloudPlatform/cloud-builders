@@ -9,6 +9,7 @@ RUN go build -o /gke-deploy
 FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
 RUN gcloud -q components install kubectl
 RUN gcloud -q components install gsutil
+RUN gcloud -q components install kustomize
 
 COPY --from=build-env /gke-deploy /
 COPY --from=build-env /gke-deploy /bin
