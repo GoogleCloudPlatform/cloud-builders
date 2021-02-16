@@ -1,6 +1,6 @@
 FROM launcher.gcr.io/google/ubuntu16_04
 
-ARG DOCKER_VERSION=5:19.03.8~3-0~ubuntu-xenial
+ARG DOCKER_VERSION=5:20.10.3~3-0~ubuntu-xenial
 
 RUN apt-get -y update && \
     apt-get -y install \
@@ -14,7 +14,7 @@ RUN apt-get -y update && \
     add-apt-repository \
        "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
        xenial \
-       edge" && \
+       stable" && \
     apt-get -y update && \
     apt-get -y install docker-ce=${DOCKER_VERSION} docker-ce-cli=${DOCKER_VERSION}
 
