@@ -1,7 +1,6 @@
 FROM launcher.gcr.io/google/ubuntu16_04
 
 ADD bazel.sh /builder/bazel.sh
-ARG DOCKER_VERSION=5:19.03.8~3-0~ubuntu-xenial
 
 RUN \
     # This makes add-apt-repository available.
@@ -38,7 +37,7 @@ RUN \
       $(lsb_release -cs) \
       stable edge" && \
     apt-get -y update && \
-    apt-get install -y docker-ce=${DOCKER_VERSION} docker-ce-cli=${DOCKER_VERSION} unzip && \
+    apt-get install -y docker-ce docker-ce-cli unzip && \
 
     mv /usr/bin/bazel /builder/bazel           && \
     mv /usr/bin/bazel-real /builder/bazel-real && \

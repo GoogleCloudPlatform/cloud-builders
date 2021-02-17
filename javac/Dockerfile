@@ -1,8 +1,6 @@
 ARG BASE_IMAGE=launcher.gcr.io/google/openjdk8
 FROM ${BASE_IMAGE}
 
-ARG DOCKER_VERSION=5:19.03.8~3-0~debian-stretch
-
 # Install Docker based on instructions from:
 # https://docs.docker.com/engine/installation/linux/docker-ce/debian
 RUN \
@@ -16,7 +14,7 @@ RUN \
       $(lsb_release -cs) \
       stable" && \
    apt-get -y update && \
-   apt-get -y install docker-ce=${DOCKER_VERSION} docker-ce-cli=${DOCKER_VERSION} && \
+   apt-get -y install docker-ce docker-ce-cli && \
 
    # Clean up build packages
    apt-get remove -y --purge curl gnupg2 software-properties-common && \
