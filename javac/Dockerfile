@@ -12,7 +12,7 @@ RUN \
    add-apt-repository \
       "deb [arch=amd64] https://download.docker.com/linux/debian \
       $(lsb_release -cs) \
-      edge stable" && \
+      stable" && \
    apt-get -y update && \
    apt-get -y install docker-ce docker-ce-cli && \
 
