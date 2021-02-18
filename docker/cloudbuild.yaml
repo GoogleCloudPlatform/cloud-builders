@@ -2,49 +2,17 @@
 # $ gcloud builds submit
 
 steps:
-# Build all supported versions.
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--tag=gcr.io/$PROJECT_ID/docker:19.03.8'
-  - '--build-arg'
-  - 'DOCKER_VERSION=5:19.03.8~3-0~ubuntu-xenial'
+  - '--tag=gcr.io/$PROJECT_ID/docker'
   - '.'
-  id: '19.03.8'
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'build'
-  - '--tag=gcr.io/$PROJECT_ID/docker:20.10.3'
-  - '--build-arg'
-  - 'DOCKER_VERSION=5:20.10.3~3-0~ubuntu-xenial'
-  - '.'
-  id: '20.10.3'
-  wait_for: ['-']
-# Future supported versions of docker builder go here.
 
-# Test each version by using it to run "docker build" on itself.
-- name: 'gcr.io/$PROJECT_ID/docker:19.03.8'
+# Test by using it to run "docker build" on itself.
+- name: 'gcr.io/$PROJECT_ID/docker'
   args:
   - 'build'
-  - '--build-arg'
-  - 'DOCKER_VERSION=5:19.03.8~3-0~ubuntu-xenial'
   - '.'
-  wait_for: ['19.03.8']
-- name: 'gcr.io/$PROJECT_ID/docker:20.10.3'
-  args:
-  - 'build'
-  - '--build-arg'
-  - 'DOCKER_VERSION=5:20.10.3~3-0~ubuntu-xenial'
-  - '.'
-  wait_for: ['20.10.3']
-# Tests for future supported versions of docker builder go here.
-
-# Tag the latest version as :latest. We use gcr.io/cloud-builders/docker here
-# and not gcr.io/$PROJECT_ID/docker because the latter may not yet exist.
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['tag', 'gcr.io/$PROJECT_ID/docker:20.10.3', 'gcr.io/$PROJECT_ID/docker']
-  wait_for: ['20.10.3']
-  id: 'latest'
 
 # Here are some things that can be done with this builder:
 
@@ -56,20 +24,15 @@ steps:
   - 'build'
   - '--tag=gcr.io/$PROJECT_ID/docker-again'
   - '.'
-  wait_for: ['latest']
 
-# Get info about an image. This effectively runs the "docker inspect" command on
-# the image built above.
+# Get info about an image: run the "docker inspect" command on itself.
 - name: 'gcr.io/$PROJECT_ID/docker'
   args: ['inspect', 'gcr.io/$PROJECT_ID/docker']
-  wait_for: ['latest']
+
 # Execute a container. The "busybox" container is executed within the docker
 # build step to echo "Hello, world!"
 - name: 'gcr.io/$PROJECT_ID/docker'
   args: ['run', 'busybox', 'echo', 'Hello, world!']
-  wait_for: ['latest']
 
 images:
 - 'gcr.io/$PROJECT_ID/docker:latest'
-- 'gcr.io/$PROJECT_ID/docker:19.03.8'
-- 'gcr.io/$PROJECT_ID/docker:20.10.3'
