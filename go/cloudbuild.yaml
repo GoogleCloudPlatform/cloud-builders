@@ -21,7 +21,6 @@ steps:
 
 - name: 'golang'
   args: ['go', 'build', '.']
-  env: ['GO111MODULE=on']
   dir: 'examples/module'
 - name: 'busybox'
   args: ['./module']
@@ -117,6 +116,8 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['run', 'https_test:ubuntu']
 
+options:
+  env: ['GO111MODULE=auto']
 images:
 - 'gcr.io/$PROJECT_ID/go'
 - 'gcr.io/$PROJECT_ID/go:alpine'
