@@ -13,6 +13,10 @@
 # limitations under the License.
 
 prepare_workspace() {
+    if [[ -e "go.mod" ]]; then
+        return 0
+    fi
+
     # We record the original working directory because some tools need to
     # remember, and sometimes this function changes directory.
     export WORKSPACE="$PWD"

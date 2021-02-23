@@ -1,5 +1,5 @@
 FROM scratch
 
-COPY subproject/bin/hello /hello
+COPY hello /hello
 
 ENTRYPOINT ["/hello"]
