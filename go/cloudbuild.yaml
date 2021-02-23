@@ -4,13 +4,10 @@
 steps:
 # Build the alpine and debian versions.
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-f', 'Dockerfile.alpine', '--tag=gcr.io/$PROJECT_ID/go:alpine', '.']
+  args: ['build', '-f', 'Dockerfile.alpine', '--tag=gcr.io/$PROJECT_ID/go', '--tag=gcr.io/$PROJECT_ID/go:alpine', '.']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-f', 'Dockerfile.debian', '--tag=gcr.io/$PROJECT_ID/go:debian', '.']
-
-# The alpine version is our default.
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['tag', 'gcr.io/$PROJECT_ID/go:alpine', 'gcr.io/$PROJECT_ID/go']
+  waitFor: ['-']
 
 # Ensure that "go get" works
 - name: 'gcr.io/$PROJECT_ID/go'
