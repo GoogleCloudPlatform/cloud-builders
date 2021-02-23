@@ -1,14 +1,9 @@
 steps:
 - name: 'gcr.io/cloud-builders/go'
-  args: ['install', 'hello']
-  env: ['GOPATH=.']
+  args: ['install', 'src/hello/main.go']
 - name: 'gcr.io/cloud-builders/go'
-  args: ['test', 'hello']
-  env: ['GOPATH=.']
+  args: ['test', 'src/hello/main.go']
+- name: 'gcr.io/cloud-builders/go'
+  args: ['build', '-o', 'hello', 'src/hello/main.go']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--tag=gcr.io/$PROJECT_ID/hello', '.']
-options:
-  # Note: to build with GOPATH defined as above, go module management must be
-  # disabled.  Projects should upgrade to use go modules.
-  # See https://golang.org/ref/mod.
-  env: ['GO111MODULE=auto']
