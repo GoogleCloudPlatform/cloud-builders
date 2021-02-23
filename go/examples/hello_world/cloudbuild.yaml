@@ -7,3 +7,8 @@ steps:
   env: ['PROJECT_ROOT=hello']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--tag=gcr.io/$PROJECT_ID/hello', '.']
+options:
+  # Note: to build with PROJECT_ROOT, go module management must be disabled.
+  # Projects using PROJECT_ROOT should upgrade to use go modules.
+  # See https://golang.org/ref/mod.
+  env: ['GO111MODULE=auto']
