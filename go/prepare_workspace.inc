@@ -13,9 +13,16 @@
 # limitations under the License.
 
 prepare_workspace() {
+    # Use Go modules (https://golang.org/ref/mod) if defined. This is the
+    # prefered workspace setup; it has been available since Go 1.11 and is the
+    # default behavior as of 1.16.
     if [[ -e "go.mod" ]]; then
         return 0
     fi
+
+    # Workspace setup without modules lives on for legacy purposes; it is no
+    # longer a supported behavior. Users should upgrade to use Go modules.
+    # See https://golang.org/ref/mod
 
     # We record the original working directory because some tools need to
     # remember, and sometimes this function changes directory.
@@ -95,3 +102,4 @@ prepare_project_root() {
     # working directory will be properly couched in GOPATH.
     cd "$shadow_workspace"
 }
+# vim: set expandtab:
