@@ -20,6 +20,7 @@ RUN apt-get -y update && \
         docker-credential-gcr \
         emulator-reverse-proxy \
         kubectl \
+        local-extract \
         pubsub-emulator \
         && \
 
