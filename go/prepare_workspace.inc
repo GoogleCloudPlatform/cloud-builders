@@ -13,6 +13,11 @@
 # limitations under the License.
 
 prepare_workspace() {
+    # If $GIT_CONFIG_VAL is set, set global git config value
+    if [[ "$GIT_CONFIG_VAL" ]]; then
+        eval "git config --global $GIT_CONFIG_VAL"
+    fi
+
     # Use Go modules (https://golang.org/ref/mod) if defined. This is the
     # prefered workspace setup; it has been available since Go 1.11 and is the
     # default behavior as of 1.16.
@@ -27,11 +32,6 @@ prepare_workspace() {
     # We record the original working directory because some tools need to
     # remember, and sometimes this function changes directory.
     export WORKSPACE="$PWD"
-
-    # If $GIT_CONFIG_VAL is set, set global git config value
-    if [[ "$GIT_CONFIG_VAL" ]]; then
-        eval "git config --global $GIT_CONFIG_VAL"
-    fi
 
     # If $GOPATH is set, do nothing. The user has already set up the workspace.
     if [[ "$GOPATH" ]]; then
