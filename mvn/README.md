@@ -11,7 +11,7 @@ https://hub.docker.com/_/maven for details.
 To migrate to the Maven team's official `maven` image, make the following
 changes to your `cloudbuild.yaml`:
 
-```
+```diff
 - name: 'gcr.io/cloud-builders/mvn'
 + name: 'maven'
 + entrypoint: 'mvn'
