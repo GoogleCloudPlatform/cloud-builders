@@ -2,17 +2,32 @@
 # $ gcloud builds submit
 
 steps:
+# Build all supported versions.
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--tag=gcr.io/$PROJECT_ID/docker'
+  - '--tag=gcr.io/$PROJECT_ID/docker:19.03.8'
+  - '--file=Dockerfile-19.03.8'
   - '.'
+  id: '19.03.8'
+# Future supported versions of docker builder go here.
 
-# Test by using it to run "docker build" on itself.
-- name: 'gcr.io/$PROJECT_ID/docker'
+# Test each version by using it to run "docker build" on itself.
+- name: 'gcr.io/$PROJECT_ID/docker:19.03.8'
   args:
   - 'build'
+  - '--file=Dockerfile-19.03.8'
   - '.'
+  wait_for: ['19.03.8']
+
+# Tests for future supported versions of docker builder go here.
+
+# Tag the latest version as :latest. We use gcr.io/cloud-builders/docker here
+# and not gcr.io/$PROJECT_ID/docker because the latter may not yet exist.
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['tag', 'gcr.io/$PROJECT_ID/docker:19.03.8', 'gcr.io/$PROJECT_ID/docker']
+  wait_for: ['19.03.8']
+  id: 'latest'
 
 # Here are some things that can be done with this builder:
 
@@ -22,17 +37,22 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/docker'
   args:
   - 'build'
+  - '--file=Dockerfile-19.03.8'
   - '--tag=gcr.io/$PROJECT_ID/docker-again'
   - '.'
+  wait_for: ['latest']
 
-# Get info about an image: run the "docker inspect" command on itself.
+# Get info about an image. This effectively runs the "docker inspect" command on
+# the image built above.
 - name: 'gcr.io/$PROJECT_ID/docker'
   args: ['inspect', 'gcr.io/$PROJECT_ID/docker']
-
+  wait_for: ['latest']
 # Execute a container. The "busybox" container is executed within the docker
 # build step to echo "Hello, world!"
 - name: 'gcr.io/$PROJECT_ID/docker'
   args: ['run', 'busybox', 'echo', 'Hello, world!']
+  wait_for: ['latest']
 
 images:
 - 'gcr.io/$PROJECT_ID/docker:latest'
+- 'gcr.io/$PROJECT_ID/docker:19.03.8'
