@@ -1,5 +1,7 @@
 FROM launcher.gcr.io/google/ubuntu16_04
 
+ARG DOCKER_VERSION=5:20.10.3~3-0~ubuntu-xenial
+
 RUN apt-get -y update && \
     apt-get -y install \
         apt-transport-https \
@@ -14,6 +16,6 @@ RUN apt-get -y update && \
        xenial \
        stable" && \
     apt-get -y update && \
-    apt-get -y install docker-ce docker-ce-cli
+    apt-get -y install docker-ce=${DOCKER_VERSION} docker-ce-cli=${DOCKER_VERSION}
 
 ENTRYPOINT ["/usr/bin/docker"]
