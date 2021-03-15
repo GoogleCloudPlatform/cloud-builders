@@ -1,9 +1,10 @@
 steps:
 - name: 'gcr.io/cloud-builders/go'
-  args: ['install', 'src/hello/main.go']
+  args: ['install', 'hello']
+  env: ['GOPATH=.']
 - name: 'gcr.io/cloud-builders/go'
-  args: ['test', 'src/hello/main.go']
-- name: 'gcr.io/cloud-builders/go'
-  args: ['build', '-o', 'hello', 'src/hello/main.go']
+  args: ['test', 'hello']
+  env: ['GOPATH=.']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--tag=gcr.io/$PROJECT_ID/hello', '.']
+images: ['gcr.io/$PROJECT_ID/hello']

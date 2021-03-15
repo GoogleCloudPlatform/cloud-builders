@@ -1,5 +1,5 @@
 FROM scratch
 
-COPY hello /hello
+COPY gopath/bin/hello /hello
 
 ENTRYPOINT ["/hello"]
