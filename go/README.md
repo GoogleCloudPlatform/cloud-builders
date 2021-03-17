@@ -22,7 +22,9 @@ to your `cloudbuild.yaml`:
 The functionality previously provided by `gcr.io/cloud-builders/go` in
 [`prepare_workspace`](https://github.com/GoogleCloudPlatform/cloud-builders/blob/master/go/prepare_workspace.inc)
 is replaced by the use of [Go modules](https://golang.org/ref/mod), available
-since Go 1.11. As of Go 1.16, go modules are the default behavior.
+since Go 1.11. Once this builder upgrades to Go 1.16, go modules will become
+the default behavior. To continue using the legacy behavior after the upgrade,
+set `GO111MODULE=on` in your `cloudbuild.yaml`.
 
 See [`examples/module`](https://github.com/GoogleCloudPlatform/cloud-builders/tree/master/go/examples/module)
 for a working example.
