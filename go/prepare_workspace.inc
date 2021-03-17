@@ -13,6 +13,11 @@
 # limitations under the License.
 
 prepare_workspace() {
+    # If $GIT_CONFIG_VAL is set, set global git config value
+    if [[ "$GIT_CONFIG_VAL" ]]; then
+        eval "git config --global $GIT_CONFIG_VAL"
+    fi
+
     # We record the original working directory because some tools need to
     # remember, and sometimes this function changes directory.
     export WORKSPACE="$PWD"
