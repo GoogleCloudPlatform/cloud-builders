@@ -121,27 +121,27 @@ func deploymentIsReady(ctx context.Context, obj *Object) (bool, error) {
 		return false, nil
 	}
 
-	statusReplicas, ok, err := unstructured.NestedInt64(obj.Object, "status", "replicas")
+	statusReplicas, _, err := unstructured.NestedInt64(obj.Object, "status", "replicas")
 	if err != nil {
 		return false, fmt.Errorf("failed to get status.replicas field: %v", err)
 	}
-	if !ok || statusReplicas != specReplicas {
+	if statusReplicas != specReplicas {
 		return false, nil
 	}
 
-	readyReplicas, ok, err := unstructured.NestedInt64(obj.Object, "status", "readyReplicas")
+	readyReplicas, _, err := unstructured.NestedInt64(obj.Object, "status", "readyReplicas")
 	if err != nil {
 		return false, fmt.Errorf("failed to get status.readyReplicas field: %v", err)
 	}
-	if !ok || readyReplicas != specReplicas {
+	if readyReplicas != specReplicas {
 		return false, nil
 	}
 
-	availableReplicas, ok, err := unstructured.NestedInt64(obj.Object, "status", "availableReplicas")
+	availableReplicas, _, err := unstructured.NestedInt64(obj.Object, "status", "availableReplicas")
 	if err != nil {
 		return false, fmt.Errorf("failed to get status.availableReplicas field: %v", err)
 	}
-	if !ok || availableReplicas != specReplicas {
+	if availableReplicas != specReplicas {
 		return false, nil
 	}
 
