@@ -14,6 +14,7 @@ func TestIsReady(t *testing.T) {
 	testDaemonsetUnready3File := "testing/daemonset-unready-3.yaml"
 	testDaemonsetUnready4File := "testing/daemonset-unready-4.yaml"
 	testDeploymentReadyFile := "testing/deployment-ready.yaml"
+	testDeploymentReady2File := "testing/deployment-ready-2.yaml"
 	testDeploymentUnreadyFile := "testing/deployment-unready.yaml"
 	testDeploymentUnready2File := "testing/deployment-unready-2.yaml"
 	testDeploymentUnready3File := "testing/deployment-unready-3.yaml"
@@ -100,6 +101,12 @@ func TestIsReady(t *testing.T) {
 		name: "Deployment is ready",
 
 		obj: newObjectFromFile(t, testDeploymentReadyFile),
+
+		want: true,
+	}, {
+		name: "Deployment is ready, zero replicas",
+
+		obj: newObjectFromFile(t, testDeploymentReady2File),
 
 		want: true,
 	}, {
