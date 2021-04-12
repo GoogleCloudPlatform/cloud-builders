@@ -36,12 +36,12 @@ Apply Phase:
   gke-deploy prepare -f configs -i gcr.io/my-project/my-app:1.0.0 -a my-app -v 1.0.0 -o expanded -n my-namespace
 
   # Apply only.
-  gke-deploy apply -f configs -c my-cluster -n my-namespace -c my-cluster -l us-east1-b
+  gke-deploy apply -f configs -n my-namespace -c my-cluster -l us-east1-b
 
   # Execute prepare and apply, with an intermediary step in between (e.g., manually check expanded YAMLs)
   gke-deploy prepare -f configs -i gcr.io/my-project/my-app:1.0.0 -a my-app -v 1.0.0 -o expanded -n my-namespace
   cat expanded/*
-  gke-deploy apply -f expanded -c my-cluster -n my-namespace -c my-cluster -l us-east1-b  # Pass expanded directory to -f
+  gke-deploy apply -f expanded -n my-namespace -c my-cluster -l us-east1-b  # Pass expanded directory to -f
 
   # Pipe output from another templating engine to gke-deploy.
   kustomize build overlays/staging | gke-deploy run -f - -a my-app -c my-cluster -l us-east1-b
