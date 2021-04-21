@@ -19,9 +19,12 @@ RUN apt-get -y update && \
         datalab \
         docker-credential-gcr \
         emulator-reverse-proxy \
+        kpt \
         kubectl \
+        kustomize \
         local-extract \
         pubsub-emulator \
+        skaffold \
         && \
 
     /builder/google-cloud-sdk/bin/gcloud -q components update && \
