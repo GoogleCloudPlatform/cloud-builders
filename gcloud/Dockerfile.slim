@@ -1,7 +1,7 @@
 FROM launcher.gcr.io/google/ubuntu16_04
 
 RUN apt-get -y update && \
-    apt-get -y install gcc python2.7 python-dev python-setuptools wget ca-certificates \
+    apt-get -y install gcc python2.7 python-dev python-pip python3-pip wget ca-certificates \
        # These are necessary for add-apt-respository
        software-properties-common python-software-properties && \
 
@@ -18,13 +18,11 @@ RUN apt-get -y update && \
         --disable-installation-options && \
 
     # install crcmod: https://cloud.google.com/storage/docs/gsutil/addlhelp/CRC32CandInstallingcrcmod
-    easy_install -U pip==20.3 && \
     pip install -U crcmod && \
-    apt-get install python3-pip -y -q && \
     pip3 install -U crcmod && \
 
     # Clean up
-    apt-get -y remove gcc python-dev python-setuptools wget python3-pip && \
+    apt-get -y remove gcc python-dev wget python-pip python3-pip && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf ~/.config/gcloud
 
