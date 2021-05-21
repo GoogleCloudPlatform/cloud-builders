@@ -39,7 +39,7 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/mvn:gcloud'
   - '--tag=gcr.io/$PROJECT_ID/mvn:appengine'
   - '.'
-  waitFor: ['-']
+  waitFor: ['latest']
   id: 'gcloud'
 
 # Minimally invoke Maven.
