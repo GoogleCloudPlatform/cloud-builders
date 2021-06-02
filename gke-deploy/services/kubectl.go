@@ -29,7 +29,7 @@ func NewKubectl(ctx context.Context, printCommands bool, serverDryRun bool) (*Ku
 func (k *Kubectl) Apply(ctx context.Context, filename, namespace string) error {
 	args := []string{"apply", "-f", filename}
 	if k.serverDryRun {
-		args = append(args, "--server-dry-run")
+		args = append(args, "--dry-run=server")
 	}
 	if namespace != "" {
 		args = append(args, "-n", namespace)
@@ -44,7 +44,7 @@ func (k *Kubectl) Apply(ctx context.Context, filename, namespace string) error {
 func (k *Kubectl) ApplyFromString(ctx context.Context, configString, namespace string) error {
 	args := []string{"apply", "-f", "-"}
 	if k.serverDryRun {
-		args = append(args, "--server-dry-run")
+		args = append(args, "--dry-run=server")
 	}
 	if namespace != "" {
 		args = append(args, "-n", namespace)

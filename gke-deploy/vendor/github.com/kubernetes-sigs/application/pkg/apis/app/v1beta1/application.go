@@ -17,6 +17,10 @@ limitations under the License.
 package v1beta1
 
 import (
+	"log"
+	"regexp"
+	"strings"
+
 	"github.com/kubernetes-sigs/application/pkg/component"
 	cr "github.com/kubernetes-sigs/application/pkg/customresource"
 	"github.com/kubernetes-sigs/application/pkg/finalizer"
@@ -24,9 +28,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"log"
-	"regexp"
-	"strings"
 )
 
 // Mutate - mutate expected

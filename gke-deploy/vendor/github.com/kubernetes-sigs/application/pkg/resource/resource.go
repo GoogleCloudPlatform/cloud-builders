@@ -17,16 +17,17 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"os"
+	"reflect"
+	"strings"
+	"text/template"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/client-go/kubernetes/scheme"
-	"os"
-	"reflect"
-	"strings"
-	"text/template"
 )
 
 // objFromReader reads Object from []byte spec
