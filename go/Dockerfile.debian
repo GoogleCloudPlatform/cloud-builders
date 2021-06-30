@@ -1,4 +1,4 @@
-FROM golang:1.15
+FROM golang:1.16
 
 # Install VCS tools to support "go get" commands and install gcc.
 RUN apt-get update -qqy && apt-get install -qqy git mercurial subversion gcc
