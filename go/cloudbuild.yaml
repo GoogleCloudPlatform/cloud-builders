@@ -4,13 +4,23 @@
 steps:
 # Build the alpine and debian versions.
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-f', 'Dockerfile.alpine', '--tag=gcr.io/$PROJECT_ID/go:alpine', '.']
+  args:
+  - 'build'
+  - '-f'
+  - 'Dockerfile.alpine'
+  - '--tag=gcr.io/$PROJECT_ID/go'
+  - '--tag=gcr.io/$PROJECT_ID/go:1.15'
+  - '--tag=gcr.io/$PROJECT_ID/go:alpine'
+  - '--tag=gcr.io/$PROJECT_ID/go:alpine-1.15'
+  - '.'
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-f', 'Dockerfile.debian', '--tag=gcr.io/$PROJECT_ID/go:debian', '.']
-
-# The alpine version is our default.
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['tag', 'gcr.io/$PROJECT_ID/go:alpine', 'gcr.io/$PROJECT_ID/go']
+  args:
+  - 'build'
+  - '-f'
+  - 'Dockerfile.debian'
+  - '--tag=gcr.io/$PROJECT_ID/go:debian'
+  - '--tag=gcr.io/$PROJECT_ID/go:debian-1.15'
+  - '.'
 
 # Ensure that "go get" works
 - name: 'gcr.io/$PROJECT_ID/go'
@@ -116,9 +126,34 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['run', 'https_test:ubuntu']
 
+# Go 1.16
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '-f'
+  - 'Dockerfile.alpine'
+  - '--build-arg=VERSION=1.16'
+  - '--tag=gcr.io/$PROJECT_ID/go:alpine-1.16'
+  - '--tag=gcr.io/$PROJECT_ID/go:1.16'
+  - '.'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '-f'
+  - 'Dockerfile.debian'
+  - '--build-arg=VERSION=1.16'
+  - '--tag=gcr.io/$PROJECT_ID/go:debian-1.16'
+  - '.'
+
 options:
   env: ['GO111MODULE=auto']
 images:
 - 'gcr.io/$PROJECT_ID/go'
 - 'gcr.io/$PROJECT_ID/go:alpine'
 - 'gcr.io/$PROJECT_ID/go:debian'
+- 'gcr.io/$PROJECT_ID/go:1.15'
+- 'gcr.io/$PROJECT_ID/go:1.16'
+- 'gcr.io/$PROJECT_ID/go:alpine-1.15'
+- 'gcr.io/$PROJECT_ID/go:debian-1.15'
+- 'gcr.io/$PROJECT_ID/go:alpine-1.16'
+- 'gcr.io/$PROJECT_ID/go:debian-1.16'
