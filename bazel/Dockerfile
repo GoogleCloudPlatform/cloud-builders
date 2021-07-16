@@ -8,7 +8,9 @@ RUN \
     apt-get update && \
     apt-get -y install \
         python \
+        python3 \
         python-pkg-resources \
+        python3-pkg-resources \
         software-properties-common \
         unzip && \
 
