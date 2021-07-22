@@ -13,7 +13,7 @@ RUN apt-get -y update && \
     # Setup Google Cloud SDK (latest)
     mkdir -p /builder && \
     wget -qO- https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz | tar zxv -C /builder && \
-    CLOUDSDK_PYTHON="python2.7" /builder/google-cloud-sdk/install.sh --usage-reporting=false \
+    /builder/google-cloud-sdk/install.sh --usage-reporting=false \
         --bash-completion=false \
         --disable-installation-options && \
 
