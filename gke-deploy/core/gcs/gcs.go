@@ -4,7 +4,6 @@ package gcs
 import (
 	"context"
 	"errors"
-	"log"
 	"strings"
 	"time"
 
@@ -28,17 +27,14 @@ type GCS struct {
 	GcsService services.GcsService
 }
 
-// Download copies file(s) from GCS. <dst> should be a directory, not a path to a file
+// Download copies file(s) from GCS. <dst> should be a directory, not a path to a file.
 func (s *GCS) Download(ctx context.Context, src, dst string, recursive bool) error {
-	log.Printf("Downloading file(s) %s from %s.\n", src, dst)
 	return s.copyWithRetry(ctx, src, dst, recursive)
 }
 
 // Upload copies file(s) to GCS.
 func (s *GCS) Upload(ctx context.Context, src, dst string) error {
-	log.Printf("Uploading file(s) %s to %s.\n", src, dst)
 	return s.copyWithRetry(ctx, src, dst, false)
-
 }
 
 // copyWithRetry is responsible for trying (and retrying) to call copyWithTimeout()
