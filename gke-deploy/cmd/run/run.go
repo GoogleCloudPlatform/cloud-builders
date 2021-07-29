@@ -4,6 +4,7 @@ package run
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/go-containerregistry/pkg/name"
@@ -161,7 +162,12 @@ func run(_ *cobra.Command, options *options) error {
 	if err := d.Prepare(ctx, im, options.appName, options.appVersion, options.filename, common.SuggestedOutputPath(options.output), expandedOutput, options.namespace, labelsMap, annotationsMap, options.exposePort, options.recursive, options.createApplicationCR, applicationLinks); err != nil {
 		return fmt.Errorf("failed to prepare deployment: %v", err)
 	}
-	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, expandedOutput, options.namespace, options.waitTimeout, options.recursive); err != nil {
+	applyConfig := expandedOutput
+	if strings.HasPrefix(options.output, "gs://") {
+		// Without this, gsutil copies the entire expanded output directory, rather than just the files in the directory, which fails applying the deployment if the --recursive flag isn't set.
+		applyConfig = applyConfig + "/*"
+	}
+	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, applyConfig, options.namespace, options.waitTimeout, options.recursive); err != nil {
 		return fmt.Errorf("failed to apply deployment: %v", err)
 	}
 

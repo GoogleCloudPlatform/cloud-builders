@@ -28,7 +28,7 @@ const (
 	managedByLabelKey  = "app.kubernetes.io/managed-by"
 
 	managedByLabelValue = "gcp-cloud-build-deploy"
-	//temporary folder pattern used to create tmp folders for the files downloaded from GCS
+	// Name pattern used to create temporary staging folders for the files to be downloaded from/uploaded to GCS.
 	k8sConfigStagingDir = "gke_deploy_temp_"
 	expendedFileName    = "expanded-resources.yaml"
 	suggestedFileName   = "suggested-resources.yaml"
@@ -200,7 +200,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 		if toGcs {
 			err := ss.Upload(ctx, fileName, gcsPath)
 			if err != nil {
-				return fmt.Errorf("failed to download configuration files from GCS %q: %v", config, err)
+				return fmt.Errorf("failed to upload configuration files from GCS %q: %v", config, err)
 			}
 		}
 	}
@@ -295,7 +295,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 	if toGcs {
 		err := ss.Upload(ctx, fileName, gcsPath)
 		if err != nil {
-			return fmt.Errorf("failed to download configuration files from GCS %q: %v", config, err)
+			return fmt.Errorf("failed to upload configuration files from GCS %q: %v", config, err)
 		}
 	}
 
