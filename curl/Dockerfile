@@ -1,3 +1,3 @@
-FROM launcher.gcr.io/google/ubuntu1604
+FROM gcr.io/gcp-runtimes/ubuntu_18_0_4
 COPY notice.sh /usr/bin
 ENTRYPOINT ["/usr/bin/notice.sh"]

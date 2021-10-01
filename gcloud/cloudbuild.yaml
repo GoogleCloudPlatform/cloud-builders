@@ -5,7 +5,11 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--tag=gcloud-slim', '--tag=gcr.io/$PROJECT_ID/gcloud-slim', '-f', 'Dockerfile.slim', '.']
 - name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=gcloud-slim:ubuntu1804', '--tag=gcr.io/$PROJECT_ID/gcloud-slim:ubuntu1804', '-f', 'Dockerfile.slim.ubuntu1804', '.']
+- name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--tag=gcr.io/$PROJECT_ID/gcloud', '-f', 'Dockerfile', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/gcloud:ubuntu1804', '-f', 'Dockerfile.ubuntu1804', '.']
 
 # Simple sanity check: invoke the new gcloud container to confirm that it was
 # built correctly.
@@ -20,6 +24,8 @@ steps:
 
 images:
 - 'gcr.io/$PROJECT_ID/gcloud'
+- 'gcr.io/$PROJECT_ID/gcloud:ubuntu1804'
 - 'gcr.io/$PROJECT_ID/gcloud-slim'
+- 'gcr.io/$PROJECT_ID/gcloud-slim:ubuntu1804'
 
-timeout: 1200s
+timeout: 2400s
