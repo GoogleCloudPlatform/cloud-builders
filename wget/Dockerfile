@@ -1,4 +1,4 @@
-FROM gcr.io/cloud-builders/gcloud:ubuntu1804
+FROM gcr.io/gcp-runtimes/ubuntu_18_0_4
 
 RUN apt-get update && \
   apt-get -y install wget ca-certificates
