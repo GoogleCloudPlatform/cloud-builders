@@ -11,10 +11,10 @@ this image is compatible with the hosted Cloud Build service, it runs as user
 https://hub.docker.com/r/curlimages/curl.
 
 This `gcr.io/cloud-builders/curl` image is a simple wrapper on top of
-`launcher.gcr.io/google/ubuntu1604` that specifies `curl` as the `entrypoint`.
-As a Google-provided image, `launcher.gcr.io/google/ubuntu1604` can be used
+`gcr.io/gcp-runtimes/ubuntu_18_0_4` that specifies `curl` as the `entrypoint`.
+As a Google-provided image, `gcr.io/gcp-runtimes/ubuntu_18_0_4` can be used
 directly with Cloud Build.  For details, visit
-https://console.cloud.google.com/launcher/details/google/ubuntu1604. Using this
+https://console.cloud.google.com/marketplace/product/google/ubuntu1804. Using this
 image directly will mean that you are always using the latest patched version.
 
 To migrate to the GCP launcher image, make the following changes
@@ -22,7 +22,7 @@ to your `cloudbuild.yaml`:
 
 ```
 - name: 'gcr.io/cloud-builders/curl'
-+ name: 'launcher.gcr.io/google/ubuntu1604'
++ name: 'gcr.io/gcp-runtimes/ubuntu_18_0_4'
 + entrypoint: 'curl'
 ```
 
@@ -37,7 +37,7 @@ file must be publicly readable, since no credentials are passed in the request.
 
 ```
 steps:
-- name: 'launcher.gcr.io/google/ubuntu1604'
+- name: 'gcr.io/gcp-runtimes/ubuntu_18_0_4'
   entrypoint: 'curl'
   args: ['http://www.example.com/']
 ```
@@ -55,7 +55,7 @@ has happened, including the build's unique ID in the JSON body of the request.
 
 ```
 steps:
-- name: 'launcher.gcr.io/google/ubuntu1604'
+- name: 'gcr.io/gcp-runtimes/ubuntu_18_0_4'
   entrypoint: 'curl'
   args: ['-d', '"{\"id\":\"$BUILD_ID\"}"', '-X', 'POST', 'http://www.example.com']
 ```
