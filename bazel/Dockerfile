@@ -1,7 +1,7 @@
-FROM gcr.io/gcp-runtimes/ubuntu_18_0_4
+FROM gcr.io/gcp-runtimes/ubuntu_20_0_4
 
 ADD bazel.sh /builder/bazel.sh
-ARG DOCKER_VERSION=5:19.03.8~3-0~ubuntu-bionic
+ARG DOCKER_VERSION=5:19.03.9~3-0~ubuntu-focal
 
 RUN \
     # This makes add-apt-repository available.
