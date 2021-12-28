@@ -18,7 +18,6 @@ RUN apt-get -y update && \
         cloud-build-local \
         datalab \
         docker-credential-gcr \
-        emulator-reverse-proxy \
         kpt \
         kubectl \
         kustomize \
