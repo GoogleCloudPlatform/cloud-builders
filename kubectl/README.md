@@ -56,6 +56,10 @@ If your GKE cluster is in a different project than the build itself, also set:
 
 ```CLOUDSDK_CORE_PROJECT=<the GKE cluster project>```
 
+To use the internal IP address of the cluster endpoint, set:
+
+```CLOUDSDK_INTERNAL_IP=true```
+
 ## Using this builder with Google Kubernetes Engine
 
 To use this builder on Google Cloud Build, your [builder service

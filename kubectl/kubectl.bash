@@ -29,6 +29,7 @@ function var_usage() {
   CLOUDSDK_CONTAINER_CLUSTER=<cluster name>
 
   Optionally, you can specify the kubectl version via KUBECTL_VERSION, taking one of the following values: ${versions[@]}
+  Setting CLOUDSDK_INTERNAL_IP=true will use the internal IP address of the cluster endpoint.
 EOF
 
   exit 1
@@ -39,6 +40,7 @@ cluster=${CLOUDSDK_CONTAINER_CLUSTER:-$(gcloud config get-value container/cluste
 region=${CLOUDSDK_COMPUTE_REGION:-$(gcloud config get-value compute/region 2> /dev/null)}
 zone=${CLOUDSDK_COMPUTE_ZONE:-$(gcloud config get-value compute/zone 2> /dev/null)}
 project=${CLOUDSDK_CORE_PROJECT:-$(gcloud config get-value core/project 2> /dev/null)}
+extra_args=()
 
 [[ -z "$cluster" ]] && var_usage
 [ ! "$zone" -o "$region" ] && var_usage
@@ -46,13 +48,14 @@ if [[ -n "$KUBECTL_VERSION" ]] && [[ ! " ${versions[*]} "  =~ " ${KUBECTL_VERSIO
   echoerr "Bad KUBECTL_VERSION \"${KUBECTL_VERSION}\". Expected one of ${versions[*]}" >&2
   exit 1
 fi
+[[ "${CLOUDSDK_INTERNAL_IP}" == "true" ]] && extra_args+=(--internal-ip)
 
 if [ -n "$region" ]; then
-  echoerr "Running: gcloud container clusters get-credentials --project=\"$project\" --region=\"$region\" \"$cluster\""
-  gcloud container clusters get-credentials --project="$project" --region="$region" "$cluster" || exit
+  echoerr "Running: gcloud container clusters get-credentials --project=\"$project\" --region=\"$region\" ${extra_args[@]} \"$cluster\""
+  gcloud container clusters get-credentials --project="$project" --region="$region" "${extra_args[@]}" "$cluster" || exit
 else
-  echoerr "Running: gcloud container clusters get-credentials --project=\"$project\" --zone=\"$zone\" \"$cluster\""
-  gcloud container clusters get-credentials --project="$project" --zone="$zone" "$cluster" || exit
+  echoerr "Running: gcloud container clusters get-credentials --project=\"$project\" --zone=\"$zone\" ${extra_args[@]} \"$cluster\""
+  gcloud container clusters get-credentials --project="$project" --zone="$zone" "${extra_args[@]}" "$cluster" || exit
  fi
 
 echoerr "Running: ${kubectl_cmd}" "$@" >&2
