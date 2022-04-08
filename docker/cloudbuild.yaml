@@ -10,6 +10,15 @@ steps:
   - '--file=Dockerfile-19.03.9'
   - '.'
   id: '19.03.9'
+
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--tag=gcr.io/$PROJECT_ID/docker:20.10.13'
+  - '--file=Dockerfile-20.10.13'
+  - '.'
+  id: '20.10.13'
+
 # Future supported versions of docker builder go here.
 
 # Test each version by using it to run "docker build" on itself.
@@ -20,13 +29,20 @@ steps:
   - '.'
   wait_for: ['19.03.9']
 
+- name: 'gcr.io/$PROJECT_ID/docker:20.10.13'
+  args:
+  - 'build'
+  - '--file=Dockerfile-20.10.13'
+  - '.'
+  wait_for: ['20.10.13']
+
 # Tests for future supported versions of docker builder go here.
 
 # Tag the latest version as :latest. We use gcr.io/cloud-builders/docker here
 # and not gcr.io/$PROJECT_ID/docker because the latter may not yet exist.
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['tag', 'gcr.io/$PROJECT_ID/docker:19.03.9', 'gcr.io/$PROJECT_ID/docker']
-  wait_for: ['19.03.9']
+  args: ['tag', 'gcr.io/$PROJECT_ID/docker:20.10.13', 'gcr.io/$PROJECT_ID/docker']
+  wait_for: ['20.10.13']
   id: 'latest'
 
 # Here are some things that can be done with this builder:
@@ -37,7 +53,7 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/docker'
   args:
   - 'build'
-  - '--file=Dockerfile-19.03.9'
+  - '--file=Dockerfile-20.10.13'
   - '--tag=gcr.io/$PROJECT_ID/docker-again'
   - '.'
   wait_for: ['latest']
@@ -56,3 +72,4 @@ steps:
 images:
 - 'gcr.io/$PROJECT_ID/docker:latest'
 - 'gcr.io/$PROJECT_ID/docker:19.03.9'
+- 'gcr.io/$PROJECT_ID/docker:20.10.13'
