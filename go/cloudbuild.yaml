@@ -164,6 +164,25 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/go:debian-1.17'
   - '.'
 
+# Go 1.18
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '-f'
+  - 'Dockerfile.alpine'
+  - '--build-arg=VERSION=1.18'
+  - '--tag=gcr.io/$PROJECT_ID/go:alpine-1.18'
+  - '--tag=gcr.io/$PROJECT_ID/go:1.18'
+  - '.'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '-f'
+  - 'Dockerfile.debian'
+  - '--build-arg=VERSION=1.18'
+  - '--tag=gcr.io/$PROJECT_ID/go:debian-1.18'
+  - '.'
+
 options:
   env: ['GO111MODULE=auto']
 images:
@@ -173,9 +192,12 @@ images:
 - 'gcr.io/$PROJECT_ID/go:1.15'
 - 'gcr.io/$PROJECT_ID/go:1.16'
 - 'gcr.io/$PROJECT_ID/go:1.17'
+- 'gcr.io/$PROJECT_ID/go:1.18'
 - 'gcr.io/$PROJECT_ID/go:alpine-1.15'
 - 'gcr.io/$PROJECT_ID/go:debian-1.15'
 - 'gcr.io/$PROJECT_ID/go:alpine-1.16'
 - 'gcr.io/$PROJECT_ID/go:debian-1.16'
 - 'gcr.io/$PROJECT_ID/go:alpine-1.17'
 - 'gcr.io/$PROJECT_ID/go:debian-1.17'
+- 'gcr.io/$PROJECT_ID/go:alpine-1.18'
+- 'gcr.io/$PROJECT_ID/go:debian-1.18'
