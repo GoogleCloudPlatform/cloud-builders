@@ -2,7 +2,7 @@ ARG PROJECT_ID="cloud-builders"
 FROM gcr.io/${PROJECT_ID}/mvn:latest
 
 # install python
-RUN microdnf install python3
+RUN apt-get update -y && apt-get install python3 -y
 
 # install cloud sdk into appengine-maven-plugin cache
 RUN set -eux; \
