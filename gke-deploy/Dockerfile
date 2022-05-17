@@ -12,6 +12,8 @@ RUN gcloud -q components install gsutil
 RUN gcloud -q components install kustomize
 RUN gcloud -q components install local-extract
 RUN apk -q --no-cache add gettext
+RUN apk -q --no-cache add yq
+
 
 COPY --from=build-env /gke-deploy /
 COPY --from=build-env /gke-deploy /bin
