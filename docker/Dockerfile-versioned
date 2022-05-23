@@ -1,0 +1,13 @@
+FROM temp
+
+ARG DOCKER_VERSION=VERSION
+ARG RELEASE_CHANNEL=NONE
+
+RUN add-apt-repository \
+       "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+       $(lsb_release -cs) \
+       ${RELEASE_CHANNEL}" && \
+    apt-get -y update && \
+    apt-get -y install docker-ce=${DOCKER_VERSION} docker-ce-cli=${DOCKER_VERSION}
+
+ENTRYPOINT ["/usr/bin/docker"]

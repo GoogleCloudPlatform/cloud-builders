@@ -2,22 +2,39 @@
 # $ gcloud builds submit
 
 steps:
+# Pre-requisite: build the base OS container; 'temp' is referenced in the
+# Dockerfile for subsequent steps but is not pushed. Building this shared base
+# image enables the versioned builders to share base layers.
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--tag=temp'
+  - '--file=Dockerfile-base'
+  - '.'
+  id: 'base'
+
 # Build all supported versions.
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
   - '--tag=gcr.io/$PROJECT_ID/docker:19.03.9'
-  - '--file=Dockerfile-19.03.9'
+  - '--file=Dockerfile-versioned'
+  - '--build-arg=DOCKER_VERSION=5:19.03.9~3-0~ubuntu-focal'
+  - '--build-arg=RELEASE_CHANNEL=edge'
   - '.'
   id: '19.03.9'
+  wait_for: ['base']
 
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
   - '--tag=gcr.io/$PROJECT_ID/docker:20.10.13'
-  - '--file=Dockerfile-20.10.13'
+  - '--file=Dockerfile-versioned'
+  - '--build-arg=DOCKER_VERSION=5:20.10.14~3-0~ubuntu-focal'
+  - '--build-arg=RELEASE_CHANNEL=stable'
   - '.'
   id: '20.10.13'
+  wait_for: ['base']
 
 # Future supported versions of docker builder go here.
 
@@ -25,14 +42,18 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/docker:19.03.9'
   args:
   - 'build'
-  - '--file=Dockerfile-19.03.9'
+  - '--file=Dockerfile-versioned'
+  - '--build-arg=DOCKER_VERSION=5:19.03.9~3-0~ubuntu-focal'
+  - '--build-arg=RELEASE_CHANNEL=edge'
   - '.'
   wait_for: ['19.03.9']
 
 - name: 'gcr.io/$PROJECT_ID/docker:20.10.13'
   args:
   - 'build'
-  - '--file=Dockerfile-20.10.13'
+  - '--file=Dockerfile-versioned'
+  - '--build-arg=DOCKER_VERSION=5:20.10.14~3-0~ubuntu-focal'
+  - '--build-arg=RELEASE_CHANNEL=stable'
   - '.'
   wait_for: ['20.10.13']
 
@@ -46,17 +67,6 @@ steps:
   id: 'latest'
 
 # Here are some things that can be done with this builder:
-
-# Do the same build, but give the image a different name. Note that
-# "docker-again" is absent from the "images" list below, so this image is built
-# but is not pushed to the repository.
-- name: 'gcr.io/$PROJECT_ID/docker'
-  args:
-  - 'build'
-  - '--file=Dockerfile-20.10.13'
-  - '--tag=gcr.io/$PROJECT_ID/docker-again'
-  - '.'
-  wait_for: ['latest']
 
 # Get info about an image. This effectively runs the "docker inspect" command on
 # the image built above.
