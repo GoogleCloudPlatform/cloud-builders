@@ -2,9 +2,8 @@ FROM temp
 
 ARG DOCKER_VERSION=VERSION
 
-RUN add-apt-repository \
-       "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" && \
-    apt-get -y update && \
-    apt-get -y install docker-ce=${DOCKER_VERSION} docker-ce-cli=${DOCKER_VERSION}
+RUN apt-get -y install docker-ce=${DOCKER_VERSION} docker-ce-cli=${DOCKER_VERSION} \
+	    docker-compose docker-compose-plugin &&\
+	apt-get clean
 
 ENTRYPOINT ["/usr/bin/docker"]
