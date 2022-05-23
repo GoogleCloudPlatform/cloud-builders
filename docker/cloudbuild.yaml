@@ -24,7 +24,6 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/docker:19.03.9'
   - '--file=Dockerfile-versioned'
   - '--build-arg=${_DOCKER_19}'
-  - '--build-arg=RELEASE_CHANNEL=edge'
   - '.'
   id: '19.03.9'
   wait_for: ['base']
@@ -35,7 +34,6 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/docker:20.10.14'
   - '--file=Dockerfile-versioned'
   - '--build-arg=${_DOCKER_20}'
-  - '--build-arg=RELEASE_CHANNEL=stable'
   - '.'
   id: '20.10.14'
   wait_for: ['base']
@@ -48,7 +46,6 @@ steps:
   - 'build'
   - '--file=Dockerfile-versioned'
   - '--build-arg=${_DOCKER_19}'
-  - '--build-arg=RELEASE_CHANNEL=edge'
   - '.'
   wait_for: ['19.03.9']
 
@@ -57,7 +54,6 @@ steps:
   - 'build'
   - '--file=Dockerfile-versioned'
   - '--build-arg=${_DOCKER_20}'
-  - '--build-arg=RELEASE_CHANNEL=stable'
   - '.'
   wait_for: ['20.10.14']
 
