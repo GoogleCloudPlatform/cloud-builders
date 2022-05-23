@@ -28,12 +28,12 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--tag=gcr.io/$PROJECT_ID/docker:20.10.13'
+  - '--tag=gcr.io/$PROJECT_ID/docker:20.10.14'
   - '--file=Dockerfile-versioned'
   - '--build-arg=DOCKER_VERSION=5:20.10.14~3-0~ubuntu-focal'
   - '--build-arg=RELEASE_CHANNEL=stable'
   - '.'
-  id: '20.10.13'
+  id: '20.10.14'
   wait_for: ['base']
 
 # Future supported versions of docker builder go here.
@@ -48,14 +48,14 @@ steps:
   - '.'
   wait_for: ['19.03.9']
 
-- name: 'gcr.io/$PROJECT_ID/docker:20.10.13'
+- name: 'gcr.io/$PROJECT_ID/docker:20.10.14'
   args:
   - 'build'
   - '--file=Dockerfile-versioned'
   - '--build-arg=DOCKER_VERSION=5:20.10.14~3-0~ubuntu-focal'
   - '--build-arg=RELEASE_CHANNEL=stable'
   - '.'
-  wait_for: ['20.10.13']
+  wait_for: ['20.10.14']
 
 # Tests for future supported versions of docker builder go here.
 
@@ -82,4 +82,4 @@ steps:
 images:
 - 'gcr.io/$PROJECT_ID/docker:latest'
 - 'gcr.io/$PROJECT_ID/docker:19.03.9'
-- 'gcr.io/$PROJECT_ID/docker:20.10.13'
+- 'gcr.io/$PROJECT_ID/docker:20.10.14'
