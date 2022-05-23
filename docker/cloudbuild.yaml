@@ -1,6 +1,10 @@
 # In this directory, run the following command to build this builder.
 # $ gcloud builds submit
 
+substitutions:
+  _DOCKER_19: DOCKER_VERSION=5:19.03.9~3-0~ubuntu-focal
+  _DOCKER_20: DOCKER_VERSION=5:20.10.14~3-0~ubuntu-focal
+
 steps:
 # Pre-requisite: build the base OS container; 'temp' is referenced in the
 # Dockerfile for subsequent steps but is not pushed. Building this shared base
@@ -19,7 +23,7 @@ steps:
   - 'build'
   - '--tag=gcr.io/$PROJECT_ID/docker:19.03.9'
   - '--file=Dockerfile-versioned'
-  - '--build-arg=DOCKER_VERSION=5:19.03.9~3-0~ubuntu-focal'
+  - '--build-arg=${_DOCKER_19}'
   - '--build-arg=RELEASE_CHANNEL=edge'
   - '.'
   id: '19.03.9'
@@ -30,7 +34,7 @@ steps:
   - 'build'
   - '--tag=gcr.io/$PROJECT_ID/docker:20.10.14'
   - '--file=Dockerfile-versioned'
-  - '--build-arg=DOCKER_VERSION=5:20.10.14~3-0~ubuntu-focal'
+  - '--build-arg=${_DOCKER_20}'
   - '--build-arg=RELEASE_CHANNEL=stable'
   - '.'
   id: '20.10.14'
@@ -43,7 +47,7 @@ steps:
   args:
   - 'build'
   - '--file=Dockerfile-versioned'
-  - '--build-arg=DOCKER_VERSION=5:19.03.9~3-0~ubuntu-focal'
+  - '--build-arg=${_DOCKER_19}'
   - '--build-arg=RELEASE_CHANNEL=edge'
   - '.'
   wait_for: ['19.03.9']
@@ -52,7 +56,7 @@ steps:
   args:
   - 'build'
   - '--file=Dockerfile-versioned'
-  - '--build-arg=DOCKER_VERSION=5:20.10.14~3-0~ubuntu-focal'
+  - '--build-arg=${_DOCKER_20}'
   - '--build-arg=RELEASE_CHANNEL=stable'
   - '.'
   wait_for: ['20.10.14']
