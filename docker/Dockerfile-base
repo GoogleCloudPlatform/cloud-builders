@@ -14,4 +14,6 @@ RUN apt-get -y update && \
         https://download.docker.com/linux/ubuntu \
         $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list && \
     apt-get -y update && \
+    apt-get -y dist-upgrade && \
+    apt-get autoremove && \
     apt-get clean
