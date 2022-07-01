@@ -38,17 +38,29 @@ steps:
   - 'build'
   - '--build-arg=NODE_VERSION=12.18.3'
   - '--tag=gcr.io/$PROJECT_ID/npm:node-12.18.3'
-  # 12.18.3 is tagged :lts
-  - '--tag=gcr.io/$PROJECT_ID/npm:lts'
-  - '--tag=gcr.io/$PROJECT_ID/nodejs/npm'
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
   - '--build-arg=NODE_VERSION=14.10.1'
   - '--tag=gcr.io/$PROJECT_ID/npm:node-14.10.1'
+  - '.'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=NODE_VERSION=16.15.1'
+  - '--tag=gcr.io/$PROJECT_ID/npm:node-16.15.1'
+  # 16.15.1 is tagged :lts
+  - '--tag=gcr.io/$PROJECT_ID/npm:lts'
+  - '--tag=gcr.io/$PROJECT_ID/nodejs/npm'
+  - '.'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=NODE_VERSION=18.4.0'
+  - '--tag=gcr.io/$PROJECT_ID/npm:node-18.4.0'
   - '--tag=gcr.io/$PROJECT_ID/npm:latest'
-  # 14.10.1 is tagged :current
+  # 18.4.0 is tagged :current
   - '--tag=gcr.io/$PROJECT_ID/npm:current'
   - '.'
 
@@ -66,6 +78,10 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/npm:node-12.18.3'
   args: ['--version']
 - name: 'gcr.io/$PROJECT_ID/npm:node-14.10.1'
+  args: ['--version']
+- name: 'gcr.io/$PROJECT_ID/npm:node-16.15.1'
+  args: ['--version']
+- name: 'gcr.io/$PROJECT_ID/npm:node-18.4.0'
   args: ['--version']
 
 # Test the examples with :latest
@@ -99,3 +115,5 @@ images:
 - 'gcr.io/$PROJECT_ID/npm:node-10.10.0'
 - 'gcr.io/$PROJECT_ID/npm:node-12.18.3'
 - 'gcr.io/$PROJECT_ID/npm:node-14.10.1'
+- 'gcr.io/$PROJECT_ID/npm:node-16.15.1'
+- 'gcr.io/$PROJECT_ID/npm:node-18.4.0'
