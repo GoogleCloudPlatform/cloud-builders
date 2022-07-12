@@ -16,3 +16,4 @@ images:
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gke-deploy'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gke-deploy'
 
+timeout: 6000s

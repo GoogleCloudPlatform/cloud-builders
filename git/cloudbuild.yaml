@@ -41,3 +41,5 @@ images:
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/git'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/git'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/git'
+
+timeout: 1800s
