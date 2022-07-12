@@ -27,6 +27,9 @@ Builders contributed by the public are available in the [Cloud Builders
 Community
 repo](https://github.com/GoogleCloudPlatform/cloud-builders-community).
 
+Cloud build can push your images to [Artifact Registry](https://cloud.google.com/artifact-registry) along with [Container Registry](https://cloud.google.com/container-registry). However for Artifact Registry you will need to [create a Docker repository](https://cloud.google.com/artifact-registry/docs/docker/store-docker-container-images#create) before you can push images. 
+
+
 To file issues and feature requests against these builder images,
 [create an issue in this repo](https://github.com/GoogleCloudPlatform/cloud-builders/issues/new).
 If you are experiencing an issue with the Cloud Build service or
