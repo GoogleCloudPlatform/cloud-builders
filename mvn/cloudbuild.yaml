@@ -8,6 +8,9 @@ steps:
   - 'build'
   - '--build-arg=MAVEN_VERSION=3.3.9-jdk-8'
   - '--tag=gcr.io/$PROJECT_ID/mvn:3.3.9-jdk-8'
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.3.9-jdk-8'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.3.9-jdk-8'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.3.9-jdk-8'
   - '.'
   waitFor: ['-']
   id: '339'
@@ -16,6 +19,9 @@ steps:
   - 'build'
   - '--build-arg=MAVEN_VERSION=3.5.0-jdk-8'
   - '--tag=gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-8'
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.5.0-jdk-8'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.5.0-jdk-8'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.5.0-jdk-8'
   - '.'
   waitFor: ['-']
   id: '350'
@@ -25,6 +31,9 @@ steps:
   args:
   - 'build'
   - '--tag=gcr.io/$PROJECT_ID/mvn'
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn'
   - '.'
   waitFor: ['-']
   id: 'latest'
@@ -38,6 +47,12 @@ steps:
   - 'Dockerfile.appengine'
   - '--tag=gcr.io/$PROJECT_ID/mvn:gcloud'
   - '--tag=gcr.io/$PROJECT_ID/mvn:appengine'
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:appengine'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:appengine'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:appengine'
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:gcloud'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:gcloud'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:gcloud'
   - '.'
   waitFor: ['latest']
   id: 'gcloud'
@@ -75,3 +90,20 @@ images:
 - 'gcr.io/$PROJECT_ID/mvn:gcloud'
 - 'gcr.io/$PROJECT_ID/mvn:appengine'
 - 'gcr.io/$PROJECT_ID/mvn'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1//mvn:3.3.9-jdk-8'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1//mvn:3.5.0-jdk-8'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1//mvn:gcloud'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1//mvn:appengine'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1//mvn'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1//mvn:3.3.9-jdk-8'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1//mvn:3.5.0-jdk-8'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1//mvn:gcloud'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1//mvn:appengine'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1//mvn'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1//mvn:3.3.9-jdk-8'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1//mvn:3.5.0-jdk-8'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1//mvn:gcloud'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1//mvn:appengine'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1//mvn'
+
+timeout: 2400s

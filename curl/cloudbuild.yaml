@@ -1,6 +1,6 @@
 steps:
 - name: gcr.io/cloud-builders/docker
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/curl', '.']
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/curl','--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/curl','--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/curl','--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/curl', '.']
 
 # Print version information.
 - name: gcr.io/$PROJECT_ID/curl
@@ -14,4 +14,9 @@ steps:
 - name: gcr.io/$PROJECT_ID/curl
   args: ['--header', 'Content-type: application/json"', '--data', '"{\"buildID\": \"$BUILD_ID\"}"', 'https://www.example.com']
 
-images: ['gcr.io/$PROJECT_ID/curl']
+images:
+ - 'gcr.io/$PROJECT_ID/curl'
+ - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/curl'
+ - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/curl'
+ - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/curl'
+  

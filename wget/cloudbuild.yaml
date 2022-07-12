@@ -1,6 +1,6 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/wget', '.']
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/wget','--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/wget','--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/wget','--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/wget', '.']
 
 # Print version information.
 - name: 'gcr.io/$PROJECT_ID/wget'
@@ -14,4 +14,4 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/wget'
   args: ['--header', 'Content-type: application/json', '--post-data="{\"buildID\": \"$BUILD_ID\"}"', 'https://www.example.com']
 
-images: ['gcr.io/$PROJECT_ID/wget']
+images: ['gcr.io/$PROJECT_ID/wget','europe-docker.pkg.dev/$PROJECT_ID/ga/v1/wget','asia-docker.pkg.dev/$PROJECT_ID/ga/v1/wget','us-docker.pkg.dev/$PROJECT_ID/ga/v1/wget']
