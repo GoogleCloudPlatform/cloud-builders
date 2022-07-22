@@ -12,18 +12,14 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/go:1.15'
   - '--tag=gcr.io/$PROJECT_ID/go:alpine'
   - '--tag=gcr.io/$PROJECT_ID/go:alpine-1.15'
-
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.15'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.15'
-  
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.15'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine'
-  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.15'
-
-  
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.15'  
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.15'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine'
