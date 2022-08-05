@@ -1,2 +1,2 @@
 #!/bin/bash
-echo $(git rev-parse HEAD) > $1
+echo $(git rev-parse --short HEAD) > $1
