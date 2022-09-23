@@ -7,8 +7,8 @@ not provide historical pinned versions of Twine.
 While there is, as of this writing, no official Twine image, users may install
 Twine from a Python image. The Python team provides `python` images that
 support multiple tagged versions of Python on multiple platforms. Please visit
-https://hub.docker.com/_/python for details. The following example illustrates
-usage of an official `python` image.
+https://hub.docker.com/_/python for more details. The following example
+illustrates usage of an official `python` image.
 
 ## Example:
 
