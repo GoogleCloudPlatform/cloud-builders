@@ -20,7 +20,7 @@ Suggested alternative images include:
     google/cloud-sdk:debian_component_based
     google/cloud-sdk:slim
 
-Please note that the `gcloud` entrypoint must be specified when using these images.
+Please note that the `gcloud` entrypoint must be specified to use these images.
 
 When executed in the Cloud Build environment, commands are executed with
 credentials of the [builder service
