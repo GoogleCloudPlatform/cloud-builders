@@ -16,13 +16,13 @@ illustrates usage of an official `python` image.
 steps:
 - name: 'python:slim'
   entrypoint: '/bin/sh'
-  args: 
+  args:
     - -c
     - |
-      python -m pip install --user twine keyrings.google-artifactregistry-auth 
+      python -m pip install --user twine keyrings.google-artifactregistry-auth
 - name: 'python:slim'
   entrypoint: '/bin/sh'
-  args: 
+  args:
     - -c
     - |
       python -m twine upload --verbose --repository-url 'https://my-region-python.pkg.dev/my-project/my-repo' dist/*
