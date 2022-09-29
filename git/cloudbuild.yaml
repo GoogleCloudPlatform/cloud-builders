@@ -6,7 +6,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['pull', 'gcr.io/cloud-builders/gcloud']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/git', '.']
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/git','--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/git','--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/git','--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/git', '.']
 
 # Clone a public repo and write its revision to a VERSION file.
 - name: 'gcr.io/$PROJECT_ID/git'
@@ -36,4 +36,10 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/git'
   args: ['clone', 'https://source.developers.google.com/p/$PROJECT_ID/r/default']
 
-images: ['gcr.io/$PROJECT_ID/git']
+images: 
+- 'gcr.io/$PROJECT_ID/git'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/git'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/git'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/git'
+
+timeout: 1800s

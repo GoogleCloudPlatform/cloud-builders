@@ -28,6 +28,14 @@ Builders contributed by the public are available in the [Cloud Builders
 Community
 repo](https://github.com/GoogleCloudPlatform/cloud-builders-community).
 
+Each builder includes a `cloudbuild.yaml` that will push your images to [Artifact
+Registry](https://cloud.google.com/artifact-registry) in addition to [Google Container
+Registry](https://cloud.google.com/container-registry). To build with this default `cloudbuild.yaml`,
+you will need to first [create a Docker
+repository](https://cloud.google.com/artifact-registry/docs/docker/store-docker-container-images#create)
+to store the images. The provided `cloudbuild.yaml` assumes your project has set up a [multi-region](https://cloud.google.com/artifact-registry/docs/repositories/repo-locations#location-mr) Artifact
+Registry Docker repositories called `ga` and that is setup for `us`, `europe`, and `asia` multi-regions (i.e. `us-docker.pkg.dev`, `europe-docker.pkg.dev`, `asia-docker.pkg.dev`).
+
 To file issues and feature requests against these builder images,
 [create an issue in this repo](https://github.com/GoogleCloudPlatform/cloud-builders/issues/new).
 If you are experiencing an issue with the Cloud Build service or

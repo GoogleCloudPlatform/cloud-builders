@@ -3,9 +3,9 @@
 
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcloud-slim', '--tag=gcr.io/$PROJECT_ID/gcloud-slim', '-f', 'Dockerfile.slim', '.']
+  args: ['build', '--tag=gcloud-slim','--tag=gcr.io/$PROJECT_ID/gcloud-slim','--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim','--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim','--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim', '-f', 'Dockerfile.slim', '.']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/gcloud', '-f', 'Dockerfile', '.']
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/gcloud','--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud','--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud','--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud', '-f', 'Dockerfile', '.']
 
 # Simple sanity check: invoke the new gcloud container to confirm that it was
 # built correctly.
@@ -21,5 +21,11 @@ steps:
 images:
 - 'gcr.io/$PROJECT_ID/gcloud'
 - 'gcr.io/$PROJECT_ID/gcloud-slim'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim'
 
 timeout: 2400s

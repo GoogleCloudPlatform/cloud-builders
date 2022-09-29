@@ -4,7 +4,7 @@
 steps:
 # Build the Bazel builder and output the version we built with.
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/bazel', '.']
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/bazel','--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel','--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel','--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel', '.']
 - name: 'gcr.io/$PROJECT_ID/bazel'
   args: ['version']
 
@@ -25,4 +25,10 @@ steps:
 
 # TODO(mattmoor): Test docker_push as well.
 
-images: ['gcr.io/$PROJECT_ID/bazel']
+images: 
+ - 'gcr.io/$PROJECT_ID/bazel'
+ - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
+ - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
+ - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
+
+timeout: 2400s

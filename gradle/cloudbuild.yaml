@@ -10,6 +10,12 @@ steps:
   - '--build-arg=SHA=32fce6628848f799b0ad3205ae8db67d0d828c10ffe62b748a7c0d9f4a5d9ee0'
   - '--tag=gcr.io/$PROJECT_ID/gradle:5.6.2-jdk-8'
   - '--tag=gcr.io/$PROJECT_ID/java/gradle:5.6.2-jdk-8'
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:5.6.2-jdk-8'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:5.6.2-jdk-8'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:5.6.2-jdk-8'
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:5.6.2-jdk-8'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:5.6.2-jdk-8'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:5.6.2-jdk-8'
   - '.'
   waitFor: ['-']
 
@@ -21,6 +27,13 @@ steps:
   - '--build-arg=SHA=98bd5fd2b30e070517e03c51cbb32beee3e2ee1a84003a5a5d748996d4b1b915'
   - '--tag=gcr.io/$PROJECT_ID/gradle:4.6-jdk-8'
   - '--tag=gcr.io/$PROJECT_ID/java/gradle:4.6-jdk-8'
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:4.6-jdk-8'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:4.6-jdk-8'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:4.6-jdk-8'
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:4.6-jdk-8'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:4.6-jdk-8'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:4.6-jdk-8'
+
   - '.'
   waitFor: ['-']
 - name: 'gcr.io/cloud-builders/docker'
@@ -31,6 +44,12 @@ steps:
   - '--build-arg=SHA=56bd2dde29ba2a93903c557da1745cafd72cdd8b6b0b83c05a40ed7896b79dfe'
   - '--tag=gcr.io/$PROJECT_ID/gradle:4.0-jdk-8'
   - '--tag=gcr.io/$PROJECT_ID/java/gradle:4.0-jdk-8'
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:4.0-jdk-8'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:4.0-jdk-8'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:4.0-jdk-8'
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:4.0-jdk-8'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:4.0-jdk-8'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:4.0-jdk-8'
   - '.'
   waitFor: ['-']
 - name: 'gcr.io/cloud-builders/docker'
@@ -41,6 +60,12 @@ steps:
   - '--build-arg=SHA=0b7450798c190ff76b9f9a3d02e18b33d94553f708ebc08ebe09bdf99111d110'
   - '--tag=gcr.io/$PROJECT_ID/gradle:3.5-jdk-8'
   - '--tag=gcr.io/$PROJECT_ID/java/gradle:3.5-jdk-8'
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:3.5-jdk-8'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:3.5-jdk-8'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:3.5-jdk-8'
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:3.5-jdk-8'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:3.5-jdk-8'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:3.5-jdk-8'
   - '.'
   waitFor: ['-']
 
@@ -55,6 +80,40 @@ steps:
   - 'tag'
   - 'gcr.io/$PROJECT_ID/gradle:5.6.2-jdk-8'
   - 'gcr.io/$PROJECT_ID/gradle'
+  
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'tag'
+  - 'gcr.io/$PROJECT_ID/gradle:5.6.2-jdk-8'
+  - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'tag'
+  - 'gcr.io/$PROJECT_ID/gradle:5.6.2-jdk-8'
+  - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle'
+
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'tag'
+  - 'gcr.io/$PROJECT_ID/gradle:5.6.2-jdk-8'
+  - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'tag'
+  - 'gcr.io/$PROJECT_ID/gradle:5.6.2-jdk-8'
+  - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle'
+
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'tag'
+  - 'gcr.io/$PROJECT_ID/gradle:5.6.2-jdk-8'
+  - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'tag'
+  - 'gcr.io/$PROJECT_ID/gradle:5.6.2-jdk-8'
+  - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle'
+
 
 # Run examples
 - name: 'gcr.io/$PROJECT_ID/gradle:4.6-jdk-8'
@@ -96,3 +155,33 @@ images:
 - 'gcr.io/$PROJECT_ID/java/gradle:4.6-jdk-8'
 - 'gcr.io/$PROJECT_ID/java/gradle:4.0-jdk-8'
 - 'gcr.io/$PROJECT_ID/java/gradle:3.5-jdk-8'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:5.6.2-jdk-8'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:4.6-jdk-8'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:4.0-jdk-8'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:3.5-jdk-8'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:5.6.2-jdk-8'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:4.6-jdk-8'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:4.0-jdk-8'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:3.5-jdk-8'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:5.6.2-jdk-8'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:4.6-jdk-8'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:4.0-jdk-8'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:3.5-jdk-8'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:5.6.2-jdk-8'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:4.6-jdk-8'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:4.0-jdk-8'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:3.5-jdk-8'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:5.6.2-jdk-8'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:4.6-jdk-8'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:4.0-jdk-8'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:3.5-jdk-8'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:5.6.2-jdk-8'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:4.6-jdk-8'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:4.0-jdk-8'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:3.5-jdk-8'

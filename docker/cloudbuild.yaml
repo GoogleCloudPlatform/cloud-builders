@@ -22,6 +22,9 @@ steps:
   args:
   - 'build'
   - '--tag=gcr.io/$PROJECT_ID/docker:19.03.9'
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:19.03.9'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:19.03.9'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:19.03.9'
   - '--file=Dockerfile-versioned'
   - '--build-arg=${_DOCKER_19}'
   - '.'
@@ -32,6 +35,9 @@ steps:
   args:
   - 'build'
   - '--tag=gcr.io/$PROJECT_ID/docker:20.10.14'
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:20.10.14'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:20.10.14'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:20.10.14'
   - '--file=Dockerfile-versioned'
   - '--build-arg=${_DOCKER_20}'
   - '.'
@@ -66,6 +72,19 @@ steps:
   wait_for: ['20.10.14']
   id: 'latest'
 
+- name: 'europe-docker.pkg.dev/cloud-builders/ga/v1/docker'
+  args: ['tag', 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:20.10.14', 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/docker']
+  wait_for: ['20.10.14']
+  id: 'latest-eu'
+- name: 'asia-docker.pkg.dev/cloud-builders/ga/v1/docker'
+  args: ['tag', 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:20.10.14', 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/docker']
+  wait_for: ['20.10.14']
+  id: 'latest-asia'
+- name: 'us-docker.pkg.dev/cloud-builders/ga/v1/docker'
+  args: ['tag', 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:20.10.14', 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/docker']
+  wait_for: ['20.10.14']
+  id: 'latest-us'
+
 # Here are some things that can be done with this builder:
 
 # Get info about an image. This effectively runs the "docker inspect" command on
@@ -83,3 +102,14 @@ images:
 - 'gcr.io/$PROJECT_ID/docker:latest'
 - 'gcr.io/$PROJECT_ID/docker:19.03.9'
 - 'gcr.io/$PROJECT_ID/docker:20.10.14'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:19.03.9'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:19.03.9'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:19.03.9'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:20.10.14'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:20.10.14'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:20.10.14'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:latest'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:latest'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:latest'
+
+timeout: 1200s
