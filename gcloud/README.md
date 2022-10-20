@@ -27,7 +27,7 @@ credentials of the [builder service
 account](https://cloud.google.com/cloud-build/docs/permissions) for the build
 project.
 
-To migrate to the Cloud SDK team's official image, make the following changes
+To migrate to the Cloud SDK team's official image, please make the following changes
 to your `cloudbuild.yaml`:
 
 ```
