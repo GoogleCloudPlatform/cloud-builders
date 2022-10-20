@@ -36,7 +36,7 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/git'
   args: ['clone', 'https://source.developers.google.com/p/$PROJECT_ID/r/default']
 
-images: 
+images:
 - 'gcr.io/$PROJECT_ID/git'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/git'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/git'

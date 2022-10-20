@@ -19,4 +19,4 @@ images:
  - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/curl'
  - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/curl'
  - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/curl'
-  
+ 

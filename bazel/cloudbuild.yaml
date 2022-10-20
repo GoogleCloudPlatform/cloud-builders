@@ -25,7 +25,7 @@ steps:
 
 # TODO(mattmoor): Test docker_push as well.
 
-images: 
+images:
  - 'gcr.io/$PROJECT_ID/bazel'
  - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
  - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
