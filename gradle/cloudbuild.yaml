@@ -80,7 +80,7 @@ steps:
   - 'tag'
   - 'gcr.io/$PROJECT_ID/gradle:5.6.2-jdk-8'
   - 'gcr.io/$PROJECT_ID/gradle'
-  
+
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'tag'
