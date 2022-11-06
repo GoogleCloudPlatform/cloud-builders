@@ -20,7 +20,7 @@ Pre-built images are available at `gcr.io/cloud-builders/...` and include:
 *   `kubectl`: runs the [kubectl](https://kubernetes.io/docs/user-guide/kubectl-overview/) tool
 *   `mvn`: runs the [maven](https://maven.apache.org/) tool
 *   `npm`: runs the [npm](https://docs.npmjs.com/) tool
-*   `twine`: runs the [twine](https://https://twine.readthedocs.io/) tool
+*   `twine`: runs the [twine](https://twine.readthedocs.io/) tool
 *   `wget`: runs the [wget](https://www.gnu.org/software/wget/) tool
 *   `yarn`: runs the [yarn](https://yarnpkg.com/) tool
 
