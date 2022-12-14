@@ -1,5 +1,6 @@
 FROM gcloud-slim
 
+ARG USE_GKE_GCLOUD_AUTH_PLUGIN=true
 RUN apt-get -y update && \
     # JRE is required for cloud-datastore-emulator
     apt-get -y install default-jre && \
