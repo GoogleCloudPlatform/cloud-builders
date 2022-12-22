@@ -27,7 +27,7 @@ RUN \
 
     apt-get -y install bazel-5.4.0 && \
     apt-get -y upgrade bazel-5.4.0 && \
-    
+
     ln -s /usr/bin/bazel-5.4.0 /usr/bin/bazel && \
 
     # Install Docker (https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/#uninstall-old-versions)
