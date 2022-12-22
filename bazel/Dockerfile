@@ -25,8 +25,10 @@ RUN \
     curl https://bazel.build/bazel-release.pub.gpg | apt-key add - && \
     apt-get update && \
 
-    apt-get -y install bazel && \
-    apt-get -y upgrade bazel && \
+    apt-get -y install bazel-5.4.0 && \
+    apt-get -y upgrade bazel-5.4.0 && \
+    
+    ln -s /usr/bin/bazel-5.4.0 /usr/bin/bazel && \
 
     # Install Docker (https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/#uninstall-old-versions)
     apt-get -y install \
@@ -43,7 +45,6 @@ RUN \
     apt-get install -y docker-ce=${DOCKER_VERSION} docker-ce-cli=${DOCKER_VERSION} unzip && \
 
     mv /usr/bin/bazel /builder/bazel           && \
-    mv /usr/bin/bazel-real /builder/bazel-real && \
     mv /builder/bazel.sh /usr/bin/bazel        && \
 
     # Unpack bazel for future use.
