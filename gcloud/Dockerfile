@@ -18,7 +18,6 @@ RUN apt-get -y update && \
         cloud-firestore-emulator \
         cloud-build-local \
         gke-gcloud-auth-plugin \
-        datalab \
         docker-credential-gcr \
         kpt \
         kubectl \
