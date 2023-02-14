@@ -10,7 +10,7 @@ github.com/docker/docker/pkg/homedir
 # github.com/docker/docker-credential-helpers v0.6.3
 github.com/docker/docker-credential-helpers/client
 github.com/docker/docker-credential-helpers/credentials
-# github.com/gogo/protobuf v1.3.1
+# github.com/gogo/protobuf v1.3.2
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/sortkeys
 # github.com/google/go-cmp v0.3.0
@@ -56,14 +56,14 @@ github.com/spf13/cobra
 github.com/spf13/cobra/doc
 # github.com/spf13/pflag v1.0.5
 github.com/spf13/pflag
-# golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa
+# golang.org/x/net v0.0.0-20201021035429-f5854403a974
 golang.org/x/net/http/httpguts
 golang.org/x/net/http2
 golang.org/x/net/http2/hpack
 golang.org/x/net/idna
-# golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
+# golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
 golang.org/x/sync/errgroup
-# golang.org/x/text v0.3.2
+# golang.org/x/text v0.3.3
 golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
