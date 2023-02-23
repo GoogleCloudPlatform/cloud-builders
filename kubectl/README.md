@@ -48,6 +48,9 @@ cluster. You can configure the cluster by setting environment variables.
     # Name of GKE cluster
     CLOUDSDK_CONTAINER_CLUSTER=<your cluster's name>
 
+    # Optionally set additional arguments
+    CLOUDSDK_GET_CREDENTIALS_OPTS=<get-credentials args> (ex: --internal-ip, --quiet)
+
 **When using Google Cloud Build, you must set these environment variables on
 every step that uses the `kubectl` builder; this context is not persisted across
 steps.**
