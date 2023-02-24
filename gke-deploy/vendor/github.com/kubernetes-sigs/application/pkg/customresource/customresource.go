@@ -14,11 +14,10 @@ limitations under the License.
 package customresource
 
 import (
-	"reflect"
-	"strings"
-
 	component "github.com/kubernetes-sigs/application/pkg/component"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"reflect"
+	"strings"
 )
 
 // Labels return custom resource label
