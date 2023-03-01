@@ -29,6 +29,7 @@ function var_usage() {
   CLOUDSDK_CONTAINER_CLUSTER=<cluster name>
 
   Optionally, you can specify the kubectl version via KUBECTL_VERSION, taking one of the following values: ${versions[@]}
+  Optionally, you can specify additional parameters for the kubectl 'get-credentials' command via CLOUDSDK_GET_CREDENTIALS_OPTS, such using values as: --internal-ip, --quiet
 EOF
 
   exit 1
@@ -39,6 +40,7 @@ cluster=${CLOUDSDK_CONTAINER_CLUSTER:-$(gcloud config get-value container/cluste
 region=${CLOUDSDK_COMPUTE_REGION:-$(gcloud config get-value compute/region 2> /dev/null)}
 zone=${CLOUDSDK_COMPUTE_ZONE:-$(gcloud config get-value compute/zone 2> /dev/null)}
 project=${CLOUDSDK_CORE_PROJECT:-$(gcloud config get-value core/project 2> /dev/null)}
+get_cred_opts=${CLOUDSDK_GET_CREDENTIALS_OPTS:+${CLOUDSDK_GET_CREDENTIALS_OPTS} }
 
 [[ -z "$cluster" ]] && var_usage
 [ ! "$zone" -o "$region" ] && var_usage
@@ -48,11 +50,11 @@ if [[ -n "$KUBECTL_VERSION" ]] && [[ ! " ${versions[*]} "  =~ " ${KUBECTL_VERSIO
 fi
 
 if [ -n "$region" ]; then
-  echoerr "Running: gcloud container clusters get-credentials --project=\"$project\" --region=\"$region\" \"$cluster\""
-  gcloud container clusters get-credentials --project="$project" --region="$region" "$cluster" || exit
+  echoerr "Running: gcloud container clusters get-credentials --project=\"$project\" --region=\"$region\" ${get_cred_opts}\"$cluster\""
+  gcloud container clusters get-credentials --project="$project" --region="$region" ${get_cred_opts}"$cluster" || exit
 else
-  echoerr "Running: gcloud container clusters get-credentials --project=\"$project\" --zone=\"$zone\" \"$cluster\""
-  gcloud container clusters get-credentials --project="$project" --zone="$zone" "$cluster" || exit
+  echoerr "Running: gcloud container clusters get-credentials --project=\"$project\" --zone=\"$zone\" ${get_cred_opts}\"$cluster\""
+  gcloud container clusters get-credentials --project="$project" --zone="$zone" ${get_cred_opts}"$cluster" || exit
  fi
 
 echoerr "Running: ${kubectl_cmd}" "$@" >&2
