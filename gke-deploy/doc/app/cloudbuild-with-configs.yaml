@@ -38,4 +38,4 @@ substitutions:
   _OUTPUT_BUCKET_PATH:
 options:
   substitution_option: 'ALLOW_LOOSE'
-tags: [$_K8S_APP_NAME']
+tags: [$_K8S_APP_NAME]
