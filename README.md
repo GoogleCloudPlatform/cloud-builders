@@ -45,14 +45,14 @@ documentation.
 
 ---
 
-# Alternative Official Images
+# Alternatives to official images
 
-Most of the tools in this repo are also available in official
+Most of the tools in this repo are also available in
 community-supported publicly available repositories. Such
 repos also generally support multiple versions and platforms,
 available by tag.
 
-The following official community-supported images are compatible with the
+The following community-supported images are compatible with the
 hosted Cloud Build service and function well as build steps; note that
 some will require that you specify an `entrypoint` for the image. Additional
 details regarding each alternative official image are available in the `README.md`
