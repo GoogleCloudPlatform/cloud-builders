@@ -36,11 +36,23 @@ steps:
   - '.'
   waitFor: ['-']
   id: '3.8'
-
-# Build the latest version.
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
+  - '--build-arg=MAVEN_VERSION=3.9.1'
+  - '--tag=gcr.io/$PROJECT_ID/mvn:3.9.1'
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.9.1'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.9.1'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.9.1'
+  - '.'
+  waitFor: ['-']
+  id: '3.9'
+
+# Build the :latest version. Which points to version 3.8 currently.
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=MAVEN_VERSION=3.8-jdk-8'
   - '--tag=gcr.io/$PROJECT_ID/mvn'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn'
@@ -83,6 +95,9 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/mvn:3.8-jdk-8'
   args: ['install']
   dir: 'examples/spring_boot'
+- name: 'gcr.io/$PROJECT_ID/mvn:3.9.1'
+  args: ['install']
+  dir: 'examples/spring_boot'
 - name: 'gcr.io/$PROJECT_ID/mvn'
   args: ['install']
   dir: 'examples/spring_boot'
@@ -102,24 +117,28 @@ images:
 - 'gcr.io/$PROJECT_ID/mvn:3.3.9-jdk-8'
 - 'gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-8'
 - 'gcr.io/$PROJECT_ID/mvn:3.8-jdk-8'
+- 'gcr.io/$PROJECT_ID/mvn:3.9.1'
 - 'gcr.io/$PROJECT_ID/mvn:gcloud'
 - 'gcr.io/$PROJECT_ID/mvn:appengine'
 - 'gcr.io/$PROJECT_ID/mvn'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.3.9-jdk-8'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.5.0-jdk-8'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.8-jdk-8'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.9.1'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:gcloud'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:appengine'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.3.9-jdk-8'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.5.0-jdk-8'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.8-jdk-8'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.9.1'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:gcloud'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:appengine'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.3.9-jdk-8'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.5.0-jdk-8'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.8-jdk-8'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.9.1'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:gcloud'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:appengine'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn'
