@@ -8,9 +8,12 @@ steps:
   - 'build'
   - '--build-arg=NODE_VERSION=8.12.0'
   - '--tag=gcr.io/$PROJECT_ID/yarn:node-8.12.0'
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-8.12.0'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-8.12.0'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-8.12.0'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/yarn:node-8.12.0'
 
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
@@ -18,18 +21,25 @@ steps:
   - 'build'
   - '--build-arg=NODE_VERSION=8.4.0'
   - '--tag=gcr.io/$PROJECT_ID/yarn:node-8.4.0'
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-8.4.0'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-8.4.0'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-8.4.0'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/yarn:node-8.4.0'
+
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
   - '--build-arg=NODE_VERSION=9.11.2'
   - '--tag=gcr.io/$PROJECT_ID/yarn:node-9.11.2'
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-9.11.2'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-9.11.2'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-9.11.2'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/yarn:node-9.11.2'
 
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
@@ -37,9 +47,13 @@ steps:
   - 'build'
   - '--build-arg=NODE_VERSION=10.10.0'
   - '--tag=gcr.io/$PROJECT_ID/yarn:node-10.10.0'
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-10.10.0'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-10.10.0'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-10.10.0'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/yarn:node-10.10.0'
+
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
   args:
@@ -48,6 +62,7 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/yarn:node-12.18.3'
   - '--tag=gcr.io/$PROJECT_ID/yarn:lts'
   - '--tag=gcr.io/$PROJECT_ID/nodejs/yarn'
+  # Regional AR Mirrors
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-12.18.3'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:lts'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/nodejs/yarn'
@@ -57,6 +72,10 @@ steps:
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-12.18.3'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:lts'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/nodejs/yarn'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/yarn:node-12.18.3'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/yarn:lts'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/nodejs/yarn'
 
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
@@ -64,9 +83,12 @@ steps:
   - 'build'
   - '--build-arg=NODE_VERSION=14.10.0'
   - '--tag=gcr.io/$PROJECT_ID/yarn:node-14.10.0'
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-14.10.0'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-14.10.0'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-14.10.0'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/yarn:node-14.10.0'
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
   args:
@@ -75,6 +97,7 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/yarn:node-14.17.1'
   - '--tag=gcr.io/$PROJECT_ID/yarn:latest'
   - '--tag=gcr.io/$PROJECT_ID/yarn:current'
+  # Regional AR Mirrors
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-14.17.1'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:latest'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:current'
@@ -84,6 +107,10 @@ steps:
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-14.17.1'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:latest'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:current'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/yarn:node-14.17.1'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/yarn:latest'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/yarn:current'
 
   - '.'
 
@@ -128,6 +155,7 @@ images:
 - 'gcr.io/$PROJECT_ID/yarn:node-14.10.0'
 - 'gcr.io/$PROJECT_ID/yarn:node-14.17.1'
 
+# Regional AR Mirrors (US)
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:latest'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:current'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:lts'
@@ -139,6 +167,7 @@ images:
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-14.10.0'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-14.17.1'
 
+# Regional AR Mirrors (ASIA)
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:latest'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:current'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:lts'
@@ -150,6 +179,7 @@ images:
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-14.10.0'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-14.17.1'
 
+# Regional AR Mirrors (EUROPE)
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:latest'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:current'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:lts'
@@ -160,5 +190,17 @@ images:
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-12.18.3'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-14.10.0'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/yarn:node-14.17.1'
+
+# GCR to AR Migration
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/yarn:latest'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/yarn:current'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/yarn:lts'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/yarn:node-8.12.0'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/yarn:node-8.4.0'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/yarn:node-9.11.2'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/yarn:node-10.10.0'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/yarn:node-12.18.3'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/yarn:node-14.10.0'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/yarn:node-14.17.1'
 
 timeout: 2400s

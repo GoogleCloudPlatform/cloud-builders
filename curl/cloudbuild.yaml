@@ -1,6 +1,15 @@
 steps:
 - name: gcr.io/cloud-builders/docker
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/curl','--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/curl','--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/curl','--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/curl', '.']
+  args:
+  - 'build'
+  - '--tag=gcr.io/$PROJECT_ID/curl'
+  # Regional AR Mirrors
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/curl'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/curl'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/curl'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/curl'
+  - '.'
 
 # Print version information.
 - name: gcr.io/$PROJECT_ID/curl
@@ -16,6 +25,9 @@ steps:
 
 images:
  - 'gcr.io/$PROJECT_ID/curl'
+ # Regional AR Mirrors
  - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/curl'
  - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/curl'
  - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/curl'
+ # GCR to AR Migration
+ - 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/curl'

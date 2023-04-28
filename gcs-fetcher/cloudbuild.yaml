@@ -6,13 +6,33 @@ steps:
 
 # Build the gcs-fetcher binary and put into the builder image.
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--build-arg=cmd=./cmd/gcs-fetcher/', '-t', 'gcr.io/$PROJECT_ID/gcs-fetcher', '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-fetcher','--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-fetcher','--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-fetcher','.']
+  args: 
+  - 'build'
+  - '--build-arg=cmd=./cmd/gcs-fetcher/'
+  - '--tag=gcr.io/$PROJECT_ID/gcs-fetcher'
+  # Regional AR Mirrors
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-fetcher'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-fetcher'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-fetcher'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/gcs-fetcher'
+  - '.'
 - name: 'gcr.io/$PROJECT_ID/gcs-fetcher'
   args: ['--help']
 
 # Build the gcs-uploader binary and put it into the builder image.
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--build-arg=cmd=./cmd/gcs-uploader/', '-t', 'gcr.io/$PROJECT_ID/gcs-uploader','--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-uploader','--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-uploader','--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-uploader', '.']
+  args: 
+  - 'build'
+  - '--build-arg=cmd=./cmd/gcs-uploader/'
+  - '--tag=gcr.io/$PROJECT_ID/gcs-uploader'
+  # Regional AR Mirrors
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-uploader'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-uploader'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-uploader'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/gcs-uploader'
+  - '.'
 - name: 'gcr.io/$PROJECT_ID/gcs-uploader'
   args: ['--help']
 
@@ -74,11 +94,15 @@ steps:
 images:
 - 'gcr.io/$PROJECT_ID/gcs-fetcher'
 - 'gcr.io/$PROJECT_ID/gcs-uploader'
+# Regional AR Mirrors
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-uploader'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-uploader'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-uploader'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-fetcher'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-fetcher'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-fetcher'
+# GCR to AR Migration
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/gcs-uploader'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/gcs-fetcher'
 
 timeout: '2100s'
