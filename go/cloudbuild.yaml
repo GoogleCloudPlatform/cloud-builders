@@ -8,21 +8,13 @@ steps:
   - 'build'
   - '-f'
   - 'Dockerfile.alpine'
-  - '--tag=gcr.io/$PROJECT_ID/go'
   - '--tag=gcr.io/$PROJECT_ID/go:1.15'
-  - '--tag=gcr.io/$PROJECT_ID/go:alpine'
   - '--tag=gcr.io/$PROJECT_ID/go:alpine-1.15'
-  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.15'
-  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.15'
-  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.15'
-  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.15'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.15'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.15'
 
   - '.'
@@ -31,16 +23,9 @@ steps:
   - 'build'
   - '-f'
   - 'Dockerfile.debian'
-  - '--tag=gcr.io/$PROJECT_ID/go:debian'
   - '--tag=gcr.io/$PROJECT_ID/go:debian-1.15'
-
-  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.15'
-
-  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.15'
-
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.15'
 
   - '.'
@@ -292,15 +277,24 @@ steps:
     - '-f'
     - 'Dockerfile.alpine'
     - '--build-arg=VERSION=1.20'
+
+    - '--tag=gcr.io/$PROJECT_ID/go'
+    - '--tag=gcr.io/$PROJECT_ID/go:alpine'
     - '--tag=gcr.io/$PROJECT_ID/go:alpine-1.20'
     - '--tag=gcr.io/$PROJECT_ID/go:1.20'
-
+    
+    - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go'
+    - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine'
     - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.20'
     - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.20'
 
+    - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go'
+    - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine'
     - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.20'
     - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.20'
 
+    - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go'
+    - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine'
     - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.20'
     - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.20'
 
@@ -311,10 +305,17 @@ steps:
     - '-f'
     - 'Dockerfile.debian'
     - '--build-arg=VERSION=1.20'
+    
+    - '--tag=gcr.io/$PROJECT_ID/go:debian'
     - '--tag=gcr.io/$PROJECT_ID/go:debian-1.20'
 
+    - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian'
     - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.20'
+    
+    - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian'
     - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.20'
+
+    - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian'
     - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.20'
 
     - '.'
