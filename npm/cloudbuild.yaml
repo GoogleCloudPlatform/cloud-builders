@@ -8,90 +8,118 @@ steps:
   - 'build'
   - '--build-arg=NODE_VERSION=6.14.4'
   - '--tag=gcr.io/$PROJECT_ID/npm:node-6.14.4'
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-6.14.4'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-6.14.4'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-6.14.4'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:node-6.14.4'
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
   - '--build-arg=NODE_VERSION=8.12.0'
   - '--tag=gcr.io/$PROJECT_ID/npm:node-8.12.0'
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-8.12.0'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-8.12.0'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-8.12.0'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:node-8.12.0'
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
   - '--build-arg=NODE_VERSION=8.4.0'
   - '--tag=gcr.io/$PROJECT_ID/npm:node-8.4.0'
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-8.4.0'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-8.4.0'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-8.4.0'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:node-8.4.0'
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
   - '--build-arg=NODE_VERSION=9.11.2'
   - '--tag=gcr.io/$PROJECT_ID/npm:node-9.11.2'
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-9.11.2'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-9.11.2'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-9.11.2'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:node-9.11.2'
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
   - '--build-arg=NODE_VERSION=10.10.0'
   - '--tag=gcr.io/$PROJECT_ID/npm:node-10.10.0'
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-10.10.0'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-10.10.0'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-10.10.0'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:node-10.10.0'
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
   - '--build-arg=NODE_VERSION=12.18.3'
   - '--tag=gcr.io/$PROJECT_ID/npm:node-12.18.3'
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-12.18.3'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-12.18.3'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-12.18.3'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:node-12.18.3'
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
   - '--build-arg=NODE_VERSION=14.10.1'
   - '--tag=gcr.io/$PROJECT_ID/npm:node-14.10.1'
+  # Regional AR Mirrors
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-14.10.1'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-14.10.1'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-14.10.1'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:node-14.10.1'
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
   - '--build-arg=NODE_VERSION=16.18.0'
   - '--tag=gcr.io/$PROJECT_ID/npm:node-16.18.0'
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-16.18.0'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-16.18.0'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-16.18.0'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:node-16.18.0'
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
   - '--build-arg=NODE_VERSION=18.12.0'
-  - '--tag=gcr.io/$PROJECT_ID/npm:node-18.12.0'
-  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-18.12.0'
-  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-18.12.0'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-18.12.0'
-  # 18.12.0 is tagged :lts
   - '--tag=gcr.io/$PROJECT_ID/npm:lts'
   - '--tag=gcr.io/$PROJECT_ID/nodejs/npm'
+  - '--tag=gcr.io/$PROJECT_ID/npm:node-18.12.0'
+  # Regional AR Mirrors
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:lts'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/npm'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-18.12.0'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:lts'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/npm'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-18.12.0'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:lts'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/npm'
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-18.12.0'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:lts'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:node-18.12.0'
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
   args:
@@ -99,17 +127,21 @@ steps:
   - '--build-arg=NODE_VERSION=19.0.0'
   - '--tag=gcr.io/$PROJECT_ID/npm:node-19.0.0'
   - '--tag=gcr.io/$PROJECT_ID/npm:latest'
+  - '--tag=gcr.io/$PROJECT_ID/npm:current'
+  # Regional AR Mirrors
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-19.0.0'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:latest'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:current'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-19.0.0'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:latest'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:current'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-19.0.0'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:latest'
-  # 19.0.0 is tagged :current
-  - '--tag=gcr.io/$PROJECT_ID/npm:current'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:current'
-  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:current'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:current'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:node-19.0.0'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:latest'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:current'
   - '.'
 
 # Print for each version
@@ -169,6 +201,7 @@ images:
 - 'gcr.io/$PROJECT_ID/npm:node-16.18.0'
 - 'gcr.io/$PROJECT_ID/npm:node-18.12.0'
 - 'gcr.io/$PROJECT_ID/npm:node-19.0.0'
+# Regional AR Mirrors
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:lts'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:latest'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:current'
@@ -208,3 +241,17 @@ images:
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-16.18.0'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-18.12.0'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/npm:node-19.0.0'
+# GCR to AR Migration
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:lts'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:latest'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:current'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:node-6.14.4'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:node-8.12.0'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:node-8.4.0'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:node-9.11.2'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:node-10.10.0'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:node-12.18.3'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:node-14.10.1'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:node-16.18.0'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:node-18.12.0'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/npm:node-19.0.0'

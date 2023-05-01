@@ -12,6 +12,7 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/javac'
   - '--tag=gcr.io/$PROJECT_ID/java/javac:8'
   - '--tag=gcr.io/$PROJECT_ID/java/javac'
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/javac'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/javac'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/javac'
@@ -24,7 +25,11 @@ steps:
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/java/javac:8'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/java/javac:8'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/java/javac:8'
-
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/javac'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/javac:8'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/java/javac'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/java/javac:8'
 
   - '.'
   waitFor: ['-']
@@ -50,6 +55,7 @@ images:
 - 'gcr.io/$PROJECT_ID/javac'
 - 'gcr.io/$PROJECT_ID/java/javac:8'
 - 'gcr.io/$PROJECT_ID/java/javac'
+# Regional AR Mirrors
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/javac'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/javac'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/javac'
@@ -62,3 +68,8 @@ images:
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/java/javac:8'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/java/javac:8'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/java/javac:8'
+# GCR to AR Migration
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/javac'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/javac:8'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/java/javac'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/java/javac:8'

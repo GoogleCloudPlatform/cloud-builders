@@ -8,9 +8,12 @@ steps:
   - 'build'
   - '--build-arg=MAVEN_VERSION=3.3.9-jdk-8'
   - '--tag=gcr.io/$PROJECT_ID/mvn:3.3.9-jdk-8'
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.3.9-jdk-8'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.3.9-jdk-8'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.3.9-jdk-8'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/mvn:3.3.9-jdk-8'
   - '.'
   waitFor: ['-']
   id: '339'
@@ -19,9 +22,12 @@ steps:
   - 'build'
   - '--build-arg=MAVEN_VERSION=3.5.0-jdk-8'
   - '--tag=gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-8'
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.5.0-jdk-8'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.5.0-jdk-8'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.5.0-jdk-8'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/mvn:3.5.0-jdk-8'
   - '.'
   waitFor: ['-']
   id: '350'
@@ -30,9 +36,12 @@ steps:
   - 'build'
   - '--build-arg=MAVEN_VERSION=3.8-jdk-8'
   - '--tag=gcr.io/$PROJECT_ID/mvn:3.8-jdk-8'
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.8-jdk-8'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.8-jdk-8'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.8-jdk-8'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/mvn:3.8-jdk-8'
   - '.'
   waitFor: ['-']
   id: '3.8'
@@ -41,9 +50,12 @@ steps:
   - 'build'
   - '--build-arg=MAVEN_VERSION=3.9.1'
   - '--tag=gcr.io/$PROJECT_ID/mvn:3.9.1'
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.9.1'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.9.1'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.9.1'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/mvn:3.9.1'
   - '.'
   waitFor: ['-']
   id: '3.9'
@@ -54,9 +66,12 @@ steps:
   - 'build'
   - '--build-arg=MAVEN_VERSION=3.8-openjdk-18'
   - '--tag=gcr.io/$PROJECT_ID/mvn'
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/mvn'
   - '.'
   waitFor: ['-']
   id: 'latest'
@@ -71,12 +86,16 @@ steps:
   - 'Dockerfile.appengine'
   - '--tag=gcr.io/$PROJECT_ID/mvn:gcloud'
   - '--tag=gcr.io/$PROJECT_ID/mvn:appengine'
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:appengine'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:appengine'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:appengine'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:gcloud'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:gcloud'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:gcloud'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/mvn:appengine'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/mvn:gcloud'
   - '.'
   waitFor: ['3.9']
   id: 'gcloud'
@@ -133,6 +152,7 @@ images:
 - 'gcr.io/$PROJECT_ID/mvn:gcloud'
 - 'gcr.io/$PROJECT_ID/mvn:appengine'
 - 'gcr.io/$PROJECT_ID/mvn'
+# Regional AR Mirrors
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.3.9-jdk-8'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.5.0-jdk-8'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:3.8-jdk-8'
@@ -154,5 +174,13 @@ images:
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:gcloud'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:appengine'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn'
+# GCR to AR Migration
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/mvn:3.3.9-jdk-8'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/mvn:3.5.0-jdk-8'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/mvn:3.8-jdk-8'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/mvn:3.9.1'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/mvn:gcloud'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/mvn:appengine'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/mvn'
 
 timeout: 2400s

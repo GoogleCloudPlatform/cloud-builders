@@ -12,6 +12,7 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/go:1.15'
   - '--tag=gcr.io/$PROJECT_ID/go:alpine'
   - '--tag=gcr.io/$PROJECT_ID/go:alpine-1.15'
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.15'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine'
@@ -24,6 +25,11 @@ steps:
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.15'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.15'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:1.15'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:alpine'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:alpine-1.15'
 
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
@@ -33,15 +39,16 @@ steps:
   - 'Dockerfile.debian'
   - '--tag=gcr.io/$PROJECT_ID/go:debian'
   - '--tag=gcr.io/$PROJECT_ID/go:debian-1.15'
-
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.15'
-
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.15'
-
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.15'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:debian'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:debian-1.15'
 
   - '.'
 
@@ -158,15 +165,16 @@ steps:
   - '--build-arg=VERSION=1.16'
   - '--tag=gcr.io/$PROJECT_ID/go:alpine-1.16'
   - '--tag=gcr.io/$PROJECT_ID/go:1.16'
-
+  # Regional AR Mirrors
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.16'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.16'
-
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.16'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.16'
-
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.16'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.16'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:alpine-1.16'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:1.16'
 
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
@@ -176,10 +184,12 @@ steps:
   - 'Dockerfile.debian'
   - '--build-arg=VERSION=1.16'
   - '--tag=gcr.io/$PROJECT_ID/go:debian-1.16'
-
+  # Regional AR Mirrors
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.16'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.16'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.16'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:debian-1.16'
 
   - '.'
 
@@ -192,15 +202,16 @@ steps:
   - '--build-arg=VERSION=1.17'
   - '--tag=gcr.io/$PROJECT_ID/go:alpine-1.17'
   - '--tag=gcr.io/$PROJECT_ID/go:1.17'
-
+  # Regional AR Mirrors
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.17'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.17'
-
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.17'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.17'
-
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.17'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.17'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:alpine-1.17'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:1.17'
 
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
@@ -210,10 +221,12 @@ steps:
   - 'Dockerfile.debian'
   - '--build-arg=VERSION=1.17'
   - '--tag=gcr.io/$PROJECT_ID/go:debian-1.17'
-
+  # Regional AR Mirrors
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.17'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.17'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.17'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:debian-1.17'
 
   - '.'
 
@@ -226,15 +239,16 @@ steps:
   - '--build-arg=VERSION=1.18'
   - '--tag=gcr.io/$PROJECT_ID/go:alpine-1.18'
   - '--tag=gcr.io/$PROJECT_ID/go:1.18'
-
+  # Regional AR Mirrors
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.18'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.18'
-
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.18'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.18'
-
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.18'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.18'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:alpine-1.18'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:1.18'
 
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
@@ -244,10 +258,12 @@ steps:
   - 'Dockerfile.debian'
   - '--build-arg=VERSION=1.18'
   - '--tag=gcr.io/$PROJECT_ID/go:debian-1.18'
-
+  # Regional AR Mirrors
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.18'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.18'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.18'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:debian-1.18'
 
   - '.'
 
@@ -260,15 +276,16 @@ steps:
     - '--build-arg=VERSION=1.19'
     - '--tag=gcr.io/$PROJECT_ID/go:alpine-1.19'
     - '--tag=gcr.io/$PROJECT_ID/go:1.19'
-
+    # Regional AR Mirrors
     - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.19'
     - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.19'
-
     - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.19'
     - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.19'
-
     - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.19'
     - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.19'
+    # GCR to AR Migration
+    - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:alpine-1.19'
+    - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:1.19'
 
     - '.'
 - name: 'gcr.io/cloud-builders/docker'
@@ -278,10 +295,12 @@ steps:
     - 'Dockerfile.debian'
     - '--build-arg=VERSION=1.19'
     - '--tag=gcr.io/$PROJECT_ID/go:debian-1.19'
-
+    # Regional AR Mirrors
     - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.19'
     - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.19'
     - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.19'
+    # GCR to AR Migration
+    - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:debian-1.19'
 
     - '.'
 
@@ -294,15 +313,16 @@ steps:
     - '--build-arg=VERSION=1.20'
     - '--tag=gcr.io/$PROJECT_ID/go:alpine-1.20'
     - '--tag=gcr.io/$PROJECT_ID/go:1.20'
-
+    # Regional AR Mirrors
     - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.20'
     - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.20'
-
     - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.20'
     - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.20'
-
     - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.20'
     - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.20'
+    # GCR to AR Migration
+    - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:alpine-1.20'
+    - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:1.20'
 
     - '.'
 - name: 'gcr.io/cloud-builders/docker'
@@ -312,10 +332,12 @@ steps:
     - 'Dockerfile.debian'
     - '--build-arg=VERSION=1.20'
     - '--tag=gcr.io/$PROJECT_ID/go:debian-1.20'
-
+    # Regional AR Mirrors
     - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.20'
     - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.20'
     - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.20'
+    # GCR to AR Migration
+    - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:debian-1.20'
 
     - '.'
 
@@ -344,6 +366,7 @@ images:
 - 'gcr.io/$PROJECT_ID/go:alpine-1.20'
 - 'gcr.io/$PROJECT_ID/go:debian-1.20'
 
+# Regional AR Mirrors (US)
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/go'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian'
@@ -366,6 +389,7 @@ images:
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.20'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.20'
 
+# Regional AR Mirrors (ASIA)
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian'
@@ -388,6 +412,7 @@ images:
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.20'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.20'
 
+# Regional AR Mirrors (EUROPE)
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian'
@@ -409,5 +434,28 @@ images:
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.19'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.20'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.20'
+
+# GCR to AR Migration
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:alpine'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:debian'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:1.15'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:1.16'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:1.17'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:1.18'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:1.19'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:1.20'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:alpine-1.15'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:debian-1.15'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:alpine-1.16'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:debian-1.16'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:alpine-1.17'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:debian-1.17'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:alpine-1.18'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:debian-1.18'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:alpine-1.19'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:debian-1.19'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:alpine-1.20'
+- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/go:debian-1.20'
 
 timeout: 2400s

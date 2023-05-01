@@ -4,7 +4,16 @@
 steps:
 # Build the Bazel builder and output the version we built with.
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/bazel','--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel','--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel','--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel', '.']
+  args:
+  - 'build'
+  - '--tag=gcr.io/$PROJECT_ID/bazel'
+  # Regional AR Mirrors
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
+  # GCR to AR Migration
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/bazel'
+  - '.'
 - name: 'gcr.io/$PROJECT_ID/bazel'
   args: ['version']
 
@@ -27,8 +36,11 @@ steps:
 
 images:
  - 'gcr.io/$PROJECT_ID/bazel'
+ # Regional AR Mirrors
  - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
- - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
  - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
+ - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
+ # GCR to AR Migration
+ - 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/bazel'
 
 timeout: 2400s
