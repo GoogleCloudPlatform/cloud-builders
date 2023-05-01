@@ -1,0 +1,4 @@
+steps:
+# Remove tag after https://github.com/GoogleCloudPlatform/cloud-builders/issues/908 is resolved
+- name: 'gcr.io/cloud-builders/mvn:3.9.1'
+  args: ['install']

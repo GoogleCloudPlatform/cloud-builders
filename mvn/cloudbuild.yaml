@@ -52,7 +52,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=MAVEN_VERSION=3.8-jdk-8'
+  - '--build-arg=MAVEN_VERSION=3.8-openjdk-18'
   - '--tag=gcr.io/$PROJECT_ID/mvn'
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn'
@@ -66,6 +66,7 @@ steps:
   args:
   - 'build'
   - '--build-arg=PROJECT_ID=${PROJECT_ID}'
+  - '--build-arg=MAVEN_VERSION=3.9.1'
   - '-f'
   - 'Dockerfile.appengine'
   - '--tag=gcr.io/$PROJECT_ID/mvn:gcloud'
@@ -77,7 +78,7 @@ steps:
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:gcloud'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/mvn:gcloud'
   - '.'
-  waitFor: ['latest']
+  waitFor: ['3.9']
   id: 'gcloud'
 
 # Minimally invoke Maven.
@@ -107,6 +108,17 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/mvn:appengine'
   args: ['package', 'appengine:stage']
   dir: 'examples/hello_appengine'
+
+# Check for jdk17 compatibility
+- name: 'gcr.io/$PROJECT_ID/mvn:3.9.1'
+  args: ['install']
+  dir: 'examples/jdk17'
+- name: 'gcr.io/$PROJECT_ID/mvn'
+  args: ['install']
+  dir: 'examples/jdk17'
+- name: 'gcr.io/$PROJECT_ID/mvn:gcloud'
+  args: ['install']
+  dir: 'examples/jdk17'
 
 # Demonstrate using the maven image directly.
 - name: 'maven'
