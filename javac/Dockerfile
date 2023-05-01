@@ -3,6 +3,15 @@ FROM ${BASE_IMAGE}
 
 ARG DOCKER_VERSION=5:19.03.8~3-0~debian-stretch
 
+# https://lists.debian.org/debian-devel-announce/2023/03/msg00006.html
+# Base image uses debian9/stretch, and as such needs to have
+# sources.list point to archive.debian.org.
+RUN \
+   sed -i s/httpredir.debian.org/archive.debian.org/g /etc/apt/sources.list && \
+   sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list && \
+   sed -i 's|security.debian.org|archive.debian.org/debian-security/|g' /etc/apt/sources.list && \
+   sed -i '/stretch-updates/d' /etc/apt/sources.list
+
 # Install Docker based on instructions from:
 # https://docs.docker.com/engine/installation/linux/docker-ce/debian
 RUN \
@@ -17,7 +26,6 @@ RUN \
       stable" && \
    apt-get -y update && \
    apt-get -y install docker-ce=${DOCKER_VERSION} docker-ce-cli=${DOCKER_VERSION} && \
-
    # Clean up build packages
    apt-get remove -y --purge curl gnupg2 software-properties-common && \
    apt-get clean
