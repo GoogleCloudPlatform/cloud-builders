@@ -9,6 +9,15 @@ ARG BASE_URL=https://services.gradle.org/distributions
 ENV GRADLE_HOME "/usr/share/gradle-${GRADLE_VERSION}"
 ENV GRADLE_USER_HOME "${USER_HOME_DIR}/.gradle/"
 
+# https://lists.debian.org/debian-devel-announce/2023/03/msg00006.html
+# Base image uses debian9/stretch, and as such needs to have
+# sources.list point to archive.debian.org.
+RUN \
+   sed -i s/httpredir.debian.org/archive.debian.org/g /etc/apt/sources.list && \
+   sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list && \
+   sed -i 's|security.debian.org|archive.debian.org/debian-security/|g' /etc/apt/sources.list && \
+   sed -i '/stretch-updates/d' /etc/apt/sources.list
+
 RUN apt-get update -qqy && apt-get install -qqy curl \
   && mkdir -p /usr/share "${GRADLE_USER_HOME}" \
   && curl -fsSL -o "gradle-${GRADLE_VERSION}-bin.zip" "${BASE_URL}/gradle-${GRADLE_VERSION}-bin.zip" \
