@@ -1,6 +1,6 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: 
+  args:
   - 'build'
   - '--tag=gcr.io/$PROJECT_ID/kubectl'
   # Regional AR Mirrors
@@ -11,7 +11,7 @@ steps:
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/kubectl'
   - '.'
 
-images: 
+images:
 - 'gcr.io/$PROJECT_ID/kubectl'
 # Regional AR Mirrors
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/kubectl'

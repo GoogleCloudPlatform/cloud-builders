@@ -6,7 +6,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['pull', 'gcr.io/cloud-builders/gcloud']
 - name: 'gcr.io/cloud-builders/docker'
-  args: 
+  args:
   - 'build'
   - '--tag=gcr.io/$PROJECT_ID/git'
   # Regional AR Mirrors

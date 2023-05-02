@@ -3,7 +3,7 @@
 
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: 
+  args:
   - 'build'
   - '--tag=gcloud-slim'
   - '--tag=gcr.io/$PROJECT_ID/gcloud-slim'
@@ -17,7 +17,7 @@ steps:
   - 'Dockerfile.slim'
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
-  args: 
+  args:
   - 'build'
   - '--tag=gcr.io/$PROJECT_ID/gcloud'
   # Regional AR Mirrors
