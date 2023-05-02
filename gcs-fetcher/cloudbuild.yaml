@@ -6,7 +6,7 @@ steps:
 
 # Build the gcs-fetcher binary and put into the builder image.
 - name: 'gcr.io/cloud-builders/docker'
-  args: 
+  args:
   - 'build'
   - '--build-arg=cmd=./cmd/gcs-fetcher/'
   - '--tag=gcr.io/$PROJECT_ID/gcs-fetcher'
@@ -22,7 +22,7 @@ steps:
 
 # Build the gcs-uploader binary and put it into the builder image.
 - name: 'gcr.io/cloud-builders/docker'
-  args: 
+  args:
   - 'build'
   - '--build-arg=cmd=./cmd/gcs-uploader/'
   - '--tag=gcr.io/$PROJECT_ID/gcs-uploader'

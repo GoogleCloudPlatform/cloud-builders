@@ -3,7 +3,7 @@
 
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: 
+  args:
   - 'build'
   - '--pull'
   - '--tag=gcr.io/$PROJECT_ID/gsutil'
@@ -22,7 +22,7 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/gsutil'
   args: ['ls']
 
-images: 
+images:
 - 'gcr.io/$PROJECT_ID/gsutil'
 # Regional AR Mirrors
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gsutil'
