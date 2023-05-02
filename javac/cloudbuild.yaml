@@ -32,7 +32,6 @@ steps:
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/java/javac:8'
 
   - '.'
-  waitFor: ['-']
   id: 'BUILD_JDK_8'
 
 # Test that javac and docker are installed, for all built images, and that apt-get update will work
