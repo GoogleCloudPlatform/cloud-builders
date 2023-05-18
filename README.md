@@ -78,6 +78,10 @@ for the corresponding Cloud Builder.
     *   [`curlimages/curl`](https://hub.docker.com/r/curlimages/curl) is community-supported
 *   [`golang`](https://hub.docker.com/_/golang) is provided by the Go team and runs the [`go`](https://golang.org/cmd/go/) tool
 
+# Container Registry Deprecation
+
+[Google announced on May 15 2023 that Container Registry has been deprecated and is superseded by Artifact Registry.](https://cloud.google.com/container-registry/docs/deprecations/container-registry-deprecation) The deprecation won't affect the use of offical cloud builder images. Artifact Registry [automatically redirects gcr.io requests](https://cloud.google.com/artifact-registry/docs/transition/transition-from-gcr#transition-options) for Container Registry hosts to corresponding Artifact Registry repositories.
+
 # Future Direction
 
 You may have already noticed that most of the images in this repo now provide notices to the
