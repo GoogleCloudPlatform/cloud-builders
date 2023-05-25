@@ -1,9 +1,12 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/twine', '.']
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/twine', '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/twine', '.']
 
 # Print version information.
 - name: 'gcr.io/$PROJECT_ID/twine'
   args: ['--version']
 
-images: ['gcr.io/$PROJECT_ID/twine']
+images:
+  - 'gcr.io/$PROJECT_ID/twine'
+  # GCR to AR Migration
+  - 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/twine'
