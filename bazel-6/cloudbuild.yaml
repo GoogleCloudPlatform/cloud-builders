@@ -6,25 +6,25 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--tag=gcr.io/$PROJECT_ID/bazel'
+  - '--tag=gcr.io/$PROJECT_ID/bazel-6'
   # Regional AR Mirrors
-  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
-  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel-6'
+  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel-6'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel-6'
   # GCR to AR Migration
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/bazel'
+  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/bazel-6'
   - '.'
-- name: 'gcr.io/$PROJECT_ID/bazel'
+- name: 'gcr.io/$PROJECT_ID/bazel-6'
   args: ['version']
 
 # Build the example.
-- name: 'gcr.io/$PROJECT_ID/bazel'
+- name: 'gcr.io/$PROJECT_ID/bazel-6'
   args: ['run', '--spawn_strategy=standalone', '//:target', '--verbose_failures']
   dir: 'examples'
-- name: 'gcr.io/$PROJECT_ID/bazel'
+- name: 'gcr.io/$PROJECT_ID/bazel-6'
   args: ['run', '--spawn_strategy=standalone', '//:checkargs', '--verbose_failures', '--', 'a', 'b', 'c']
   dir: 'examples'
-- name: 'gcr.io/$PROJECT_ID/bazel'
+- name: 'gcr.io/$PROJECT_ID/bazel-6'
   entrypoint: '/bin/bash'
   args: ['invocation_id_test.sh']
 
@@ -35,12 +35,12 @@ steps:
 # TODO(mattmoor): Test docker_push as well.
 
 images:
- - 'gcr.io/$PROJECT_ID/bazel'
+ - 'gcr.io/$PROJECT_ID/bazel-6'
  # Regional AR Mirrors
- - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
- - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
- - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
+ - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel-6'
+ - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel-6'
+ - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel-6'
  # GCR to AR Migration
- - 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/bazel'
+ - 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/bazel-6'
 
 timeout: 2400s
