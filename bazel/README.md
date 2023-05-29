@@ -33,7 +33,9 @@ This is a tool builder to simply invoke [`bazel`](https://bazel.io) commands.
 
 Arguments passed to this builder will be passed to `bazel` directly.
 
-The latest available version of `bazel` is used.
+Following #880, the `bazel` version is pinned to 5.4.0. See
+[`bazel-6`](.../bazel-6/README.md) for the latest non-backwards compatible
+image.
 
 ## Examples
 
