@@ -11,8 +11,6 @@ steps:
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
-  # GCR to AR Migration
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/bazel'
   - '.'
 - name: 'gcr.io/$PROJECT_ID/bazel'
   args: ['version']
@@ -40,7 +38,5 @@ images:
  - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
  - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
  - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel'
- # GCR to AR Migration
- - 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/bazel'
 
 timeout: 2400s

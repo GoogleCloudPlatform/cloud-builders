@@ -7,8 +7,6 @@ steps:
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/kubectl'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/kubectl'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/kubectl'
-  # GCR to AR Migration
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/kubectl'
   - '.'
 
 images:
@@ -17,5 +15,3 @@ images:
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/kubectl'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/kubectl'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/kubectl'
-# GCR to AR Migration
-- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/kubectl'

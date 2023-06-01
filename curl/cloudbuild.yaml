@@ -7,8 +7,6 @@ steps:
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/curl'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/curl'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/curl'
-  # GCR to AR Migration
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/curl'
   - '.'
 
 # Print version information.
@@ -29,5 +27,3 @@ images:
  - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/curl'
  - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/curl'
  - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/curl'
- # GCR to AR Migration
- - 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/curl'

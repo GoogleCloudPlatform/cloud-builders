@@ -11,8 +11,6 @@ steps:
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim'
-  # GCR to AR Migration
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/gcloud-slim'
   - '-f'
   - 'Dockerfile.slim'
   - '.'
@@ -24,8 +22,6 @@ steps:
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
-  # GCR to AR Migration
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/gcloud'
   - '-f'
   - 'Dockerfile'
   - '.'
@@ -51,8 +47,5 @@ images:
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim'
-# GCR to AR Migration
-- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/gcloud'
-- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/gcloud-slim'
 
 timeout: 2400s

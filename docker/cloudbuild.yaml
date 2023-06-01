@@ -26,8 +26,6 @@ steps:
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:19.03.9'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:19.03.9'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:19.03.9'
-  # GCR to AR Migration
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/docker:19.03.9'
   - '--file=Dockerfile-versioned'
   - '--build-arg=${_DOCKER_19}'
   - '.'
@@ -46,9 +44,6 @@ steps:
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:20.10.14'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:latest'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:20.10.14'
-  # GCR to AR Migration
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/docker:latest'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/docker:20.10.14'
   - '--file=Dockerfile-versioned'
   - '--build-arg=${_DOCKER_20}'
   - '.'
@@ -103,9 +98,5 @@ images:
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:latest'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:19.03.9'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/docker:20.10.14'
-# GCR to AR Migration
-- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/docker:latest'
-- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/docker:19.03.9'
-- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/docker:20.10.14'
 
 timeout: 1200s

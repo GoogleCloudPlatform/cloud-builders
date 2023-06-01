@@ -11,8 +11,6 @@ steps:
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gsutil'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gsutil'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gsutil'
-  # GCR to AR Migration
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/gsutil'
   - '.'
 - name: 'gcr.io/$PROJECT_ID/gsutil'
   args: ['version']
@@ -28,5 +26,3 @@ images:
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gsutil'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gsutil'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gsutil'
-# GCR to AR Migration
-- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/gsutil'
