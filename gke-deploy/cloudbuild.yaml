@@ -14,8 +14,6 @@ steps:
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gke-deploy'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gke-deploy'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gke-deploy'
-  # GCR to AR Migration
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/gke-deploy'
   - '.'
 - name: 'gcr.io/$PROJECT_ID/gke-deploy'
   args: ['--help']
@@ -26,7 +24,5 @@ images:
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gke-deploy'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gke-deploy'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gke-deploy'
-# GCR to AR Migration
-- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/gke-deploy'
 
 timeout: 6000s

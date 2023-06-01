@@ -13,8 +13,6 @@ steps:
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/git'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/git'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/git'
-  # GCR to AR Migration
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/git'
   - '.'
 
 # Clone a public repo and write its revision to a VERSION file.
@@ -51,7 +49,5 @@ images:
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/git'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/git'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/git'
-# GCR to AR Migration
-- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/git'
 
 timeout: 1800s

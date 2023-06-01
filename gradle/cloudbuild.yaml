@@ -25,11 +25,6 @@ steps:
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gradle:5.6.2-jdk-8'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:5.6.2-jdk-8'
-  # GCR to AR Migration
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/gradle'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/gradle:5.6.2-jdk-8'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/java/gradle'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/java/gradle:5.6.2-jdk-8'
   - '.'
 
 - name: 'gcr.io/cloud-builders/docker'
@@ -47,9 +42,6 @@ steps:
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:4.6-jdk-8'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:4.6-jdk-8'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:4.6-jdk-8'
-  # GCR to AR Migration
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/gradle:4.6-jdk-8'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/java/gradle:4.6-jdk-8'
 
   - '.'
 
@@ -68,9 +60,6 @@ steps:
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:4.0-jdk-8'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:4.0-jdk-8'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:4.0-jdk-8'
-  # GCR to AR Migration
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/gradle:4.0-jdk-8'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/java/gradle:4.0-jdk-8'
 
   - '.'
 
@@ -89,9 +78,6 @@ steps:
   - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:3.5-jdk-8'
   - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:3.5-jdk-8'
   - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:3.5-jdk-8'
-  # GCR to AR Migration
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/gradle:3.5-jdk-8'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/java/gradle:3.5-jdk-8'
   - '.'
 
 # Run examples
@@ -165,14 +151,3 @@ images:
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:4.6-jdk-8'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:4.0-jdk-8'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/java/gradle:3.5-jdk-8'
-# GCR to AR Migration
-- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/gradle'
-- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/gradle:5.6.2-jdk-8'
-- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/gradle:4.6-jdk-8'
-- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/gradle:4.0-jdk-8'
-- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/gradle:3.5-jdk-8'
-- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/java/gradle'
-- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/java/gradle:5.6.2-jdk-8'
-- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/java/gradle:4.6-jdk-8'
-- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/java/gradle:4.0-jdk-8'
-- 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/java/gradle:3.5-jdk-8'
