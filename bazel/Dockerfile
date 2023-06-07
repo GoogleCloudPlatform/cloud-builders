@@ -1,6 +1,7 @@
 FROM gcr.io/gcp-runtimes/ubuntu_20_0_4
 
 ADD bazel.sh /builder/bazel.sh
+ARG BAZEL_VERSION=latest
 ARG DOCKER_VERSION=5:19.03.9~3-0~ubuntu-focal
 
 RUN \
@@ -25,10 +26,10 @@ RUN \
     curl https://bazel.build/bazel-release.pub.gpg | apt-key add - && \
     apt-get update && \
 
-    apt-get -y install bazel-5.4.0 && \
-    apt-get -y upgrade bazel-5.4.0 && \
+    apt-get -y install bazel-${BAZEL_VERSION} && \
+    apt-get -y upgrade bazel-${BAZEL_VERSION} && \
 
-    ln -s /usr/bin/bazel-5.4.0 /usr/bin/bazel && \
+    ln -s /usr/bin/bazel-${BAZEL_VERSION} /usr/bin/bazel && \
 
     # Install Docker (https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/#uninstall-old-versions)
     apt-get -y install \
