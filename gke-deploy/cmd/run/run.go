@@ -119,10 +119,10 @@ func run(_ *cobra.Command, options *options) error {
 		return fmt.Errorf("value of -o|--output cannot be empty")
 	}
 	if options.clusterName != "" && options.clusterLocation == "" {
-		return fmt.Errorf("you must set -c|--cluster flag because -l|--location flag is set")
+		return fmt.Errorf("you must set -l|--location flag because -c|--cluster flag is set")
 	}
 	if options.clusterLocation != "" && options.clusterName == "" {
-		return fmt.Errorf("you must set -l|--location flag because -c|--cluster flag is set")
+		return fmt.Errorf("you must set -c|--cluster flag because -l|--location flag is set")
 	}
 
 	useGcloud := common.GcloudInPath()
