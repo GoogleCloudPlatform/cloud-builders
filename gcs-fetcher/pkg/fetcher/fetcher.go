@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -67,6 +67,7 @@ var (
 	noTimeout      = 0 * time.Second
 	errGCSTimeout  = errors.New("GCS timeout")
 
+	vpcscRegex  = regexp.MustCompile(`<Details>(.+vpcServiceControlsUniqueIdentifier: .+)<\/Details>`)
 	robotRegex  = regexp.MustCompile(`<Details>(\S+@\S+)\s`)
 	nonHexRegex = regexp.MustCompile(`[^0-9a-f]`)
 )
@@ -158,6 +159,15 @@ type Fetcher struct {
 	Verbose     bool
 	Stdout      io.Writer
 	Stderr      io.Writer
+}
+
+type vpcscError struct {
+	bucket  string
+	details string
+}
+
+func (e *vpcscError) Error() string {
+	return fmt.Sprintf("Access to bucket %s denied. %s.", e.bucket, e.details)
 }
 
 type permissionError struct {
@@ -268,11 +278,14 @@ func (gf *Fetcher) fetchObject(ctx context.Context, j job) *jobReport {
 		allowedGCSTimeout := gf.timeout(j.filename, retrynum)
 		size, err := gf.fetchObjectOnceWithTimeout(ctx, j, allowedGCSTimeout, tmpfile)
 		if err != nil {
-			// Allow permissionError to bubble up.
+			// Allow permissionError and vpcscError to bubble up.
 			e := err
-			if _, ok := err.(*permissionError); !ok {
+			switch e.(type) {
+			case *permissionError, *vpcscError:
+			default:
 				e = fmt.Errorf("fetching %q with timeout %v to temp file %q: %v", formatGCSName(j.bucket, j.object, j.generation), allowedGCSTimeout, tmpfile, err)
 			}
+
 			gf.recordFailure(j, started, allowedGCSTimeout, e, report)
 			continue
 		}
@@ -352,6 +365,11 @@ func (gf *Fetcher) fetchObjectOnce(ctx context.Context, j job, dest string, brea
 	if err != nil {
 		// Check for AccessDenied failure here and return a useful error message on Stderr and exit immediately.
 		if gerr, ok := err.(*googleapi.Error); ok && gerr.Code == http.StatusForbidden {
+			// Check if VPC SC is the source of Access Denial
+			if match := vpcscRegex.FindStringSubmatch(err.Error()); len(match) == 2 {
+				result.err = &vpcscError{bucket: j.bucket, details: match[1]}
+				return result
+			}
 			// Try to parse out the robot name.
 			match := robotRegex.FindStringSubmatch(err.Error())
 			robot := "your Cloud Build service account"
@@ -564,8 +582,9 @@ func (gf *Fetcher) fetchFromManifest(ctx context.Context) (err error) {
 	report := gf.fetchObject(ctx, j)
 	gf.Retries, gf.Backoff = oretries, obackoff
 	if !report.success {
-		if err, ok := report.err.(*permissionError); ok {
-			gf.logErr(err.Error())
+		switch report.err.(type) {
+		case *permissionError, *vpcscError:
+			gf.logErr(report.err.Error())
 			os.Exit(1)
 		}
 		return fmt.Errorf("failed to download manifest %s: %v", formatGCSName(gf.Bucket, gf.Object, gf.Generation), report.err)
