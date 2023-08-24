@@ -1,0 +1,28 @@
+# In this directory, run the following command to build this builder.
+# $ gcloud builds submit
+
+steps:
+- name: 'gcr.io/cloud-builders/git'
+  args: ['clone', 'https://github.com/GoogleCloudPlatform/aactl']
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'bash'
+  args:
+  - -c
+  - |
+    cd aactl/
+    make image
+    docker tag aactl:latest gcr.io/$PROJECT_ID/aactl:$(cat .version)
+    docker tag aactl:latest gcr.io/$PROJECT_ID/aactl:latest
+    # Regional AR Mirrors
+    docker tag aactl:latest europe-docker.pkg.dev/$PROJECT_ID/ga/v1/aactl:$(cat .version)
+    docker tag aactl:latest europe-docker.pkg.dev/$PROJECT_ID/ga/v1/aactl:latest
+    docker tag aactl:latest asia-docker.pkg.dev/$PROJECT_ID/ga/v1/aactl:$(cat .version)
+    docker tag aactl:latest asia-docker.pkg.dev/$PROJECT_ID/ga/v1/aactl:latest
+    docker tag aactl:latest us-docker.pkg.dev/$PROJECT_ID/ga/v1/aactl:$(cat .version)
+    docker tag aactl:latest us-docker.pkg.dev/$PROJECT_ID/ga/v1/aactl:latest
+images:
+- 'gcr.io/$PROJECT_ID/aactl'
+# Regional AR Mirrors
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/aactl'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/aactl'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/aactl'
