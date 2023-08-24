@@ -1,4 +1,4 @@
-# aactl Google Cloud Builder
+# aactl
 
 Google Artifact Analysis (AA) service data import utility, supports OSS vulnerability scanner reports, SLSA provenance, and sigstore attestations.
 
