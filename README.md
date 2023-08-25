@@ -5,6 +5,7 @@ Cloud Build API](https://cloud.google.com/cloud-build/docs/).
 
 Pre-built images are available at `gcr.io/cloud-builders/...` and include:
 
+*   `aactl`: runs the [aactl](https://github.com/GoogleCloudPlatform/aactl) tool
 *   `bazel`: runs the [bazel](https://bazel.io) tool
 *   `curl`: runs the [curl](https://curl.haxx.se) tool
 *   `docker`: runs the [docker](https://docker.com) tool

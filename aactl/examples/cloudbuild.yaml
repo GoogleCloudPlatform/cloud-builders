@@ -1,0 +1,77 @@
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+substitutions:
+  _IMG_NAME: nginx
+  _IMG_VERSION: latest
+  _REPO_NAME: sample-repo
+
+steps:
+
+# Build image
+- id: build
+  name: gcr.io/cloud-builders/docker
+  entrypoint: /bin/bash
+  dir: examples/cloud-build
+  args:
+  - -c
+  - |
+    docker pull docker.io/library/nginx:latest || exit 1
+    docker tag docker.io/library/nginx:latest ${LOCATION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_IMG_NAME}:${_IMG_VERSION} || exit 1
+
+# Publish image
+- id: publish
+  name: gcr.io/cloud-builders/docker
+  entrypoint: /bin/bash
+  waitFor:
+  - build
+  dir: examples/cloud-build
+  args:
+  - -c
+  - |-
+    docker push "${LOCATION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_IMG_NAME}:${_IMG_VERSION}" || exit 1
+    docker image inspect "${LOCATION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_IMG_NAME}:${_IMG_VERSION}" \
+      --format '{{index .RepoDigests 0}}' > image-digest.txt || exit 1
+    cat image-digest.txt
+
+- id: scan
+  name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  entrypoint: /bin/bash
+  dir: examples/cloud-build
+  waitFor:
+  - publish
+  args:
+  - -c
+  - |-
+    curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin || exit 1
+    grype --add-cpes-if-none -s AllLayers -o json --file report.json $(cat image-digest.txt) || exit 1
+
+- id: import
+  waitFor:
+  - scan
+  name: gcr.io/cloud-builders/aactl
+  dir: examples/cloud-build
+  args:
+  - vulnerability
+  - --project=$PROJECT_ID
+  - --source=${LOCATION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_IMG_NAME}:${_IMG_VERSION}
+  - --file=report.json
+
+images:
+- ${LOCATION}-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMG_NAME:${_IMG_VERSION}
+
+options:
+  # Verify generation of attestations and provenance metadata for this build.
+  # Otherwise, GCB generates provenance for global builds only.
+  requestedVerifyOption: VERIFIED
