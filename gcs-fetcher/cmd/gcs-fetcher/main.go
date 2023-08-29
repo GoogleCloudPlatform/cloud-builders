@@ -48,7 +48,7 @@ var (
 	timeoutGCS  = flag.Bool("timeout_gcs", true, "If true, a timeout will be used to avoid GCS longtails.")
 	help        = flag.Bool("help", false, "If true, prints help text and exits.")
 
-	keepSource    = flag.Bool("keep_source", false, "If true, keeps the source file in the file system.")
+	keepSource    = flag.Bool("keep_source", false, "If true, the source file is preserved in the file system.")
 	stagingFolder = flag.String("staging_folder", ".download/", "Temp folder where to download the source file.")
 )
 
