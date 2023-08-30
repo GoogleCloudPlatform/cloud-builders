@@ -26,3 +26,4 @@ images:
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/aactl'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/aactl'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/aactl'
+
