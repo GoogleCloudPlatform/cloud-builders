@@ -33,7 +33,6 @@ import (
 )
 
 const (
-	stagingFolder = ".download/"
 	userAgent     = "gcs-fetcher"
 )
 
@@ -48,6 +47,9 @@ var (
 	backoff     = flag.Duration("backoff", 100*time.Millisecond, "Time to wait when retrying, will be doubled on each retry.")
 	timeoutGCS  = flag.Bool("timeout_gcs", true, "If true, a timeout will be used to avoid GCS longtails.")
 	help        = flag.Bool("help", false, "If true, prints help text and exits.")
+
+	keepSource    = flag.Bool("keep_source", false, "If true, the source file is preserved in the file system.")
+	stagingFolder = flag.String("staging_folder", ".download/", "Temp folder where to download the source file.")
 )
 
 func logFatalf(writer io.Writer, format string, a ...interface{}) {
@@ -103,7 +105,7 @@ func main() {
 		GCS:         realGCS{client},
 		OS:          realOS{},
 		DestDir:     *destDir,
-		StagingDir:  filepath.Join(*destDir, stagingFolder),
+		StagingDir:  filepath.Join(*destDir, *stagingFolder),
 		CreatedDirs: map[string]bool{},
 		Bucket:      bucket,
 		Object:      object,
@@ -113,6 +115,7 @@ func main() {
 		Retries:     *retries,
 		Backoff:     *backoff,
 		SourceType:  *sourceType,
+		KeepSource:  *keepSource,
 		Verbose:     *verbose,
 		Stdout:      stdout,
 		Stderr:      stderr,

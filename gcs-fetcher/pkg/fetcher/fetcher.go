@@ -141,6 +141,7 @@ type Fetcher struct {
 	OS  OS
 
 	DestDir    string
+	KeepSource string
 	StagingDir string
 
 	// mu guards CreatedDirs
@@ -712,15 +713,17 @@ func (gf *Fetcher) fetchFromZip(ctx context.Context) (err error) {
 	}
 	unzipDuration := time.Since(unzipStart)
 
-	// Remove the zip file (best effort only, no harm if this fails).
-	if err := os.RemoveAll(zipfile); err != nil {
-		gf.log("Failed to remove zipfile %s, continuing: %v", zipfile, err)
-	}
+	if !gf.KeepSource {
+		// Remove the zip file (best effort only, no harm if this fails).
+		if err := os.RemoveAll(zipfile); err != nil {
+			gf.log("Failed to remove zipfile %s, continuing: %v", zipfile, err)
+		}
 
-	// Final cleanup of staging directory, which is only a temporary staging
-	// location for downloading the zipfile in this case.
-	if err := gf.OS.RemoveAll(gf.StagingDir); err != nil {
-		gf.log("Failed to remove staging dir %q, continuing: %v", gf.StagingDir, err)
+		// Final cleanup of staging directory, which is only a temporary staging
+		// location for downloading the zipfile in this case.
+		if err := gf.OS.RemoveAll(gf.StagingDir); err != nil {
+			gf.log("Failed to remove staging dir %q, continuing: %v", gf.StagingDir, err)
+		}
 	}
 
 	mib := float64(report.size) / 1024 / 1024
@@ -884,15 +887,18 @@ func (gf *Fetcher) fetchFromTarGz(ctx context.Context) (err error) {
 	}
 	untgzDuration := time.Since(untgzStart)
 
-	// Remove the tgz file (best effort only, no harm if this fails).
-	if err := gf.OS.RemoveAll(tgzfile); err != nil {
-		gf.log("Failed to remove tgzfile %s, continuing: %v", tgzfile, err)
-	}
 
-	// Final cleanup of staging directory, which is only a temporary staging
-	// location for downloading the tgzfile in this case.
-	if err := gf.OS.RemoveAll(gf.StagingDir); err != nil {
-		gf.log("Failed to remove staging dir %q, continuing: %v", gf.StagingDir, err)
+	if !gf.KeepSource {
+		// Remove the tgz file (best effort only, no harm if this fails).
+		if err := gf.OS.RemoveAll(tgzfile); err != nil {
+			gf.log("Failed to remove tgzfile %s, continuing: %v", tgzfile, err)
+		}
+
+		// Final cleanup of staging directory, which is only a temporary staging
+		// location for downloading the tgzfile in this case.
+		if err := gf.OS.RemoveAll(gf.StagingDir); err != nil {
+			gf.log("Failed to remove staging dir %q, continuing: %v", gf.StagingDir, err)
+		}
 	}
 
 	mib := float64(report.size) / 1024 / 1024
