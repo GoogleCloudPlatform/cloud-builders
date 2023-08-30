@@ -75,4 +75,3 @@ options:
   # Verify generation of attestations and provenance metadata for this build.
   # Otherwise, GCB generates provenance for global builds only.
   requestedVerifyOption: VERIFIED
-  
