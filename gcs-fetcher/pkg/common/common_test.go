@@ -21,10 +21,11 @@ import (
 
 func TestParseBucketObject(t *testing.T) {
 	for _, c := range []struct {
-		uri     string
-		bucket  string
-		object  string
-		wantErr bool
+		uri        string
+		bucket     string
+		object     string
+		generation int64
+		wantErr    bool
 	}{{
 		uri:    "https://storage.googleapis.com/staging.appid.appspot.com/abc123",
 		bucket: "staging.appid.appspot.com",
@@ -38,10 +39,23 @@ func TestParseBucketObject(t *testing.T) {
 		bucket: "some-bucket",
 		object: "abc123",
 	}, {
+		uri:        "https://storage.googleapis.com/some-bucket/abc123#4444",
+		bucket:     "some-bucket",
+		object:     "abc123",
+		generation: 4444,
+	}, {
+		uri:        "https://storage.googleapis.com/some-bucket/myFile#2.txt#4444",
+		bucket:     "some-bucket",
+		object:     "myFile#2.txt",
+		generation: 4444,
+	}, {
 		uri:     "https://storage.googleapis.com/too-short",
 		wantErr: true,
 	}, {
 		uri:     "https://incorrect-domain.com/some-bucket.google.com.a.appspot.com/some/path",
+		wantErr: true,
+	}, {
+		uri:     "https://storage.googleapis.com/some-bucket/abc123#invalidGeneration444",
 		wantErr: true,
 	}, {
 		uri:    "gs://my-bucket/manifest-20171004T175409.json",
@@ -60,6 +74,16 @@ func TestParseBucketObject(t *testing.T) {
 		bucket: "some-bucket",
 		object: "abc123",
 	}, {
+		uri:        "gs://some-bucket/abc123#4444",
+		bucket:     "some-bucket",
+		object:     "abc123",
+		generation: 4444,
+	}, {
+		uri:        "gs://some-bucket/myFile#2.txt#4444",
+		bucket:     "some-bucket",
+		object:     "myFile#2.txt",
+		generation: 4444,
+	}, {
 		uri:    "http://storage.googleapis.com/my-bucket/test-memchache/server.js",
 		bucket: "my-bucket",
 		object: "test-memchache/server.js",
@@ -69,14 +93,17 @@ func TestParseBucketObject(t *testing.T) {
 	}, {
 		uri:     "some-bucket/some/path",
 		wantErr: true,
+	}, {
+		uri:     "gs://some-bucket/abc123#invalidGeneration444",
+		wantErr: true,
 	}} {
-		bucket, object, _, err := ParseBucketObject(c.uri)
+		bucket, object, generation, err := ParseBucketObject(c.uri)
 		if (err != nil) != c.wantErr {
 			t.Errorf("ParseBucketObject(%q): got %v, wantErr = %t", c.uri, err, c.wantErr)
 		}
 		if err == nil {
-			if bucket != c.bucket || object != c.object {
-				t.Errorf("parseBucketObject(%q) = (%q, %q); want (%q, %q)", c.uri, bucket, object, c.bucket, c.object)
+			if bucket != c.bucket || object != c.object || generation != c.generation {
+				t.Errorf("parseBucketObject(%q) = (%q, %q, %d); want (%q, %q, %d)", c.uri, bucket, object, generation, c.bucket, c.object, c.generation)
 			}
 		}
 	}

@@ -18,6 +18,7 @@ package common
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -38,26 +39,53 @@ type ManifestItem struct {
 //
 // It supports URIs in either of these forms:
 // - https://storage.googleapis.com/bucket/path/to/object
+// - https://storage.googleapis.com/bucket/path/to/object#1234
 // - gs://bucket/path/to/object
+// - gs://bucket/path/to/object#1234
 //
-// In both of the above cases, bucket=bucket and object=path/to/object.
+// In the above cases bucket=bucket, object=path/to/object, and when specified generation=1234.
 func ParseBucketObject(uri string) (bucket, object string, generation int64, err error) {
-	// TODO: Parse generation.
 	switch {
 	case strings.HasPrefix(uri, "https://storage.googleapis.com/") || strings.HasPrefix(uri, "http://storage.googleapis.com/"):
 		// uri looks like "https://storage.googleapis.com/staging.my-project.appspot.com/3aa080e5e72a610b06033dbfee288483d87cfd61"
 		if parts := strings.Split(uri, "/"); len(parts) >= 5 {
 			bucket := parts[3]
-			object := strings.Join(parts[4:], "/")
-			return bucket, object, 0, nil
+			object, generation, err := splitObjectAndGeneration(strings.Join(parts[4:], "/"))
+			if err != nil {
+				return "", "", 0, fmt.Errorf("cannot parse object/generation from uri %q", uri)
+			}
+			return bucket, object, generation, nil
 		}
 	case strings.HasPrefix(uri, "gs://"):
 		// uri looks like "gs://my-bucket/manifest-20171004T175409.json"
 		if parts := strings.Split(uri, "/"); len(parts) >= 4 {
 			bucket := parts[2]
-			object := strings.Join(parts[3:], "/")
-			return bucket, object, 0, nil
+			object, generation, err := splitObjectAndGeneration(strings.Join(parts[3:], "/"))
+			if err != nil {
+				return "", "", 0, fmt.Errorf("cannot parse object/generation from uri %q", uri)
+			}
+
+			return bucket, object, generation, nil
 		}
 	}
 	return "", "", 0, fmt.Errorf("cannot parse bucket/object from uri %q", uri)
+}
+
+func splitObjectAndGeneration(fullObject string) (object string, generation int64, err error) {
+	generation = 0
+	object = fullObject
+
+	generationIndex := strings.LastIndex(fullObject, "#")
+	// if generation exists parse it
+	// e.g. myFile.json#123456 is 123456
+	if generationIndex > 0 {
+		generation, err = strconv.ParseInt(fullObject[generationIndex + 1:], 10, 64)
+		if err != nil {
+			return "", 0, err
+		}
+
+		object = fullObject[:generationIndex]
+	}
+
+	return object, generation, nil
 }
