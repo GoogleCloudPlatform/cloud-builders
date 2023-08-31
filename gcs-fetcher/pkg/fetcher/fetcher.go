@@ -141,7 +141,7 @@ type Fetcher struct {
 	OS  OS
 
 	DestDir    string
-	KeepSource string
+	KeepSource bool
 	StagingDir string
 
 	// mu guards CreatedDirs
