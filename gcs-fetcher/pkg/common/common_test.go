@@ -28,7 +28,7 @@ func TestParseBucketObject(t *testing.T) {
 	}{{
 		uri:    "https://storage.googleapis.com/staging.appid.appspot.com/abc123",
 		bucket: "staging.appid.appspot.com",
-		object: "abc123",
+		object: "abc1234",
 	}, {
 		uri:    "https://storage.googleapis.com/some-bucket.google.com.a.appspot.com/some/path/to/file",
 		bucket: "some-bucket.google.com.a.appspot.com",
