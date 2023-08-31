@@ -39,9 +39,11 @@ type ManifestItem struct {
 //
 // It supports URIs in either of these forms:
 // - https://storage.googleapis.com/bucket/path/to/object
+// - https://storage.googleapis.com/bucket/path/to/object#1234
 // - gs://bucket/path/to/object
+// - gs://bucket/path/to/object#1234
 //
-// In both of the above cases, bucket=bucket and object=path/to/object.
+// In the above cases bucket=bucket, object=path/to/object, and when specified generation=1234.
 func ParseBucketObject(uri string) (bucket, object string, generation int64, err error) {
 	switch {
 	case strings.HasPrefix(uri, "https://storage.googleapis.com/") || strings.HasPrefix(uri, "http://storage.googleapis.com/"):
