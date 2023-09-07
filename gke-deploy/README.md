@@ -81,7 +81,7 @@ Build](https://cloud.google.com/cloud-build/), you can run it locally for testin
 2.  Next, install `gke-deploy`:
 
     ```bash
-    go get github.com/GoogleCloudPlatform/cloud-builders/gke-deploy
+    go install github.com/GoogleCloudPlatform/cloud-builders/gke-deploy@latest
     gke-deploy -h
     ```
 
