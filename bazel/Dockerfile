@@ -33,7 +33,6 @@ RUN \
 
     # Install Docker (https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/#uninstall-old-versions)
     apt-get -y install \
-        linux-image-extra-virtual \
         apt-transport-https \
         curl \
         ca-certificates && \
