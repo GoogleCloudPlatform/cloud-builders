@@ -81,7 +81,7 @@ for the corresponding Cloud Builder.
 
 # Container Registry Deprecation
 
-[Google announced on May 15 2023 that Container Registry has been deprecated and is superseded by Artifact Registry.](https://cloud.google.com/container-registry/docs/deprecations/container-registry-deprecation) The deprecation won't affect the use of offical cloud builder images. Artifact Registry [automatically redirects gcr.io requests](https://cloud.google.com/artifact-registry/docs/transition/transition-from-gcr#transition-options) for Container Registry hosts to corresponding Artifact Registry repositories.
+[Google announced on May 15 2023 that Container Registry has been deprecated and is superseded by Artifact Registry.](https://cloud.google.com/container-registry/docs/deprecations/container-registry-deprecation) The deprecation won't affect the use of official cloud builder images. Artifact Registry [automatically redirects gcr.io requests](https://cloud.google.com/artifact-registry/docs/transition/transition-from-gcr#transition-options) for Container Registry hosts to corresponding Artifact Registry repositories.
 
 # Future Direction
 
