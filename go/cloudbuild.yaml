@@ -308,6 +308,38 @@ steps:
 
     - '.'
 
+  # Go 1.21
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'build'
+    - '-f'
+    - 'Dockerfile.alpine'
+    - '--build-arg=VERSION=1.21'
+    - '--tag=gcr.io/$PROJECT_ID/go:alpine-1.21'
+    - '--tag=gcr.io/$PROJECT_ID/go:1.21'
+    # Regional AR Mirrors
+    - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.21'
+    - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.21'
+    - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.21'
+    - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.21'
+    - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.21'
+    - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.21'
+
+    - '.'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'build'
+    - '-f'
+    - 'Dockerfile.debian'
+    - '--build-arg=VERSION=1.21'
+    - '--tag=gcr.io/$PROJECT_ID/go:debian-1.21'
+    # Regional AR Mirrors
+    - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.21'
+    - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.21'
+    - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.21'
+
+    - '.'
+
 options:
   env: ['GO111MODULE=auto']
 images:
@@ -320,6 +352,7 @@ images:
 - 'gcr.io/$PROJECT_ID/go:1.18'
 - 'gcr.io/$PROJECT_ID/go:1.19'
 - 'gcr.io/$PROJECT_ID/go:1.20'
+- 'gcr.io/$PROJECT_ID/go:1.21'
 - 'gcr.io/$PROJECT_ID/go:alpine-1.15'
 - 'gcr.io/$PROJECT_ID/go:debian-1.15'
 - 'gcr.io/$PROJECT_ID/go:alpine-1.16'
@@ -332,6 +365,8 @@ images:
 - 'gcr.io/$PROJECT_ID/go:debian-1.19'
 - 'gcr.io/$PROJECT_ID/go:alpine-1.20'
 - 'gcr.io/$PROJECT_ID/go:debian-1.20'
+- 'gcr.io/$PROJECT_ID/go:alpine-1.21'
+- 'gcr.io/$PROJECT_ID/go:debian-1.21'
 
 # Regional AR Mirrors (US)
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/go'
@@ -343,6 +378,7 @@ images:
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.18'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.19'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.20'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.21'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.15'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.15'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.16'
@@ -355,6 +391,8 @@ images:
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.19'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.20'
 - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.20'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.21'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.21'
 
 # Regional AR Mirrors (ASIA)
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go'
@@ -366,6 +404,7 @@ images:
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.18'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.19'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.20'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.21'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.15'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.15'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.16'
@@ -378,6 +417,8 @@ images:
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.19'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.20'
 - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.20'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.21'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.21'
 
 # Regional AR Mirrors (EUROPE)
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go'
@@ -389,6 +430,7 @@ images:
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.18'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.19'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.20'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:1.21'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.15'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.15'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.16'
@@ -401,5 +443,7 @@ images:
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.19'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.20'
 - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.20'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:alpine-1.21'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/go:debian-1.21'
 
 timeout: 2400s
