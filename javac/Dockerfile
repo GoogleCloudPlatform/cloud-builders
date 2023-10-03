@@ -16,7 +16,7 @@ RUN \
 # Install Docker based on instructions from:
 # https://docs.docker.com/engine/installation/linux/docker-ce/debian
 RUN \
-   apt-get -y update && \
+   apt-get update -qqy && apt-get dist-upgrade -yq && \
    apt-get --fix-broken -y install && \
    apt-get -y install apt-transport-https ca-certificates curl gnupg2 software-properties-common && \
    curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \

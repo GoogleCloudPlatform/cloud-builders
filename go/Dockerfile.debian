@@ -2,7 +2,7 @@ ARG VERSION=1.15
 FROM golang:${VERSION}
 
 # Install VCS tools to support "go get" commands and install gcc.
-RUN apt-get update -qqy && apt-get install -qqy git mercurial subversion gcc
+RUN apt-get update -qqy && apt-get dist-upgrade -yq && apt-get install -qqy git mercurial subversion gcc
 
 # We blank out the GOPATH because the base image sets it, and
 # if the user of this build step does *not* set it, we want to

@@ -43,6 +43,13 @@ RUN \
       stable edge" && \
     apt-get -y update && \
     apt-get install -y docker-ce=${DOCKER_VERSION} docker-ce-cli=${DOCKER_VERSION} unzip && \
+    apt-get dist-upgrade -y && \
+    rm -rf \
+       /var/cache/debconf/* \
+       /var/lib/apt/lists/* \
+       /var/log/* \
+       /tmp/* \
+       /var/tmp/*  && \
 
     mv /usr/bin/bazel /builder/bazel           && \
     mv /builder/bazel.sh /usr/bin/bazel        && \

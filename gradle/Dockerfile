@@ -18,7 +18,7 @@ RUN \
    sed -i 's|security.debian.org|archive.debian.org/debian-security/|g' /etc/apt/sources.list && \
    sed -i '/stretch-updates/d' /etc/apt/sources.list
 
-RUN apt-get update -qqy && apt-get install -qqy curl \
+RUN apt-get update -qqy && apt-get dist-upgrade -yq && apt-get install -qqy curl \
   && mkdir -p /usr/share "${GRADLE_USER_HOME}" \
   && curl -fsSL -o "gradle-${GRADLE_VERSION}-bin.zip" "${BASE_URL}/gradle-${GRADLE_VERSION}-bin.zip" \
   && echo "${SHA}  gradle-${GRADLE_VERSION}-bin.zip" | sha256sum -c - \

@@ -12,6 +12,7 @@ RUN gcloud -q components install gsutil
 RUN gcloud -q components install kustomize
 RUN gcloud -q components install nomos
 RUN gcloud -q components install local-extract
+RUN apk update && apk upgrade --available --no-cache
 RUN apk -q --no-cache add gettext
 RUN apk -q --no-cache add yq
 
