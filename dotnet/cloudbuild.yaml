@@ -5,10 +5,6 @@ steps:
   args:
   - 'build'
   - '--tag=gcr.io/$PROJECT_ID/dotnet'
-  # Regional AR Mirrors
-  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/dotnet'
-  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/dotnet'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/dotnet'
   - '.'
 
 # Build the test projects
@@ -22,7 +18,3 @@ steps:
 
 images:
 - 'gcr.io/$PROJECT_ID/dotnet'
-# Regional AR Mirrors
-- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/dotnet'
-- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/dotnet'
-- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/dotnet'

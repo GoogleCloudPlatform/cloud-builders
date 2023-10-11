@@ -10,10 +10,6 @@ steps:
   - 'build'
   - '--build-arg=cmd=./cmd/gcs-fetcher/'
   - '--tag=gcr.io/$PROJECT_ID/gcs-fetcher'
-  # Regional AR Mirrors
-  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-fetcher'
-  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-fetcher'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-fetcher'
   - '.'
 - name: 'gcr.io/$PROJECT_ID/gcs-fetcher'
   args: ['--help']
@@ -24,10 +20,6 @@ steps:
   - 'build'
   - '--build-arg=cmd=./cmd/gcs-uploader/'
   - '--tag=gcr.io/$PROJECT_ID/gcs-uploader'
-  # Regional AR Mirrors
-  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-uploader'
-  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-uploader'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-uploader'
   - '.'
 - name: 'gcr.io/$PROJECT_ID/gcs-uploader'
   args: ['--help']
@@ -90,12 +82,5 @@ steps:
 images:
 - 'gcr.io/$PROJECT_ID/gcs-fetcher'
 - 'gcr.io/$PROJECT_ID/gcs-uploader'
-# Regional AR Mirrors
-- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-uploader'
-- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-uploader'
-- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-uploader'
-- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-fetcher'
-- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-fetcher'
-- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcs-fetcher'
 
 timeout: '2100s'

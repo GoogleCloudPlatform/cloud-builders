@@ -9,10 +9,6 @@ steps:
   args:
   - 'build'
   - '--tag=gcr.io/$PROJECT_ID/git'
-  # Regional AR Mirrors
-  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/git'
-  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/git'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/git'
   - '.'
 
 # Clone a public repo and write its revision to a VERSION file.
@@ -45,9 +41,5 @@ steps:
 
 images:
 - 'gcr.io/$PROJECT_ID/git'
-# Regional AR Mirrors
-- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/git'
-- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/git'
-- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/git'
 
 timeout: 1800s

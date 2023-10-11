@@ -10,23 +10,12 @@ steps:
   - '--build-arg=BAZEL_VERSION=5.4.0'
   - '--tag=gcr.io/$PROJECT_ID/bazel:5.4.0'
   - '--tag=gcr.io/$PROJECT_ID/bazel:latest'
-  # Regional AR Mirrors
-  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel:5.4.0'
-  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel:latest'
-  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel:5.4.0'
-  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel:latest'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel:5.4.0'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel:latest'
   - '.'
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
   - '--build-arg=BAZEL_VERSION=6.2.1'
   - '--tag=gcr.io/$PROJECT_ID/bazel:6.2.1'
-  # Regional AR Mirrors
-  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel:6.2.1'
-  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel:6.2.1'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel:6.2.1'
   - '.'
 
 # Print for each version
@@ -71,15 +60,5 @@ images:
  - 'gcr.io/$PROJECT_ID/bazel:latest'
  - 'gcr.io/$PROJECT_ID/bazel:5.4.0'
  - 'gcr.io/$PROJECT_ID/bazel:6.2.1'
- # Regional AR Mirrors
- - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel:latest'
- - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel:5.4.0'
- - 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel:6.2.1'
- - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel:latest'
- - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel:5.4.0'
- - 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel:6.2.1'
- - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel:latest'
- - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel:5.4.0'
- - 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/bazel:6.2.1'
 
 timeout: 2400s

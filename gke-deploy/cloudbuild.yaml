@@ -10,19 +10,11 @@ steps:
   - 'build'
   - '-t'
   - 'gcr.io/$PROJECT_ID/gke-deploy'
-  # Regional AR Mirrors
-  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gke-deploy'
-  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gke-deploy'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gke-deploy'
   - '.'
 - name: 'gcr.io/$PROJECT_ID/gke-deploy'
   args: ['--help']
 
 images:
 - 'gcr.io/$PROJECT_ID/gke-deploy'
-# Regional AR Mirrors
-- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gke-deploy'
-- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gke-deploy'
-- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gke-deploy'
 
 timeout: 6000s
