@@ -5,6 +5,6 @@ RUN apt-get update && apt-get dist-upgrade -y && \
        /var/lib/apt/lists/* \
        /var/log/* \
        /tmp/* \
-       /var/tmp/* 
+       /var/tmp/*
 COPY notice.sh /usr/bin
 ENTRYPOINT ["/usr/bin/notice.sh"]
