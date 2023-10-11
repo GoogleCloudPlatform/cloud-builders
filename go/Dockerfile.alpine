@@ -10,7 +10,7 @@ RUN apk update && apk upgrade --available --no-cache && \
 # explore other options for workspace derivation.
 ENV GOPATH=
 
-RUN mkdir /builder 
+RUN mkdir /builder
 
 COPY go_workspace.go prepare_workspace.inc /builder/
 
