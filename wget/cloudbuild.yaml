@@ -3,10 +3,6 @@ steps:
   args:
   - 'build'
   - '--tag=gcr.io/$PROJECT_ID/wget'
-  # Regional AR Mirrors
-  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/wget'
-  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/wget'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/wget'
   - '.'
 
 # Print version information.
@@ -23,7 +19,3 @@ steps:
 
 images:
 - 'gcr.io/$PROJECT_ID/wget'
-# Regional AR Mirrors
-- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/wget'
-- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/wget'
-- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/wget'

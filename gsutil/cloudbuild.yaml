@@ -7,10 +7,6 @@ steps:
   - 'build'
   - '--pull'
   - '--tag=gcr.io/$PROJECT_ID/gsutil'
-  # Regional AR Mirrors
-  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gsutil'
-  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gsutil'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gsutil'
   - '.'
 - name: 'gcr.io/$PROJECT_ID/gsutil'
   args: ['version']
@@ -22,7 +18,3 @@ steps:
 
 images:
 - 'gcr.io/$PROJECT_ID/gsutil'
-# Regional AR Mirrors
-- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gsutil'
-- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gsutil'
-- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gsutil'

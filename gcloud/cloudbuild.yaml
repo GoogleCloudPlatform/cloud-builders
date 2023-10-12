@@ -7,10 +7,6 @@ steps:
   - 'build'
   - '--tag=gcloud-slim'
   - '--tag=gcr.io/$PROJECT_ID/gcloud-slim'
-  # Regional AR Mirrors
-  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim'
-  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim'
   - '-f'
   - 'Dockerfile.slim'
   - '.'
@@ -18,10 +14,6 @@ steps:
   args:
   - 'build'
   - '--tag=gcr.io/$PROJECT_ID/gcloud'
-  # Regional AR Mirrors
-  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
-  - '--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
-  - '--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
   - '-f'
   - 'Dockerfile'
   - '.'
@@ -40,12 +32,5 @@ steps:
 images:
 - 'gcr.io/$PROJECT_ID/gcloud'
 - 'gcr.io/$PROJECT_ID/gcloud-slim'
-# Regional AR Mirrors
-- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
-- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim'
-- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
-- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim'
-- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
-- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim'
 
 timeout: 2400s
