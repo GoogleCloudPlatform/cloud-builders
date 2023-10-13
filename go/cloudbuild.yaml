@@ -22,109 +22,7 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/go:debian-1.15'
   - '.'
 
-# Ensure that "go get" works
-- name: 'gcr.io/$PROJECT_ID/go'
-  args: ['get', 'golang.org/x/net/context']
-  env: ['GOPATH=/tmp']
 
-# Test the examples.
-
-- name: 'golang'
-  args: ['go', 'build', '.']
-  dir: 'examples/module'
-- name: 'busybox'
-  args: ['./module']
-  dir: 'examples/module'
-
-# examples/hello_world
-- name: 'gcr.io/$PROJECT_ID/go'
-  args: ['test', 'hello']
-  env: ['PROJECT_ROOT=hello']
-  dir: 'examples/hello_world'
-- name: 'gcr.io/$PROJECT_ID/go'
-  args: ['install', '.']
-  env: ['PROJECT_ROOT=hello']
-  dir: 'examples/hello_world'
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '.']
-  dir: 'examples/hello_world'
-
-# examples/whole_workspace
-- name: 'gcr.io/$PROJECT_ID/go'
-  args: ['test', 'hello']
-  env: ['GOPATH=.']
-  dir: 'examples/whole_workspace'
-- name: 'gcr.io/$PROJECT_ID/go'
-  args: ['install', 'hello']
-  env: ['GOPATH=.']
-  dir: 'examples/whole_workspace'
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '.']
-  dir: 'examples/whole_workspace'
-
-# examples/whole_workspace with an absolute path
-- name: 'gcr.io/$PROJECT_ID/go'
-  args: ['test', 'hello']
-  env: ['GOPATH=/workspace/examples/whole_workspace']
-  dir: 'examples/whole_workspace'
-- name: 'gcr.io/$PROJECT_ID/go'
-  args: ['install', 'hello']
-  env: ['GOPATH=/workspace/examples/whole_workspace']
-  dir: 'examples/whole_workspace'
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '.']
-  dir: 'examples/whole_workspace'
-
-# examples/import_workspace
-- name: 'gcr.io/$PROJECT_ID/go'
-  args: ['test', 'hello']
-  dir: 'examples/import_workspace'
-- name: 'gcr.io/$PROJECT_ID/go'
-  args: ['build', 'hello']
-  dir: 'examples/import_workspace'
-- name: 'gcr.io/$PROJECT_ID/go'
-  args: ['install', 'hello']
-  dir: 'examples/import_workspace'
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '.']
-  dir: 'examples/import_workspace'
-
-# examples/nested_workspace
-- name: 'gcr.io/$PROJECT_ID/go'
-  args: ['test', 'hello']
-  env: ['GOPATH=subproject']
-  dir: 'examples/nested_workspace'
-- name: 'gcr.io/$PROJECT_ID/go'
-  args: ['install', 'hello']
-  env: ['GOPATH=subproject']
-  dir: 'examples/nested_workspace'
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '.']
-  dir: 'examples/nested_workspace'
-
-# examples/https_test
-# with alpine/default
-- name: 'gcr.io/$PROJECT_ID/go:alpine'
-  args: ['install', 'https_test']
-  dir: 'examples/https_test'
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-f', 'Dockerfile.alpine', '--tag=https_test:alpine', '.']
-  dir: 'examples/https_test'
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['run', 'https_test:alpine']
-# clear out the alpine binary.
-- name: 'alpine'
-  args: ['rm', 'gopath/bin/https_test']
-  dir: 'examples/https_test'
-# with debian
-- name: 'gcr.io/$PROJECT_ID/go:debian'
-  args: ['install', 'https_test']
-  dir: 'examples/https_test'
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-f', 'Dockerfile.ubuntu', '--tag=https_test:ubuntu', '.']
-  dir: 'examples/https_test'
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['run', 'https_test:ubuntu']
 
 # Go 1.16
 - name: 'gcr.io/cloud-builders/docker'
@@ -220,6 +118,110 @@ steps:
     - '--build-arg=VERSION=1.20'
     - '--tag=gcr.io/$PROJECT_ID/go:debian-1.20'
     - '.'
+
+# Ensure that "go get" works
+- name: 'gcr.io/$PROJECT_ID/go:1.20'
+  args: ['get', 'golang.org/x/net/context']
+  env: ['GOPATH=/tmp']
+
+# Test the examples.
+
+- name: 'golang'
+  args: ['go', 'build', '.']
+  dir: 'examples/module'
+- name: 'busybox'
+  args: ['./module']
+  dir: 'examples/module'
+
+# examples/hello_world
+- name: 'gcr.io/$PROJECT_ID/go:1.20'
+  args: ['test', 'hello']
+  env: ['PROJECT_ROOT=hello']
+  dir: 'examples/hello_world'
+- name: 'gcr.io/$PROJECT_ID/go:1.20'
+  args: ['install', '.']
+  env: ['PROJECT_ROOT=hello']
+  dir: 'examples/hello_world'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '.']
+  dir: 'examples/hello_world'
+
+# examples/whole_workspace
+- name: 'gcr.io/$PROJECT_ID/go:1.20'
+  args: ['test', 'hello']
+  env: ['GOPATH=.']
+  dir: 'examples/whole_workspace'
+- name: 'gcr.io/$PROJECT_ID/go:1.20'
+  args: ['install', 'hello']
+  env: ['GOPATH=.']
+  dir: 'examples/whole_workspace'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '.']
+  dir: 'examples/whole_workspace'
+
+# examples/whole_workspace with an absolute path
+- name: 'gcr.io/$PROJECT_ID/go:1.20'
+  args: ['test', 'hello']
+  env: ['GOPATH=/workspace/examples/whole_workspace']
+  dir: 'examples/whole_workspace'
+- name: 'gcr.io/$PROJECT_ID/go:1.20'
+  args: ['install', 'hello']
+  env: ['GOPATH=/workspace/examples/whole_workspace']
+  dir: 'examples/whole_workspace'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '.']
+  dir: 'examples/whole_workspace'
+
+# examples/import_workspace
+- name: 'gcr.io/$PROJECT_ID/go:1.20'
+  args: ['test', 'hello']
+  dir: 'examples/import_workspace'
+- name: 'gcr.io/$PROJECT_ID/go:1.20'
+  args: ['build', 'hello']
+  dir: 'examples/import_workspace'
+- name: 'gcr.io/$PROJECT_ID/go:1.20'
+  args: ['install', 'hello']
+  dir: 'examples/import_workspace'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '.']
+  dir: 'examples/import_workspace'
+
+# examples/nested_workspace
+- name: 'gcr.io/$PROJECT_ID/go:1.20'
+  args: ['test', 'hello']
+  env: ['GOPATH=subproject']
+  dir: 'examples/nested_workspace'
+- name: 'gcr.io/$PROJECT_ID/go:1.20'
+  args: ['install', 'hello']
+  env: ['GOPATH=subproject']
+  dir: 'examples/nested_workspace'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '.']
+  dir: 'examples/nested_workspace'
+
+# examples/https_test
+# with alpine/default
+- name: 'gcr.io/$PROJECT_ID/go:alpine-1.20'
+  args: ['install', 'https_test']
+  dir: 'examples/https_test'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-f', 'Dockerfile.alpine', '--tag=https_test:alpine', '.']
+  dir: 'examples/https_test'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['run', 'https_test:alpine']
+# clear out the alpine binary.
+- name: 'alpine'
+  args: ['rm', 'gopath/bin/https_test']
+  dir: 'examples/https_test'
+# with debian
+- name: 'gcr.io/$PROJECT_ID/go:debian'
+  args: ['install', 'https_test']
+  dir: 'examples/https_test'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-f', 'Dockerfile.ubuntu', '--tag=https_test:ubuntu', '.']
+  dir: 'examples/https_test'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['run', 'https_test:ubuntu']
 
 options:
   env: ['GO111MODULE=auto']
