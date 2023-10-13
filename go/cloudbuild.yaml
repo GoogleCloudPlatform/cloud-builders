@@ -22,8 +22,6 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/go:debian-1.15'
   - '.'
 
-
-
 # Go 1.16
 - name: 'gcr.io/cloud-builders/docker'
   args:
@@ -117,6 +115,25 @@ steps:
     - 'Dockerfile.debian'
     - '--build-arg=VERSION=1.20'
     - '--tag=gcr.io/$PROJECT_ID/go:debian-1.20'
+    - '.'
+
+  # Go 1.21
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'build'
+    - '-f'
+    - 'Dockerfile.alpine'
+    - '--build-arg=VERSION=1.21'
+    - '--tag=gcr.io/$PROJECT_ID/go:alpine-1.21'
+    - '--tag=gcr.io/$PROJECT_ID/go:1.21'
+    - '.'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'build'
+    - '-f'
+    - 'Dockerfile.debian'
+    - '--build-arg=VERSION=1.21'
+    - '--tag=gcr.io/$PROJECT_ID/go:debian-1.21'
     - '.'
 
 # Ensure that "go get" works
@@ -235,6 +252,7 @@ images:
 - 'gcr.io/$PROJECT_ID/go:1.18'
 - 'gcr.io/$PROJECT_ID/go:1.19'
 - 'gcr.io/$PROJECT_ID/go:1.20'
+- 'gcr.io/$PROJECT_ID/go:1.21'
 - 'gcr.io/$PROJECT_ID/go:alpine-1.15'
 - 'gcr.io/$PROJECT_ID/go:debian-1.15'
 - 'gcr.io/$PROJECT_ID/go:alpine-1.16'
@@ -247,5 +265,7 @@ images:
 - 'gcr.io/$PROJECT_ID/go:debian-1.19'
 - 'gcr.io/$PROJECT_ID/go:alpine-1.20'
 - 'gcr.io/$PROJECT_ID/go:debian-1.20'
+- 'gcr.io/$PROJECT_ID/go:alpine-1.21'
+- 'gcr.io/$PROJECT_ID/go:debian-1.21'
 
 timeout: 2400s
