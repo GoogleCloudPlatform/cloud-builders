@@ -16,7 +16,6 @@ RUN apt-get -y update && \
         cbt \
         cloud-datastore-emulator \
         cloud-firestore-emulator \
-        cloud-build-local \
         gke-gcloud-auth-plugin \
         docker-credential-gcr \
         kpt \
