@@ -1,10 +1,10 @@
-FROM golang:stretch AS build-env
+FROM golang:1.21 AS build-env
 WORKDIR /go-src
 COPY go.mod /
 COPY go.sum /
 RUN go mod download
 ADD . /go-src
-RUN go build -o /gke-deploy
+RUN CGO_ENABLED=0 go build -o /gke-deploy
 
 FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
 RUN gcloud -q components install kubectl
