@@ -1,6 +1,6 @@
 // Copyright 2017, The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE.md file.
+// license that can be found in the LICENSE file.
 
 package cmp
 
@@ -33,6 +33,7 @@ type Option interface {
 }
 
 // applicableOption represents the following types:
+//
 //	Fundamental: ignore | validator | *comparer | *transformer
 //	Grouping:    Options
 type applicableOption interface {
@@ -43,6 +44,7 @@ type applicableOption interface {
 }
 
 // coreOption represents the following types:
+//
 //	Fundamental: ignore | validator | *comparer | *transformer
 //	Filters:     *pathFilter | *valuesFilter
 type coreOption interface {
@@ -225,8 +227,23 @@ func (validator) apply(s *state, vx, vy reflect.Value) {
 
 	// Unable to Interface implies unexported field without visibility access.
 	if !vx.CanInterface() || !vy.CanInterface() {
-		const help = "consider using a custom Comparer; if you control the implementation of type, you can also consider AllowUnexported or cmpopts.IgnoreUnexported"
-		panic(fmt.Sprintf("cannot handle unexported field: %#v\n%s", s.curPath, help))
+		help := "consider using a custom Comparer; if you control the implementation of type, you can also consider using an Exporter, AllowUnexported, or cmpopts.IgnoreUnexported"
+		var name string
+		if t := s.curPath.Index(-2).Type(); t.Name() != "" {
+			// Named type with unexported fields.
+			name = fmt.Sprintf("%q.%v", t.PkgPath(), t.Name()) // e.g., "path/to/package".MyType
+			if _, ok := reflect.New(t).Interface().(error); ok {
+				help = "consider using cmpopts.EquateErrors to compare error values"
+			}
+		} else {
+			// Unnamed type with unexported fields. Derive PkgPath from field.
+			var pkgPath string
+			for i := 0; i < t.NumField() && pkgPath == ""; i++ {
+				pkgPath = t.Field(i).PkgPath
+			}
+			name = fmt.Sprintf("%q.(%v)", pkgPath, t.String()) // e.g., "path/to/package".(struct { a int })
+		}
+		panic(fmt.Sprintf("cannot handle unexported field at %#v:\n\t%v\n%s", s.curPath, name, help))
 	}
 
 	panic("not reachable")
@@ -321,9 +338,9 @@ func (tr transformer) String() string {
 // both implement T.
 //
 // The equality function must be:
-//	• Symmetric: equal(x, y) == equal(y, x)
-//	• Deterministic: equal(x, y) == equal(x, y)
-//	• Pure: equal(x, y) does not modify x or y
+//   - Symmetric: equal(x, y) == equal(y, x)
+//   - Deterministic: equal(x, y) == equal(x, y)
+//   - Pure: equal(x, y) does not modify x or y
 func Comparer(f interface{}) Option {
 	v := reflect.ValueOf(f)
 	if !function.IsType(v.Type(), function.Equal) || v.IsNil() {
@@ -360,9 +377,8 @@ func (cm comparer) String() string {
 	return fmt.Sprintf("Comparer(%s)", function.NameOf(cm.fnc))
 }
 
-// AllowUnexported returns an Option that forcibly allows operations on
-// unexported fields in certain structs, which are specified by passing in a
-// value of each struct type.
+// Exporter returns an Option that specifies whether Equal is allowed to
+// introspect into the unexported fields of certain struct types.
 //
 // Users of this option must understand that comparing on unexported fields
 // from external packages is not safe since changes in the internal
@@ -386,10 +402,24 @@ func (cm comparer) String() string {
 //
 // In other cases, the cmpopts.IgnoreUnexported option can be used to ignore
 // all unexported fields on specified struct types.
-func AllowUnexported(types ...interface{}) Option {
-	if !supportAllowUnexported {
-		panic("AllowUnexported is not supported on purego builds, Google App Engine Standard, or GopherJS")
+func Exporter(f func(reflect.Type) bool) Option {
+	if !supportExporters {
+		panic("Exporter is not supported on purego builds")
 	}
+	return exporter(f)
+}
+
+type exporter func(reflect.Type) bool
+
+func (exporter) filter(_ *state, _ reflect.Type, _, _ reflect.Value) applicableOption {
+	panic("not implemented")
+}
+
+// AllowUnexported returns an Options that allows Equal to forcibly introspect
+// unexported fields of the specified struct types.
+//
+// See Exporter for the proper use of this option.
+func AllowUnexported(types ...interface{}) Option {
 	m := make(map[reflect.Type]bool)
 	for _, typ := range types {
 		t := reflect.TypeOf(typ)
@@ -398,17 +428,11 @@ func AllowUnexported(types ...interface{}) Option {
 		}
 		m[t] = true
 	}
-	return visibleStructs(m)
-}
-
-type visibleStructs map[reflect.Type]bool
-
-func (visibleStructs) filter(_ *state, _ reflect.Type, _, _ reflect.Value) applicableOption {
-	panic("not implemented")
+	return exporter(func(t reflect.Type) bool { return m[t] })
 }
 
 // Result represents the comparison result for a single node and
-// is provided by cmp when calling Result (see Reporter).
+// is provided by cmp when calling Report (see Reporter).
 type Result struct {
 	_     [0]func() // Make Result incomparable
 	flags resultFlags
@@ -436,6 +460,11 @@ func (r Result) ByFunc() bool {
 	return r.flags&reportByFunc != 0
 }
 
+// ByCycle reports whether a reference cycle was detected.
+func (r Result) ByCycle() bool {
+	return r.flags&reportByCycle != 0
+}
+
 type resultFlags uint
 
 const (
@@ -446,6 +475,7 @@ const (
 	reportByIgnore
 	reportByMethod
 	reportByFunc
+	reportByCycle
 )
 
 // Reporter is an Option that can be passed to Equal. When Equal traverses

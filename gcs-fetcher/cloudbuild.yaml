@@ -1,6 +1,6 @@
 steps:
 # Run tests.
-- name: 'golang:buster'
+- name: 'golang:1.21'
   entrypoint: 'go'
   args: ['test', './...']
 
