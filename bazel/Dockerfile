@@ -2,7 +2,7 @@ FROM gcr.io/gcp-runtimes/ubuntu_20_0_4
 
 ADD bazel.sh /builder/bazel.sh
 ARG BAZEL_VERSION=latest
-ARG DOCKER_VERSION=5:19.03.9~3-0~ubuntu-focal
+ARG DOCKER_VERSION=5:24.0.7-1~ubuntu.20.04~focal
 
 RUN \
     # This makes add-apt-repository available.
