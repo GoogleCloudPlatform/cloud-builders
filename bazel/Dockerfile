@@ -42,8 +42,8 @@ RUN \
       $(lsb_release -cs) \
       stable edge" && \
     apt-get -y update && \
-    apt-get install -y docker-ce=${DOCKER_VERSION} docker-ce-cli=${DOCKER_VERSION} unzip && \
     apt-get dist-upgrade -y && \
+    apt-get install -y docker-ce=${DOCKER_VERSION} docker-ce-cli=${DOCKER_VERSION} unzip && \
     rm -rf \
        /var/cache/debconf/* \
        /var/lib/apt/lists/* \
