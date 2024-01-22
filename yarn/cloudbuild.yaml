@@ -51,6 +51,12 @@ steps:
   - 'build'
   - '--build-arg=NODE_VERSION=14.17.1'
   - '--tag=gcr.io/$PROJECT_ID/yarn:node-14.17.1'
+  - '.'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=NODE_VERSION=19.0.0'
+  - '--tag=gcr.io/$PROJECT_ID/yarn:node-19.0.0'
   - '--tag=gcr.io/$PROJECT_ID/yarn:latest'
   - '--tag=gcr.io/$PROJECT_ID/yarn:current'
   - '.'
@@ -69,6 +75,8 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/yarn:node-14.10.0'
   args: ['--version']
 - name: 'gcr.io/$PROJECT_ID/yarn:node-14.17.1'
+  args: ['--version']
+- name: 'gcr.io/$PROJECT_ID/yarn:node-19.0.0'
   args: ['--version']
 
 # Test the examples with :latest
@@ -95,5 +103,6 @@ images:
 - 'gcr.io/$PROJECT_ID/yarn:node-12.18.3'
 - 'gcr.io/$PROJECT_ID/yarn:node-14.10.0'
 - 'gcr.io/$PROJECT_ID/yarn:node-14.17.1'
+- 'gcr.io/$PROJECT_ID/yarn:node-19.0.0'
 
 timeout: 2400s
