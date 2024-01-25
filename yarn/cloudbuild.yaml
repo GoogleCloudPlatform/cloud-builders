@@ -54,6 +54,18 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/yarn:latest'
   - '--tag=gcr.io/$PROJECT_ID/yarn:current'
   - '.'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=NODE_VERSION=18.12.0'
+  - '--tag=gcr.io/$PROJECT_ID/yarn:node-18.12.0'
+  - '.'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=NODE_VERSION=19.0.0'
+  - '--tag=gcr.io/$PROJECT_ID/yarn:node-19.0.0'
+  - '.'
 
 # Print for each version
 - name: 'gcr.io/$PROJECT_ID/yarn:node-8.12.0'
@@ -69,6 +81,10 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/yarn:node-14.10.0'
   args: ['--version']
 - name: 'gcr.io/$PROJECT_ID/yarn:node-14.17.1'
+  args: ['--version']
+- name: 'gcr.io/$PROJECT_ID/yarn:node-18.12.0'
+  args: ['--version']
+- name: 'gcr.io/$PROJECT_ID/yarn:node-19.0.0'
   args: ['--version']
 
 # Test the examples with :latest
@@ -95,5 +111,7 @@ images:
 - 'gcr.io/$PROJECT_ID/yarn:node-12.18.3'
 - 'gcr.io/$PROJECT_ID/yarn:node-14.10.0'
 - 'gcr.io/$PROJECT_ID/yarn:node-14.17.1'
+- 'gcr.io/$PROJECT_ID/yarn:node-18.12.0'
+- 'gcr.io/$PROJECT_ID/yarn:node-19.0.0'
 
 timeout: 2400s
