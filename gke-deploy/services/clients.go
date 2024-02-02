@@ -53,7 +53,7 @@ type GcsService interface {
 }
 
 // NewClients returns a new Clients object with default services.
-func NewClients(ctx context.Context, useGcloud, printCommands bool, serverDryRun bool) (*Clients, error) {
+func NewClients(ctx context.Context, useGsutil, useGcloud, printCommands bool, serverDryRun bool) (*Clients, error) {
 	oss, err := NewOS(ctx)
 	if err != nil {
 		return nil, err
@@ -75,9 +75,13 @@ func NewClients(ctx context.Context, useGcloud, printCommands bool, serverDryRun
 		return nil, err
 	}
 
-	ss, err := NewGsutil(ctx, printCommands)
-	if err != nil {
-		return nil, err
+	var ss GcsService
+	if useGsutil {
+		gcs, err := NewGsutil(ctx, printCommands)
+		if err != nil {
+			return nil, err
+		}
+		ss = gcs
 	}
 
 	return &Clients{

@@ -132,6 +132,43 @@ func TestCreateApplicationLinksListFromEqualDelimitedStringsErrors(t *testing.T)
 	}
 }
 
+func TestUseGsutil(t *testing.T) {
+	tests := []struct {
+		name     string
+		filename string
+		output   string
+		want     bool
+	}{{
+		name:     "both start with gs://",
+		filename: "gs://foo/bar",
+		output:   "gs://bar/baz",
+		want:     true,
+	}, {
+		name:     "filename starts with gs://",
+		filename: "gs://foo/bar",
+		output:   "bar/baz",
+		want:     true,
+	}, {
+		name:     "output start with gs://",
+		filename: "foo/bar",
+		output:   "gs://bar/baz",
+		want:     true,
+	}, {
+		name:     "netther starts with gs://",
+		filename: "foo/bar",
+		output:   "bar/baz",
+		want:     false,
+	}}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := UseGsutil(tc.filename, tc.output); got != tc.want {
+				t.Errorf("UseGsutil(%s, %s) = got: %v, want: %v", tc.filename, tc.output, got, tc.want)
+			}
+		})
+	}
+}
+
 func TestCreateMapFromEqualDelimitedStrings(t *testing.T) {
 	tests := []struct {
 		name string

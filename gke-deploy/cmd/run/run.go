@@ -153,7 +153,8 @@ func run(_ *cobra.Command, options *options) error {
 	if err != nil {
 		return err
 	}
-	d, err := common.CreateDeployer(ctx, useGcloud, options.verbose, options.serverDryRun)
+	useGsutil := common.UseGsutil(options.filename, options.output)
+	d, err := common.CreateDeployer(ctx, useGsutil, useGcloud, options.verbose, options.serverDryRun)
 	if err != nil {
 		return err
 	}
