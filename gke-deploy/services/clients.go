@@ -32,6 +32,7 @@ type OSService interface {
 // GcloudService is an interface for gcloud operations.
 type GcloudService interface {
 	ContainerClustersGetCredentials(ctx context.Context, clusterName, clusterLocation, clusterProject string) error
+	ContainerClustersGetCredentialsGoClient(ctx context.Context, clusterName, clusterLocation, clusterProject string) error
 	ConfigGetValue(ctx context.Context, property string) (string, error)
 }
 
@@ -65,6 +66,8 @@ func NewClients(ctx context.Context, useGsutil, useGcloud, printCommands bool, s
 			return nil, err
 		}
 		gs = svc
+	} else {
+		gs = NewGcloudGoClient(ctx, false)
 	}
 	ks, err := NewKubectl(ctx, printCommands, serverDryRun)
 	if err != nil {

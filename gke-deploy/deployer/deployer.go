@@ -309,7 +309,7 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 	if d.ServerDryRun {
 		fmt.Printf("Applying deployment in server dry run mode.\n")
 	} else {
-		fmt.Printf("Applying deployment.\n")
+		fmt.Printf("Applying deployment.....\n")
 	}
 
 	if (clusterName != "" && clusterLocation == "") || (clusterName == "" && clusterLocation != "") {
@@ -323,23 +323,27 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 		clusterProject = currentProject
 	}
 
-	if clusterName != "" && clusterLocation != "" && d.UseGcloud {
+	if clusterName != "" && clusterLocation != "" {
 		fmt.Printf("Getting access to cluster %q in %q.\n", clusterName, clusterLocation)
-		if err := cluster.AuthorizeAccess(ctx, clusterName, clusterLocation, clusterProject, d.Clients.Gcloud); err != nil {
-			account, err2 := gcp.GetAccount(ctx, d.Clients.Gcloud)
-			if err2 != nil {
-				fmt.Printf("Failed to get GCP account. Swallowing error: %v\n", err)
-			}
-			if err2 == nil {
-				// TODO(joonlim): Find a better way to figure out if accountType is "user", "serviceAccount", or "group".
-				accountType := "user"
-				if strings.Contains(account, "gserviceaccount.com") {
-					accountType = "serviceAccount"
+		if err := cluster.AuthorizeAccess(ctx, clusterName, clusterLocation, clusterProject, d.UseGcloud, d.Clients.Gcloud); err != nil {
+			if d.UseGcloud {
+				account, err2 := gcp.GetAccount(ctx, d.Clients.Gcloud)
+				if err2 != nil {
+					fmt.Printf("Failed to get GCP account. Swallowing error: %v\n", err)
 				}
+				if err2 == nil {
+					// TODO(joonlim): Find a better way to figure out if accountType is "user", "serviceAccount", or "group".
+					accountType := "user"
+					if strings.Contains(account, "gserviceaccount.com") {
+						accountType = "serviceAccount"
+					}
 
-				fmt.Printf("> You may need to grant permission to access to the cluster:\n\n")
-				fmt.Printf("   gcloud projects add-iam-policy-binding %s --member=%s:%s --role=roles/container.developer\n\n", clusterProject, accountType, account)
+					fmt.Printf("> You may need to grant permission to access to the cluster:\n\n")
+					fmt.Printf("   gcloud projects add-iam-policy-binding %s --member=%s:%s --role=roles/container.developer\n\n", clusterProject, accountType, account)
+				}
 			}
+			fmt.Printf("> You may need to grant permission to access to the cluster:\n\n")
+			fmt.Printf("   gcloud projects add-iam-policy-binding %s --member=<account-type>:<account> --role=roles/container.developer\n\n", clusterProject)
 			return fmt.Errorf("failed to get access to cluster: %v", err)
 		}
 	}

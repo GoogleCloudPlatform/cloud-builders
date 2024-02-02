@@ -1337,7 +1337,10 @@ func TestApplyErrors(t *testing.T) {
 		namespace:       namespace,
 		waitTimeout:     waitTimeout,
 		want:            "failed to download configuration files",
-		gcs:             gcs,
+		gcloud: &testservices.TestGcloud{
+			ContainerClustersGetCredentialsErr: nil,
+		},
+		gcs: gcs,
 	}}
 
 	for _, tc := range tests {

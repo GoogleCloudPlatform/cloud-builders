@@ -7,6 +7,7 @@ ADD . /go-src
 RUN CGO_ENABLED=0 go build -o /gke-deploy
 
 FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+RUN gcloud -q components install gke-gcloud-auth-plugin
 RUN gcloud -q components install kubectl
 RUN gcloud -q components install gsutil
 RUN gcloud -q components install kustomize
