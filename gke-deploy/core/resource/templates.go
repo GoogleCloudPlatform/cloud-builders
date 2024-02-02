@@ -20,7 +20,7 @@ spec:
         image: %s
 `
 
-	horizontalPodAutoscalerTemplate = `apiVersion: autoscaling/v2beta1
+	horizontalPodAutoscalerTemplate = `apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: %s
@@ -35,7 +35,9 @@ spec:
   - type: Resource
     resource:
       name: cpu
-      targetAverageUtilization: 80
+      target:
+        averageUtilization: 80
+        type: Utilization
 `
 
 	namespaceTemplate = `apiVersion: v1

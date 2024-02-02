@@ -21,7 +21,7 @@ func CreateApplicationObject(name, selectorKey, selectorValue, descriptorType, d
 		if kind == "Namespace" || kind == "Application" {
 			continue
 		}
-		apiVersion := obj.GetAPIVersion() // e.g., v1, apps/v1, autoscaling/v2beta1
+		apiVersion := obj.GetAPIVersion() // e.g., v1, apps/v1, autoscaling/v2
 		apiVersionSplit := strings.Split(apiVersion, "/")
 		var group string
 		if len(apiVersionSplit) == 1 {
