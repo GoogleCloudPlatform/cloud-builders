@@ -25,7 +25,7 @@ steps:
           - name: "nginx"
             image: "gcr.io/google-containers/nginx:latest"
     ---
-    apiVersion: "autoscaling/v2beta1"
+    apiVersion: "autoscaling/v2"
     kind: "HorizontalPodAutoscaler"
     metadata:
       name: "nginx-hpa"
@@ -43,7 +43,9 @@ steps:
       - type: "Resource"
         resource:
           name: "cpu"
-          targetAverageUtilization: 80
+          target:
+            type: Utilization
+            averageUtilization: 80
     ---
     apiVersion: "v1"
     kind: "Service"

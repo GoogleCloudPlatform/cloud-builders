@@ -63,7 +63,7 @@ func EncodeToYAMLString(obj *Object) (string, error) {
 func DecodeFromYAML(ctx context.Context, yaml []byte) (*Object, error) {
 	obj, err := runtime.Decode(decoder, yaml)
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode yaml into object")
+		return nil, fmt.Errorf("failed to decode yaml into object: %s", err)
 	}
 	objUn, ok := obj.(*unstructured.Unstructured)
 	if !ok {
