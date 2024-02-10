@@ -52,7 +52,7 @@ steps:
 
 # Build and push a container image
 
-If the rule is a [`docker_build`](https://bazel.build/versions/master/docs/be/docker.html#docker_build)
+If the rule is a [`docker_build`](https://docs.bazel.build/versions/0.17.1/be/docker.html#docker_build)
 target, then you can `bazel run` the target to build a Docker image and load
 it into the Docker daemon.  You can then tag the resulting image so it can be
 pushed to the Container Registry.
@@ -70,7 +70,7 @@ docker_build(
 This `docker_build` rule produces a Docker container image based on debian that
 specifies "echo foo" as its `ENTRYPOINT`.
 
-See https://bazel.build/versions/master/docs/be/docker.html for more options.
+See https://docs.bazel.build/versions/0.17.1/be/docker.html for more options.
 
 `cloudbuild.yaml`:
 
