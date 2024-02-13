@@ -2,9 +2,9 @@
 # $ gcloud builds submit
 
 substitutions:
-  _DOCKER_19: DOCKER_VERSION=5:19.03.9~3-0~ubuntu-focal
-  _DOCKER_20: DOCKER_VERSION=5:20.10.14~3-0~ubuntu-focal
-  _DOCKER_24: DOCKER_VERSION=5:24.0.6-1~ubuntu.20.04~focal
+  _DOCKER_19: DOCKER_VERSION=5:19.03.15~3-0~ubuntu-focal
+  _DOCKER_20: DOCKER_VERSION=5:20.10.24~3-0~ubuntu-focal
+  _DOCKER_24: DOCKER_VERSION=5:24.0.9-1~ubuntu.20.04~focal
 
 steps:
 # Pre-requisite: build the base OS container; 'temp' is referenced in the
@@ -22,60 +22,60 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--tag=gcr.io/$PROJECT_ID/docker:19.03.9'
+  - '--tag=gcr.io/$PROJECT_ID/docker:19.03.15'
   - '--file=Dockerfile-versioned'
   - '--build-arg=${_DOCKER_19}'
   - '.'
-  id: '19.03.9'
+  id: '19.03.15'
   wait_for: ['base']
 
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
   - '--tag=gcr.io/$PROJECT_ID/docker:latest'
-  - '--tag=gcr.io/$PROJECT_ID/docker:20.10.14'
+  - '--tag=gcr.io/$PROJECT_ID/docker:20.10.24'
   - '--file=Dockerfile-versioned'
   - '--build-arg=${_DOCKER_20}'
   - '.'
-  id: '20.10.14'
+  id: '20.10.24'
   wait_for: ['base']
 
 - name: 'gcr.io/cloud-builders/docker'
   args:
     - 'build'
-    - '--tag=gcr.io/$PROJECT_ID/docker:24.0.6'
+    - '--tag=gcr.io/$PROJECT_ID/docker:24.0.9'
     - '--file=Dockerfile-versioned'
     - '--build-arg=${_DOCKER_24}'
     - '.'
-  id: '24.0.6'
+  id: '24.0.9'
   wait_for: [ 'base' ]
 
 # Future supported versions of docker builder go here.
 
 # Test each version by using it to run "docker build" on itself.
-- name: 'gcr.io/$PROJECT_ID/docker:19.03.9'
+- name: 'gcr.io/$PROJECT_ID/docker:19.03.15'
   args:
   - 'build'
   - '--file=Dockerfile-versioned'
   - '--build-arg=${_DOCKER_19}'
   - '.'
-  wait_for: ['19.03.9']
+  wait_for: ['19.03.15']
 
-- name: 'gcr.io/$PROJECT_ID/docker:20.10.14'
+- name: 'gcr.io/$PROJECT_ID/docker:20.10.24'
   args:
   - 'build'
   - '--file=Dockerfile-versioned'
   - '--build-arg=${_DOCKER_20}'
   - '.'
-  wait_for: ['20.10.14']
+  wait_for: ['20.10.24']
 
-- name: 'gcr.io/$PROJECT_ID/docker:24.0.6'
+- name: 'gcr.io/$PROJECT_ID/docker:24.0.9'
   args:
     - 'build'
     - '--file=Dockerfile-versioned'
     - '--build-arg=${_DOCKER_24}'
     - '.'
-  wait_for: ['24.0.6']
+  wait_for: ['24.0.9']
 
 # Tests for future supported versions of docker builder go here.
 
@@ -85,17 +85,17 @@ steps:
 # the image built above.
 - name: 'gcr.io/$PROJECT_ID/docker'
   args: ['inspect', 'gcr.io/$PROJECT_ID/docker']
-  wait_for: ['20.10.14']
+  wait_for: ['20.10.24']
 # Execute a container. The "busybox" container is executed within the docker
 # build step to echo "Hello, world!"
 - name: 'gcr.io/$PROJECT_ID/docker'
   args: ['run', 'busybox', 'echo', 'Hello, world!']
-  wait_for: ['20.10.14']
+  wait_for: ['20.10.24']
 
 images:
 - 'gcr.io/$PROJECT_ID/docker:latest'
-- 'gcr.io/$PROJECT_ID/docker:19.03.9'
-- 'gcr.io/$PROJECT_ID/docker:20.10.14'
-- 'gcr.io/$PROJECT_ID/docker:24.0.6'
+- 'gcr.io/$PROJECT_ID/docker:19.03.15'
+- 'gcr.io/$PROJECT_ID/docker:20.10.24'
+- 'gcr.io/$PROJECT_ID/docker:24.0.9'
 
 timeout: 1200s
