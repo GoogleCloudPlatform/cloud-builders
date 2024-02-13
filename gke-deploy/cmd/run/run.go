@@ -126,9 +126,6 @@ func run(_ *cobra.Command, options *options) error {
 	}
 
 	useGcloud := common.GcloudInPath()
-	if !useGcloud && options.clusterName != "" && options.clusterLocation != "" {
-		return fmt.Errorf("gcloud must be installed and in PATH to use -c|--cluster and -l|--location")
-	}
 
 	if options.exposePort < 0 {
 		return fmt.Errorf("value of -x|--expose must be > 0")

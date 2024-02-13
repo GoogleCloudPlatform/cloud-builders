@@ -86,9 +86,6 @@ func apply(_ *cobra.Command, options *options) error {
 	}
 
 	useGcloud := common.GcloudInPath()
-	if !useGcloud && options.clusterName != "" && options.clusterLocation != "" {
-		return fmt.Errorf("gcloud must be installed and in PATH to use -c|--cluster and -l|--location")
-	}
 
 	useGsutil := common.UseGsutil(options.filename, "")
 	d, err := common.CreateDeployer(ctx, useGsutil, useGcloud, options.verbose, options.serverDryRun)

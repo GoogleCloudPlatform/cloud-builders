@@ -23,7 +23,12 @@ func TestAuthorizeAccess(t *testing.T) {
 		ContainerClustersGetCredentialsErr: nil,
 	}
 
-	if err := AuthorizeAccess(ctx, clusterName, clusterLocation, clusterProject, gs); err != nil {
+	useGcloud := true
+	if err := AuthorizeAccess(ctx, clusterName, clusterLocation, clusterProject, useGcloud, gs); err != nil {
+		t.Errorf("AuthorizeAccess(ctx, %s, %s, gs) = %v; want <nil>", clusterName, clusterLocation, err)
+	}
+	useGcloud = false
+	if err := AuthorizeAccess(ctx, clusterName, clusterLocation, clusterProject, useGcloud, gs); err != nil {
 		t.Errorf("AuthorizeAccess(ctx, %s, %s, gs) = %v; want <nil>", clusterName, clusterLocation, err)
 	}
 }
@@ -37,7 +42,12 @@ func TestAuthorizeAccessErrors(t *testing.T) {
 		ContainerClustersGetCredentialsErr: fmt.Errorf("failed to get credentials of cluster"),
 	}
 
-	if err := AuthorizeAccess(ctx, clusterName, clusterLocation, clusterProject, gs); err == nil {
+	useGcloud := true
+	if err := AuthorizeAccess(ctx, clusterName, clusterLocation, clusterProject, useGcloud, gs); err == nil {
+		t.Errorf("AuthorizeAccess(ctx, %s, %s, gs) = <nil>; want error", clusterName, clusterLocation)
+	}
+	useGcloud = false
+	if err := AuthorizeAccess(ctx, clusterName, clusterLocation, clusterProject, useGcloud, gs); err == nil {
 		t.Errorf("AuthorizeAccess(ctx, %s, %s, gs) = <nil>; want error", clusterName, clusterLocation)
 	}
 }

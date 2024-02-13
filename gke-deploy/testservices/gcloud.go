@@ -17,6 +17,11 @@ func (g *TestGcloud) ContainerClustersGetCredentials(ctx context.Context, cluste
 	return g.ContainerClustersGetCredentialsErr
 }
 
+// ContainerClustersGetCredentialsGoClient calls `gcloud container clusters get-credentials <clusterName> --zone=<clusterLocation> --project=<clusterProject>`.
+func (g *TestGcloud) ContainerClustersGetCredentialsGoClient(ctx context.Context, clusterName, clusterLocation, clusterProject string) error {
+	return g.ContainerClustersGetCredentialsErr
+}
+
 // ConfigGetValue calls `gcloud config get-value <property>` and returns stdout.
 func (g *TestGcloud) ConfigGetValue(ctx context.Context, property string) (string, error) {
 	return g.ConfigGetValueResp, g.ConfigGetValueErr
