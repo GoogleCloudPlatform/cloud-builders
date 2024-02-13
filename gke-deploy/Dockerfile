@@ -4,6 +4,7 @@ COPY go.mod /
 COPY go.sum /
 RUN go mod download
 ADD . /go-src
+RUN CGO_ENABLED=0 go test ./...
 RUN CGO_ENABLED=0 go build -o /gke-deploy
 
 FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
