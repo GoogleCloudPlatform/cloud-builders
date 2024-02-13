@@ -73,8 +73,8 @@ func CreateMapFromEqualDelimitedStrings(labels []string) (map[string]string, err
 }
 
 // CreateDeployer creates a Deployer with initialized clients.
-func CreateDeployer(ctx context.Context, useGcloud, verbose bool, serverDryRun bool) (*deployer.Deployer, error) {
-	c, err := services.NewClients(ctx, useGcloud, verbose, serverDryRun)
+func CreateDeployer(ctx context.Context, useGsutil, useGcloud, verbose bool, serverDryRun bool) (*deployer.Deployer, error) {
+	c, err := services.NewClients(ctx, useGsutil, useGcloud, verbose, serverDryRun)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize Clients: %v", err)
 	}
@@ -104,6 +104,13 @@ func GcloudInPath() bool {
 		return false
 	}
 	return true
+}
+
+// UseGsutil returns true if the config or suggestedOutput or expandedOutput has a prefix of gs://.
+// This indicates whether to pull the config from GCS or push the output to GCS.
+func UseGsutil(config, output string) bool {
+	prefix := "gs://"
+	return strings.HasPrefix(config, prefix) || strings.HasPrefix(output, prefix)
 }
 
 func join(base, path string) string {
