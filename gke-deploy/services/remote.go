@@ -2,11 +2,13 @@ package services
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/go-containerregistry/pkg/authn"
 	"github.com/google/go-containerregistry/pkg/name"
-	"github.com/google/go-containerregistry/pkg/v1"
+	v1 "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/google/go-containerregistry/pkg/v1/remote"
+	"golang.org/x/oauth2/google"
 )
 
 // Remote implements the RemoteService interface.
@@ -18,6 +20,15 @@ func NewRemote(ctx context.Context) (*Remote, error) {
 }
 
 // Image gets a remote image from a reference.
-func (*Remote) Image(ref name.Reference) (v1.Image, error) {
-	return remote.Image(ref, remote.WithAuthFromKeychain(authn.DefaultKeychain))
+func (*Remote) Image(ctx context.Context, ref name.Reference) (v1.Image, error) {
+	img, err := remote.Image(ref, remote.WithAuthFromKeychain(authn.DefaultKeychain))
+	if err != nil {
+		fmt.Printf("Error fetching digest: %v\n Attempting to fetch from Google's container/artifact registry.\n", err)
+		client, err := google.DefaultClient(ctx, "https://www.googleapis.com/auth/cloud-platform")
+		if err != nil {
+			return nil, err
+		}
+		return remote.Image(ref, remote.WithTransport(client.Transport))
+	}
+	return img, nil
 }
