@@ -101,7 +101,12 @@ func getK8sClusterConfigs(ctx context.Context, clusterProject, clusterLocation, 
 	if err != nil {
 		return fmt.Errorf("failed to create google token source: %v", err)
 	}
-	svc, err := container.NewService(ctx, option.WithTokenSource(ts))
+	options := []option.ClientOption{option.WithTokenSource(ts)}
+	userAgent := os.Getenv("GOOGLE_APIS_USER_AGENT")
+	if userAgent != "" {
+		options = append(options, option.WithUserAgent(userAgent))
+	}
+	svc, err := container.NewService(ctx, options...)
 	if err != nil {
 		return fmt.Errorf("failed to initialize gke client: %v", err)
 	}
