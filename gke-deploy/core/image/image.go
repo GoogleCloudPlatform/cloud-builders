@@ -18,7 +18,7 @@ func Name(ref name.Reference) string {
 
 // ResolveDigest gets an image's corresponding digest.
 func ResolveDigest(ctx context.Context, ref name.Reference, rs services.RemoteService) (string, error) {
-	im, err := rs.Image(ref)
+	im, err := rs.Image(ctx, ref)
 	if err != nil {
 		return "", fmt.Errorf("failed to get remote image reference: %v", err)
 	}

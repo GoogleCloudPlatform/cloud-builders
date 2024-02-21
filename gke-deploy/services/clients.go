@@ -45,7 +45,7 @@ type KubectlService interface {
 
 // RemoteService is an interface for github.com/google/go-containerregistry/pkg/v1/remote.
 type RemoteService interface {
-	Image(ref name.Reference) (v1.Image, error)
+	Image(ctx context.Context, ref name.Reference) (v1.Image, error)
 }
 
 // GcsService is an interface for interacting with Google Cloud Storage

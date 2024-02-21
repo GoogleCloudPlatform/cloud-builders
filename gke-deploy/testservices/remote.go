@@ -1,8 +1,10 @@
 package testservices
 
 import (
+	"context"
+
 	"github.com/google/go-containerregistry/pkg/name"
-	"github.com/google/go-containerregistry/pkg/v1"
+	v1 "github.com/google/go-containerregistry/pkg/v1"
 )
 
 // TestRemote implements the RemoteService interface.
@@ -12,7 +14,7 @@ type TestRemote struct {
 }
 
 // Image gets a remote image from a reference.
-func (r *TestRemote) Image(ref name.Reference) (v1.Image, error) {
+func (r *TestRemote) Image(ctx context.Context, ref name.Reference) (v1.Image, error) {
 	return r.ImageResp, r.ImageErr
 }
 
