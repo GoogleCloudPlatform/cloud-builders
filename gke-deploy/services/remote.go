@@ -23,9 +23,9 @@ func NewRemote(ctx context.Context) (*Remote, error) {
 func (*Remote) Image(ctx context.Context, ref name.Reference) (v1.Image, error) {
 	img, err := remote.Image(ref, remote.WithAuthFromKeychain(authn.DefaultKeychain))
 	if err != nil {
-		fmt.Printf("Error fetching digest: %v\n Attempting to fetch from Google's container/artifact registry.\n", err)
 		client, err := google.DefaultClient(ctx, "https://www.googleapis.com/auth/cloud-platform")
 		if err != nil {
+			fmt.Printf("Error fetching digest: %v\n", err)
 			return nil, err
 		}
 		return remote.Image(ref, remote.WithTransport(client.Transport))
