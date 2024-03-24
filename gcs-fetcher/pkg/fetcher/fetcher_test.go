@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -49,6 +49,7 @@ const (
 	efile2        = "efile2"
 	efile3        = "efile3"
 	efile4        = "efile4"
+	efile5        = "efile5"
 	errorManifest = "error-manifest.json"
 	errorZipfile  = "error-source.zip"
 
@@ -81,6 +82,7 @@ var (
 	errMkdirAll     = fmt.Errorf("instrumented os.MkdirAll error")
 	errOpen         = fmt.Errorf("instrumented os.Open error")
 	errGCS403       = fmt.Errorf("instrumented GCS AccessDenied error")
+	errVPCSC        = fmt.Errorf("instrumented VPC SC error")
 )
 
 type fakeGCSErrorReader struct {
@@ -120,6 +122,15 @@ func (f *fakeGCS) NewReader(context context.Context, bucket, object string) (io.
 
 	if response.err == errGCS403 {
 		message := "<Xml><Code>AccessDenied</Code><Details>some@robot has no access.</Details></Xml>"
+		err := &googleapi.Error{
+			Code: 403,
+			Body: message,
+		}
+		return ioutil.NopCloser(bytes.NewReader([]byte(""))), err
+	}
+
+	if response.err == errVPCSC {
+		message := "<Xml><Error><Code>SecurityPolicyViolated</Code><Details>Request is prohibited by organization's policy. vpcServiceControlsUniqueIdentifier: 1234567890_ABCDefg</Details></Error>"
 		err := &googleapi.Error{
 			Code: 403,
 			Body: message,
@@ -225,6 +236,7 @@ func buildManifestTestContext(t *testing.T) (tc *testContext, teardown func()) {
 			formatGCSName(errorBucket, efile2, generation):              {err: errGCSRead},
 			formatGCSName(errorBucket, efile3, generation):              {err: errGCSSlowRead},
 			formatGCSName(errorBucket, efile4, generation):              {err: errGCS403},
+			formatGCSName(errorBucket, efile5, generation):              {err: errVPCSC},
 			formatGCSName(successBucket, goodManifest, generation):      {content: goodManifestContents},
 			formatGCSName(successBucket, malformedManifest, generation): {content: malformedManifestContents},
 			formatGCSName(errorBucket, errorManifest, generation):       {err: errGCSRead},
@@ -281,6 +293,24 @@ func TestFetchObjectOnceStoresFile(t *testing.T) {
 	}
 	if !bytes.Equal(got, sfile1Contents) {
 		t.Fatalf("ReadFile(%v) got %v, want %v", dest, got, sfile1Contents)
+	}
+}
+
+func TestVPCSCDenial(t *testing.T) {
+	tc, teardown := buildManifestTestContext(t)
+	defer teardown()
+	j := job{bucket: errorBucket, object: efile5}
+	result := tc.gf.fetchObjectOnce(context.Background(), j, filepath.Join(tc.workDir, "efile5.tmp"), make(chan struct{}, 1))
+	if result.err == nil {
+		t.Fatalf("fetchObjectOnce did not fail, got err=nil, want err!=nil")
+	}
+	if err, ok := result.err.(*vpcscError); ok {
+		want := `Access to bucket error-bucket denied. Request is prohibited by organization's policy. vpcServiceControlsUniqueIdentifier: 1234567890_ABCDefg.`
+		if err.Error() != want {
+			t.Fatalf("incorrect error message, got %q, want %q", err.Error(), want)
+		}
+	} else {
+		t.Fatalf("got err=%q, want vpcscError", result.err)
 	}
 }
 
