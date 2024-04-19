@@ -8,6 +8,11 @@ RUN CGO_ENABLED=0 go test ./...
 RUN CGO_ENABLED=0 go build -o /gke-deploy
 
 FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+
+COPY --from=build-env /gke-deploy /bin
+COPY VENDOR-LICENSE /
+COPY LICENSE /
+
 RUN gcloud -q components install \
     gke-gcloud-auth-plugin \
     kubectl \
@@ -19,9 +24,7 @@ RUN gcloud -q components install \
     && apk update && apk upgrade --available --no-cache \
     && apk -q --no-cache add \
         gettext \
-        yq
+        yq \
+    && ln  /bin/gke-deploy /gke-deploy
 
-COPY --from=build-env /gke-deploy /bin
-COPY VENDOR-LICENSE /
-COPY LICENSE /
 ENTRYPOINT [ "/bin/gke-deploy" ]
