@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -293,7 +293,7 @@ func TestGCSAccessDenied(t *testing.T) {
 		t.Fatalf("fetchObjectOnce did not fail, got err=nil, want err!=nil")
 	}
 	if err, ok := result.err.(*permissionError); ok {
-		want := `Access to bucket error-bucket denied. You must grant Storage Object Viewer permission to some@robot.`
+		want := `Access to bucket error-bucket denied. You must grant Storage Object Viewer permission to some@robot. If you are using VPC Service Controls, you must also grant it access to your service perimeter.`
 		if err.Error() != want {
 			t.Fatalf("incorrect error message, got %q, want %q", err.Error(), want)
 		}
