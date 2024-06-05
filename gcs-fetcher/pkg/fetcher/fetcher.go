@@ -167,7 +167,7 @@ type permissionError struct {
 }
 
 func (e *permissionError) Error() string {
-	return fmt.Sprintf("Access to bucket %s denied. You must grant Storage Object Viewer permission to %s.", e.bucket, e.robot)
+	return fmt.Sprintf("Access to bucket %s denied. You must grant Storage Object Viewer permission to %s. If you are using VPC Service Controls, you must also grant it access to your service perimeter.", e.bucket, e.robot)
 }
 
 func logit(writer io.Writer, format string, a ...interface{}) {
