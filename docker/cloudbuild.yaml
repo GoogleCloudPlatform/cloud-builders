@@ -24,7 +24,8 @@ steps:
   - 'build'
   - '--tag=gcr.io/$PROJECT_ID/docker:19.03.15'
   - '--file=Dockerfile-versioned'
-  - '--build-arg=${_DOCKER_19}'
+  - '--build-arg'
+  - 'DOCKER_VERSION=${_DOCKER_19}'
   - '.'
   id: '19.03.15'
   wait_for: ['base']
@@ -35,7 +36,8 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/docker:latest'
   - '--tag=gcr.io/$PROJECT_ID/docker:20.10.24'
   - '--file=Dockerfile-versioned'
-  - '--build-arg=${_DOCKER_20}'
+  - '--build-arg'
+  - 'DOCKER_VERSION=${_DOCKER_20}'
   - '.'
   id: '20.10.24'
   wait_for: ['base']
@@ -45,7 +47,8 @@ steps:
     - 'build'
     - '--tag=gcr.io/$PROJECT_ID/docker:24.0.9'
     - '--file=Dockerfile-versioned'
-    - '--build-arg=${_DOCKER_24}'
+    - '--build-arg'
+    - 'DOCKER_VERSION=${_DOCKER_24}'
     - '.'
   id: '24.0.9'
   wait_for: [ 'base' ]
@@ -57,7 +60,8 @@ steps:
   args:
   - 'build'
   - '--file=Dockerfile-versioned'
-  - '--build-arg=${_DOCKER_19}'
+  - '--build-arg'
+  - 'DOCKER_VERSION=${_DOCKER_19}'
   - '.'
   wait_for: ['19.03.15']
 
@@ -65,7 +69,8 @@ steps:
   args:
   - 'build'
   - '--file=Dockerfile-versioned'
-  - '--build-arg=${_DOCKER_20}'
+  - '--build-arg'
+  - 'DOCKER_VERSION=${_DOCKER_20}'
   - '.'
   wait_for: ['20.10.24']
 
@@ -73,7 +78,8 @@ steps:
   args:
     - 'build'
     - '--file=Dockerfile-versioned'
-    - '--build-arg=${_DOCKER_24}'
+    - '--build-arg'
+    - 'DOCKER_VERSION=${_DOCKER_24}'
     - '.'
   wait_for: ['24.0.9']
 
