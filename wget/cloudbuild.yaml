@@ -11,11 +11,11 @@ steps:
 
 # GET data from a server, specifying an Authorization header.
 - name: 'gcr.io/$PROJECT_ID/wget'
-  args: ['-Ofile.out', '--header', 'Authorization: Bearer foobar', 'https://www.example.com', '-d']
+  args: ['-Ofile.out', '--header', 'Authorization: Bearer foobar', 'https://httpbin.org', '-d']
 
 # POST information to a server, specifying a Content-type header.
 - name: 'gcr.io/$PROJECT_ID/wget'
-  args: ['--header', 'Content-type: application/json', '--post-data="{\"buildID\": \"$BUILD_ID\"}"', 'https://www.example.com']
+  args: ['--header', 'Content-type: application/json', '--post-data="{\"buildID\": \"$BUILD_ID\"}"', 'https://httpbin.org/post']
 
 images:
 - 'gcr.io/$PROJECT_ID/wget'
