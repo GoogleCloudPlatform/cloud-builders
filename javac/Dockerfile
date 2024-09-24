@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=launcher.gcr.io/google/openjdk8
+ARG BASE_IMAGE=marketplace.gcr.io/google/openjdk8
 FROM ${BASE_IMAGE}
 
 ARG DOCKER_VERSION=5:19.03.8~3-0~debian-stretch
