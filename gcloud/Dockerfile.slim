@@ -1,8 +1,8 @@
-FROM gcr.io/cloud-marketplace/google/ubuntu2204
+FROM gcr.io/gcp-runtimes/ubuntu_20_0_4
 
 RUN apt-get -y update && \
     apt-get dist-upgrade -y && \
-    apt-get -y install gcc python2.7 python3-pip wget ca-certificates \
+    apt-get -y install gcc python2.7 python-dev python3-pip wget ca-certificates \
        # These are necessary for add-apt-respository
        software-properties-common && \
 
@@ -23,7 +23,7 @@ RUN apt-get -y update && \
     pip3 install -U crcmod && \
 
     # Clean up
-    apt-get -y remove gcc wget python-pip python3-pip && \
+    apt-get -y remove gcc python-dev wget python-pip python3-pip && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf ~/.config/gcloud
 
