@@ -18,8 +18,8 @@ RUN \
 RUN \
    apt-get update -qqy && apt-get dist-upgrade -yq && \
    apt-get --fix-broken -y install && \
-   apt-get -y install apt-transport-https ca-certificates curl gnupg2 software-properties-common \
-   less bunzip2 bzcat bzcmp bzdiff bzegrep bzexe bzfgrep bzgrep bzip2 bzip2recover bzless bzmore && \
+   apt-get -y install apt-transport-https ca-certificates curl gnupg2 \
+   software-properties-common less bzip2 && \
    curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
    apt-key fingerprint 9DC858229FC7DD38854AE2D88D81803C0EBFCD88 && \
    add-apt-repository \
