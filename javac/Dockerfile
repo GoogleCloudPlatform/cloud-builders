@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=launcher.gcr.io/google/openjdk8
+ARG BASE_IMAGE=marketplace.gcr.io/google/openjdk8
 FROM ${BASE_IMAGE}
 
 ARG DOCKER_VERSION=5:19.03.8~3-0~debian-stretch
@@ -18,7 +18,8 @@ RUN \
 RUN \
    apt-get update -qqy && apt-get dist-upgrade -yq && \
    apt-get --fix-broken -y install && \
-   apt-get -y install apt-transport-https ca-certificates curl gnupg2 software-properties-common && \
+   apt-get -y install apt-transport-https ca-certificates curl gnupg2 \
+   software-properties-common less bzip2 && \
    curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
    apt-key fingerprint 9DC858229FC7DD38854AE2D88D81803C0EBFCD88 && \
    add-apt-repository \

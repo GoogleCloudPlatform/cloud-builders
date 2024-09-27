@@ -6,7 +6,7 @@ steps:
   args:
   - 'build'
   - '--no-cache'
-  - '--build-arg=BASE_IMAGE=launcher.gcr.io/google/openjdk8'
+  - '--build-arg=BASE_IMAGE=marketplace.gcr.io/google/openjdk8'
   - '--build-arg=DOCKER_VERSION=5:19.03.8~3-0~debian-stretch'
   - '--tag=gcr.io/$PROJECT_ID/javac:8'
   - '--tag=gcr.io/$PROJECT_ID/javac'
