@@ -1,4 +1,4 @@
-FROM launcher.gcr.io/google/aspnetcore:2.0
+FROM marketplace.gcr.io/google/aspnetcore:2.0
 ADD ./ /app
 ENV ASPNETCORE_URLS=http://*:${PORT}
 WORKDIR /app
