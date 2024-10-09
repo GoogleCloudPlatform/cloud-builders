@@ -26,6 +26,13 @@ steps:
   - '--tag=gcr.io/$PROJECT_ID/bazel:7.0.1'
   - '.'
 
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=BAZEL_VERSION=7.3.2'
+  - '--tag=gcr.io/$PROJECT_ID/bazel:7.3.2'
+  - '.'
+
 
 # Print for each version
 - name: 'gcr.io/$PROJECT_ID/bazel:latest'
@@ -35,6 +42,8 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/bazel:6.4.0'
   args: ['version']
 - name: 'gcr.io/$PROJECT_ID/bazel:7.0.1'
+  args: ['version']
+- name: 'gcr.io/$PROJECT_ID/bazel:7.3.2'
   args: ['version']
 
 # Build the example with :latest
@@ -79,6 +88,20 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['run', 'bazel:target']
 
+# Build the example with :7.3.2
+- name: 'gcr.io/$PROJECT_ID/bazel:7.3.2'
+  args: ['run', '--spawn_strategy=standalone', '//:target', '--verbose_failures']
+  dir: 'examples'
+- name: 'gcr.io/$PROJECT_ID/bazel:7.3.2'
+  args: ['run', '--spawn_strategy=standalone', '//:checkargs', '--verbose_failures', '--', 'a', 'b', 'c']
+  dir: 'examples'
+- name: 'gcr.io/$PROJECT_ID/bazel:7.3.2'
+  entrypoint: '/bin/bash'
+  args: ['invocation_id_test.sh']
+# Run the example (it was built as bazel:target).
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['run', 'bazel:target']
+
 # TODO(mattmoor): Test docker_push as well.
 
 images:
@@ -86,5 +109,6 @@ images:
  - 'gcr.io/$PROJECT_ID/bazel:5.4.0'
  - 'gcr.io/$PROJECT_ID/bazel:6.4.0'
  - 'gcr.io/$PROJECT_ID/bazel:7.0.1'
+ - 'gcr.io/$PROJECT_ID/bazel:7.3.2'
 
 timeout: 2400s
