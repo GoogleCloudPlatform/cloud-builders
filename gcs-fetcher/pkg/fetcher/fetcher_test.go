@@ -24,6 +24,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"reflect"
 	"sort"
@@ -204,7 +205,7 @@ type testContext struct {
 	workDir string
 }
 
-func buildManifestTestContext(t *testing.T) (tc *testContext, teardown func()) {
+func buildTestContext(t *testing.T) (tc *testContext, teardown func()) {
 	t.Helper()
 
 	// Set up a temp directory for each test so it's easy to clean up.
@@ -260,7 +261,7 @@ func buildManifestTestContext(t *testing.T) (tc *testContext, teardown func()) {
 }
 
 func TestFetchObjectOnceStoresFile(t *testing.T) {
-	tc, teardown := buildManifestTestContext(t)
+	tc, teardown := buildTestContext(t)
 	defer teardown()
 
 	j := job{bucket: successBucket, object: sfile1}
@@ -285,7 +286,7 @@ func TestFetchObjectOnceStoresFile(t *testing.T) {
 }
 
 func TestGCSAccessDenied(t *testing.T) {
-	tc, teardown := buildManifestTestContext(t)
+	tc, teardown := buildTestContext(t)
 	defer teardown()
 	j := job{bucket: errorBucket, object: efile4}
 	result := tc.gf.fetchObjectOnce(context.Background(), j, filepath.Join(tc.workDir, "efile4.tmp"), make(chan struct{}, 1))
@@ -305,7 +306,7 @@ func TestGCSAccessDenied(t *testing.T) {
 func TestFetchObjectOnceFailureModes(t *testing.T) {
 
 	// GCS NewReader failure
-	tc, teardown := buildManifestTestContext(t)
+	tc, teardown := buildTestContext(t)
 	j := job{bucket: errorBucket, object: efile1}
 	result := tc.gf.fetchObjectOnce(context.Background(), j, filepath.Join(tc.workDir, "efile1.tmp"), make(chan struct{}, 1))
 	if result.err == nil || !strings.HasSuffix(result.err.Error(), errGCSNewReader.Error()) {
@@ -314,7 +315,7 @@ func TestFetchObjectOnceFailureModes(t *testing.T) {
 	teardown()
 
 	// Failure due to cancellation
-	tc, teardown = buildManifestTestContext(t)
+	tc, teardown = buildTestContext(t)
 	breaker := make(chan struct{}, 1)
 	breaker <- struct{}{}
 	j = job{bucket: successBucket, object: sfile1}
@@ -325,7 +326,7 @@ func TestFetchObjectOnceFailureModes(t *testing.T) {
 	teardown()
 
 	// os.Create failure
-	tc, teardown = buildManifestTestContext(t)
+	tc, teardown = buildTestContext(t)
 	tc.os.errorsCreate = 1
 	j = job{bucket: successBucket, object: sfile1}
 	result = tc.gf.fetchObjectOnce(context.Background(), j, filepath.Join(tc.workDir, "sfile1.tmp"), make(chan struct{}, 1))
@@ -335,7 +336,7 @@ func TestFetchObjectOnceFailureModes(t *testing.T) {
 	teardown()
 
 	// GCS Copy failure
-	tc, teardown = buildManifestTestContext(t)
+	tc, teardown = buildTestContext(t)
 	j = job{bucket: errorBucket, object: efile2}
 	result = tc.gf.fetchObjectOnce(context.Background(), j, filepath.Join(tc.workDir, "efile2.tmp"), make(chan struct{}, 1))
 	if result.err == nil || !strings.HasSuffix(result.err.Error(), errGCSRead.Error()) {
@@ -348,7 +349,7 @@ func TestFetchObjectOnceFailureModes(t *testing.T) {
 }
 
 func TestFetchObjectOnceWithTimeoutSucceeds(t *testing.T) {
-	tc, teardown := buildManifestTestContext(t)
+	tc, teardown := buildTestContext(t)
 	defer teardown()
 
 	j := job{bucket: successBucket, object: sfile1}
@@ -362,7 +363,7 @@ func TestFetchObjectOnceWithTimeoutSucceeds(t *testing.T) {
 }
 
 func TestFetchObjectOnceWithTimeoutFailsOnTimeout(t *testing.T) {
-	tc, teardown := buildManifestTestContext(t)
+	tc, teardown := buildTestContext(t)
 	defer teardown()
 
 	j := job{bucket: errorBucket, object: efile3} // efile3 is a slow GCS read
@@ -375,7 +376,7 @@ func TestFetchObjectOnceWithTimeoutFailsOnTimeout(t *testing.T) {
 }
 
 func TestFetchObjectSucceeds(t *testing.T) {
-	tc, teardown := buildManifestTestContext(t)
+	tc, teardown := buildTestContext(t)
 	defer teardown()
 
 	j := job{bucket: successBucket, object: sfile1, filename: "localfile.txt"}
@@ -427,7 +428,7 @@ func TestFetchObjectSucceeds(t *testing.T) {
 }
 
 func TestFetchObjectRetriesUntilSuccess(t *testing.T) {
-	tc, teardown := buildManifestTestContext(t)
+	tc, teardown := buildTestContext(t)
 	defer teardown()
 	tc.os.errorsCreate = 1 // first create fails, second succeeds
 
@@ -465,7 +466,7 @@ func TestFetchObjectRetriesUntilSuccess(t *testing.T) {
 }
 
 func TestFetchObjectRetriesMaxTimes(t *testing.T) {
-	tc, teardown := buildManifestTestContext(t)
+	tc, teardown := buildTestContext(t)
 	defer teardown()
 	tc.os.errorsCreate = maxretries + 1 // create continually fails until max reached
 
@@ -499,7 +500,7 @@ func TestFetchObjectRetriesMaxTimes(t *testing.T) {
 }
 
 func TestFetchObjectRetriesOnFolderCreationError(t *testing.T) {
-	tc, teardown := buildManifestTestContext(t)
+	tc, teardown := buildTestContext(t)
 	defer teardown()
 	tc.os.errorsMkdirAll = 1
 
@@ -531,7 +532,7 @@ func TestFetchObjectRetriesOnFolderCreationError(t *testing.T) {
 }
 
 func TestFetchObjectRetriesOnFetchFail(t *testing.T) {
-	tc, teardown := buildManifestTestContext(t)
+	tc, teardown := buildTestContext(t)
 	defer teardown()
 	tc.os.errorsCreate = 1 // Invoked when fetching the file.
 
@@ -563,7 +564,7 @@ func TestFetchObjectRetriesOnFetchFail(t *testing.T) {
 }
 
 func TestFetchObjectRetriesOnRenameFailure(t *testing.T) {
-	tc, teardown := buildManifestTestContext(t)
+	tc, teardown := buildTestContext(t)
 	defer teardown()
 	tc.os.errorsRename = 1
 
@@ -595,7 +596,7 @@ func TestFetchObjectRetriesOnRenameFailure(t *testing.T) {
 }
 
 func TestFetchObjectRetriesOnChmodFailure(t *testing.T) {
-	tc, teardown := buildManifestTestContext(t)
+	tc, teardown := buildTestContext(t)
 	defer teardown()
 	tc.os.errorsChmod = 1
 
@@ -627,7 +628,7 @@ func TestFetchObjectRetriesOnChmodFailure(t *testing.T) {
 }
 
 func TestDoWork(t *testing.T) {
-	tc, teardown := buildManifestTestContext(t)
+	tc, teardown := buildTestContext(t)
 	defer teardown()
 
 	files := []string{sfile1, sfile2, sfile3}
@@ -675,7 +676,7 @@ func TestDoWork(t *testing.T) {
 }
 
 func TestProcessJobs(t *testing.T) {
-	tc, teardown := buildManifestTestContext(t)
+	tc, teardown := buildTestContext(t)
 	defer teardown()
 	tc.os.errorsCreate = 1 // Provoke one retry
 
@@ -706,8 +707,89 @@ func TestProcessJobs(t *testing.T) {
 	}
 }
 
+func TestFetchFromManifestPermissionDenied(t *testing.T) {
+	if os.Getenv("subprocess") == "1" {
+		tc, teardown := buildTestContext(t)
+		defer teardown()
+
+		tc.gf.Bucket = errorBucket
+		tc.gf.Object = efile4
+
+		tc.gf.fetchFromManifest(context.Background())
+		return
+	}
+	cmd := exec.Command(os.Args[0], "-test.run=^TestFetchFromManifestPermissionDenied$")
+	cmd.Env = append(os.Environ(), "subprocess=1")
+	err := cmd.Run()
+	if err == nil {
+		t.Fatal("fetchFromManifest() unexpectedly exited with success")
+	}
+	exitError, ok := err.(*exec.ExitError)
+	if !ok {
+		t.Fatal("fetchFromManifest() unexpectedly exited with unknown error")
+	}
+	exitCode := exitError.ExitCode()
+	if exitCode != permissionDeniedExitStatus {
+		t.Fatalf("fetchFromManifest() exited with wrong status, got %v, want %v", exitCode, permissionDeniedExitStatus)
+	}
+}
+
+func TestFetchFromZipPermissionDenied(t *testing.T) {
+	if os.Getenv("subprocess") == "1" {
+		tc, teardown := buildTestContext(t)
+		defer teardown()
+
+		tc.gf.Bucket = errorBucket
+		tc.gf.Object = efile4
+
+		tc.gf.fetchFromZip(context.Background())
+		return
+	}
+	cmd := exec.Command(os.Args[0], "-test.run=^TestFetchFromZipPermissionDenied$")
+	cmd.Env = append(os.Environ(), "subprocess=1")
+	err := cmd.Run()
+	if err == nil {
+		t.Fatal("fetchFromZip() unexpectedly exited with success")
+	}
+	exitError, ok := err.(*exec.ExitError)
+	if !ok {
+		t.Fatal("fetchFromZip() unexpectedly exited with unknown error")
+	}
+	exitCode := exitError.ExitCode()
+	if exitCode != permissionDeniedExitStatus {
+		t.Fatalf("fetchFromZip() exited with wrong status, got %v, want %v", exitCode, permissionDeniedExitStatus)
+	}
+}
+
+func TestFetchFromTarGzPermissionDenied(t *testing.T) {
+	if os.Getenv("subprocess") == "1" {
+		tc, teardown := buildTestContext(t)
+		defer teardown()
+
+		tc.gf.Bucket = errorBucket
+		tc.gf.Object = efile4
+
+		tc.gf.fetchFromTarGz(context.Background())
+		return
+	}
+	cmd := exec.Command(os.Args[0], "-test.run=^TestFetchFromTarGzPermissionDenied$")
+	cmd.Env = append(os.Environ(), "subprocess=1")
+	err := cmd.Run()
+	if err == nil {
+		t.Fatal("fetchFromTarGz() unexpectedly exited with success")
+	}
+	exitError, ok := err.(*exec.ExitError)
+	if !ok {
+		t.Fatal("fetchFromTarGz() unexpectedly exited with unknown error")
+	}
+	exitCode := exitError.ExitCode()
+	if exitCode != permissionDeniedExitStatus {
+		t.Fatalf("fetchFromTarGz() exited with wrong status, got %v, want %v", exitCode, permissionDeniedExitStatus)
+	}
+}
+
 func TestFetchFromManifestSuccess(t *testing.T) {
-	tc, teardown := buildManifestTestContext(t)
+	tc, teardown := buildTestContext(t)
 	defer teardown()
 
 	tc.gf.Bucket = successBucket
@@ -729,7 +811,7 @@ func TestFetchFromManifestSuccess(t *testing.T) {
 }
 
 func TestFetchFromManifestManifestFetchFailed(t *testing.T) {
-	tc, teardown := buildManifestTestContext(t)
+	tc, teardown := buildTestContext(t)
 	defer teardown()
 
 	tc.gf.Bucket = errorBucket
@@ -742,7 +824,7 @@ func TestFetchFromManifestManifestFetchFailed(t *testing.T) {
 }
 
 func TestFetchFromManifestManifestJSONDeserializtionFailed(t *testing.T) {
-	tc, teardown := buildManifestTestContext(t)
+	tc, teardown := buildTestContext(t)
 	defer teardown()
 
 	tc.gf.Bucket = successBucket
@@ -756,7 +838,7 @@ func TestFetchFromManifestManifestJSONDeserializtionFailed(t *testing.T) {
 }
 
 func TestFetchFromManifestManifestFileReadFailed(t *testing.T) {
-	tc, teardown := buildManifestTestContext(t)
+	tc, teardown := buildTestContext(t)
 	defer teardown()
 	tc.os.errorsOpen = 1 // Error returned when trying to open the downloaded manifest file
 
@@ -782,7 +864,7 @@ func TestTimeout(t *testing.T) {
 		{"no-extension", 1, notSourceTimeout[1]},
 		{"no-extension", 2, defaultTimeout},
 	}
-	tc, teardown := buildManifestTestContext(t)
+	tc, teardown := buildTestContext(t)
 	defer teardown()
 	for _, test := range tests {
 		got := tc.gf.timeout(test.filename, test.retrynum)
@@ -941,3 +1023,4 @@ func TestUnzip(t *testing.T) {
 		})
 	}
 }
+
