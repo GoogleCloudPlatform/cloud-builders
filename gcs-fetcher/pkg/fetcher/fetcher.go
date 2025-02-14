@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -69,6 +69,9 @@ var (
 
 	robotRegex  = regexp.MustCompile(`<Details>(\S+@\S+)\s`)
 	nonHexRegex = regexp.MustCompile(`[^0-9a-f]`)
+
+	errorExitStatus            = 1
+	permissionDeniedExitStatus = 3
 )
 
 type sizeBytes int64
@@ -485,9 +488,14 @@ func (gf *Fetcher) processJobs(ctx context.Context, jobs []job) stats {
 
 	// Consume the reports.
 	failed := false
+	hasPermissionError := false
 	for n := 0; n < len(jobs); n++ {
 		report := <-results
 		if !report.success {
+			if err, ok := report.err.(*permissionError); ok {
+				hasPermissionError = true
+				gf.logErr(err.Error())
+			}
 			failed = true
 		}
 		stats.size += report.size
@@ -512,7 +520,10 @@ func (gf *Fetcher) processJobs(ctx context.Context, jobs []job) stats {
 	if failed {
 		stats.success = false
 		gf.logErr("Failed to download at least one file. Cannot continue.")
-		os.Exit(1)
+		if hasPermissionError {
+			os.Exit(permissionDeniedExitStatus)
+		}
+		os.Exit(errorExitStatus)
 	}
 
 	stats.duration = time.Since(started)
@@ -567,7 +578,7 @@ func (gf *Fetcher) fetchFromManifest(ctx context.Context) (err error) {
 	if !report.success {
 		if err, ok := report.err.(*permissionError); ok {
 			gf.logErr(err.Error())
-			os.Exit(1)
+			os.Exit(permissionDeniedExitStatus)
 		}
 		return fmt.Errorf("failed to download manifest %s: %v", formatGCSName(gf.Bucket, gf.Object, gf.Generation), report.err)
 	}
@@ -701,6 +712,10 @@ func (gf *Fetcher) fetchFromZip(ctx context.Context) (err error) {
 	}
 	report := gf.fetchObject(ctx, j)
 	if !report.success {
+		if err, ok := report.err.(*permissionError); ok {
+			gf.logErr(err.Error())
+			os.Exit(permissionDeniedExitStatus)
+		}
 		return fmt.Errorf("failed to download archive %s: %v", formatGCSName(gf.Bucket, gf.Object, gf.Generation), report.err)
 	}
 
@@ -834,6 +849,10 @@ func (gf *Fetcher) fetchFromTarGz(ctx context.Context) (err error) {
 	}
 	report := gf.fetchObject(ctx, j)
 	if !report.success {
+		if err, ok := report.err.(*permissionError); ok {
+			gf.logErr(err.Error())
+			os.Exit(permissionDeniedExitStatus)
+		}
 		return fmt.Errorf("failed to download archive %s: %v", formatGCSName(gf.Bucket, gf.Object, gf.Generation), report.err)
 	}
 
@@ -886,7 +905,6 @@ func (gf *Fetcher) fetchFromTarGz(ctx context.Context) (err error) {
 		}
 	}
 	untgzDuration := time.Since(untgzStart)
-
 
 	if !gf.KeepSource {
 		// Remove the tgz file (best effort only, no harm if this fails).
@@ -947,3 +965,4 @@ func formatGCSName(bucket, object string, generation int64) string {
 	}
 	return n
 }
+
