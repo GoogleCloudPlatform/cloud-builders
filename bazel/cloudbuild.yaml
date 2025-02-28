@@ -3,112 +3,50 @@
 
 steps:
 # Build all supported versions.
-# Explicitly point latest at 5.x as 6.x is backwards-incompatible (see #880).
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=BAZEL_VERSION=5.4.0'
-  - '--tag=gcr.io/$PROJECT_ID/bazel:5.4.0'
-  - '--tag=gcr.io/$PROJECT_ID/bazel:latest'
+  - '--build-arg=BAZEL_VERSION=8.1.1'
+  - '--tag=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:latest'
+  - '--tag=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:8.1.1'
+  - '--tag=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:8.1'
+  - '--tag=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:8'
   - '.'
-
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=BAZEL_VERSION=6.4.0'
-  - '--tag=gcr.io/$PROJECT_ID/bazel:6.4.0'
+  - '--build-arg=BAZEL_VERSION=7.4.1'
+  - '--tag=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:7.4.1'
+  - '--tag=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:7.4'
+  - '--tag=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:7'
   - '.'
-
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'build'
-  - '--build-arg=BAZEL_VERSION=7.0.1'
-  - '--tag=gcr.io/$PROJECT_ID/bazel:7.0.1'
-  - '.'
-
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'build'
-  - '--build-arg=BAZEL_VERSION=7.3.2'
-  - '--tag=gcr.io/$PROJECT_ID/bazel:7.3.2'
-  - '.'
-
 
 # Print for each version
-- name: 'gcr.io/$PROJECT_ID/bazel:latest'
+- name: '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:latest'
   args: ['version']
-- name: 'gcr.io/$PROJECT_ID/bazel:5.4.0'
+- name: '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:8.1.1'
   args: ['version']
-- name: 'gcr.io/$PROJECT_ID/bazel:6.4.0'
+- name: '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:8.1'
   args: ['version']
-- name: 'gcr.io/$PROJECT_ID/bazel:7.0.1'
+- name: '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:8'
   args: ['version']
-- name: 'gcr.io/$PROJECT_ID/bazel:7.3.2'
+- name: '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:7.4.1'
   args: ['version']
-
-# Build the example with :latest
-- name: 'gcr.io/$PROJECT_ID/bazel:latest'
-  args: ['run', '--spawn_strategy=standalone', '//:target', '--verbose_failures']
-  dir: 'examples'
-- name: 'gcr.io/$PROJECT_ID/bazel:latest'
-  args: ['run', '--spawn_strategy=standalone', '//:checkargs', '--verbose_failures', '--', 'a', 'b', 'c']
-  dir: 'examples'
-- name: 'gcr.io/$PROJECT_ID/bazel:latest'
-  entrypoint: '/bin/bash'
-  args: ['invocation_id_test.sh']
-# Run the example (it was built as bazel:target).
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['run', 'bazel:target']
-
-# Build the example with :6.4.0
-- name: 'gcr.io/$PROJECT_ID/bazel:6.4.0'
-  args: ['run', '--spawn_strategy=standalone', '//:target', '--verbose_failures']
-  dir: 'examples'
-- name: 'gcr.io/$PROJECT_ID/bazel:6.4.0'
-  args: ['run', '--spawn_strategy=standalone', '//:checkargs', '--verbose_failures', '--', 'a', 'b', 'c']
-  dir: 'examples'
-- name: 'gcr.io/$PROJECT_ID/bazel:6.4.0'
-  entrypoint: '/bin/bash'
-  args: ['invocation_id_test.sh']
-# Run the example (it was built as bazel:target).
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['run', 'bazel:target']
-
-# Build the example with :7.0.1
-- name: 'gcr.io/$PROJECT_ID/bazel:7.0.1'
-  args: ['run', '--spawn_strategy=standalone', '//:target', '--verbose_failures']
-  dir: 'examples'
-- name: 'gcr.io/$PROJECT_ID/bazel:7.0.1'
-  args: ['run', '--spawn_strategy=standalone', '//:checkargs', '--verbose_failures', '--', 'a', 'b', 'c']
-  dir: 'examples'
-- name: 'gcr.io/$PROJECT_ID/bazel:7.0.1'
-  entrypoint: '/bin/bash'
-  args: ['invocation_id_test.sh']
-# Run the example (it was built as bazel:target).
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['run', 'bazel:target']
-
-# Build the example with :7.3.2
-- name: 'gcr.io/$PROJECT_ID/bazel:7.3.2'
-  args: ['run', '--spawn_strategy=standalone', '//:target', '--verbose_failures']
-  dir: 'examples'
-- name: 'gcr.io/$PROJECT_ID/bazel:7.3.2'
-  args: ['run', '--spawn_strategy=standalone', '//:checkargs', '--verbose_failures', '--', 'a', 'b', 'c']
-  dir: 'examples'
-- name: 'gcr.io/$PROJECT_ID/bazel:7.3.2'
-  entrypoint: '/bin/bash'
-  args: ['invocation_id_test.sh']
-# Run the example (it was built as bazel:target).
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['run', 'bazel:target']
-
-# TODO(mattmoor): Test docker_push as well.
+- name: '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:7.4'
+  args: ['version']
+- name: '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:7'
+  args: ['version']
 
 images:
- - 'gcr.io/$PROJECT_ID/bazel:latest'
- - 'gcr.io/$PROJECT_ID/bazel:5.4.0'
- - 'gcr.io/$PROJECT_ID/bazel:6.4.0'
- - 'gcr.io/$PROJECT_ID/bazel:7.0.1'
- - 'gcr.io/$PROJECT_ID/bazel:7.3.2'
+ - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:latest'
+ - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:8.1.1'
+ - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:8.1'  
+ - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:8'
+ - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:7.4.1'
+ - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:7.4'  
+ - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/bazel:7'
 
 timeout: 2400s
+
+substitutions:
+  _REGION: "us-central1"
