@@ -19,8 +19,8 @@ RUN apt-get -y update && \
         --disable-installation-options && \
 
     # install crcmod: https://cloud.google.com/storage/docs/gsutil/addlhelp/CRC32CandInstallingcrcmod
-    pip install -U crcmod && \
-    pip3 install -U crcmod && \
+    COPY requirements.txt .
+    pip install --require-hashes -r requirements.txt
 
     # Clean up
     apt-get -y remove gcc wget python-pip python3-pip && \
