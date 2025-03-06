@@ -20,6 +20,7 @@ RUN apt-get -y update && \
 
     # install crcmod: https://cloud.google.com/storage/docs/gsutil/addlhelp/CRC32CandInstallingcrcmod
     COPY requirements.txt .
+    pip install --require-hashes -r requirements2.txt
     pip3 install --require-hashes -r requirements.txt
 
     # Clean up
