@@ -1,5 +1,8 @@
 FROM gcr.io/cloud-marketplace/google/ubuntu2204
 
+COPY requirements.txt .
+COPY requirements_py2.txt .
+
 RUN apt-get -y update && \
     apt-get dist-upgrade -y && \
     apt-get -y install gcc python2.7 python3-pip wget ca-certificates curl openssl bzip2 \
@@ -19,10 +22,8 @@ RUN apt-get -y update && \
         --disable-installation-options && \
 
     # install crcmod: https://cloud.google.com/storage/docs/gsutil/addlhelp/CRC32CandInstallingcrcmod
-    COPY requirements.txt .
-    COPY requirements_py2.txt .
-    pip install --require-hashes -r requirements_py2.txt
-    pip3 install --require-hashes -r requirements.txt
+    pip install --require-hashes -r requirements_py2.txt && \
+    pip3 install --require-hashes -r requirements.txt && \
 
     # Clean up
     apt-get -y remove gcc wget python-pip python3-pip && \
