@@ -6,6 +6,7 @@ RUN apt-get -y update && \
         ca-certificates \
         curl \
         make \
+        coreutils \
         software-properties-common && \
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
         gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg && \
