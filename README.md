@@ -1,3 +1,5 @@
+[![CodeQL Advanced](https://github.com/nodoubtz/cloud-builders/actions/workflows/codeql.yml/badge.svg)](https://github.com/nodoubtz/cloud-builders/actions/workflows/codeql.yml)
+
 # Google Cloud Build official builder images
 
 This repository contains source code for official builders used with the [Google
