@@ -884,15 +884,20 @@ func (gf *Fetcher) fetchFromTarGz(ctx context.Context) (err error) {
 		if err != nil {
 			return err
 		}
+		// Validate the path to prevent directory traversal
 		n := filepath.Join(gf.DestDir, h.Name)
+		cleanPath := filepath.Clean(n)
+		if !strings.HasPrefix(cleanPath, filepath.Clean(gf.DestDir)) {
+			return fmt.Errorf("invalid file path: %s", h.Name)
+		}
 		switch h.Typeflag {
 		case tar.TypeDir:
-			if err := gf.OS.MkdirAll(n, h.FileInfo().Mode()); err != nil {
+			if err := gf.OS.MkdirAll(cleanPath, h.FileInfo().Mode()); err != nil {
 				return err
 			}
 		case tar.TypeReg:
 			if err := func() error {
-				f, err := os.OpenFile(n, os.O_WRONLY|os.O_CREATE, h.FileInfo().Mode())
+				f, err := os.OpenFile(cleanPath, os.O_WRONLY|os.O_CREATE, h.FileInfo().Mode())
 				if err != nil {
 					return err
 				}
