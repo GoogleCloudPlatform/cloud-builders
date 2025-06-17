@@ -774,7 +774,13 @@ func unzip(zipfile, dest string) (numFiles int, err error) {
 
 	numFiles = 0
 	for _, file := range zipReader.File {
-		target := filepath.Join(dest, file.Name)
+		// Sanitize the file name and ensure it does not escape the destination directory.
+		cleanName := filepath.Clean(file.Name)
+		if strings.Contains(cleanName, "..") || !strings.HasPrefix(filepath.Join(dest, cleanName), filepath.Clean(dest)+string(os.PathSeparator)) {
+			log.Printf("Skipping potentially unsafe file: %s", file.Name)
+			continue
+		}
+		target := filepath.Join(dest, cleanName)
 
 		if file.FileInfo().IsDir() {
 			// Create directory with appropriate permissions if it doesn't exist.
