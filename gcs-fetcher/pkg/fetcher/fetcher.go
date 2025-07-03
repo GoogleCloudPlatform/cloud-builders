@@ -890,13 +890,14 @@ func (gf *Fetcher) fetchFromTarGz(ctx context.Context) (err error) {
 		if err != nil {
 			return err
 		}
-		// Validate the path to prevent directory traversal
-		if strings.Contains(h.Name, "..") {
+		// Normalize and validate the path to prevent directory traversal
+		cleanName := filepath.Clean(h.Name)
+		if filepath.IsAbs(cleanName) || strings.HasPrefix(cleanName, "..") || strings.Contains(cleanName, ":") {
 			return fmt.Errorf("invalid file path: %s", h.Name)
 		}
-		n := filepath.Join(gf.DestDir, h.Name)
+		n := filepath.Join(gf.DestDir, cleanName)
 		cleanPath := filepath.Clean(n)
-		if !strings.HasPrefix(cleanPath, filepath.Clean(gf.DestDir)) {
+		if !strings.HasPrefix(cleanPath, filepath.Clean(gf.DestDir)+string(os.PathSeparator)) {
 			return fmt.Errorf("invalid file path: %s", h.Name)
 		}
 		switch h.Typeflag {
