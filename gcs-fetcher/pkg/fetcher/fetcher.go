@@ -774,7 +774,13 @@ func unzip(zipfile, dest string) (numFiles int, err error) {
 
 	numFiles = 0
 	for _, file := range zipReader.File {
-		target := filepath.Join(dest, file.Name)
+		// Sanitize the file name and ensure it does not escape the destination directory.
+		cleanName := filepath.Clean(file.Name)
+		if strings.Contains(cleanName, "..") || !strings.HasPrefix(filepath.Join(dest, cleanName), filepath.Clean(dest)+string(os.PathSeparator)) {
+			log.Printf("Skipping potentially unsafe file: %s", file.Name)
+			continue
+		}
+		target := filepath.Join(dest, cleanName)
 
 		if file.FileInfo().IsDir() {
 			// Create directory with appropriate permissions if it doesn't exist.
@@ -884,15 +890,24 @@ func (gf *Fetcher) fetchFromTarGz(ctx context.Context) (err error) {
 		if err != nil {
 			return err
 		}
-		n := filepath.Join(gf.DestDir, h.Name)
+		// Normalize and validate the path to prevent directory traversal
+		cleanName := filepath.Clean(h.Name)
+		if filepath.IsAbs(cleanName) || strings.HasPrefix(cleanName, "..") || strings.Contains(cleanName, ":") {
+			return fmt.Errorf("invalid file path: %s", h.Name)
+		}
+		n := filepath.Join(gf.DestDir, cleanName)
+		cleanPath := filepath.Clean(n)
+		if !strings.HasPrefix(cleanPath, filepath.Clean(gf.DestDir)+string(os.PathSeparator)) {
+			return fmt.Errorf("invalid file path: %s", h.Name)
+		}
 		switch h.Typeflag {
 		case tar.TypeDir:
-			if err := gf.OS.MkdirAll(n, h.FileInfo().Mode()); err != nil {
+			if err := gf.OS.MkdirAll(cleanPath, h.FileInfo().Mode()); err != nil {
 				return err
 			}
 		case tar.TypeReg:
 			if err := func() error {
-				f, err := os.OpenFile(n, os.O_WRONLY|os.O_CREATE, h.FileInfo().Mode())
+				f, err := os.OpenFile(cleanPath, os.O_WRONLY|os.O_CREATE, h.FileInfo().Mode())
 				if err != nil {
 					return err
 				}
