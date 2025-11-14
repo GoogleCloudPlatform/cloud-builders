@@ -22,6 +22,7 @@ RUN apt-get -y update && \
         kubectl \
         kustomize \
         local-extract \
+        nomos \
         package-go-module \
         pubsub-emulator \
         skaffold \
