@@ -8,13 +8,13 @@ steps:
   - '--pull'
   - '--tag=gcr.io/$PROJECT_ID/gsutil'
   - '.'
-- name: 'gcr.io/$PROJECT_ID/gsutil'
-  args: ['version']
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['-v']
 
 # Invoke a command that requires auth, to check that it gets piped through
 # correctly.
-- name: 'gcr.io/$PROJECT_ID/gsutil'
-  args: ['ls']
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['storage', 'ls']
 
 images:
 - 'gcr.io/$PROJECT_ID/gsutil'

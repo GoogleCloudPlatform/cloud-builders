@@ -162,7 +162,7 @@ func run(_ *cobra.Command, options *options) error {
 	}
 	applyConfig := expandedOutput
 	if strings.HasPrefix(options.output, "gs://") {
-		// Without this, gsutil copies the entire expanded output directory, rather than just the files in the directory, which fails applying the deployment if the --recursive flag isn't set.
+		// Without this, gcloud storage copies the entire expanded output directory, rather than just the files in the directory, which fails applying the deployment if the --recursive flag isn't set.
 		applyConfig = applyConfig + "/*"
 	}
 	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, applyConfig, options.namespace, options.waitTimeout, options.recursive); err != nil {

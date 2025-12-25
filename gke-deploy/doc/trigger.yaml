@@ -32,7 +32,7 @@ build:
     - --output=output
     - --annotation=gcb-build-id=$BUILD_ID
   - id: Save configs
-    name: gcr.io/cloud-builders/gsutil
+    name: gcr.io/cloud-builders/gcloud
     entrypoint: sh
     args:
     - -c
@@ -40,9 +40,9 @@ build:
       set -e
 
       if [ $_OUTPUT_BUCKET_PATH ]; then
-        gsutil cp -r output/suggested gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/suggested
+        gcloud storage cp --recursive output/suggested gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/suggested
         echo "Copied suggested base configs to gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/suggested"
-        gsutil cp -r output/expanded gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/expanded
+        gcloud storage cp --recursive output/expanded gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/expanded
         echo "Copied expanded configs to gs://$_OUTPUT_BUCKET_PATH/config/$BUILD_ID/expanded"
       fi
   - id: Apply deploy
