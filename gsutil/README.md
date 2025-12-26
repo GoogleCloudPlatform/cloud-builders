@@ -33,6 +33,7 @@ to your `cloudbuild.yaml`:
 ```
 - name: 'gcr.io/cloud-builders/gsutil'
 + name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
++ entrypoint: 'gsutil'
 ```
 
 -------
