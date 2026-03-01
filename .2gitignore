@@ -1,0 +1,58 @@
+# Ignore node_modules directory
+node_modules/
+
+# Ignore log files
+logs/
+*.log
+
+# Ignore environment variables
+.env
+.env.local
+.env.*.local
+
+# Ignore build and dependency directories
+dist/
+build/
+target/
+
+# Ignore dependency directories for various languages
+vendor/
+*.egg-info/
+.eggs/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore OS generated files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE and editor specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore temporary files
+*.tmp
+*.temp
+
+# Ignore sensitive information
+*.key
+*.pem
+*.p12
+*.cer
+*.crt
+
+# Ignore database files
+*.sqlite
+*.db
+*.sql
+
+# Ignore backup files
+*.bak
+
+# Ignore specific configuration files
+config.yaml
+config.json

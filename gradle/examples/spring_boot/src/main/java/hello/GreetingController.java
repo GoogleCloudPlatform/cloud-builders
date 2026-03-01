@@ -1,6 +1,7 @@
 package hello;
 
 import java.util.concurrent.atomic.AtomicLong;
+import org.owasp.encoder.Encode;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,7 +15,8 @@ public class GreetingController {
 
   @RequestMapping("/")
   public String greeting(@RequestParam(value = "name", defaultValue = "World") String name) {
-    return String.format(TEMPLATE, name, counter.incrementAndGet());
+    String sanitizedName = Encode.forHtml(name);
+    return String.format(TEMPLATE, sanitizedName, counter.incrementAndGet());
   }
 
 }
