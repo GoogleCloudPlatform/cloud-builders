@@ -286,7 +286,12 @@ func (gf *Fetcher) fetchObject(ctx context.Context, j job) *jobReport {
 		if j.destDirOverride != "" {
 			dest = j.destDirOverride
 		}
-		finalname := filepath.Join(dest, j.filename)
+		finalname, err := safeJoin(dest, j.filename)
+		if err != nil {
+			e := fmt.Errorf("path traversal in manifest filename %q: %v", j.filename, err)
+			gf.recordFailure(j, started, noTimeout, e, report)
+			continue
+		}
 		if err := gf.ensureFolders(finalname); err != nil {
 			e := fmt.Errorf("creating folders for final file %q: %v", finalname, err)
 			gf.recordFailure(j, started, noTimeout, e, report)
@@ -774,7 +779,10 @@ func unzip(zipfile, dest string) (numFiles int, err error) {
 
 	numFiles = 0
 	for _, file := range zipReader.File {
-		target := filepath.Join(dest, file.Name)
+		target, err := safeJoin(dest, file.Name)
+		if err != nil {
+			return 0, fmt.Errorf("path traversal in zip entry %q: %v", file.Name, err)
+		}
 
 		if file.FileInfo().IsDir() {
 			// Create directory with appropriate permissions if it doesn't exist.
@@ -884,7 +892,10 @@ func (gf *Fetcher) fetchFromTarGz(ctx context.Context) (err error) {
 		if err != nil {
 			return err
 		}
-		n := filepath.Join(gf.DestDir, h.Name)
+		n, err := safeJoin(gf.DestDir, h.Name)
+		if err != nil {
+			return fmt.Errorf("path traversal in tar entry %q: %v", h.Name, err)
+		}
 		switch h.Typeflag {
 		case tar.TypeDir:
 			if err := gf.OS.MkdirAll(n, h.FileInfo().Mode()); err != nil {
@@ -964,5 +975,17 @@ func formatGCSName(bucket, object string, generation int64) string {
 		n += fmt.Sprintf("#%d", generation)
 	}
 	return n
+}
+
+// safeJoin joins base and entry, then verifies the result is still under base.
+// This prevents path traversal via "../" sequences in archive entry names.
+func safeJoin(base, entry string) (string, error) {
+	target := filepath.Join(base, entry)
+	cleanBase := filepath.Clean(base) + string(os.PathSeparator)
+	cleanTarget := filepath.Clean(target)
+	if cleanTarget == filepath.Clean(base) || strings.HasPrefix(cleanTarget, cleanBase) {
+		return target, nil
+	}
+	return "", fmt.Errorf("entry %q resolves to %q which is outside base %q", entry, cleanTarget, base)
 }
 
