@@ -10,15 +10,15 @@ steps:
   - '--label=foo=bar'
   - '--annotation=hi=bye'
   - '--output=$_OUTPUT'
-- name: 'gcr.io/cloud-builders/gsutil'
+- name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'sh'
   args:
   - '-c'
   - |
     set -x  # Print commands
     set -e  # Fail if any command below fails
-    gsutil -q stat $_OUTPUT/expanded/expanded-resources.yaml
-    gsutil -q stat $_OUTPUT/suggested/suggested-resources.yaml
+    gcloud -q storage objects list --stat --fetch-encrypted-object-hashes $_OUTPUT/expanded/expanded-resources.yaml
+    gcloud -q storage objects list --stat --fetch-encrypted-object-hashes $_OUTPUT/suggested/suggested-resources.yaml
 - name: 'gcr.io/$PROJECT_ID/gke-deploy'
   args:
   - 'apply'

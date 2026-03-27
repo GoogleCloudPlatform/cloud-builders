@@ -29,8 +29,9 @@ steps:
   args:
   - '--location=gs://${PROJECT_ID}_cloudbuild/manifest-${BUILD_ID}.json'
 # Print the manifest.
-- name: 'gcr.io/cloud-builders/gsutil'
-  args: ['cat', 'gs://${PROJECT_ID}_cloudbuild/manifest-${BUILD_ID}.json']
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'gcloud'
+  args: ['storage', 'cat', 'gs://${PROJECT_ID}_cloudbuild/manifest-${BUILD_ID}.json']
 # Fetch the manifest.
 - name: 'gcr.io/$PROJECT_ID/gcs-fetcher'
   args:
@@ -48,7 +49,7 @@ steps:
   - -c
   - |
     tar czvf /tmp/out.tar.gz .
-    gsutil cp /tmp/out.tar.gz gs://${PROJECT_ID}_cloudbuild/
+    gcloud storage cp /tmp/out.tar.gz gs://${PROJECT_ID}_cloudbuild/
 - name: gcr.io/$PROJECT_ID/gcs-fetcher
   args:
   - --type=TarGzArchive
@@ -67,7 +68,7 @@ steps:
   - |
     apt-get install -y zip
     zip -r /tmp/out.zip .
-    gsutil cp /tmp/out.zip gs://${PROJECT_ID}_cloudbuild/
+    gcloud storage cp /tmp/out.zip gs://${PROJECT_ID}_cloudbuild/
 - name: gcr.io/$PROJECT_ID/gcs-fetcher
   args:
   - --type=ZipArchive

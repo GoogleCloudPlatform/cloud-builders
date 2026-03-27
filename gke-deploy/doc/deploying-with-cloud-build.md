@@ -35,7 +35,7 @@ gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$SERVICE
 
 # Create a bucket that will be used to store configs suggested and expanded by gke-deploy.
 BUCKET=my-bucket
-gsutil mb -p $PROJECT gs://$BUCKET
+gcloud storage buckets create gs://$BUCKET --project=$PROJECT
 ```
 
 ## Examples
