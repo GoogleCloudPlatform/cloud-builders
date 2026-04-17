@@ -662,7 +662,7 @@ func (gf *Fetcher) fetchFromManifest(ctx context.Context) (err error) {
 		for _, e := range stats.errs {
 			es = append(es, fmt.Sprintf(" - %s", e))
 		}
-		return fmt.Errorf(strings.Join(es, "\n"))
+		return errors.New(strings.Join(es, "\n"))
 	}
 	return nil
 }

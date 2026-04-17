@@ -1,4 +1,4 @@
-FROM golang:1.21 AS build-env
+FROM golang:1.26 AS build-env
 ADD . /go-src
 WORKDIR /go-src
 ARG cmd
