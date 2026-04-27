@@ -35,9 +35,18 @@ package callctx
 import (
 	"context"
 	"fmt"
+	"log/slog"
 )
 
 const (
+	// XGoogFieldMaskHeader is the canonical header key for the [System Parameter]
+	// that specifies the response read mask. The value(s) for this header
+	// must adhere to format described in [fieldmaskpb].
+	//
+	// [System Parameter]: https://cloud.google.com/apis/docs/system-parameters
+	// [fieldmaskpb]: https://google.golang.org/protobuf/types/known/fieldmaskpb
+	XGoogFieldMaskHeader = "x-goog-fieldmask"
+
 	headerKey = contextKey("header")
 )
 
@@ -66,9 +75,72 @@ func SetHeaders(ctx context.Context, keyvals ...string) context.Context {
 	h, ok := ctx.Value(headerKey).(map[string][]string)
 	if !ok {
 		h = make(map[string][]string)
+	} else {
+		h = cloneHeaders(h)
 	}
+
 	for i := 0; i < len(keyvals); i = i + 2 {
 		h[keyvals[i]] = append(h[keyvals[i]], keyvals[i+1])
 	}
 	return context.WithValue(ctx, headerKey, h)
+}
+
+// cloneHeaders makes a new key-value map while reusing the value slices.
+// As such, new values should be appended to the value slice, and modifying
+// indexed values is not thread safe.
+//
+// TODO: Replace this with maps.Clone when Go 1.21 is the minimum version.
+func cloneHeaders(h map[string][]string) map[string][]string {
+	c := make(map[string][]string, len(h))
+	for k, v := range h {
+		vc := make([]string, len(v))
+		copy(vc, v)
+		c[k] = vc
+	}
+	return c
+}
+
+// telemetryKey is a private type used to store/retrieve telemetry context values.
+type telemetryKey string
+
+// WithTelemetryContext injects telemetry attribute values (like resource name
+// or client version) into the context. In accordance with standard Go context
+// guidelines, this should only be used for data that transits processes and APIs,
+// and not for passing optional parameters to functions. keyvals should have a
+// corresponding value for every key provided. If there is an odd number of keyvals
+// this method will panic.
+func WithTelemetryContext(ctx context.Context, keyvals ...string) context.Context {
+	if len(keyvals)%2 != 0 {
+		panic(fmt.Sprintf("callctx: an even number of key value pairs must be provided, got %d", len(keyvals)))
+	}
+
+	for i := 0; i < len(keyvals); i = i + 2 {
+		ctx = context.WithValue(ctx, telemetryKey(keyvals[i]), keyvals[i+1])
+	}
+	return ctx
+}
+
+// TelemetryFromContext extracts a telemetry attribute value from the context.
+// The returned bool indicates a successful typecast of the value to a string.
+func TelemetryFromContext(ctx context.Context, key string) (string, bool) {
+	val, ok := ctx.Value(telemetryKey(key)).(string)
+	return val, ok
+}
+
+// loggerKey is a private type used to store/retrieve the logger context value.
+type loggerContextKey string
+
+const loggerCKey = loggerContextKey("logger")
+
+// WithLoggerContext injects a slog.Logger into the context. This logger will
+// be extracted by the client library or transport wrappers to emit logs.
+func WithLoggerContext(ctx context.Context, logger *slog.Logger) context.Context {
+	return context.WithValue(ctx, loggerCKey, logger)
+}
+
+// LoggerFromContext extracts a slog.Logger from the context.
+// The returned bool indicates whether a logger was found.
+func LoggerFromContext(ctx context.Context) (*slog.Logger, bool) {
+	logger, ok := ctx.Value(loggerCKey).(*slog.Logger)
+	return logger, ok
 }
