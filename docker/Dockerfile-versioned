@@ -1,4 +1,4 @@
-FROM temp
+FROM us-docker.pkg.dev/cloud-builders-dev/cloud-builders/docker-base
 
 ARG DOCKER_VERSION=VERSION
 
