@@ -87,9 +87,6 @@ github.com/inconshreveable/mousetrap
 # github.com/json-iterator/go v1.1.12
 ## explicit; go 1.12
 github.com/json-iterator/go
-# github.com/konsorten/go-windows-terminal-sequences v1.0.2
-## explicit
-github.com/konsorten/go-windows-terminal-sequences
 # github.com/kubernetes-sigs/application v0.8.1
 ## explicit
 github.com/kubernetes-sigs/application/pkg/apis/app/v1beta1
@@ -109,8 +106,8 @@ github.com/pkg/errors
 # github.com/russross/blackfriday v1.5.2
 ## explicit
 github.com/russross/blackfriday
-# github.com/sirupsen/logrus v1.4.2
-## explicit
+# github.com/sirupsen/logrus v1.8.3
+## explicit; go 1.13
 github.com/sirupsen/logrus
 # github.com/spf13/cobra v0.0.5
 ## explicit; go 1.12
