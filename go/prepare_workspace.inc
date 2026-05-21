@@ -13,9 +13,13 @@
 # limitations under the License.
 
 prepare_workspace() {
-    # If $GIT_CONFIG_VAL is set, set global git config value
+    # If $GIT_CONFIG_VAL is set, set global git config value. Pipe through
+    # xargs so that shell-quoted values are tokenized into argv positions
+    # rather than re-evaluated by the shell; otherwise any $(...), `...`,
+    # ; or && embedded in GIT_CONFIG_VAL would execute as shell when this
+    # builder image runs inside a Cloud Build step.
     if [[ "$GIT_CONFIG_VAL" ]]; then
-        eval "git config --global $GIT_CONFIG_VAL"
+        printf '%s' "$GIT_CONFIG_VAL" | xargs git config --global
     fi
 
     # We record the original working directory because some tools need to
