@@ -632,6 +632,7 @@ func TestApply(t *testing.T) {
 	testServiceUnreadyFile := "testing/service-unready.yaml"
 	testServiceReadyFile := "testing/service-ready.yaml"
 	testNamespaceFile := "testing/namespace.yaml"
+	testNamespace2File := "testing/namespace-2.yaml"
 	testNamespaceReadyFile := "testing/namespace-ready.yaml"
 	testNamespaceReady2File := "testing/namespace-ready-2.yaml"
 	testApplicationFile := "testing/application.yaml"
@@ -797,6 +798,7 @@ func TestApply(t *testing.T) {
 		kubectl: testservices.TestKubectl{
 			ApplyFromStringResponse: map[string][]error{
 				string(fileContents(t, testDeploymentFile)): {nil},
+				string(fileContents(t, testNamespaceFile)):  {nil},
 			},
 			GetResponse: map[string]map[string][]testservices.GetResponse{
 				"Deployment": {
@@ -862,6 +864,8 @@ func TestApply(t *testing.T) {
 		kubectl: testservices.TestKubectl{
 			ApplyFromStringResponse: map[string][]error{
 				string(fileContents(t, testDeploymentFile)): {nil},
+				string(fileContents(t, testNamespaceFile)):  {nil},
+				string(fileContents(t, testNamespace2File)): {nil},
 			},
 			GetResponse: map[string]map[string][]testservices.GetResponse{
 				"Deployment": {
@@ -933,6 +937,7 @@ func TestApply(t *testing.T) {
 		kubectl: testservices.TestKubectl{
 			ApplyFromStringResponse: map[string][]error{
 				string(fileContents(t, testDeploymentFile)): {nil},
+				string(fileContents(t, testNamespaceFile)):  {nil},
 			},
 			GetResponse: map[string]map[string][]testservices.GetResponse{
 				"Deployment": {
