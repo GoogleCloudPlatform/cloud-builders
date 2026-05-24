@@ -2,8 +2,8 @@ ARG PROJECT_ID="cloud-builders"
 ARG MAVEN_VERSION=latest
 FROM gcr.io/${PROJECT_ID}/mvn:${MAVEN_VERSION}
 
-# install python
-RUN apt-get update -y && apt-get install python3 -y
+# install python3 and the python command used by Cloud SDK scripts
+RUN apt-get update -y && apt-get install -y python3 python-is-python3
 
 # install cloud sdk into appengine-maven-plugin cache
 RUN set -eux; \
