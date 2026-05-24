@@ -14,7 +14,8 @@ Pre-built images are available at `gcr.io/cloud-builders/...` and include:
 - `gcs-fetcher`: efficiently fetches objects from Google Cloud Storage
 - `git`: runs the [git](https://git-scm.com/) tool
 - `gke-deploy`: deploys an application to a Kubernetes cluster, following Google's recommended best practices
-- `go`: runs the [go](https://golang.org/cmd/go) tool
+- `go`: deprecated; use the official [`golang`](https://hub.docker.com/_/golang)
+  image instead
 - `gradle`: runs the [gradle](https://gradle.org/) tool
 - `gsutil`: runs the [gsutil](https://cloud.google.com/storage/docs/gsutil) tool
 - `javac`: runs the [javac](https://docs.oracle.com/javase/7/docs/technotes/tools/windows/javac.html) tool
@@ -73,7 +74,9 @@ for the corresponding Cloud Builder.
 - `curl` is packaged in:
   - [`launcher.gcr.io/google/ubuntu1604`](https://console.cloud.google.com/launcher/details/google/ubuntu1604)
   - [`curlimages/curl`](https://hub.docker.com/r/curlimages/curl) is community-supported
-- [`golang`](https://hub.docker.com/_/golang) is provided by the Go team and runs the [`go`](https://golang.org/cmd/go/) tool
+- [`golang`](https://hub.docker.com/_/golang) is provided by the Go team and
+  runs the [`go`](https://golang.org/cmd/go/) tool. Use this image instead of
+  the deprecated `gcr.io/cloud-builders/go` builder.
 
 # Container Registry Deprecation
 
