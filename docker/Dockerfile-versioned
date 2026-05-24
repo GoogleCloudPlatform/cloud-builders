@@ -5,7 +5,11 @@ ARG DOCKER_VERSION=VERSION
 RUN apt-get -y install \
         docker-ce=${DOCKER_VERSION} \
         docker-ce-cli=${DOCKER_VERSION} \
-        docker-compose docker-compose-plugin && \
+        docker-compose-plugin && \
+    printf '#!/bin/sh\ncase "$1" in\n  --version|-v)\n    shift\n    exec docker compose version "$@"\n    ;;\nesac\nexec docker compose "$@"\n' > /usr/local/bin/docker-compose && \
+    chmod +x /usr/local/bin/docker-compose && \
+    docker-compose --version && \
+    test "$(docker compose version --short)" = "$(docker-compose version --short)" && \
     apt-get clean
 
 ENTRYPOINT ["/usr/bin/docker"]
