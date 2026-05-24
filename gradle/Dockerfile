@@ -1,5 +1,7 @@
 ARG BASE_IMAGE=gcr.io/cloud-builders/javac:8
 FROM ${BASE_IMAGE}
+LABEL org.opencontainers.image.source="https://github.com/GoogleCloudPlatform/cloud-builders" \
+      org.opencontainers.image.vendor="Google LLC"
 
 ARG GRADLE_VERSION=4.0
 ARG USER_HOME_DIR="/root"
