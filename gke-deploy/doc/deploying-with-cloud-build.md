@@ -101,11 +101,34 @@ sed -i "s#@IMAGE_NAME@#$IMAGE_NAME#g" config/deployment.yaml
 sed -i "s#@NAMESPACE@#$NAMESPACE#g" config/namespace.yaml
 
 # Run build, replacing substitution variables accordingly.
-gcloud builds submit . --project=$PROJECT --config cloudbuild-with-configs.yaml --substitutions=_IMAGE_NAME=gcr.io/$PROJECT/$APP,_IMAGE_VERSION=$VERSION,_GKE_CLUSTER=$CLUSTER,_GKE_LOCATION=$LOCATION,_K8S_YAML_PATH=config,_K8S_APP_NAME=$APP,_K8S_NAMESPACE=$NAMESPACE,_OUTPUT_PATH=$BUCKET_PATH
+gcloud builds submit . --project=$PROJECT --config cloudbuild-with-configs.yaml --substitutions=_IMAGE_NAME=gcr.io/$PROJECT/$APP,_IMAGE_VERSION=$VERSION,_GKE_CLUSTER=$CLUSTER,_GKE_LOCATION=$LOCATION,_K8S_YAML_PATH=config,_K8S_APP_NAME=$APP,_K8S_NAMESPACE=$NAMESPACE,_OUTPUT_BUCKET_PATH=$BUCKET_PATH
 ```
 
 You can replace the GCS url with a UNIX file path if you do not
 want to store configs to a bucket.
+
+### Increase the deploy wait timeout
+
+`gke-deploy apply` waits up to five minutes for applied Kubernetes objects to
+be ready. If your rollout needs more time, pass a larger `--timeout` value to
+the `gke-deploy` step:
+
+```yaml
+- name: 'gcr.io/cloud-builders/gke-deploy'
+  id: 'Apply deploy'
+  args:
+  - 'apply'
+  - '--filename=$_K8S_YAML_PATH'
+  - '--cluster=$_GKE_CLUSTER'
+  - '--location=$_GKE_LOCATION'
+  - '--timeout=20m0s'
+  timeout: 1260s
+```
+
+The `--timeout` flag controls how long `gke-deploy` waits for Kubernetes
+objects to become ready. The Cloud Build step `timeout` controls how long Cloud
+Build lets the entire build step run, so it should be slightly longer than the
+`gke-deploy` timeout.
 
 Builds can use `$SHORT_SHA` instead of an explicit `$_IMAGE_VERSION` for the
 image and app versions if executed via a trigger. Follow [these
