@@ -60,6 +60,7 @@ type options struct {
 	waitTimeout         time.Duration
 	recursive           bool
 	serverDryRun        bool
+	internalIP          bool
 }
 
 // NewRunCommand creates the `gke-deploy run` subcommand.
@@ -96,6 +97,7 @@ func NewRunCommand() *cobra.Command {
 	cmd.Flags().BoolVar(&options.createApplicationCR, "create-application-cr", false, "Creates an Application CR object with the name provided by --app and connects to deployed objects using a selector that matches the label with key as 'app.kubernetes.io/name' and value specified by --app.")
 	cmd.Flags().StringSliceVar(&options.applicationLinks, "links", nil, "Links(s) to add to the spec.descriptor.links field of an Application CR generated with the --create-application-cr flag or provided via the --filename flag (description=URL). Links can be set comma-delimited or as separate flags.")
 	cmd.Flags().BoolVarP(&options.serverDryRun, "server-dry-run", "D", false, "Perform kubectl apply server dry run to validate configurations without persisting resources.")
+	cmd.Flags().BoolVar(&options.internalIP, "internal-ip", false, "Use the GKE cluster's internal endpoint when getting cluster credentials.")
 
 	return cmd
 }
@@ -123,6 +125,9 @@ func run(_ *cobra.Command, options *options) error {
 	}
 	if options.clusterLocation != "" && options.clusterName == "" {
 		return fmt.Errorf("you must set -c|--cluster flag because -l|--location flag is set")
+	}
+	if options.internalIP && (options.clusterName == "" || options.clusterLocation == "") {
+		return fmt.Errorf("you must set -c|--cluster and -l|--location flags because --internal-ip is set")
 	}
 
 	useGcloud := common.GcloudInPath()
@@ -165,7 +170,7 @@ func run(_ *cobra.Command, options *options) error {
 		// Without this, gcloud storage copies the entire expanded output directory, rather than just the files in the directory, which fails applying the deployment if the --recursive flag isn't set.
 		applyConfig = applyConfig + "/*"
 	}
-	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, applyConfig, options.namespace, options.waitTimeout, options.recursive); err != nil {
+	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, applyConfig, options.namespace, options.waitTimeout, options.recursive, options.internalIP); err != nil {
 		return fmt.Errorf("failed to apply deployment: %v", err)
 	}
 

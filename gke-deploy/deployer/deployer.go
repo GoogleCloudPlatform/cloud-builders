@@ -305,7 +305,7 @@ func (d *Deployer) Prepare(ctx context.Context, im name.Reference, appName, appV
 }
 
 // Apply handles applying the deployment.
-func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clusterProject, config, namespace string, waitTimeout time.Duration, recursive bool) error {
+func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clusterProject, config, namespace string, waitTimeout time.Duration, recursive, useInternalIP bool) error {
 	if d.ServerDryRun {
 		fmt.Printf("Applying deployment in server dry run mode.\n")
 	} else {
@@ -325,7 +325,7 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 
 	if clusterName != "" && clusterLocation != "" {
 		fmt.Printf("Getting access to cluster %q in %q.\n", clusterName, clusterLocation)
-		if err := cluster.AuthorizeAccess(ctx, clusterName, clusterLocation, clusterProject, d.UseGcloud, d.Clients.Gcloud); err != nil {
+		if err := cluster.AuthorizeAccess(ctx, clusterName, clusterLocation, clusterProject, useInternalIP, d.UseGcloud, d.Clients.Gcloud); err != nil {
 			if d.UseGcloud {
 				account, err2 := gcp.GetAccount(ctx, d.Clients.Gcloud)
 				if err2 != nil {

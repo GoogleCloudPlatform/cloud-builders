@@ -24,12 +24,19 @@ func TestAuthorizeAccess(t *testing.T) {
 	}
 
 	useGcloud := true
-	if err := AuthorizeAccess(ctx, clusterName, clusterLocation, clusterProject, useGcloud, gs); err != nil {
+	useInternalIP := true
+	if err := AuthorizeAccess(ctx, clusterName, clusterLocation, clusterProject, useInternalIP, useGcloud, gs); err != nil {
 		t.Errorf("AuthorizeAccess(ctx, %s, %s, gs) = %v; want <nil>", clusterName, clusterLocation, err)
 	}
+	if !gs.ContainerClustersUseInternalIP {
+		t.Errorf("AuthorizeAccess(ctx, %s, %s, gs) did not pass useInternalIP to gcloud", clusterName, clusterLocation)
+	}
 	useGcloud = false
-	if err := AuthorizeAccess(ctx, clusterName, clusterLocation, clusterProject, useGcloud, gs); err != nil {
+	if err := AuthorizeAccess(ctx, clusterName, clusterLocation, clusterProject, useInternalIP, useGcloud, gs); err != nil {
 		t.Errorf("AuthorizeAccess(ctx, %s, %s, gs) = %v; want <nil>", clusterName, clusterLocation, err)
+	}
+	if !gs.GoClientUseInternalIP {
+		t.Errorf("AuthorizeAccess(ctx, %s, %s, gs) did not pass useInternalIP to go client", clusterName, clusterLocation)
 	}
 }
 
@@ -43,11 +50,12 @@ func TestAuthorizeAccessErrors(t *testing.T) {
 	}
 
 	useGcloud := true
-	if err := AuthorizeAccess(ctx, clusterName, clusterLocation, clusterProject, useGcloud, gs); err == nil {
+	useInternalIP := false
+	if err := AuthorizeAccess(ctx, clusterName, clusterLocation, clusterProject, useInternalIP, useGcloud, gs); err == nil {
 		t.Errorf("AuthorizeAccess(ctx, %s, %s, gs) = <nil>; want error", clusterName, clusterLocation)
 	}
 	useGcloud = false
-	if err := AuthorizeAccess(ctx, clusterName, clusterLocation, clusterProject, useGcloud, gs); err == nil {
+	if err := AuthorizeAccess(ctx, clusterName, clusterLocation, clusterProject, useInternalIP, useGcloud, gs); err == nil {
 		t.Errorf("AuthorizeAccess(ctx, %s, %s, gs) = <nil>; want error", clusterName, clusterLocation)
 	}
 }

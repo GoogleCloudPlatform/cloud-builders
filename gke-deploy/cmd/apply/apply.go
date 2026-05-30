@@ -41,6 +41,7 @@ type options struct {
 	waitTimeout     time.Duration
 	recursive       bool
 	serverDryRun    bool
+	internalIP      bool
 }
 
 // NewApplyCommand creates the `gke-deploy apply` subcommand.
@@ -68,6 +69,7 @@ func NewApplyCommand() *cobra.Command {
 	cmd.Flags().DurationVarP(&options.waitTimeout, "timeout", "t", 5*time.Minute, "Timeout limit for waiting for Kubernetes objects to finish applying.")
 	cmd.Flags().BoolVarP(&options.recursive, "recursive", "R", false, "Recursively search through the provided path in --filename for all YAML files.")
 	cmd.Flags().BoolVarP(&options.serverDryRun, "server-dry-run", "D", false, "Perform kubectl apply server dry run to validate configurations without persisting resources.")
+	cmd.Flags().BoolVar(&options.internalIP, "internal-ip", false, "Use the GKE cluster's internal endpoint when getting cluster credentials.")
 
 	return cmd
 }
@@ -84,6 +86,9 @@ func apply(_ *cobra.Command, options *options) error {
 	if options.clusterLocation != "" && options.clusterName == "" {
 		return fmt.Errorf("you must set -l|--location flag because -c|--cluster flag is set")
 	}
+	if options.internalIP && (options.clusterName == "" || options.clusterLocation == "") {
+		return fmt.Errorf("you must set -c|--cluster and -l|--location flags because --internal-ip is set")
+	}
 
 	useGcloud := common.GcloudInPath()
 
@@ -93,7 +98,7 @@ func apply(_ *cobra.Command, options *options) error {
 		return err
 	}
 
-	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, options.filename, options.namespace, options.waitTimeout, options.recursive); err != nil {
+	if err := d.Apply(ctx, options.clusterName, options.clusterLocation, options.clusterProject, options.filename, options.namespace, options.waitTimeout, options.recursive, options.internalIP); err != nil {
 		return fmt.Errorf("failed to apply deployment: %v", err)
 	}
 

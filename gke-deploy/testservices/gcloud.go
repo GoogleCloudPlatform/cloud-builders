@@ -7,18 +7,22 @@ import (
 // TestGcloud implements the GcloudService interface.
 type TestGcloud struct {
 	ContainerClustersGetCredentialsErr error
+	ContainerClustersUseInternalIP     bool
+	GoClientUseInternalIP              bool
 
 	ConfigGetValueResp string
 	ConfigGetValueErr  error
 }
 
 // ContainerClustersGetCredentials calls `gcloud container clusters get-credentials <clusterName> --zone=<clusterLocation> --project=<clusterProject>`.
-func (g *TestGcloud) ContainerClustersGetCredentials(ctx context.Context, clusterName, clusterLocation, clusterProject string) error {
+func (g *TestGcloud) ContainerClustersGetCredentials(ctx context.Context, clusterName, clusterLocation, clusterProject string, useInternalIP bool) error {
+	g.ContainerClustersUseInternalIP = useInternalIP
 	return g.ContainerClustersGetCredentialsErr
 }
 
 // ContainerClustersGetCredentialsGoClient calls `gcloud container clusters get-credentials <clusterName> --zone=<clusterLocation> --project=<clusterProject>`.
-func (g *TestGcloud) ContainerClustersGetCredentialsGoClient(ctx context.Context, clusterName, clusterLocation, clusterProject string) error {
+func (g *TestGcloud) ContainerClustersGetCredentialsGoClient(ctx context.Context, clusterName, clusterLocation, clusterProject string, useInternalIP bool) error {
+	g.GoClientUseInternalIP = useInternalIP
 	return g.ContainerClustersGetCredentialsErr
 }
 

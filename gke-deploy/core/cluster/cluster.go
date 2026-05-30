@@ -11,15 +11,15 @@ import (
 
 // AuthorizeAccess authorizes kubectl to the cluster. In doing so, this also verifies the cluster
 // exists.
-func AuthorizeAccess(ctx context.Context, clusterName, clusterLocation, clusterProject string, useGcloud bool, gs services.GcloudService) error {
+func AuthorizeAccess(ctx context.Context, clusterName, clusterLocation, clusterProject string, useInternalIP, useGcloud bool, gs services.GcloudService) error {
 	if useGcloud {
 		fmt.Println("using gcloud to get cluster credentials")
-		if err := gs.ContainerClustersGetCredentials(ctx, clusterName, clusterLocation, clusterProject); err != nil {
+		if err := gs.ContainerClustersGetCredentials(ctx, clusterName, clusterLocation, clusterProject, useInternalIP); err != nil {
 			return fmt.Errorf("failed to authorize access: %v", err)
 		}
 	} else {
 		fmt.Println("using go client libraries to get cluster credentials")
-		if err := gs.ContainerClustersGetCredentialsGoClient(ctx, clusterName, clusterLocation, clusterProject); err != nil {
+		if err := gs.ContainerClustersGetCredentialsGoClient(ctx, clusterName, clusterLocation, clusterProject, useInternalIP); err != nil {
 			return fmt.Errorf("failed to authorize access: %v", err)
 		}
 	}

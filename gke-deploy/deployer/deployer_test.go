@@ -1168,7 +1168,7 @@ func TestApply(t *testing.T) {
 				},
 			}
 
-			if err := d.Apply(ctx, tc.clusterName, tc.clusterLocation, clusterProject, tc.config, tc.namespace, tc.waitTimeout, tc.recursive); err != nil {
+			if err := d.Apply(ctx, tc.clusterName, tc.clusterLocation, clusterProject, tc.config, tc.namespace, tc.waitTimeout, tc.recursive, false); err != nil {
 				t.Fatalf("Apply(ctx, %s, %s, %s, %s, %v, %v) = %v; want <nil>", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, tc.recursive, err)
 			}
 
@@ -1355,7 +1355,7 @@ func TestApplyErrors(t *testing.T) {
 			}
 
 			var applyErr error
-			if applyErr = d.Apply(ctx, tc.clusterName, tc.clusterLocation, clusterProject, tc.config, tc.namespace, tc.waitTimeout, tc.recursive); applyErr == nil {
+			if applyErr = d.Apply(ctx, tc.clusterName, tc.clusterLocation, clusterProject, tc.config, tc.namespace, tc.waitTimeout, tc.recursive, false); applyErr == nil {
 				t.Errorf("Apply(ctx, %s, %s, %s, %s, %v, %v) = <nil>; want error", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, tc.recursive)
 			}
 

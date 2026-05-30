@@ -56,16 +56,32 @@ func NewGcloudGoClient(ctx context.Context, printCommands bool) *Gcloud {
 	}
 }
 
-func (g *Gcloud) ContainerClustersGetCredentials(ctx context.Context, clusterName, clusterLocation, clusterProject string) error {
-	if _, err := runCommand(ctx, g.printCommands, "gcloud", "container", "clusters", "get-credentials", clusterName, fmt.Sprintf("--zone=%s", clusterLocation), fmt.Sprintf("--project=%s", clusterProject), "--quiet"); err != nil {
+func (g *Gcloud) ContainerClustersGetCredentials(ctx context.Context, clusterName, clusterLocation, clusterProject string, useInternalIP bool) error {
+	args := getCredentialsArgs(clusterName, clusterLocation, clusterProject, useInternalIP)
+	if _, err := runCommand(ctx, g.printCommands, "gcloud", args...); err != nil {
 		return fmt.Errorf("command to get cluster credentials failed: %v", err)
 	}
 	return nil
 }
 
+func getCredentialsArgs(clusterName, clusterLocation, clusterProject string, useInternalIP bool) []string {
+	args := []string{
+		"container",
+		"clusters",
+		"get-credentials",
+		clusterName,
+		fmt.Sprintf("--zone=%s", clusterLocation),
+		fmt.Sprintf("--project=%s", clusterProject),
+	}
+	if useInternalIP {
+		args = append(args, "--internal-ip")
+	}
+	return append(args, "--quiet")
+}
+
 // ContainerClustersGetCredentialsGoClient uses the go client libraries to get cluster credentials and generate the kubeconfig file for kubectl.
 // The kubectl authenticates using the accessToken instead of the google-gke-auth-plugin (which depends on gcloud).
-func (g *Gcloud) ContainerClustersGetCredentialsGoClient(ctx context.Context, clusterName, clusterLocation, clusterProject string) error {
+func (g *Gcloud) ContainerClustersGetCredentialsGoClient(ctx context.Context, clusterName, clusterLocation, clusterProject string, useInternalIP bool) error {
 
 	dirname, err := os.UserHomeDir()
 	if err != nil {
@@ -77,7 +93,7 @@ func (g *Gcloud) ContainerClustersGetCredentialsGoClient(ctx context.Context, cl
 		return fmt.Errorf("failed to make directory %s: %v", path, err)
 	}
 	kubeConfigFile := filepath.Join(path, "config")
-	if err := getK8sClusterConfigs(ctx, clusterProject, clusterLocation, clusterName, kubeConfigFile); err != nil {
+	if err := getK8sClusterConfigs(ctx, clusterProject, clusterLocation, clusterName, kubeConfigFile, useInternalIP); err != nil {
 		return fmt.Errorf("failed to initialize gke cluster config: %v", err)
 	}
 	return nil
@@ -94,7 +110,7 @@ func (g *Gcloud) ConfigGetValue(ctx context.Context, property string) (string, e
 
 // getK8sClusterConfigs uses the go client libraries to authenticate against the cluster and generate the kubeconfig file
 // instead of the gcloud CLI.
-func getK8sClusterConfigs(ctx context.Context, clusterProject, clusterLocation, clusterName, kubeConfigFile string) error {
+func getK8sClusterConfigs(ctx context.Context, clusterProject, clusterLocation, clusterName, kubeConfigFile string, useInternalIP bool) error {
 	fullClusterName := fmt.Sprintf(gkeResourceNameFormat, clusterProject, clusterLocation, clusterName)
 	fmt.Printf("Full Cluster: %s\n", fullClusterName)
 	ts, err := google.DefaultTokenSource(ctx, googleScopes...)
@@ -114,7 +130,15 @@ func getK8sClusterConfigs(ctx context.Context, clusterProject, clusterLocation, 
 	if err != nil {
 		return fmt.Errorf("failed to list clusters: %w", err)
 	}
-	fmt.Printf("Cluster's Endpoint is: %s\n", cluster.Endpoint)
+	endpoint, err := clusterEndpoint(cluster, useInternalIP)
+	if err != nil {
+		return err
+	}
+	if useInternalIP {
+		fmt.Printf("Cluster's internal endpoint is: %s\n", endpoint)
+	} else {
+		fmt.Printf("Cluster's endpoint is: %s\n", endpoint)
+	}
 	name := fmt.Sprintf(gkeContextFormat, clusterProject, cluster.Zone, cluster.Name)
 	kubeConfig := &api.Config{
 		APIVersion:     "v1",
@@ -139,7 +163,7 @@ func getK8sClusterConfigs(ctx context.Context, clusterProject, clusterLocation, 
 	}
 	kubeConfig.Clusters[name] = &api.Cluster{
 		CertificateAuthorityData: cert,
-		Server:                   "https://" + cluster.Endpoint,
+		Server:                   "https://" + endpoint,
 	}
 	kubeConfig.Contexts[name] = &api.Context{
 		Cluster:  name,
@@ -158,4 +182,17 @@ func getK8sClusterConfigs(ctx context.Context, clusterProject, clusterLocation, 
 		return fmt.Errorf("failed to write kubeConfig to file %s: %v", kubeConfigFile, err)
 	}
 	return nil
+}
+
+func clusterEndpoint(cluster *container.Cluster, useInternalIP bool) (string, error) {
+	if useInternalIP {
+		if cluster.PrivateClusterConfig == nil || cluster.PrivateClusterConfig.PrivateEndpoint == "" {
+			return "", fmt.Errorf("cluster %q does not have a private endpoint", cluster.Name)
+		}
+		return cluster.PrivateClusterConfig.PrivateEndpoint, nil
+	}
+	if cluster.Endpoint == "" {
+		return "", fmt.Errorf("cluster %q does not have an endpoint", cluster.Name)
+	}
+	return cluster.Endpoint, nil
 }
