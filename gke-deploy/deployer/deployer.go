@@ -471,6 +471,7 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 
 		for _, obj := range objs {
 			kind := resource.ObjectKind(obj)
+			gvk := resource.ObjectGroupVersionKind(obj)
 			name, err := resource.ObjectName(obj)
 			if err != nil {
 				return fmt.Errorf("failed to get name of object: %v", err)
@@ -485,7 +486,7 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 			} else {
 				objNamespace = namespace
 			}
-			deployedObj, err := cluster.GetDeployedObject(ctx, kind, name, objNamespace, d.Clients.Kubectl)
+			deployedObj, err := cluster.GetDeployedObject(ctx, gvk, name, objNamespace, d.Clients.Kubectl)
 			if err != nil {
 				return fmt.Errorf("failed to get configuration of deployed object with kind %q and name %q: %v", kind, name, err)
 			}
