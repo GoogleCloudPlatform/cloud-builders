@@ -408,13 +408,13 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 			}
 			if !exists {
 				fmt.Fprintf(os.Stderr, "\nWARNING: It is recommended that namespaces be created by an administrator. Creating namespace %q because it does not exist.\n\n", nsName)
-				objString, err := resource.EncodeToYAMLString(obj)
-				if err != nil {
-					return fmt.Errorf("failed to encode obj to string")
-				}
-				if err := cluster.ApplyConfigFromString(ctx, objString, "", d.Clients.Kubectl); err != nil {
-					return fmt.Errorf("failed to apply Namespace configuration file with name %q to cluster: %v", nsName, err)
-				}
+			}
+			objString, err := resource.EncodeToYAMLString(obj)
+			if err != nil {
+				return fmt.Errorf("failed to encode obj to string")
+			}
+			if err := cluster.ApplyConfigFromString(ctx, objString, "", d.Clients.Kubectl); err != nil {
+				return fmt.Errorf("failed to apply Namespace configuration file with name %q to cluster: %v", nsName, err)
 			}
 		} else {
 			// Delete namespace from list of objects to be deployed because it has already been deployed we do not want it to show up in the deployment summary.
