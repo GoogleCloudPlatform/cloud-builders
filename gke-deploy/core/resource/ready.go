@@ -279,7 +279,11 @@ func podIsReady(ctx context.Context, obj *Object) (bool, error) {
 // podDisruptionBudget returns true if a deployed object with kind "PodDisruptionBudget" is ready.
 // This returns true if the following bullets are true:
 // * status.observedGeneration == metadata.generation
-// * status.currentHealthy >= status.desiredHealthy
+// * status.currentHealthy >= status.desiredHealthy  (for spec.minAvailable PDBs)
+//
+// For PDBs using spec.maxUnavailable (supported since Kubernetes 1.17), desiredHealthy may be
+// zero when no minimum is set. In that case readiness is determined by status.disruptionsAllowed
+// being present, which the API server populates once the PDB is accepted and reconciled.
 func podDisruptionBudgetIsReady(ctx context.Context, obj *Object) (bool, error) {
 	generation, ok, err := unstructured.NestedInt64(obj.Object, "metadata", "generation")
 	if err != nil {
@@ -297,20 +301,32 @@ func podDisruptionBudgetIsReady(ctx context.Context, obj *Object) (bool, error) 
 		return false, nil
 	}
 
-	desiredHealthy, ok, err := unstructured.NestedInt64(obj.Object, "status", "desiredHealthy")
+	desiredHealthy, desiredOk, err := unstructured.NestedInt64(obj.Object, "status", "desiredHealthy")
 	if err != nil {
 		return false, fmt.Errorf("failed to get status.desiredHealthy field: %v", err)
 	}
 
-	currentHealthy, ok, err := unstructured.NestedInt64(obj.Object, "status", "currentHealthy")
+	currentHealthy, currentOk, err := unstructured.NestedInt64(obj.Object, "status", "currentHealthy")
 	if err != nil {
 		return false, fmt.Errorf("failed to get status.currentHealthy field: %v", err)
 	}
-	if !ok || currentHealthy < desiredHealthy {
-		return false, nil
+
+	// spec.minAvailable path: desiredHealthy > 0, check currentHealthy satisfies it.
+	if desiredOk && desiredHealthy > 0 {
+		if !currentOk || currentHealthy < desiredHealthy {
+			return false, nil
+		}
+		return true, nil
 	}
 
-	return true, nil
+	// spec.maxUnavailable path (Kubernetes 1.17+): desiredHealthy is 0 or absent.
+	// The API server sets disruptionsAllowed once the PDB is reconciled; its presence
+	// confirms the resource is ready.
+	_, disruptionsAllowedOk, err := unstructured.NestedInt64(obj.Object, "status", "disruptionsAllowed")
+	if err != nil {
+		return false, fmt.Errorf("failed to get status.disruptionsAllowed field: %v", err)
+	}
+	return disruptionsAllowedOk, nil
 }
 
 // replicaSetIsReady returns true if a deployed object with kind "ReplicaSet" is ready.
