@@ -1,3 +1,3 @@
 ARG NODE_VERSION=latest
-FROM node:${NODE_VERSION}
+FROM us-docker.pkg.dev/artifact-foundry-prod/docker-3p-trusted/node@${NODE_VERSION}
 ENTRYPOINT ["yarn"]
