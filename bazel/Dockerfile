@@ -13,7 +13,8 @@ RUN \
         python-pkg-resources \
         python3-pkg-resources \
         software-properties-common \
-        unzip && \
+        unzip \
+        zip && \
 
     # Install Git >2.0.1
     add-apt-repository ppa:git-core/ppa && \
