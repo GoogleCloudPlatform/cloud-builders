@@ -3,6 +3,8 @@ package testservices
 import (
 	"context"
 	"fmt"
+
+	"sigs.k8s.io/yaml"
 )
 
 // TestKubectl implements the KubectlService interface.
@@ -10,6 +12,7 @@ type TestKubectl struct {
 	ApplyResponse           map[string][]error
 	ApplyFromStringResponse map[string][]error
 	GetResponse             map[string]map[string][]GetResponse
+	GetFromStringResponse   map[string][]GetResponse
 }
 
 // StatResponse represents a response tuple for a Stat function call.
@@ -76,4 +79,47 @@ func (k *TestKubectl) Get(ctx context.Context, kind, name, namespace, format str
 		k.GetResponse[kind][name] = k.GetResponse[kind][name][1:]
 	}
 	return res, err
+}
+
+// GetFromString calls `kubectl get -f - -n <namespace> < ${configString}`.
+func (k *TestKubectl) GetFromString(ctx context.Context, configString, namespace, format string) (string, error) {
+	if k.GetFromStringResponse != nil {
+		resp, ok := k.GetFromStringResponse[configString]
+		if !ok {
+			panic(fmt.Sprintf("GetFromStringResponse has no response for configs %q", configString))
+		}
+		if len(resp) == 0 {
+			panic(fmt.Sprintf("GetFromStringResponse ran out of responses for configs %q", configString))
+		}
+		res := resp[0].Res
+		err := resp[0].Err
+		if len(resp) == 1 {
+			delete(k.GetFromStringResponse, configString)
+		} else {
+			k.GetFromStringResponse[configString] = k.GetFromStringResponse[configString][1:]
+		}
+		return res, err
+	}
+
+	kind, name, err := objectKindAndName(configString)
+	if err != nil {
+		return "", err
+	}
+	return k.Get(ctx, kind, name, namespace, format, false)
+}
+
+func objectKindAndName(configString string) (string, string, error) {
+	var obj struct {
+		Kind     string `yaml:"kind"`
+		Metadata struct {
+			Name string `yaml:"name"`
+		} `yaml:"metadata"`
+	}
+	if err := yaml.Unmarshal([]byte(configString), &obj); err != nil {
+		return "", "", err
+	}
+	if obj.Kind == "" || obj.Metadata.Name == "" {
+		return "", "", fmt.Errorf("config missing kind or metadata.name")
+	}
+	return obj.Kind, obj.Metadata.Name, nil
 }

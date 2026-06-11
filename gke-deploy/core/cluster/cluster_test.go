@@ -146,6 +146,28 @@ func TestGetDeployedObject(t *testing.T) {
 	}
 }
 
+func TestGetDeployedObjectFromString(t *testing.T) {
+	ctx := context.Background()
+
+	testDeploymentFile := "testing/deployment.yaml"
+	configString := string(fileContents(t, testDeploymentFile))
+
+	ks := &testservices.TestKubectl{
+		GetFromStringResponse: map[string][]testservices.GetResponse{
+			configString: {
+				{
+					Res: configString,
+					Err: nil,
+				},
+			},
+		},
+	}
+
+	if got, err := GetDeployedObjectFromString(ctx, configString, "default", ks); !reflect.DeepEqual(got, newObjectFromFile(t, testDeploymentFile)) || err != nil {
+		t.Errorf("GetDeployedObjectFromString(ctx, config, default, ks) = %v, %v; want %v, <nil>", got, err, newObjectFromFile(t, testDeploymentFile))
+	}
+}
+
 func TestDeployedObjectExists(t *testing.T) {
 	ctx := context.Background()
 

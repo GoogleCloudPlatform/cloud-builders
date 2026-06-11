@@ -55,6 +55,22 @@ func (k *Kubectl) ApplyFromString(ctx context.Context, configString, namespace s
 	return nil
 }
 
+// GetFromString calls `kubectl get -f - -n <namespace> --output=<format> < ${configString}`.
+func (k *Kubectl) GetFromString(ctx context.Context, configString, namespace, format string) (string, error) {
+	args := []string{"get", "-f", "-"}
+	if namespace != "" {
+		args = append(args, "-n", namespace)
+	}
+	if format != "" {
+		args = append(args, fmt.Sprintf("--output=%s", format))
+	}
+	out, err := runCommandWithStdinRedirection(ctx, k.printCommands, "kubectl", configString, args...)
+	if err != nil {
+		return "", fmt.Errorf("command to get kubernetes config from string: %v", err)
+	}
+	return out, nil
+}
+
 // Get calls `kubectl get <kind> <name> -n <namespace> --output=<format>`.
 func (k *Kubectl) Get(ctx context.Context, kind, name, namespace, format string, ignoreNotFound bool) (string, error) {
 	args := []string{"get", kind}

@@ -635,6 +635,7 @@ func TestApply(t *testing.T) {
 	testNamespaceReadyFile := "testing/namespace-ready.yaml"
 	testNamespaceReady2File := "testing/namespace-ready-2.yaml"
 	testApplicationFile := "testing/application.yaml"
+	testIngressRouteFile := "testing/configs/ingressroute.yaml"
 
 	clusterName := "test-cluster"
 	clusterLocation := "us-east1-b"
@@ -884,6 +885,31 @@ func TestApply(t *testing.T) {
 							Res: string(fileContents(t, testNamespaceReady2File)),
 							Err: nil,
 						},
+					},
+				},
+			},
+		},
+	}, {
+		name: "Custom resource is fetched from its manifest",
+
+		clusterName:     clusterName,
+		clusterLocation: clusterLocation,
+		config:          testIngressRouteFile,
+		namespace:       namespace,
+		waitTimeout:     waitTimeout,
+
+		gcloud: &testservices.TestGcloud{
+			ContainerClustersGetCredentialsErr: nil,
+		},
+		kubectl: testservices.TestKubectl{
+			ApplyFromStringResponse: map[string][]error{
+				string(fileContents(t, testIngressRouteFile)): {nil},
+			},
+			GetFromStringResponse: map[string][]testservices.GetResponse{
+				string(fileContents(t, testIngressRouteFile)): {
+					{
+						Res: string(fileContents(t, testIngressRouteFile)),
+						Err: nil,
 					},
 				},
 			},
@@ -1181,6 +1207,9 @@ func TestApply(t *testing.T) {
 			if len(tc.kubectl.GetResponse) != 0 {
 				t.Fatalf("Apply(ctx, %s, %s, %s, %s, %v, %v) did not get all of the expected configs. got %v; want []", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, tc.recursive, tc.kubectl.GetResponse)
 			}
+			if len(tc.kubectl.GetFromStringResponse) != 0 {
+				t.Fatalf("Apply(ctx, %s, %s, %s, %s, %v, %v) did not get all of the expected configs from string. got %v; want []", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, tc.recursive, tc.kubectl.GetFromStringResponse)
+			}
 		})
 	}
 }
@@ -1367,6 +1396,9 @@ func TestApplyErrors(t *testing.T) {
 			// Verify that all expected gets were executed
 			if len(tc.kubectl.GetResponse) != 0 {
 				t.Fatalf("Apply(ctx, %s, %s, %s, %s, %v, %v) did not get all of the expected configs. got %v; want []", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, tc.recursive, tc.kubectl.GetResponse)
+			}
+			if len(tc.kubectl.GetFromStringResponse) != 0 {
+				t.Fatalf("Apply(ctx, %s, %s, %s, %s, %v, %v) did not get all of the expected configs from string. got %v; want []", tc.clusterName, tc.clusterLocation, tc.config, tc.namespace, tc.waitTimeout, tc.recursive, tc.kubectl.GetFromStringResponse)
 			}
 
 			if tc.want == "" {
