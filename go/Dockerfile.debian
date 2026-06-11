@@ -1,5 +1,5 @@
 ARG VERSION=1.15
-FROM golang:${VERSION}
+FROM us-docker.pkg.dev/artifact-foundry-prod/docker-3p-trusted/golang@${VERSION}
 
 # Install VCS tools to support "go get" commands and install gcc.
 RUN apt-get update -qqy && apt-get dist-upgrade -yq && apt-get install -qqy git mercurial subversion gcc
