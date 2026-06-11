@@ -5,25 +5,37 @@ but it may not support the most recent features or versions of Bazel. We also do
 not provide historical pinned versions of bazel.
 
 The Bazel team provides a `bazel` image that supports multiple tagged versions
-at http://gcr.io/cloud-marketplace-containers/google/bazel.
+at https://gcr.io/bazel-public/bazel.
 
-To migrate to the Bazel team's official Bazel image, make the following changes
-to your `cloudbuild.yaml`:
+The Bazel team's official image is not a direct replacement for
+`gcr.io/cloud-builders/bazel` in Cloud Build. The image runs as the `ubuntu`
+user, so Bazel needs a writable output root. To migrate, make the following
+changes to your `cloudbuild.yaml`:
 
 ```
 - name: 'gcr.io/cloud-builders/bazel'
-+ name: 'gcr.io/cloud-marketplace-containers/google/bazel'
++ name: 'gcr.io/bazel-public/bazel:<bazel-version>'
 + entrypoint: 'bazel'
++ args: ['--output_user_root=/home/ubuntu/.cache/bazel', 'build', '//...']
 ```
 
 ## Example Usage
 
 ```
 steps:
-- name: 'gcr.io/cloud-marketplace-containers/google/bazel'
+- name: 'gcr.io/bazel-public/bazel:<bazel-version>'
   entrypoint: 'bazel'
-  args: ['build', '//java/com/company/service:server']
+  args:
+  - '--output_user_root=/home/ubuntu/.cache/bazel'
+  - 'build'
+  - '//java/com/company/service:server'
 ```
+
+If your build writes outputs that must be shared with later Cloud Build steps,
+write those outputs under `/workspace` or another Cloud Build volume. If your
+build needs a cache outside `/workspace`, create a named volume in `cloudbuild.yaml`
+and make it writable before invoking the Bazel image, then pass that path to
+`--output_user_root`.
 
 ---
 
