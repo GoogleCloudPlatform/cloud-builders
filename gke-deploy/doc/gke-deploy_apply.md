@@ -36,6 +36,7 @@ gke-deploy apply [flags]
   -c, --cluster string     Name of GKE cluster to deploy to.
   -f, --filename string    Local or GCS path to configuration file or directory of configuration files to use to create Kubernetes objects (file or files in directory must end in ".yml" or ".yaml"). Prefix this value with "gs://" to indicate a GCS path.
   -h, --help               help for apply
+      --internal-ip        Use the GKE cluster's internal endpoint when getting cluster credentials.
   -l, --location string    Region/zone of GKE cluster to deploy to.
   -n, --namespace string   Namespace of GKE cluster to deploy to. If omitted, the namespace(s) specified in each Kubernetes configuration file is used.
   -p, --project string     Project of GKE cluster to deploy to. If this field is not provided, the current set GCP project is used.

@@ -31,8 +31,8 @@ type OSService interface {
 
 // GcloudService is an interface for gcloud operations.
 type GcloudService interface {
-	ContainerClustersGetCredentials(ctx context.Context, clusterName, clusterLocation, clusterProject string) error
-	ContainerClustersGetCredentialsGoClient(ctx context.Context, clusterName, clusterLocation, clusterProject string) error
+	ContainerClustersGetCredentials(ctx context.Context, clusterName, clusterLocation, clusterProject string, useInternalIP bool) error
+	ContainerClustersGetCredentialsGoClient(ctx context.Context, clusterName, clusterLocation, clusterProject string, useInternalIP bool) error
 	ConfigGetValue(ctx context.Context, property string) (string, error)
 }
 

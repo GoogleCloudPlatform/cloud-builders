@@ -49,6 +49,7 @@ gke-deploy run [flags]
   -f, --filename string         Local or GCS path to configuration file or directory of configuration files to use to create Kubernetes objects (file or files in directory must end in ".yml" or ".yaml"). Prefix this value with "gs://" to indicate a GCS path. If this field is not provided, a Deployment (with image provided by --image) and a HorizontalPodAutoscaler are created as suggested based configs. The application's name is inferred from the image name's suffix.
   -h, --help                    help for run
   -i, --image string            Image to be deployed.
+      --internal-ip             Use the GKE cluster's internal endpoint when getting cluster credentials.
   -L, --label strings           Label(s) to add to Kubernetes configuration files (k1=v1). Labels can be set comma-delimited or as separate flags. If two or more labels with the same key are listed, the last one is used.
       --links strings           Links(s) to add to the spec.descriptor.links field of an Application CR generated with the --create-application-cr flag or provided via the --filename flag (description=URL). Links can be set comma-delimited or as separate flags.
   -l, --location string         Region/zone of GKE cluster to deploy to.
