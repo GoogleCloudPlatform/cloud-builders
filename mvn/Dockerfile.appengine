@@ -3,7 +3,7 @@ ARG MAVEN_VERSION=latest
 FROM gcr.io/${PROJECT_ID}/mvn:${MAVEN_VERSION}
 
 # install python
-RUN apt-get update -y && apt-get install python3 -y
+RUN apt-get update -y && apt-get install python3 python -y
 
 # install cloud sdk into appengine-maven-plugin cache
 RUN set -eux; \
