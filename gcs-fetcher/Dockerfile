@@ -5,6 +5,9 @@ ARG cmd
 RUN CGO_ENABLED=0 go build -o /go-app ${cmd}
 
 FROM gcr.io/distroless/static-debian12
+LABEL org.opencontainers.image.source="https://github.com/GoogleCloudPlatform/cloud-builders" \
+      org.opencontainers.image.vendor="Google LLC"
+
 ARG cmd
 COPY --from=build-env /go-app /
 COPY ${cmd}/VENDOR-LICENSE /

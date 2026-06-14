@@ -1,4 +1,6 @@
 FROM gcr.io/gcp-runtimes/ubuntu_20_0_4
+LABEL org.opencontainers.image.source="https://github.com/GoogleCloudPlatform/cloud-builders" \
+      org.opencontainers.image.vendor="Google LLC"
 
 ADD bazel.sh /builder/bazel.sh
 ARG BAZEL_VERSION=latest

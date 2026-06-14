@@ -1,4 +1,6 @@
 FROM us-docker.pkg.dev/cloud-builders-dev/cloud-builders/docker-base
+LABEL org.opencontainers.image.source="https://github.com/GoogleCloudPlatform/cloud-builders" \
+      org.opencontainers.image.vendor="Google LLC"
 
 ARG DOCKER_VERSION=VERSION
 

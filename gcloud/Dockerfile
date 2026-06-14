@@ -1,4 +1,6 @@
 FROM gcloud-slim
+LABEL org.opencontainers.image.source="https://github.com/GoogleCloudPlatform/cloud-builders" \
+      org.opencontainers.image.vendor="Google LLC"
 
 ARG USE_GKE_GCLOUD_AUTH_PLUGIN=true
 RUN apt-get -y update && \

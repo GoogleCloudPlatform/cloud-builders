@@ -1,4 +1,6 @@
 FROM marketplace.gcr.io/google/ubuntu2204
+LABEL org.opencontainers.image.source="https://github.com/GoogleCloudPlatform/cloud-builders" \
+      org.opencontainers.image.vendor="Google LLC"
 
 COPY requirements.txt .
 COPY requirements_py2.txt .

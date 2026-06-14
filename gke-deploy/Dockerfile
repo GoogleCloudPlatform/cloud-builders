@@ -8,6 +8,8 @@ RUN CGO_ENABLED=0 go test ./...
 RUN CGO_ENABLED=0 go build -o /gke-deploy
 
 FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+LABEL org.opencontainers.image.source="https://github.com/GoogleCloudPlatform/cloud-builders" \
+      org.opencontainers.image.vendor="Google LLC"
 
 COPY --from=build-env /gke-deploy /bin
 COPY VENDOR-LICENSE /

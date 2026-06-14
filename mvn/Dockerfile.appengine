@@ -1,6 +1,8 @@
 ARG PROJECT_ID="cloud-builders"
 ARG MAVEN_VERSION=latest
 FROM gcr.io/${PROJECT_ID}/mvn:${MAVEN_VERSION}
+LABEL org.opencontainers.image.source="https://github.com/GoogleCloudPlatform/cloud-builders" \
+      org.opencontainers.image.vendor="Google LLC"
 
 # install python
 RUN apt-get update -y && apt-get install python3 -y

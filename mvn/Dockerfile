@@ -1,5 +1,8 @@
 ARG MAVEN_VERSION=latest
 FROM us-docker.pkg.dev/artifact-foundry-prod/docker-3p-trusted/maven@${MAVEN_VERSION}
+LABEL org.opencontainers.image.source="https://github.com/GoogleCloudPlatform/cloud-builders" \
+      org.opencontainers.image.vendor="Google LLC"
+
 # Upstream maven images for JDK >= 16 are Oracle Linux (ol) based
 # and others are based on Debian base image
 RUN v=$(awk </etc/os-release -F = '$1 ~ /VERSION_ID/ {gsub(/"/,"",$2);print set $2}') && \

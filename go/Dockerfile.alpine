@@ -1,5 +1,7 @@
 ARG VERSION=sha256:b58c367d52e46cdedc25ec9cd74cadb14ad65e8db75b25e5ec117cdb227aa264
 FROM us-docker.pkg.dev/artifact-foundry-prod/docker-3p-trusted/golang@${VERSION}
+LABEL org.opencontainers.image.source="https://github.com/GoogleCloudPlatform/cloud-builders" \
+      org.opencontainers.image.vendor="Google LLC"
 
 # Install VCS tools to support "go get" commands and install gcc.
 RUN apk update && apk upgrade --available --no-cache && \

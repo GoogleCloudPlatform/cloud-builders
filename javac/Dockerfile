@@ -1,5 +1,7 @@
 ARG BASE_IMAGE=launcher.gcr.io/google/openjdk8
 FROM ${BASE_IMAGE}
+LABEL org.opencontainers.image.source="https://github.com/GoogleCloudPlatform/cloud-builders" \
+      org.opencontainers.image.vendor="Google LLC"
 
 ARG DOCKER_VERSION=5:19.03.8~3-0~debian-stretch
 ARG PYTHON_VERSION=3.11.5
