@@ -689,6 +689,16 @@ func ObjectKind(obj *Object) string {
 	return obj.GetObjectKind().GroupVersionKind().Kind
 }
 
+// ObjectGroupVersionKind returns the group/kind format for kubectl commands (e.g., "middleware.traefik.io" or just "pod").
+// For resources with a group, returns "kind.group". For core API resources, returns just "kind".
+func ObjectGroupVersionKind(obj *Object) string {
+	gvk := obj.GetObjectKind().GroupVersionKind()
+	if gvk.Group == "" {
+		return gvk.Kind
+	}
+	return strings.ToLower(gvk.Kind) + "." + gvk.Group
+}
+
 // ObjectName returns the name of an object.
 func ObjectName(obj *Object) (string, error) {
 	accessor, err := meta.Accessor(obj)
