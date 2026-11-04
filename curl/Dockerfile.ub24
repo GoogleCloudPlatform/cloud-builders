@@ -1,0 +1,49 @@
+ARG BASE_IMAGE=marketplace.gcr.io/google/ubuntu2404
+FROM ${BASE_IMAGE}
+
+ARG TARGETARCH
+ARG APT_AUTH=""
+ARG USE_PUBLIC_DEPS="true"
+
+# 1. Configure Apt sources: use default public Ubuntu mirrors when USE_PUBLIC_DEPS=true, or internal mirrors for internal amd64 builds
+RUN if [ "${USE_PUBLIC_DEPS}" = "true" ]; then \
+        # Public build: use default public Ubuntu mirrors in the base image
+        apt-get update && \
+        apt-get dist-upgrade -y && \
+        apt-get install -y --no-install-recommends ca-certificates curl wget ; \
+    else \
+        # Internal build: use internal mirrors for amd64, default base image sources (ubuntu-ports) for arm64
+        . /etc/os-release && \
+        if [ "${TARGETARCH}" = "amd64" ]; then \
+            if [ -f /etc/apt/sources.list ]; then mv /etc/apt/sources.list /etc/apt/sources.list.bak; fi && \
+            if [ -d /etc/apt/sources.list.d ]; then mv /etc/apt/sources.list.d /etc/apt/sources.list.d.bak; fi && \
+            mkdir -p /etc/apt/sources.list.d && \
+            if [ -n "${APT_AUTH}" ]; then echo "${APT_AUTH}" > /etc/apt/auth.conf; fi && \
+            # Temporarily disable TLS validation to install ca-certificates; package signatures are still verified via GPG.
+            echo 'Acquire::https::Verify-Peer "false";' > /etc/apt/apt.conf.d/99ssl && \
+            echo 'Acquire::https::Verify-Host "false";' >> /etc/apt/apt.conf.d/99ssl && \
+            REPO_URL="https://us-apt.pkg.dev/remote/artifact-foundry-prod/ubuntu-3p-remote" ; \
+            echo "deb ${REPO_URL}-${VERSION_CODENAME} ${VERSION_CODENAME} main universe" > /etc/apt/sources.list.d/artifact-registry.list && \
+            echo "deb ${REPO_URL}-${VERSION_CODENAME}-updates ${VERSION_CODENAME}-updates main universe" >> /etc/apt/sources.list.d/artifact-registry.list && \
+            echo "deb ${REPO_URL}-${VERSION_CODENAME}-security ${VERSION_CODENAME}-security main universe" >> /etc/apt/sources.list.d/artifact-registry.list ; \
+        fi && \
+        apt-get update -qqy && \
+        apt-get install -y --no-install-recommends ca-certificates && \
+        rm -f /etc/apt/apt.conf.d/99ssl && \
+        apt-get dist-upgrade -yq && \
+        apt-get install -y --no-install-recommends curl wget && \
+        rm -f /etc/apt/auth.conf && \
+        if [ "${TARGETARCH}" = "amd64" ]; then \
+            rm -rf /etc/apt/sources.list.d && \
+            if [ -d /etc/apt/sources.list.d.bak ]; then mv /etc/apt/sources.list.d.bak /etc/apt/sources.list.d; else mkdir -p /etc/apt/sources.list.d; fi && \
+            if [ -f /etc/apt/sources.list.bak ]; then mv /etc/apt/sources.list.bak /etc/apt/sources.list; fi ; \
+        fi ; \
+    fi && \
+    \
+    # Clean up temporary files, caches, and package lists
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+COPY notice.sh /usr/bin
+
+ENTRYPOINT ["/usr/bin/notice.sh"]
