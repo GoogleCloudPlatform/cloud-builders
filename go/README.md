@@ -1,8 +1,9 @@
 # Tool builder: `gcr.io/cloud-builders/go`
 
-The `gcr.io/cloud-builders/go` image is maintained by the Cloud Build team, but
-it may not support the most recent features or versions of Go. We also do not
-provide historical pinned versions of Go.
+The `gcr.io/cloud-builders/go` image is deprecated. Use the official
+[`golang`](https://hub.docker.com/_/golang) image for new Cloud Build configs.
+The deprecated builder may not support the most recent features or versions of
+Go, and it does not provide historical pinned versions of Go.
 
 The [Docker community](https://github.com/docker-library/golang) maintains the
 [`golang`](https://hub.docker.com/_/golang) image which includes additional Go
@@ -90,11 +91,10 @@ including `GOPROXY=https://proxy.golang.org` in your build steps, e.g.:
 ```
 ----
 
-## Using `gcr.io/cloud-builders/go`
+## Using deprecated `gcr.io/cloud-builders/go`
 
-This builder runs the `go` tool (`go build`, `go test`, etc.)
-after placing source in `/workspace` into the `GOPATH` before
-running the tool.
+This deprecated builder runs the `go` tool (`go build`, `go test`, etc.) after
+placing source in `/workspace` into the `GOPATH` before running the tool.
 
 ### `alpine` vs `debian`
 
