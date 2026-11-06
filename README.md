@@ -69,7 +69,7 @@ for the corresponding Cloud Builder.
   - [`openjdk`](https://hub.docker.com/_/openjdk) supports many production versions of Java across multiple platforms
   - [`gradle`](https://hub.docker.com/_/gradle/) supports a matrix of Java and gradle versions across multiple platforms
   - [`maven`](https://hub.docker.com/_/maven/) supports a matrix of Java and maven versions across multiple platforms
-- [`gcr.io/cloud-marketplace-containers/google/bazel`](http://gcr.io/cloud-marketplace-containers/google/bazel) is provided by the bazel team and runs the [`bazel`](https://bazel.build/) tool
+- [`gcr.io/bazel-public/bazel`](https://bazel.build/install/ubuntu#docker-container) is provided by the bazel team and runs the [`bazel`](https://bazel.build/) tool. It is not a direct replacement for `gcr.io/cloud-builders/bazel`; see [`bazel/README.md`](bazel/README.md) for Cloud Build usage notes.
 - `curl` is packaged in:
   - [`launcher.gcr.io/google/ubuntu1604`](https://console.cloud.google.com/launcher/details/google/ubuntu1604)
   - [`curlimages/curl`](https://hub.docker.com/r/curlimages/curl) is community-supported
