@@ -227,54 +227,60 @@ func addCommentsToLines(s string, lineComments map[string]string) (string, error
 func UpdateMatchingContainerImage(ctx context.Context, objs Objects, imageName, replace string) error {
 	matched := false
 	for _, obj := range objs {
-		var nestedFields []string
+		var containersFields []string
+		var initContainersFields []string
 
 		switch kind := ObjectKind(obj); kind {
 		case "CronJob":
-			nestedFields = []string{"spec", "jobTemplate", "spec", "template", "spec", "containers"}
+			containersFields = []string{"spec", "jobTemplate", "spec", "template", "spec", "containers"}
+			initContainersFields = []string{"spec", "jobTemplate", "spec", "template", "spec", "initContainers"}
 		case "Pod":
-			nestedFields = []string{"spec", "containers"}
+			containersFields = []string{"spec", "containers"}
+			initContainersFields = []string{"spec", "initContainers"}
 		case "DaemonSet", "Deployment", "Job", "ReplicaSet", "ReplicationController", "StatefulSet":
-			nestedFields = []string{"spec", "template", "spec", "containers"}
+			containersFields = []string{"spec", "template", "spec", "containers"}
+			initContainersFields = []string{"spec", "template", "spec", "initContainers"}
 		default:
 			continue
 		}
 
-		cons, ok, err := unstructured.NestedFieldNoCopy(obj.Object, nestedFields...)
-		if err != nil {
-			return fmt.Errorf("failed to get nested containers field: %v", err)
-		}
-		if !ok {
-			continue
-		}
-		consList, ok := cons.([]interface{})
-		if !ok {
-			return fmt.Errorf("failed to convert containers to list")
-		}
-
-		for _, con := range consList {
-			conMap, ok := con.(map[string]interface{})
-			if !ok {
-				return fmt.Errorf("failed to convert container to map")
-			}
-			im, ok, err := unstructured.NestedString(conMap, "image")
+		for _, nestedFields := range [][]string{containersFields, initContainersFields} {
+			cons, ok, err := unstructured.NestedFieldNoCopy(obj.Object, nestedFields...)
 			if err != nil {
-				return fmt.Errorf("failed to get image field: %v", err)
+				return fmt.Errorf("failed to get nested containers field: %v", err)
 			}
 			if !ok {
 				continue
 			}
-
-			ref, err := name.ParseReference(im)
-			if err != nil {
-				return fmt.Errorf("failed to parse reference from image %q: %v", im, err)
+			consList, ok := cons.([]interface{})
+			if !ok {
+				return fmt.Errorf("failed to convert containers to list")
 			}
-			if image.Name(ref) == imageName {
-				fmt.Printf("Updating container of resource: %v\n", obj)
-				if err := unstructured.SetNestedField(conMap, replace, "image"); err != nil {
-					return fmt.Errorf("failed to set image field: %v", err)
+
+			for _, con := range consList {
+				conMap, ok := con.(map[string]interface{})
+				if !ok {
+					return fmt.Errorf("failed to convert container to map")
 				}
-				matched = true
+				im, ok, err := unstructured.NestedString(conMap, "image")
+				if err != nil {
+					return fmt.Errorf("failed to get image field: %v", err)
+				}
+				if !ok {
+					continue
+				}
+
+				ref, err := name.ParseReference(im)
+				if err != nil {
+					return fmt.Errorf("failed to parse reference from image %q: %v", im, err)
+				}
+				if image.Name(ref) == imageName {
+					fmt.Printf("Updating container of resource: %v\n", obj)
+					if err := unstructured.SetNestedField(conMap, replace, "image"); err != nil {
+						return fmt.Errorf("failed to set image field: %v", err)
+					}
+					matched = true
+				}
 			}
 		}
 	}
@@ -687,6 +693,16 @@ func addToNestedMap(obj *Object, key, value string, override bool, nestedFields 
 // ObjectKind returns the kind of an object.
 func ObjectKind(obj *Object) string {
 	return obj.GetObjectKind().GroupVersionKind().Kind
+}
+
+// ObjectGroupVersionKind returns the group/kind format for kubectl commands (e.g., "middleware.traefik.io" or just "pod").
+// For resources with a group, returns "kind.group". For core API resources, returns just "kind".
+func ObjectGroupVersionKind(obj *Object) string {
+	gvk := obj.GetObjectKind().GroupVersionKind()
+	if gvk.Group == "" {
+		return gvk.Kind
+	}
+	return strings.ToLower(gvk.Kind) + "." + gvk.Group
 }
 
 // ObjectName returns the name of an object.
