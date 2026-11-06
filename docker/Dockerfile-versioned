@@ -5,7 +5,7 @@ ARG DOCKER_VERSION=VERSION
 RUN apt-get -y install \
         docker-ce=${DOCKER_VERSION} \
         docker-ce-cli=${DOCKER_VERSION} \
-        docker-compose docker-compose-plugin && \
+        docker-compose-plugin && \
     apt-get clean
 
 ENTRYPOINT ["/usr/bin/docker"]
