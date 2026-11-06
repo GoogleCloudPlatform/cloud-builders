@@ -10,6 +10,7 @@ RUN \
     apt-get -y install \
         python \
         python3 \
+        python3-distutils \
         python-pkg-resources \
         python3-pkg-resources \
         software-properties-common \
