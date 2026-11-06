@@ -1,5 +1,13 @@
 # Tool builder: `gcr.io/cloud-builders/go`
 
+## ⚠️ DEPRECATED
+
+**This builder is deprecated.** Please migrate to the official [`golang`](https://hub.docker.com/_/golang) image instead.
+
+The `gcr.io/cloud-builders/go` image is no longer actively maintained and does not support current Go versions with security updates. The official `golang` image is actively maintained by the Docker community and provides up-to-date Go tooling and versions.
+
+---
+
 The `gcr.io/cloud-builders/go` image is maintained by the Cloud Build team, but
 it may not support the most recent features or versions of Go. We also do not
 provide historical pinned versions of Go.
