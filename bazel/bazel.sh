@@ -1,6 +1,42 @@
 #!/bin/bash
 set -e
 
+# Initialize workspace configuration dynamically to handle permission and
+# isolation issues across different Cloud Build execution contexts.
+setup_bazelrc() {
+    # Use current working directory for output base (allows workspace isolation)
+    local BAZEL_OUTPUT_BASE="${BAZEL_OUTPUT_BASE:-.bazel}"
+
+    # Ensure the output base directory exists with proper permissions
+    mkdir -p "${BAZEL_OUTPUT_BASE}"
+
+    # Write bazelrc to /tmp to avoid permission issues with home directory
+    # Use --nohome_rc to prevent user-level .bazelrc from interfering
+    cat > /tmp/.bazelrc <<EOF
+startup --nohome_rc
+startup --output_base=${PWD}/${BAZEL_OUTPUT_BASE}
+EOF
+
+    # Override HOME to prevent permission conflicts with root's home directory
+    export HOME=/tmp
+}
+
+# Handle workspace initialization
+setup_workspace() {
+    # Record original working directory for later use
+    export WORKSPACE="${WORKSPACE:=$PWD}"
+
+    # If BAZEL_HOME is not set, use a workspace-local cache to avoid conflicts
+    if [[ -z "$BAZEL_HOME" ]]; then
+        export BAZEL_HOME="${WORKSPACE}/.bazel-home"
+        mkdir -p "${BAZEL_HOME}"
+    fi
+}
+
+# Set up environment before running Bazel
+setup_bazelrc
+setup_workspace
+
 # Always write the build_event_text_file to a temp file we create.
 readonly BUILD_EVENT_FILE="$(mktemp --tmpdir build_event_text_file.XXXXX)"
 readonly BUILD_EVENT_FILE_FLAG="--build_event_text_file=${BUILD_EVENT_FILE}"
@@ -22,13 +58,13 @@ n=$(($#-$i+1))
 # Insert our flag at index $i out of $n. Quoting is all required for expansion.
 set -- "${@:1:$((i-1))}" "$BUILD_EVENT_FILE_FLAG" "${@:$i:$n}"
 
-# Run bazel with the new command line and capture the exit code.
+# Run bazel with the dynamically generated bazelrc file and capture the exit code.
 #
 # This script has -e enabled, so if bazel exits non-zero, we need to both
 # capture the exit code *and* replace it with zero. That is the purpose of the
 # short-circuiting OR operator.
 EXIT_CODE=0
-/builder/bazel "$@" || EXIT_CODE=$?
+/usr/local/bin/bazel --bazelrc=/tmp/.bazelrc "$@" || EXIT_CODE=$?
 
 # Parse out the UUID from the BEP output file and write it to
 # $BUILDER_OUTPUT/output, whose first 4KB will be served inline in the Build.
@@ -39,6 +75,12 @@ EXIT_CODE=0
 # parsing the text proto file using real protobuf definitions.
 readonly INVOCATION_ID_FIELD="$(grep -Eo 'uuid: \".{36}\"$' "${BUILD_EVENT_FILE}" | head -n 1)"
 readonly INVOCATION_ID="${INVOCATION_ID_FIELD:7:-1}"
+
+# Ensure BUILDER_OUTPUT directory exists before writing
+mkdir -p "${BUILDER_OUTPUT:-.}"
 echo "{\"bazel.build/invocation_id\": \"${INVOCATION_ID}\"}" > "${BUILDER_OUTPUT}/output"
+
+# Cleanup temporary files
+rm -f "${BUILD_EVENT_FILE}"
 
 exit "${EXIT_CODE}"
