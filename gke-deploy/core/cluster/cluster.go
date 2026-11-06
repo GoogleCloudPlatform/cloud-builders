@@ -43,6 +43,16 @@ func GetDeployedObject(ctx context.Context, kind, name, namespace string, ks ser
 	return resource.DecodeFromYAML(ctx, []byte(objYaml))
 }
 
+// GetDeployedObjectFromString gets an object deployed to the current context's cluster
+// using the original manifest to preserve its declared apiVersion and kind.
+func GetDeployedObjectFromString(ctx context.Context, configString, namespace string, ks services.KubectlService) (*resource.Object, error) {
+	objYaml, err := ks.GetFromString(ctx, configString, namespace, "yaml")
+	if err != nil {
+		return nil, fmt.Errorf("failed to get config of deployed object: %v", err)
+	}
+	return resource.DecodeFromYAML(ctx, []byte(objYaml))
+}
+
 // DeployedObjectExists returns true if a deployed object exists in the current context's cluster,
 // else false.
 func DeployedObjectExists(ctx context.Context, kind, name, namespace string, ks services.KubectlService) (bool, error) {

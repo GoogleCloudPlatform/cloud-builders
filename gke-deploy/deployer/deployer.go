@@ -485,7 +485,11 @@ func (d *Deployer) Apply(ctx context.Context, clusterName, clusterLocation, clus
 			} else {
 				objNamespace = namespace
 			}
-			deployedObj, err := cluster.GetDeployedObject(ctx, kind, name, objNamespace, d.Clients.Kubectl)
+			objString, err := resource.EncodeToYAMLString(obj)
+			if err != nil {
+				return fmt.Errorf("failed to encode obj to string")
+			}
+			deployedObj, err := cluster.GetDeployedObjectFromString(ctx, objString, objNamespace, d.Clients.Kubectl)
 			if err != nil {
 				return fmt.Errorf("failed to get configuration of deployed object with kind %q and name %q: %v", kind, name, err)
 			}

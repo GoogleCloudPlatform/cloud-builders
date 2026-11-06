@@ -41,6 +41,7 @@ type KubectlService interface {
 	Apply(ctx context.Context, filename, namespace string) error
 	ApplyFromString(ctx context.Context, configString, namespace string) error
 	Get(ctx context.Context, kind, name, namespace, format string, ignoreNotFound bool) (string, error)
+	GetFromString(ctx context.Context, configString, namespace, format string) (string, error)
 }
 
 // RemoteService is an interface for github.com/google/go-containerregistry/pkg/v1/remote.
