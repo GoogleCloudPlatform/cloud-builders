@@ -24,6 +24,7 @@ steps:
   - '--namespace=$_K8S_NAMESPACE'
   - '--cluster=$_GKE_CLUSTER'
   - '--location=$_GKE_LOCATION'
+  - '--timeout=$_GKE_DEPLOY_TIMEOUT'
 images:
 - '$_IMAGE_NAME:$_IMAGE_VERSION'
 substitutions:
@@ -36,6 +37,7 @@ substitutions:
   _K8S_APP_NAME:
   _K8S_NAMESPACE:
   _OUTPUT_BUCKET_PATH:
+  _GKE_DEPLOY_TIMEOUT: 5m0s
 options:
   substitution_option: 'ALLOW_LOOSE'
 tags: [$_K8S_APP_NAME]
